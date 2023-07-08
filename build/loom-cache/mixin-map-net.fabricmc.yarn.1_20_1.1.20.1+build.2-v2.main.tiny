@@ -1,3 +1,0 @@
-v1	named	intermediary
-FIELD	de/hype/hypeclient/mixins/SimpleOptionMixin	Ljava/lang/Object;	value	field_37868
-FIELD	de/hype/hypeclient/mixins/SimpleOptionMixin	Ljava/util/function/Consumer;	changeCallback	field_37867

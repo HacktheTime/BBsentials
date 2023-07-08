@@ -25,6 +25,7 @@ public class SimpleOptionMixin implements ISimpleOption {
         }
         else {
             if (!Objects.equals(this.value, value)) {
+                System.out.println("used mixin");
                 this.value = value;
                 this.changeCallback.accept(this.value);
             }

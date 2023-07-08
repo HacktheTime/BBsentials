@@ -4,6 +4,8 @@
   "package": "de.hype.bbsentials.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "SimpleOptionMixin",
+    "ClientCommandSourceMixin"
   ],
   "client": [
     "SimpleOptionMixin",

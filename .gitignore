@@ -13,6 +13,9 @@
 *.zip
 /run/config/NoChatReports/README.md
 /run/config/citresewn-defaults.json
+/run/config/Hype_Client_settings.json
+/run/config/BBsential_settings.json
+/run/.fabric/
 /run/config/capes.json5
 /run/config/chatnotify.json
 /run/config/citresewn.json
@@ -22,7 +25,6 @@
 /run/config/fabrishot.properties
 /run/config/fsb-interop.json
 /run/config/gamecontrollerdatabase.txt
-/run/config/Hype_Client_settings.json
 /run/config/immediatelyfast.json
 /run/config/fabric/indigo-renderer.properties
 /run/config/isxander-main-menu-credits.json

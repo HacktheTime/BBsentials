@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "de.hype.bbsentials.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "SimpleOptionMixin",
+    "ClientCommandSourceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

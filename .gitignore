@@ -45,3 +45,4 @@
 /run/config/symbol-chat.json
 /run/usercache.json
 /run/config/zoomify.json
+/run/.fabric/processedMods/

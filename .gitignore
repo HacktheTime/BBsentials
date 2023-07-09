@@ -46,3 +46,4 @@
 /run/usercache.json
 /run/config/zoomify.json
 /run/.fabric/processedMods/
+/run/.fabric/tmp/*

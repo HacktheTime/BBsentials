@@ -10,6 +10,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.hype.bbsentials.api.Discord;
 import de.hype.bbsentials.chat.Chat;
+import de.hype.bbsentials.communication.BBsentialConnection;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.hype.bbsentials.chat.Chat.*;
+import static de.hype.bbsentials.client.BBsentials.bbserver;
 import static de.hype.bbsentials.client.BBsentials.getConfig;
 
 public class Commands {
@@ -285,6 +287,24 @@ public class Commands {
                             )
                     )
             );
-        });
+        }); /*chchest*/
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+                    dispatcher.register(
+                            ClientCommandManager.literal("bbserver")
+                                    .then(ClientCommandManager.argument("Message", StringArgumentType.greedyString())
+                                            .executes((context) -> {
+                                                String message = StringArgumentType.getString(context, "Message");
+                                                if (message.equals("bb:reconnect")) {
+                                                    BBsentials.bbserver = new BBsentialConnection();
+                                                    bbserver.connect(getConfig().getBBServerURL(),5000);
+                                                }
+                                                else {
+                                                    BBsentials.bbserver.sendMessage(message);                                                }
+                                                return 1;
+                                            })
+                                    )
+                    );
+                }
+        );
     }
 }

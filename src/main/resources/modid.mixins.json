@@ -9,7 +9,6 @@
   ],
   "client": [
     "SimpleOptionMixin",
-    "renderItemMixin",
     "ClientCommandSourceMixin"],
   "injectors": {
     "defaultRequire": 1

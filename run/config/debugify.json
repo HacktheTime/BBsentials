@@ -3,6 +3,7 @@
   "MC-2025": true,
   "MC-4490": true,
   "MC-7569": true,
+  "MC-8187": true,
   "MC-12829": true,
   "MC-14923": true,
   "MC-22882": true,
@@ -64,6 +65,7 @@
   "MC-231743": true,
   "MC-232869": true,
   "MC-237493": true,
+  "MC-263865": true,
   "opt_out_updater": false,
   "gameplay_fixes_in_multiplayer": false,
   "default_disabled": false

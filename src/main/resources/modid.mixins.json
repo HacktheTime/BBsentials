@@ -5,10 +5,12 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "SimpleOptionMixin",
+    "ItemRendererMixin",
     "ClientCommandSourceMixin"
   ],
   "client": [
     "SimpleOptionMixin",
+    "ItemRendererMixin",
     "ClientCommandSourceMixin"],
   "injectors": {
     "defaultRequire": 1

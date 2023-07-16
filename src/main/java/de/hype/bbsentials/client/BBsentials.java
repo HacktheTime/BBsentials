@@ -173,6 +173,7 @@ public class BBsentials implements ClientModInitializer {
     }
 
     public static void refreshCommands() {
+        Chat.sendPrivateMessageToSelf("Setting up commands");
         coms = new CommandsOLD();
     }
 

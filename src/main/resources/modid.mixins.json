@@ -3,15 +3,13 @@
   "minVersion": "0.8",
   "package": "de.hype.bbsentials.mixins",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
-    "SimpleOptionMixin",
-    "ItemRendererMixin",
-    "ClientCommandSourceMixin"
-  ],
+  "mixins": [],
   "client": [
-    "SimpleOptionMixin",
+    "ClientCommandSourceMixin",
     "ItemRendererMixin",
-    "ClientCommandSourceMixin"],
+    "ScreenMixin",
+    "SimpleOptionMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

@@ -17,3 +17,5 @@ logs
 !.idea/copyright/*
 !.idea/scopes/*
 /run/usercache.json
+/run/config/*
+/run/config/

@@ -1,7 +1,8 @@
-package de.hype.bbsentials.communication;
+package de.hype.bbsentials.communication.old.de;
 
 import de.hype.bbsentials.chat.Chat;
 import de.hype.bbsentials.client.BBsentials;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -34,25 +35,7 @@ public class BBsentialConnection {
 
     public void connect(String serverIP, int serverPort) {
         try {
-            // Erstellen Sie eine SSL-Verbindung
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-
-            // Erstellen Sie einen SSL-Socket-Factory und einen SSL-Socket
-            SSLSocketFactory sslSocketFactory;
-            if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                // Windows-Betriebssystem
-                sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            } else {
-                // Linux und andere Betriebssysteme
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                tmf.init((KeyStore) null); // Lade die Standard-Rot-Zertifikate
-                TrustManager[] trustManagers = tmf.getTrustManagers();
-
-                sslContext.init(null, trustManagers, new SecureRandom());
-                sslSocketFactory = sslContext.getSocketFactory();
-            }
-
-            socket = sslSocketFactory.createSocket(serverIP, serverPort);
+            socket = new Socket(serverIP, serverPort);
 
             socket.setKeepAlive(true); // Enable Keep-Alive
 
@@ -96,7 +79,7 @@ public class BBsentialConnection {
             // sendMessage("Hello from client!");
             // More logic here...
 
-        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -110,8 +93,8 @@ public class BBsentialConnection {
     }
 
     public void sendHiddenMessage(String message) {
-        if (BBsentials.getConfig().isDetailedDevModeEnabled()){
-            Chat.sendPrivateMessageToSelf("BBDev-s: "+message);
+        if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
+            Chat.sendPrivateMessageToSelf("BBDev-s: " + message);
         }
         writer.println(message);
     }
@@ -124,20 +107,16 @@ public class BBsentialConnection {
                 sendHiddenMessage("?getperms");
             }
             else if (message.contains("H-PotDurations?")) {
-                System.out.println("worked");
-                int remainingTimeInMinutes = 0;
-                StatusEffectInstance potTimeRequest = MinecraftClient.getInstance().player.getStatusEffect(StatusEffects.JUMP_BOOST);
-                if (potTimeRequest != null) {
-                    Chat.sendPrivateMessageToSelf(String.valueOf(potTimeRequest.getAmplifier()));
-                    if (true) {
-                        remainingTimeInMinutes = (int) (potTimeRequest.getDuration() / 20.0);
-                    }
-                }
-                sendHiddenMessage("?potduration " + remainingTimeInMinutes);
+                sendHiddenMessage("?potduration " + getPotTime());
             }
             else if (message.startsWith("H-?splash")) {
-                String[] arguments = message.split(" ", 4);
-                Chat.sendPrivateMessageToSelf(arguments[2] + "is splashing in Hub #" + arguments[1] + " soon.");
+                String[] arguments = message.split(" ", 6);
+                String splashMessage = "§6"+arguments[4] + " is splashing in Hub #" + arguments[1] + " soon.";
+                if ((getPotTime()>=Integer.parseInt(arguments[2]))&&getPotTime()<=Integer.parseInt(arguments[3]))
+                    if (arguments.length >= 6) {
+                        splashMessage = splashMessage + " : " + arguments[5];
+                    }
+                Chat.sendPrivateMessageToSelf(splashMessage);
                 splashHighlightItem("Hub #" + arguments[1], 30000);
             }
             else if (message.startsWith("H-Roles")) {
@@ -145,13 +124,18 @@ public class BBsentialConnection {
                 BBsentials.refreshCommands();
             }
             else if (message.startsWith("H-chchest")) {
-                String[] arguments = message.replace("H-chchest","").trim().split(" ", 5); // Split with limit of 5
-                String item = arguments[0];
-                int x = Integer.parseInt(arguments[1]);
-                int y = Integer.parseInt(arguments[2]);
-                int z = Integer.parseInt(arguments[3]);
-                String inviteCommand = arguments[4];
-                Chat.createClientSideTellraw("");
+                String[] arguments = message.replace("H-chchest", "").trim().split(" ", 6); // Split with limit of 5
+                String username = arguments[0];
+                String item = arguments[1];
+                int x = Integer.parseInt(arguments[2]);
+                int y = Integer.parseInt(arguments[3]);
+                int z = Integer.parseInt(arguments[4]);
+                String inviteCommand = arguments[5];
+                String tellrawText = (
+                        "{\"text\":\"BB: @username found one or more @item in a chest (@x @y @z). Click here to join\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}"
+                );
+                tellrawText = tellrawText.replace("@username", username).replace("@item", item).replace("@x", x + "").replace("@y", y + "").replace("@z", z + "").replace("@inviteCommand", inviteCommand);
+                Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(tellrawText));
             }
             if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
                 Chat.sendPrivateMessageToSelf("BBDev-r: " + message);
@@ -191,6 +175,17 @@ public class BBsentialConnection {
         return highlightItem;
     }
 
+    public static int getPotTime() {
+        int remainingTimeInMinutes = 0;
+        StatusEffectInstance potTimeRequest = MinecraftClient.getInstance().player.getStatusEffect(StatusEffects.JUMP_BOOST);
+        if (potTimeRequest != null) {
+            Chat.sendPrivateMessageToSelf(String.valueOf(potTimeRequest.getAmplifier()));
+            if (true) {
+                remainingTimeInMinutes = (int) (potTimeRequest.getDuration() / 20.0);
+            }
+        }
+        return remainingTimeInMinutes;
+    }
     //TODO socket verschlüsseln
     //TODO dyndns eintrag?
     //TODO search

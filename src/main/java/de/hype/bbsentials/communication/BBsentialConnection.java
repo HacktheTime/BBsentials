@@ -208,9 +208,11 @@ public class BBsentialConnection {
             messageSenderThread.start();
             messageSenderThread.setName("bb sender thread");
 
-        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
+        } catch (IOException | NoSuchAlgorithmException |
+                 KeyManagementException e) {
             e.printStackTrace();
-        } catch (CertificateException e) {
+        } catch (
+                CertificateException e) {
             throw new RuntimeException(e);
         }
 

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "bbsentials",
+  "version": "${version}",
+  "name": "BBsentials",
+  "description": "QOL Modifications",
+  "authors": [
+    "Hype_the_Time/hackthetime"
+  ],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "logo.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "de.hype.bbsentials.client.BBsentials"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  },
+  "mixins": [
+    "bbsentials.mixins.json"
+  ]
+}

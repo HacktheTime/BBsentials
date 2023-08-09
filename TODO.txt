@@ -1,0 +1,17 @@
+master toggle for the mod, automatically disables after bingo but can be enabled manually between bingos, if manually turned off will remain off until turned back on manually
+no pet equiped warning
+batphone opener, trapper accepter
+mining event click integration
+chchest click integration
+Main:
+gui
+chchest command (with auto chest coords, detect if structure spawned?)
+~~coins/bingo point calculator on items in the bingo shop~~
+conerter of in 36 h into 1 d at 8 am etc
+Optional
+Social Menu?
+bb!role claim for brank etc
+mutliple accounts on something
+Problem with data collection:
+~~crowd source the approximate contributions required for each top x% contributions on community goals~~
+

@@ -149,7 +149,8 @@ public class BBsentials implements ClientModInitializer {
                                                         List<String> variableNames;
                                                         variableNames = List.of(getVariableInfo("de.hype.bbsentials.client", "Config"));
                                                         return CommandSource.suggestMatching(variableNames, builder);
-                                                    }).executes((context) -> {
+                                                    })
+                                                    .executes((context) -> {
                                                         // Handle "variableName" and "variableValue" logic here
                                                         String variableName = StringArgumentType.getString(context, "variableName");
                                                         try {

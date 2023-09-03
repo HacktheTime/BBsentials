@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -57,13 +58,11 @@ public class Chat {
             if (java.lang.reflect.Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
-
             String variableName = field.getName();
             String variablePackageName = clazz.getPackage().getName();
             String variableClassName = clazz.getSimpleName();
 
-            String variableInfo = variableName;
-            variableInfoList.add(variableInfo);
+            variableInfoList.add(variableName);
         }
 
         return variableInfoList.toArray(new String[variableInfoList.size()]);
@@ -167,7 +166,7 @@ public class Chat {
 
     //Handle in client
     public Text handleInClient(Text messageOriginal) {
-        String message = extractPlainText(messageOriginal.toString()).trim();
+        String message = messageOriginal.getString().trim();
         if (getConfig().messageFromAlreadyReported(message) && getPlayerNameFromMessage(message) != " " && getPlayerNameFromMessage(message) != "") {
             System.out.println("Message: " + message);
             sendPrivateMessageToSelf(Formatting.RED + "B: " + message);
@@ -243,35 +242,6 @@ public class Chat {
                     }
                 }
 
-            } //Everything containing party is processed differently (split so fewer checks)
-            else if (message.contains("unlocked Wither Essence") && message.startsWith(getConfig().getUsername())) {
-                if (BBsentials.getConfig().isLeader()) {
-                    repartyActive = true;
-                    sendCommand("/pl");
-                }
-                else {
-                    System.out.println("No Reparty because not leader");
-                }
-                if (getConfig().isLeaveDungeonAutomatically()) {
-                    config.sender.addSendTask("/warp dhub", 3);
-                }
-            }
-            else if (message.contains("unlocked Crimson Essence") && message.startsWith(getConfig().getUsername())) {
-                if (BBsentials.getConfig().isLeader()) {
-                    repartyActive = true;
-                    sendCommand("/pl");
-                }
-                else {
-                    System.out.println("No Reparty because not leader");
-                }
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                if (getConfig().isLeaveKuudraAutomatically()) {
-                    sendCommand("/warp kuudra");
-                }
             }
             else if (message.contains("bb:test")) {
                 sendPrivateMessageToSelf(test());
@@ -321,19 +291,7 @@ public class Chat {
                     }
                 }
             }
-            else if (message.equals("You laid an Egg!")) {
-                Thread eggThread = new Thread(() -> {
-                    try {
-                        Thread.sleep(21000); // Wait for 21 seconds (in milliseconds)
-                        sendPrivateMessageToSelf("Chicken Head is ready");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-
-                eggThread.start();
-            }
-            else if (message.contains("[OPEN MENU]") || message.contains("YES")) {
+            else if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
                 setChatPromtId(messageOriginal.toString());
             }
 
@@ -535,7 +493,11 @@ public class Chat {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    BBsentials.getConfig().setLastChatPromptAnswer("/cb " + finalLastPrompt1);
+                    String promptCommand = "/cb " + finalLastPrompt1;
+                    BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
+                    if (config.isDevModeEnabled()) {
+                        Chat.sendPrivateMessageToSelf("set the last prompt action too + \""+promptCommand+"\"");
+                    }
                     try {
                         Thread.sleep(10 * 1000);
                     } catch (InterruptedException e) {
@@ -552,13 +514,17 @@ public class Chat {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    BBsentials.getConfig().setLastChatPromptAnswer("/chatprompt " + finalLastPrompt + " YES");
+                    String promptCommand = "/chatprompt " + finalLastPrompt + " YES";
+                    getConfig().setLastChatPromptAnswer(promptCommand);
+                    if (config.isDevModeEnabled()) {
+                        Chat.sendPrivateMessageToSelf("set the last prompt action too + \""+promptCommand+"\"");
+                    }
                     try {
                         Thread.sleep(10 * 1000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    BBsentials.getConfig().setLastChatPromptAnswer(null);
+                    getConfig().setLastChatPromptAnswer(null);
                     return;
                 }
             }).start();

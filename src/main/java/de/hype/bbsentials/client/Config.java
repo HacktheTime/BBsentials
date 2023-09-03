@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class Config implements Serializable {
     // Helper class for sending chat messages
+    public int version = 1;
     public transient final Sender sender = new Sender();
 
     public transient boolean highlightitem = false;
@@ -28,13 +29,14 @@ public class Config implements Serializable {
     private transient boolean isLeader;
     private transient String alreadyReported = "";
     private String bbServerURL = "static.204.177.34.188.clients.your-server.de";
-    public String bbsentialsRoles = "";
+    public String[] bbsentialsRoles = {""};
     public static ArrayList<String> partyMembers = new ArrayList<>();
 
     // Set via load / default
     private String bbsentialsCommandPrefix = ".";
     private String apiKey = "";
     private boolean leaveDungeonAutomatically;
+    public boolean showBingoChat = true;
     private boolean allowBBinviteMe = true;
     private boolean leaveKuudraAutomatically;
     private boolean devMode = false;
@@ -42,6 +44,8 @@ public class Config implements Serializable {
     private boolean acceptReparty;
     private String nickname;
     private String getNotifForParty;
+    private final int apiVersion = 1;
+    public transient ToDisplayConfig toDisplayConfig = ToDisplayConfig.loadFromFile();
 
     // Set default attribute values
     private void setDefaults() {
@@ -146,16 +150,22 @@ public class Config implements Serializable {
             } catch (IOException e) {
                 e.printStackTrace();
                 settings = new Config(); // Use default values if loading fails
+                settings.save();
+            }catch (IllegalStateException e){
+                System.out.println("Error loading config. Resetting it.");
+                settings = new Config();
+                settings.save();
             }
         }
         else {
             settings = new Config(); // Use default values if the file doesn't exist
             settings.username = MinecraftClient.getInstance().player.getName().getString();
         }
-        if (!settings.bbsentialsRoles.contains("dev")) {
+        if (!settings.hasBBRoles("dev")) {
             settings.detailedDevMode = false;
             settings.devMode = false;
         }
+        settings.save();
         return settings;
     }
 
@@ -244,7 +254,7 @@ public class Config implements Serializable {
         return isBefore || isInRange;
     }
 
-    public boolean overrideBingoTime()  {
+    public boolean overrideBingoTime() {
         return overrideBingoTime;
     }
 
@@ -262,5 +272,22 @@ public class Config implements Serializable {
 
     public void setLastChatPromptAnswer(String lastChatPromptAnswer) {
         this.lastChatPromptAnswer = lastChatPromptAnswer;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public boolean hasBBRoles(String roleName) {
+        for (String role : bbsentialsRoles) {
+            if (role.equalsIgnoreCase(roleName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getApiVersion() {
+        return apiVersion;
     }
 }

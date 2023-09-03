@@ -21,6 +21,9 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static de.hype.bbsentials.chat.Chat.*;
 
@@ -29,7 +32,7 @@ public class BBsentials implements ClientModInitializer {
     public static Config config;
     public static BBsentialConnection bbserver;
     public static CommandsOLD coms;
-
+    public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     /**
      * Runs the mod initializer on the client environment.
      */
@@ -122,7 +125,7 @@ public class BBsentials implements ClientModInitializer {
                                                                 String variableName = StringArgumentType.getString(context, "variableName");
                                                                 String variableValue = StringArgumentType.getString(context, "variableValue");
                                                                 try {
-                                                                    if (!variableName.contains("dev")||config.bbsentialsRoles.contains("dev")){
+                                                                    if (!variableName.toLowerCase().contains("dev")||config.hasBBRoles("dev")){
                                                                     setVariableValue(getConfig(), variableName, variableValue);}
                                                                     getConfig().save();
                                                                 } catch (ClassNotFoundException | NoSuchFieldException |
@@ -166,6 +169,7 @@ public class BBsentials implements ClientModInitializer {
                                     })))
             );
         }); //bbi}
+        executionService.scheduleAtFixedRate(new DebugThread(),0,20, TimeUnit.SECONDS);
     }
 
     public static void refreshCommands() {

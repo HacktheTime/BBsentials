@@ -1,5 +1,6 @@
 package de.hype.bbsentials.packets.packets;
 
+
 import de.hype.bbsentials.packets.AbstractPacket;
 
 public class BroadcastMessagePacket extends AbstractPacket {

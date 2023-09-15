@@ -1,8 +1,1 @@
-[21:56:35] [ERROR] [FabricLoader/GameProvider]: Minecraft game provider couldn't locate the game! The game may be absent from the class path, lacks some expected files, suffers from jar corruption or is of an unsupported variety/version.
-[21:56:35] [ERROR] [FabricLoader/]: Uncaught exception in thread "main"
-java.lang.RuntimeException: Minecraft game provider couldn't locate the game! The game may be absent from the class path, lacks some expected files, suffers from jar corruption or is of an unsupported variety/version.
-	at net.fabricmc.loader.impl.launch.knot.Knot.createGameProvider(Knot.java:214)
-	at net.fabricmc.loader.impl.launch.knot.Knot.init(Knot.java:130)
-	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:68)
-	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
-	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
+[13:18:31] [INFO] [FabricLoader/GameProvider]: Loading Minecraft 1.20.1 with Fabric Loader 0.14.21

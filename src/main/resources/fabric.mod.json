@@ -18,7 +18,8 @@
   "entrypoints": {
     "client": [
       "de.hype.bbsentials.client.BBsentials"
-    ]
+    ],
+    "modmenu": [ "de.hype.bbsentials.client.ModMenueScreen" ]
   },
   "depends": {
     "fabricloader": ">=${loader_version}",

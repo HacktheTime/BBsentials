@@ -25,7 +25,7 @@ public class PacketManager {
     public static void initializePacketActions(BBsentialConnection connection) {
         packets.add(new Packet<>(SplashNotifyPacket.class, connection::onSplashNotify));
         packets.add(new Packet<>(BingoChatMessagePacket.class, connection::onBingoChatMessagePacket));
-        packets.add(new Packet<>(ChChestPackage.class, connection::onChChestPackage));
+        packets.add(new Packet<>(ChChestPacket.class, connection::onChChestPackage));
 //        packets.add(new Packet<>(DisconnectPacket.class, connection::dummy));
 //        packets.add(new Packet<>(InternalCommandPacket.class, connection::dummy));
         packets.add(new Packet<>(MiningEventPacket.class, connection::onMiningEventPacket));

@@ -1,6 +1,5 @@
 package de.hype.bbsentials.packets.packets;
 
-
 import de.hype.bbsentials.packets.AbstractPacket;
 
 //Only used for small things which don't really need an own Packet.

@@ -1,6 +1,5 @@
 package de.hype.bbsentials.constants.enviromentShared;
 
-
 import de.hype.bbsentials.constants.BBDisplayNameProvider;
 
 // Mining Events

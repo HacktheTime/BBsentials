@@ -34,6 +34,4 @@ public enum Islands implements BBDisplayNameProvider {
     public String getDisplayName() {
         return displayName;
     }
-
-
 }

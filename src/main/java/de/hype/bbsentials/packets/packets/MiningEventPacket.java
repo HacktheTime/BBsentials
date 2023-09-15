@@ -1,9 +1,8 @@
 package de.hype.bbsentials.packets.packets;
 
-
+import de.hype.bbsentials.packets.AbstractPacket;
 import de.hype.bbsentials.constants.enviromentShared.Islands;
 import de.hype.bbsentials.constants.enviromentShared.MiningEvents;
-import de.hype.bbsentials.packets.AbstractPacket;
 
 public class MiningEventPacket extends AbstractPacket {
 

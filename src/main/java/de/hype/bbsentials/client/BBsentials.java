@@ -33,35 +33,152 @@ public class BBsentials implements ClientModInitializer {
     public static BBsentialConnection bbserver;
     public static CommandsOLD coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
+
     /**
      * Runs the mod initializer on the client environment.
      */
     @Override
     public void onInitializeClient() {
+        System.out.println("ide: " + Boolean.getBoolean("runningFromIDE"));
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
                     if (!initialised) {
                         config = Config.load();
                         Options.setGamma(10);
                         Chat chat = new Chat();
-                        if (Config.isBingoTime() || config.overrideBingoTime()) {
+                        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+                            dispatcher.register(ClientCommandManager.literal("bbi")
+                                    .then(ClientCommandManager.literal("reconnect")
+                                            .executes((context) -> {
+                                                connectToBBserver();
+                                                return 1;
+                                            }))
+                                    .then(ClientCommandManager.literal("config")
+                                            .then(ClientCommandManager.argument("category", StringArgumentType.string())
+                                                    .suggests((context, builder) -> {
+                                                        // Provide tab-completion options for config subfolder
+                                                        return CommandSource.suggestMatching(new String[]{"save", "reset", "load"}, builder);
+                                                    }).executes((context) -> {
+                                                        String category = StringArgumentType.getString(context, "category");
+                                                        switch (category) {
+                                                            case "save":
+                                                                getConfig().save();
+                                                                sendPrivateMessageToSelf(Formatting.GREEN + "Saved config successfully");
+                                                                break;
+                                                            case "load":
+                                                                BBsentials.config = Config.load();
+                                                                break;
+                                                            case "reset":
+                                                                // Reset logic here
+                                                                break;
+                                                        }
+                                                        return 1;
+                                                    }))
+                                            .then(ClientCommandManager.literal("set-value")
+                                                    .then(ClientCommandManager.argument("className", StringArgumentType.string())
+                                                            .suggests((context, builder) -> {
+                                                                // Provide tab-completion options for classes
+                                                                ArrayList<String> classNames = new ArrayList<>();
+                                                                classNames.add("Config");
+                                                                // Replace with your own logic to retrieve class names
+                                                                return CommandSource.suggestMatching(classNames, builder);
+                                                            })
+                                                            .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
+                                                                    .suggests((context, builder) -> {
+                                                                        // Provide tab-completion options for variable names
+                                                                        List<String> variableNames;
+                                                                        variableNames = List.of(getVariableInfo("de.hype.bbsentials.client", "Config"));
+                                                                        return CommandSource.suggestMatching(variableNames, builder);
+                                                                    })
+                                                                    .then(ClientCommandManager.argument("variableValue", StringArgumentType.string())
+                                                                            .executes((context) -> {
+                                                                                // Handle "variableName" and "variableValue" logic here
+                                                                                String variableName = StringArgumentType.getString(context, "variableName");
+                                                                                String variableValue = StringArgumentType.getString(context, "variableValue");
+                                                                                try {
+                                                                                    if (!variableName.toLowerCase().contains("dev") || config.hasBBRoles("dev")) {
+                                                                                        setVariableValue(getConfig(), variableName, variableValue);
+                                                                                    }
+                                                                                    getConfig().save();
+                                                                                } catch (ClassNotFoundException |
+                                                                                         NoSuchFieldException |
+                                                                                         IllegalAccessException |
+                                                                                         InstantiationException |
+                                                                                         InvocationTargetException |
+                                                                                         NoSuchMethodException e) {
+                                                                                    Chat.sendPrivateMessageToSelf("§cInvalid variable or value");
+                                                                                }
+                                                                                return 1;
+                                                                            })))))
+                                            .then(ClientCommandManager.literal("get-value")
+                                                    .then(ClientCommandManager.argument("className", StringArgumentType.string())
+                                                            .suggests((context, builder) -> {
+                                                                // Provide tab-completion options for classes
+                                                                ArrayList<String> classNames = new ArrayList<>();
+                                                                classNames.add("Config");
+                                                                // Replace with your own logic to retrieve class names
+                                                                return CommandSource.suggestMatching(classNames, builder);
+                                                            })
+                                                            .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
+                                                                    .suggests((context, builder) -> {
+                                                                        // Provide tab-completion options for variable names
+                                                                        List<String> variableNames;
+                                                                        variableNames = List.of(getVariableInfo("de.hype.bbsentials.client", "Config"));
+                                                                        return CommandSource.suggestMatching(variableNames, builder);
+                                                                    })
+                                                                    .executes((context) -> {
+                                                                        // Handle "variableName" and "variableValue" logic here
+                                                                        String variableName = StringArgumentType.getString(context, "variableName");
+                                                                        try {
+                                                                            Chat.getVariableValue(getConfig(), variableName);
+                                                                        } catch (Exception e) {
+                                                                            e.printStackTrace();
+                                                                        }
+                                                                        return 1;
+                                                                    }))).executes((context) -> {
+                                                        // Handle the case when "config" argument is not provided
+                                                        // ...
+                                                        return 1;
+                                                    })))
+                            );
+                        }); //bbi}
+                        if (Config.isBingoTime() || config.overrideBingoTime() || Boolean.getBoolean("runningFromIDE")) {
                             connectToBBserver();
                         }
                         initialised = true;
                     }
                 }
         );
-        KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
-        KeyBindingHelper.registerKeyBinding(promptKeyBind);
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (promptKeyBind.wasPressed()) {
-                if (config.getLastChatPromptAnswer() != null) {
-                    if (config.isDetailedDevModeEnabled()){
-                    Chat.sendPrivateMessageToSelf(config.getLastChatPromptAnswer());}
-                    MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(config.getLastChatPromptAnswer());
+        {
+            KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
+            KeyBindingHelper.registerKeyBinding(promptKeyBind);
+            ClientTickEvents.END_CLIENT_TICK.register(client -> {
+                if (promptKeyBind.wasPressed()) {
+                    if (config.getLastChatPromptAnswer() != null) {
+                        if (config.isDetailedDevModeEnabled()) {
+                            Chat.sendPrivateMessageToSelf(config.getLastChatPromptAnswer());
+                        }
+                        MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(config.getLastChatPromptAnswer());
+                    }
+                    config.setLastChatPromptAnswer(null);
                 }
-                config.setLastChatPromptAnswer(null);
+            });
+            KeyBinding craftKeyBind = new KeyBinding("Craft", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "BBsentials");
+            KeyBindingHelper.registerKeyBinding(craftKeyBind);
+            ClientTickEvents.END_CLIENT_TICK.register(client -> {
+                if (craftKeyBind.wasPressed()) Chat.sendCommand("/craft");
+            });
+            for (int i = 1; i <= 9; i++) {
+                KeyBinding ecPageKeyBind = new KeyBinding("Ender Chest Page " + i, InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_1 + (i - 1), "BBsentials");
+                KeyBindingHelper.registerKeyBinding(ecPageKeyBind);
+                int pageNum = i; // Capture the page number for lambda
+                ClientTickEvents.END_CLIENT_TICK.register(client -> {
+                    if (ecPageKeyBind.wasPressed()) {
+                        BBsentials.getConfig().sender.addImmediateSendTask("/ec " + pageNum);
+                    }
+                });
             }
-        });
+        } // KeyBinds
+
     }
 
     public static Config getConfig() {
@@ -73,103 +190,10 @@ public class BBsentials implements ClientModInitializer {
             bbserver.sendHiddenMessage("exit");
         }
         bbserver = new BBsentialConnection();
+        coms = new CommandsOLD();
         bbserver.setMessageReceivedCallback(message -> bbserver.onMessageReceived(message));
         bbserver.connect(config.getBBServerURL(), 5000);
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(ClientCommandManager.literal("bbi")
-                    .then(ClientCommandManager.literal("reconnect")
-                            .executes((context) -> {
-                                connectToBBserver();
-                                return 1;
-                            }))
-                    .then(ClientCommandManager.literal("config")
-                            .then(ClientCommandManager.argument("category", StringArgumentType.string())
-                                    .suggests((context, builder) -> {
-                                        // Provide tab-completion options for config subfolder
-                                        return CommandSource.suggestMatching(new String[]{"save", "reset", "load"}, builder);
-                                    }).executes((context) -> {
-                                        String category = StringArgumentType.getString(context, "category");
-                                        switch (category) {
-                                            case "save":
-                                                getConfig().save();
-                                                sendPrivateMessageToSelf(Formatting.GREEN + "Saved config successfully");
-                                                break;
-                                            case "load":
-                                                BBsentials.config = Config.load();
-                                                break;
-                                            case "reset":
-                                                // Reset logic here
-                                                break;
-                                        }
-                                        return 1;
-                                    }))
-                            .then(ClientCommandManager.literal("set-value")
-                                    .then(ClientCommandManager.argument("className", StringArgumentType.string())
-                                            .suggests((context, builder) -> {
-                                                // Provide tab-completion options for classes
-                                                ArrayList<String> classNames = new ArrayList<>();
-                                                classNames.add("Config");
-                                                // Replace with your own logic to retrieve class names
-                                                return CommandSource.suggestMatching(classNames, builder);
-                                            })
-                                            .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
-                                                    .suggests((context, builder) -> {
-                                                        // Provide tab-completion options for variable names
-                                                        List<String> variableNames;
-                                                        variableNames = List.of(getVariableInfo("de.hype.bbsentials.client", "Config"));
-                                                        return CommandSource.suggestMatching(variableNames, builder);
-                                                    })
-                                                    .then(ClientCommandManager.argument("variableValue", StringArgumentType.string())
-                                                            .executes((context) -> {
-                                                                // Handle "variableName" and "variableValue" logic here
-                                                                String variableName = StringArgumentType.getString(context, "variableName");
-                                                                String variableValue = StringArgumentType.getString(context, "variableValue");
-                                                                try {
-                                                                    if (!variableName.toLowerCase().contains("dev")||config.hasBBRoles("dev")){
-                                                                    setVariableValue(getConfig(), variableName, variableValue);}
-                                                                    getConfig().save();
-                                                                } catch (ClassNotFoundException | NoSuchFieldException |
-                                                                         IllegalAccessException |
-                                                                         InstantiationException |
-                                                                         InvocationTargetException |
-                                                                         NoSuchMethodException e) {
-                                                                    Chat.sendPrivateMessageToSelf("§cInvalid variable or value");
-                                                                }
-                                                                return 1;
-                                                            })))))
-                            .then(ClientCommandManager.literal("get-value")
-                                    .then(ClientCommandManager.argument("className", StringArgumentType.string())
-                                            .suggests((context, builder) -> {
-                                                // Provide tab-completion options for classes
-                                                ArrayList<String> classNames = new ArrayList<>();
-                                                classNames.add("Config");
-                                                // Replace with your own logic to retrieve class names
-                                                return CommandSource.suggestMatching(classNames, builder);
-                                            })
-                                            .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
-                                                    .suggests((context, builder) -> {
-                                                        // Provide tab-completion options for variable names
-                                                        List<String> variableNames;
-                                                        variableNames = List.of(getVariableInfo("de.hype.bbsentials.client", "Config"));
-                                                        return CommandSource.suggestMatching(variableNames, builder);
-                                                    })
-                                                    .executes((context) -> {
-                                                        // Handle "variableName" and "variableValue" logic here
-                                                        String variableName = StringArgumentType.getString(context, "variableName");
-                                                        try {
-                                                            Chat.getVariableValue(getConfig(), variableName);
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                        return 1;
-                                                    }))).executes((context) -> {
-                                        // Handle the case when "config" argument is not provided
-                                        // ...
-                                        return 1;
-                                    })))
-            );
-        }); //bbi}
-        executionService.scheduleAtFixedRate(new DebugThread(),0,20, TimeUnit.SECONDS);
+        executionService.scheduleAtFixedRate(new DebugThread(), 0, 20, TimeUnit.SECONDS);
     }
 
     public static void refreshCommands() {

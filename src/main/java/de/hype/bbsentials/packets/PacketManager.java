@@ -23,13 +23,19 @@ public class PacketManager {
     }
 
     public static void initializePacketActions(BBsentialConnection connection) {
-        packets.add(new Packet<>(SplashNotifyPacket.class, connection::onSplashNotify));
         packets.add(new Packet<>(BingoChatMessagePacket.class, connection::onBingoChatMessagePacket));
-        packets.add(new Packet<>(ChChestPacket.class, connection::onChChestPackage));
-//        packets.add(new Packet<>(DisconnectPacket.class, connection::dummy));
+        packets.add(new Packet<>(BroadcastMessagePacket.class, connection::onBroadcastMessagePacket));
+        packets.add(new Packet<>(ChChestPacket.class, connection::onChChestPacket));
+        packets.add(new Packet<>(DisconnectPacket.class, connection::onDisconnectPacket));
+        packets.add(new Packet<>(DisplayMessagePacket.class, connection::onDisplayMessagePacket));
+        packets.add(new Packet<>(DisplayTellrawMessagePacket.class, connection::onDisplayTellrawMessagePacket));
 //        packets.add(new Packet<>(InternalCommandPacket.class, connection::dummy));
+        packets.add(new Packet<>(InvalidCommandFeedbackPacket.class, connection::onInvalidCommandFeedbackPacket));
         packets.add(new Packet<>(MiningEventPacket.class, connection::onMiningEventPacket));
+        packets.add(new Packet<>(PartyPacket.class, connection::onPartyPacket));
 //        packets.add(new Packet<>(RequestConnectPacket.class, connection::dummy));
+        packets.add(new Packet<>(SplashNotifyPacket.class, connection::onSplashNotifyPacket));
+        packets.add(new Packet<>(SystemMessagePacket.class, connection::onSystemMessagePacket));
         packets.add(new Packet<>(WelcomeClientPacket.class, connection::onWelcomePacket));
     }
 

@@ -20,7 +20,6 @@ public class BingoChatMessagePacket extends AbstractPacket {
 
     public boolean baseCheck() {
         boolean cancelPacket = false;
-
         return !cancelPacket;
     }
 }

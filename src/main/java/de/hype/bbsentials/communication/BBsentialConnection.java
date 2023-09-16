@@ -10,8 +10,11 @@ import de.hype.bbsentials.packets.PacketManager;
 import de.hype.bbsentials.packets.PacketUtils;
 import de.hype.bbsentials.packets.packets.*;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -43,49 +46,6 @@ public class BBsentialConnection {
     public BBsentialConnection() {
         packetManager = new PacketManager(this);
     }
-
-    public void onBingoChatMessagePacket(BingoChatMessagePacket packet) {
-        if (BBsentials.config.showBingoChat) {
-            Chat.sendPrivateMessageToSelf("[" + packet.prefix + "] " + packet.username + ": " + packet.message);
-        }
-    }
-
-    public void onChChestPackage(ChChestPacket packet) {
-        if (isCommandSafe(packet.bbcommand)) {
-            String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-            tellrawText = tellrawText.replace("@username", packet.announcerUsername).replace("@item", Arrays.stream(packet.items).map(ChChestItem::getDisplayName).toList().toString()).replace("@coords", packet.locationCoords).replace("@inviteCommand", packet.bbcommand);
-            if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
-                tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
-            }
-            Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(tellrawText));
-        }
-        else {
-            Chat.sendPrivateMessageToSelf("§cFiltered out a suspicious packet! Please send a screenshot of this message with ping Hype_the_Time (hackthetime) in Bingo Apothecary, BB, SBZ, offical Hypixel,...");
-            Chat.sendPrivateMessageToSelf(PacketUtils.parsePacketToJson(packet));
-        }
-    }
-
-    public void onMiningEventPacket(MiningEventPacket packet) {
-        if (BBsentials.config.toDisplayConfig.getValue("disableAll")) {
-            //its will returns false cause disabled is checked already before.
-            Chat.sendPrivateMessageToSelf(packet.username + "There is a " + packet.event.getDisplayName() + "in the " + packet.island.getDisplayName() + " now/soon.");
-        }
-    }
-
-    public void onWelcomePacket(WelcomeClientPacket packet) {
-        if (packet.success) {
-            BBsentials.config.bbsentialsRoles = packet.roles;
-            Chat.sendPrivateMessageToSelf("Login Success");
-            if (!packet.motd.isEmpty()) {
-                Chat.sendPrivateMessageToSelf(packet.motd);
-            }
-        }
-        else {
-            Chat.sendPrivateMessageToSelf("Login Failed");
-        }
-
-    }
-
     public interface MessageReceivedCallback {
         void onMessageReceived(String message);
     }
@@ -305,35 +265,6 @@ public class BBsentialConnection {
         }
     }
 
-    public void onBroadcastMessage(BroadcastMessagePacket packet) {
-        String message = packet.message;
-    }
-
-    public void onSplashNotify(SplashNotifyPacket packet) {
-        int waitTime;
-        if (packet.lessWaste) {
-            waitTime = (getPotTime() * 1000) / 80;
-        }
-        else {
-            waitTime = 0;
-        }
-        String where;
-        if (packet.hubType.equals(Islands.DUNGEON_HUB)) {
-            where = "§5DUNGEON HUB§6";
-        }
-        else {
-            where = "Hub";
-        }
-        BBsentials.executionService.schedule(() -> {
-            splashHighlightItem("HUB #" + packet.hub, 20);
-            String timeLoss = "";
-            if (packet.lessWaste) {
-                timeLoss = "§c(" + waitTime + ")";
-            }
-            Chat.sendPrivateMessageToSelf("§6" + packet.splasherUsername + " is Splashing in " + where + " #" + packet.hub + " at " + packet.location + ":" + packet.extraMessage + " | " + timeLoss);
-        }, waitTime, TimeUnit.MILLISECONDS);
-    }
-
     public void dummy(Object o) {
         //this does absoloutely nothing
     }
@@ -400,4 +331,117 @@ public class BBsentialConnection {
             sendHiddenMessage(packetName + "." + PacketUtils.parsePacketToJson(packet));
         }
     }
+
+    public void onBroadcastMessagePacket(BroadcastMessagePacket packet) {
+        Chat.sendPrivateMessageToSelf("§6[A]§r ["+packet.prefix+"] "+packet.username+": "+packet.message);
+    }
+
+    public void onSplashNotifyPacket(SplashNotifyPacket packet) {
+        int waitTime;
+        if (packet.lessWaste) {
+            waitTime = (getPotTime() * 1000) / 80;
+        }
+        else {
+            waitTime = 0;
+        }
+        String where;
+        if (packet.hubType.equals(Islands.DUNGEON_HUB)) {
+            where = "§5DUNGEON HUB§6";
+        }
+        else {
+            where = "Hub";
+        }
+        BBsentials.executionService.schedule(() -> {
+            splashHighlightItem("HUB #" + packet.hub, 20);
+            String timeLoss = "";
+            if (packet.lessWaste) {
+                timeLoss = "§c(" + waitTime + ")";
+            }
+            Chat.sendPrivateMessageToSelf("§6" + packet.splasherUsername + " is Splashing in " + where + " #" + packet.hub + " at " + packet.location + ":" + packet.extraMessage + " | " + timeLoss);
+        }, waitTime, TimeUnit.MILLISECONDS);
+    }
+
+    public void onBingoChatMessagePacket(BingoChatMessagePacket packet) {
+        if (BBsentials.config.showBingoChat) {
+            Chat.sendPrivateMessageToSelf("[" + packet.prefix + "] " + packet.username + ": " + packet.message);
+        }
+    }
+
+    public void onChChestPacket(ChChestPacket packet) {
+        if (isCommandSafe(packet.bbcommand)) {
+            String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
+            tellrawText = tellrawText.replace("@username", packet.announcerUsername).replace("@item", Arrays.stream(packet.items).map(ChChestItem::getDisplayName).toList().toString()).replace("@coords", packet.locationCoords).replace("@inviteCommand", packet.bbcommand);
+            if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
+                tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
+            }
+            Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(tellrawText));
+        }
+        else {
+            Chat.sendPrivateMessageToSelf("§cFiltered out a suspicious packet! Please send a screenshot of this message with ping Hype_the_Time (hackthetime) in Bingo Apothecary, BB, SBZ, offical Hypixel,...");
+            Chat.sendPrivateMessageToSelf(PacketUtils.parsePacketToJson(packet));
+        }
+    }
+
+    public void onMiningEventPacket(MiningEventPacket packet) {
+        if (BBsentials.config.toDisplayConfig.getValue("disableAll")) {
+            //its will returns false cause disabled is checked already before.
+            Chat.sendPrivateMessageToSelf(packet.username + "There is a " + packet.event.getDisplayName() + "in the " + packet.island.getDisplayName() + " now/soon.");
+        }
+    }
+
+    public void onWelcomePacket(WelcomeClientPacket packet) {
+        if (packet.success) {
+            BBsentials.config.bbsentialsRoles = packet.roles;
+            Chat.sendPrivateMessageToSelf("§aLogin Success");
+            if (!packet.motd.isEmpty()) {
+                Chat.sendPrivateMessageToSelf(packet.motd);
+            }
+        }
+        else {
+            Chat.sendPrivateMessageToSelf("Login Failed");
+        }
+    }
+
+    public void onDisconnectPacket(DisconnectPacket packet) {
+
+    }
+
+    public void onDisplayMessagePacket(DisplayMessagePacket packet) {
+        Chat.sendPrivateMessageToSelf("§r"+packet.message);
+    }
+
+    public void onDisplayTellrawMessagePacket(DisplayTellrawMessagePacket packet) {
+        /*Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(packet.rawJson));*/
+        Chat.sendPrivateMessageToSelf("You received a tellraw Packet but it got ignored due too there being no safety checks in this version.");
+    }
+
+    public void onInternalCommandPacket(InternalCommandPacket packet) {
+
+    }
+
+    public void onInvalidCommandFeedbackPacket(InvalidCommandFeedbackPacket packet) {
+        Chat.sendPrivateMessageToSelf(packet.displayMessage);
+    }
+
+    public void onPartyPacket(PartyPacket packet) {
+        Chat.sendCommand("/p "+packet.type+String.join(" ",packet.users));
+    }
+
+    public void onSystemMessagePacket(SystemMessagePacket packet) {
+        if (packet.important) {
+            Chat.sendPrivateMessageToSelf("§c§n"+packet.message);
+        }else {
+            Chat.sendPrivateMessageToSelf("§r"+packet.message);
+        }
+        if (packet.ping){
+            playsound(SoundEvents.ENTITY_WARDEN_DIG);
+        }
+    }
+
+
+    public static void playsound(SoundEvent event){
+        MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance
+                .master(event, 1.0F, 1.0F));
+    }
+
 }

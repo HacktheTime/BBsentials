@@ -34,13 +34,12 @@
       "links": {
         "modmenu.discord": "https://discord.gg/m7gX2GyQYj"
       },
-      "parent": {
         "id": "bbsentials",
         "name": "BBsentials",
         "description": "Mod to connect to the BBsentials Network for Splashes and more",
         "icon": "logo.png"
       },
       "update_checker": false
-    }
+
   }
 }

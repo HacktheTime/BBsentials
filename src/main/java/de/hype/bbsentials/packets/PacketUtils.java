@@ -1,6 +1,8 @@
 package de.hype.bbsentials.packets;
 
 import com.google.gson.Gson;
+import de.hype.bbsentials.chat.Chat;
+import de.hype.bbsentials.client.BBsentials;
 import de.hype.bbsentials.client.CustomGson;
 import de.hype.bbsentials.communication.BBsentialConnection;
 
@@ -108,6 +110,7 @@ public class PacketUtils {
         for (Packet<? extends AbstractPacket> packet : manager.getPackets()) {
             if (!packetName.equals(packet.getClazz().getSimpleName())) continue;
             try {
+                if (BBsentials.getConfig().isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelf("§b"+packetName+":"+rawJson);
                 tryToProcessPacket(packet, rawJson);
                 return true;
             } catch (Throwable t) {

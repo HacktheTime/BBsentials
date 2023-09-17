@@ -166,7 +166,7 @@ public class CommandsOLD {
                                                                         int z = IntegerArgumentType.getInteger(context, "Z");
                                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
 
-                                                                        bbserver.sendPacket(new ChChestPacket("", ChChestItems.getItem(item.split(";")), x + "" + y + "" + z, contactWay, ""));
+                                                                        bbserver.sendPacket(new ChChestPacket("", ChChestItems.getItem(item.split(";")), x + " " + y + " " + z, contactWay, ""));
                                                                         return 1;
                                                                     }
                                                             )

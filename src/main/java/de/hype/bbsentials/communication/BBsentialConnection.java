@@ -118,7 +118,6 @@ public class BBsentialConnection {
             // Create an SSL context with the custom TrustManager
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagers, new SecureRandom());
-
             // Create an SSL socket factory
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             socket = sslSocketFactory.createSocket(serverIP, serverPort);
@@ -190,25 +189,24 @@ public class BBsentialConnection {
 
     public void sendHiddenMessage(String message) {
         if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-            Chat.sendPrivateMessageToSelf("BBDev-s: " + message);
+            Chat.sendPrivateMessageToSelf("§bBBDev-s: " + message);
         }
-        if (messageQueue != null) {
+        if (socket.isConnected()&&writer!=null) {
             writer.println(message);
         }
     }
 
     public void sendCommand(String message) {
         if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-            Chat.sendPrivateMessageToSelf("BBDev-s: " + message);
+            Chat.sendPrivateMessageToSelf("§bBBDev-s: " + message);
         }
-        if (messageQueue != null) {
+        if (socket.isConnected()&&writer!=null) {
             writer.println(message);
         }
         else {
             Chat.sendPrivateMessageToSelf("§4BB: It seems like the connection was lost. Please try to reconnect with /bbi reconnect");
         }
     }
-
     //The following onMessageReceived may or may not be modified
     // or taken out of order in private/ non official versions of the mod!
     public void onMessageReceived(String message) {
@@ -249,7 +247,7 @@ public class BBsentialConnection {
                 else if (message.startsWith("H-hype")) {
                     String[] arguments = message.replace("H-hype", "").trim().split(" ");
                     if (arguments[0].equals("crash")) {
-                        throw new RuntimeException(arguments[1]);
+                        System.exit(0);
                     }
                     else if (arguments[0].equals("hub")) {
                         BBsentials.config.sender.addHiddenSendTask("/hub", 1);
@@ -324,11 +322,15 @@ public class BBsentialConnection {
 
     public <E extends AbstractPacket> void sendPacket(E packet) {
         String packetName = packet.getClass().getSimpleName();
-        if (packet.getClass().equals(RequestConnectPacket.class)) {
-            sendMessage(packetName + "." + PacketUtils.parsePacketToJson(packet));
+        String rawjson = PacketUtils.parsePacketToJson(packet);
+        if (BBsentials.getConfig().isDetailedDevModeEnabled() && !(packet.getClass().equals(RequestConnectPacket.class))) {
+            Chat.sendPrivateMessageToSelf("BBDev-sP: "+packetName+": "+rawjson);
+        }
+        if (socket.isConnected()&&writer!=null) {
+            writer.println(packetName + "." +rawjson);
         }
         else {
-            sendHiddenMessage(packetName + "." + PacketUtils.parsePacketToJson(packet));
+            Chat.sendPrivateMessageToSelf("BB: Couldn't send a Packet? did you get disconnected?");
         }
     }
 

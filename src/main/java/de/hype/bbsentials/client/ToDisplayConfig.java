@@ -11,33 +11,30 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 public class ToDisplayConfig {
-    private boolean disableAll = true;
-    private boolean prehistoricEgg = true;
-    private boolean pickonimbus2000 = true;
-    private boolean controlSwitch = true;
-    private boolean electronTransmitter = true;
-    private boolean ftx3070 = true;
-    private boolean robotronReflector = true;
-    private boolean superliteMotor = true;
-    private boolean syntheticHeart = true;
-    private boolean flawlessGemstone = true;
-    private boolean allRoboPartCustomChChestItem = true;
-    private boolean allChChestItem = true;
-    private boolean dwBetterTogether = true;
-    private boolean dwDoublePowder = true;
-    private boolean dwGoneWithTheWind = true;
-    private boolean dwGoblinRaid = true;
-    private boolean dwMithrilGourmand = true;
-    private boolean dwRaffle = true;
-    private boolean dwEvents = true;
-    private boolean chBetterTogether = true;
-    private boolean chDoublePowder = true;
-    private boolean chGoneWithTheWind = true;
-    private boolean chEvents = true;
-    private boolean allBetterTogether = true;
-    private boolean allDoublePowder = true;
-    private boolean allGoneWithTheWind = true;
-    private boolean allEvents = true;
+    public boolean disableAll = false;
+    public boolean allChChestItem = true;
+    public boolean allRoboPart = false;
+    public boolean customChChestItem = false;
+
+    public boolean prehistoricEgg = false;
+    public boolean pickonimbus2000 = false;
+    public boolean controlSwitch = false;
+    public boolean electronTransmitter = false;
+    public boolean ftx3070 = false;
+    public boolean robotronReflector = false;
+    public boolean superliteMotor = false;
+    public boolean syntheticHeart = false;
+    public boolean flawlessGemstone = false;
+    //Mining Events.
+    public boolean allEvents = true;
+    public boolean blockChEvents = false;
+
+    public String betterTogether = "none";
+    public String doublePowder = "none";
+    public String goneWithTheWind = "none";
+    public boolean goblinRaid = false;
+    public boolean mithrilGourmand = false;
+    public boolean raffle = false;
 
     // Serialize the object to JSON and save to file
     public void saveToFile() {

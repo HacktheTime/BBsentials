@@ -151,7 +151,7 @@ public class BBsentials implements ClientModInitializer {
                                                 return 1;
                                             })))
                     );
-                }); //bbi}
+                }); //bbi
                 if (Config.isBingoTime() || config.overrideBingoTime()) {
                     connectToBBserver();
                 }
@@ -161,6 +161,14 @@ public class BBsentials implements ClientModInitializer {
     }
 
     {
+        KeyBinding devKeyBind = new KeyBinding("Open Mod Menu Config", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_ADD, "BBsentials: Developing Tools");
+        KeyBindingHelper.registerKeyBinding(devKeyBind);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (devKeyBind.wasPressed()) {
+                MinecraftClient.getInstance().setScreen(BBsentialsConfigScreemFactory.create(MinecraftClient.getInstance().currentScreen));
+            }
+        });
+
         KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
         KeyBindingHelper.registerKeyBinding(promptKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

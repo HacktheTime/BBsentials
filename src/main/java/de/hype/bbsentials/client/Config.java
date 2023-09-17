@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class Config implements Serializable {
     //DO NOT Change any of the following unless you know what you are doing!
     public int apiVersion = 1;
-    private boolean devMode = false;
-    private boolean detailedDevMode = false;
+     boolean devMode = false;
+     boolean detailedDevMode = false;
     //You can change again
 
     // set automatically
@@ -104,6 +104,7 @@ public class Config implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        toDisplayConfig.saveToFile();
     }
 
     // Getter methods for various config attributes

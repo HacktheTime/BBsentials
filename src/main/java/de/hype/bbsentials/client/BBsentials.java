@@ -53,6 +53,11 @@ public class BBsentials implements ClientModInitializer {
                                         connectToBBserver();
                                         return 1;
                                     }))
+                            .then(ClientCommandManager.literal("reconnect-stable-server")
+                                    .executes((context) -> {
+                                        connectToBBserver(false);
+                                        return 1;
+                                    }))
                             .then(ClientCommandManager.literal("reconnect-test-server")
                                     .executes((context) -> {
                                         connectToBBserver(true);
@@ -191,7 +196,7 @@ public class BBsentials implements ClientModInitializer {
     }
 
     public static void connectToBBserver() {
-        connectToBBserver(false);
+        connectToBBserver(config.connectToBeta);
     }
 
     public static void connectToBBserver(boolean beta) {

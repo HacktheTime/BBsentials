@@ -172,7 +172,7 @@ public class Chat {
             sendPrivateMessageToSelf(Formatting.RED + "B: " + message);
             return null;
         }
-        if (getConfig().isDevModeEnabled()) {
+        if (getConfig().isDetailedDevModeEnabled()) {
             System.out.println("Got message to analyse internally: " + message);
         }
         //party accepter
@@ -246,13 +246,13 @@ public class Chat {
             else if (message.contains("bb:test")) {
                 sendPrivateMessageToSelf(test());
             }
-            else if ((message.endsWith("is visiting Your Garden !") || message.endsWith("is visiting Your Island !")) && !MinecraftClient.getInstance().isWindowFocused()) {
+            else if ((message.endsWith("is visiting Your Garden !") || message.endsWith("is visiting Your Island !")) && !MinecraftClient.getInstance().isWindowFocused()&& config.doDesktopNotifications) {
                 sendNotification("BBsentials Visit-Watcher", message);
             }
             else if (message.equals("Please type /report confirm to log your report for staff review.")) {
                 sendCommand("/report confirm");
             }
-            else if (message.contains(":") && !MinecraftClient.getInstance().isWindowFocused()) {
+            else if (message.contains(":") && !MinecraftClient.getInstance().isWindowFocused()&&config.doDesktopNotifications) {
                 if (message.startsWith("Party >")) {
                     String partyMessage = message.replaceFirst("Party >", "").trim();
                     messageOriginal = replaceAllForText(messageOriginal, "\"action\":\"run_command\",\"value\":\"/viewprofile", "\"action\":\"run_command\",\"value\":\"/hci menu pcm " + partyMessage);

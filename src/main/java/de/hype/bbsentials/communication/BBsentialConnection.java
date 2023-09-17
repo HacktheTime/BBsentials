@@ -322,7 +322,7 @@ public class BBsentialConnection {
 
     public <E extends AbstractPacket> void sendPacket(E packet) {
         String packetName = packet.getClass().getSimpleName();
-        String rawjson = PacketUtils.parsePacketToJson(packet);
+            String rawjson = PacketUtils.parsePacketToJson(packet);
         if (BBsentials.getConfig().isDetailedDevModeEnabled() && !(packet.getClass().equals(RequestConnectPacket.class))) {
             Chat.sendPrivateMessageToSelf("BBDev-sP: "+packetName+": "+rawjson);
         }

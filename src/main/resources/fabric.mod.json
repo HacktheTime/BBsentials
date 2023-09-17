@@ -3,17 +3,17 @@
   "id": "bbsentials",
   "version": "${version}",
   "name": "BBsentials",
-  "description": "QOL Modifications",
+  "icon": "logo.png",
+  "description": "Mod to connect to the BBsentials Network for Splashes and more",
   "authors": [
     "Hype_the_Time/hackthetime"
   ],
   "contact": {
     "homepage": "https://github.com/HacktheTime/BBsentials1.20",
     "issues": "https://github.com/HacktheTime/BBsentials1.20/issues",
-    "discord": "https://discord.gg/m7gX2GyQYj"
+    "discord": "discord.gg"
   },
   "license": "All-Rights-Reserved",
-  "icon": "logo.png",
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -28,18 +28,5 @@
   },
   "mixins": [
     "bbsentials.mixins.json"
-  ],
-  "custom": {
-    "modmenu": {
-      "links": {
-        "modmenu.discord": "https://discord.gg/m7gX2GyQYj"
-      },
-        "id": "bbsentials",
-        "name": "BBsentials",
-        "description": "Mod to connect to the BBsentials Network for Splashes and more",
-        "icon": "logo.png"
-      },
-      "update_checker": false
-
-  }
+  ]
 }

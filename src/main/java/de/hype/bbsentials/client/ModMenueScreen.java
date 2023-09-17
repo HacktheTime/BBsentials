@@ -8,13 +8,10 @@ import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.text.Text;
 
 public class ModMenueScreen implements ModMenuApi {
-    public class CITResewnModMenu implements ModMenuApi {
-        @Override
-        public ConfigScreenFactory<?> getModConfigScreenFactory() {
-            if (FabricLoader.getInstance().isModLoaded("cloth-config2"))
-                return BBsentialsConfigScreemFactory::create;
-
-            return parent -> new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(parent), Text.of("CIT Resewn"), Text.of("CIT Resewn requires Cloth Config to be able to show the config."));
-        }
+    @Override
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+        if (FabricLoader.getInstance().isModLoaded("cloth-config2"))
+            return BBsentialsConfigScreemFactory::create;
+        return parent -> new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(parent), Text.of("BBsentials"), Text.of("BBsentials requires Cloth Config to be able to show the config."));
     }
 }

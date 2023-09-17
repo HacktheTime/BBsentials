@@ -8,124 +8,52 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 
 import java.io.*;
-import java.lang.reflect.Field;
-import java.net.Socket;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Config implements Serializable {
-    // Helper class for sending chat messages
-    public int version = 1;
-    public transient final Sender sender = new Sender();
-
-    public transient boolean highlightitem = false;
-    public transient String lastChatPromptAnswer = null;
-
-    // Automatically set, no need for config
-    private transient String username;
-    private boolean overrideBingoTime = false;
-
-    // Set in-game
-    private transient boolean isLeader;
-    private transient String alreadyReported = "";
-    private String bbServerURL = "static.204.177.34.188.clients.your-server.de";
-    public String[] bbsentialsRoles = {""};
-    public static ArrayList<String> partyMembers = new ArrayList<>();
-
-    // Set via load / default
-    private String bbsentialsCommandPrefix = ".";
-    private String apiKey = "";
-    private boolean leaveDungeonAutomatically;
-    public boolean showBingoChat = true;
-    private boolean allowBBinviteMe = true;
-    private boolean leaveKuudraAutomatically;
+    //DO NOT Change any of the following unless you know what you are doing!
+    public int apiVersion = 1;
     private boolean devMode = false;
     private boolean detailedDevMode = false;
-    private boolean acceptReparty;
-    private String nickname;
-    private String getNotifForParty;
-    private final int apiVersion = 1;
+    //You can change again
+
+    // set automatically
+    private transient boolean isLeader;
+    private transient String alreadyReported = "";
+    public String[] bbsentialsRoles = {""};
+    public static ArrayList<String> partyMembers = new ArrayList<>();
     public transient ToDisplayConfig toDisplayConfig = ToDisplayConfig.loadFromFile();
+    public transient final Sender sender = new Sender();
+    public transient boolean highlightitem = false;
+    public transient String lastChatPromptAnswer = null;
+    private transient String username;
+
+    // Set via load / default you may change these
+    public boolean overrideBingoTime = false;
+    public boolean connectToBeta = false;
+
+    public String bbServerURL = "localhost";
+     String apiKey = "";
+    public boolean showBingoChat = true;
+    public boolean allowBBinviteMe = true;
+    public boolean doDesktopNotifications = false;
+    public boolean acceptReparty;
+    public String nickname;
+    public String NotifForPartyMessagesType;
 
     // Set default attribute values
     private void setDefaults() {
         username = MinecraftClient.getInstance().player.getName().getString();
-        leaveKuudraAutomatically = true;
-        leaveDungeonAutomatically = true;
         acceptReparty = true;
         if (username.equals("Hype_the_Time")) {
             nickname = "Hype";
-            getNotifForParty = "nick";
-        }
+            NotifForPartyMessagesType = "nick";
+            doDesktopNotifications=true;
+        } //Gimmic for Developer due too things which dont make it into releases (bugs)
         else {
             nickname = "";
-            getNotifForParty = "none";
-        }
-    }
-
-    // Method to send the config to a server using sockets
-    public void sendConfig(Config config, String host, int port) {
-        Socket socket = null;
-        ObjectOutputStream objectOutputStream = null;
-        try {
-            socket = new Socket(host, port);
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            objectOutputStream.writeObject(config);
-            objectOutputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (objectOutputStream != null) {
-                    objectOutputStream.close();
-                }
-                if (socket != null) {
-                    socket.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // Method to replace the current config with a new one
-    public void replaceConfig(Config newConfig) {
-        try {
-            // Get the class of the current config
-            Class<? extends Config> currentClass = this.getClass();
-
-            // Get the fields of the current config class
-            Field[] currentFields = currentClass.getDeclaredFields();
-
-            // Iterate through the fields
-            for (Field field : currentFields) {
-                // Exclude the socket field from being updated
-                if (field.getName().equals("serverSocket") || field.getName().equals("clientSocket")) {
-                    continue;
-                }
-
-                // Make the field accessible to modify its value
-                field.setAccessible(true);
-
-                // Get the corresponding field from the new config class
-                Field newField = newConfig.getClass().getDeclaredField(field.getName());
-
-                // Make the new field accessible to read its value
-                newField.setAccessible(true);
-
-                // Get the current value of the field
-                Object currentValue = field.get(this);
-
-                // Get the new value of the field
-                Object newValue = newField.get(newConfig);
-
-                // Update the field only if it is defined or explicitly overridden
-                if (newValue != null || currentValue == null) {
-                    field.set(this, newValue);
-                }
-            }
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
+            NotifForPartyMessagesType = "none";
         }
     }
 
@@ -151,7 +79,7 @@ public class Config implements Serializable {
                 e.printStackTrace();
                 settings = new Config(); // Use default values if loading fails
                 settings.save();
-            }catch (IllegalStateException e){
+            } catch (IllegalStateException e) {
                 System.out.println("Error loading config. Resetting it.");
                 settings = new Config();
                 settings.save();
@@ -196,15 +124,7 @@ public class Config implements Serializable {
     }
 
     public String getNotifForParty() {
-        return getNotifForParty;
-    }
-
-    public boolean isLeaveDungeonAutomatically() {
-        return leaveDungeonAutomatically;
-    }
-
-    public boolean isLeaveKuudraAutomatically() {
-        return leaveKuudraAutomatically;
+        return NotifForPartyMessagesType;
     }
 
     public boolean isDevModeEnabled() {
@@ -235,15 +155,6 @@ public class Config implements Serializable {
         return bbServerURL;
     }
 
-    public String getCommandPrefix(String type) {
-        if (type.equals("BBsentials")) {
-            System.out.println("Registered command with: " + bbsentialsCommandPrefix);
-            return bbsentialsCommandPrefix;
-        }
-        else {
-            return "/";
-        }
-    }
 
     public static boolean isBingoTime() {
         LocalDate currentDate = LocalDate.now();
@@ -258,10 +169,6 @@ public class Config implements Serializable {
         return overrideBingoTime;
     }
 
-    public boolean isHighlightitem() {
-        return highlightitem;
-    }
-
     public String getLastChatPromptAnswer() {
         return lastChatPromptAnswer;
     }
@@ -272,10 +179,6 @@ public class Config implements Serializable {
 
     public void setLastChatPromptAnswer(String lastChatPromptAnswer) {
         this.lastChatPromptAnswer = lastChatPromptAnswer;
-    }
-
-    public int getVersion() {
-        return version;
     }
 
     public boolean hasBBRoles(String roleName) {

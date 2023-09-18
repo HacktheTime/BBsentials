@@ -219,7 +219,7 @@ public class BBsentials implements ClientModInitializer {
         bbthread = new Thread(() -> {
             bbserver = new BBsentialConnection();
             coms = new CommandsOLD();
-            bbserver.setMessageReceivedCallback(message -> bbserver.onMessageReceived(message));
+            bbserver.setMessageReceivedCallback(message -> executionService.execute(()->bbserver.onMessageReceived(message)));
             if (beta) {
                 bbserver.connect(config.getBBServerURL(), 5011);
             }

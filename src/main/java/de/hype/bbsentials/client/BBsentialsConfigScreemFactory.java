@@ -172,6 +172,11 @@ public class BBsentialsConfigScreemFactory {
                     .setTooltip(Text.of("Select to receive notifications when any Flawless Gemstone is found"))
                     .setSaveConsumer(newValue -> config.toDisplayConfig.flawlessGemstone = newValue)
                     .build());
+            chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Jungle Heart"), config.toDisplayConfig.jungleHeart)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Select to receive notifications when a JungleHeart is found"))
+                    .setSaveConsumer(newValue -> config.toDisplayConfig.jungleHeart = newValue)
+                    .build());
         }//CHChestItems
         ConfigCategory miningEvents = builder.getOrCreateCategory(Text.of("Mining Events"));
         {

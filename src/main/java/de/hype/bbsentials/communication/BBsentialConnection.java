@@ -2,10 +2,7 @@ package de.hype.bbsentials.communication;
 
 import de.hype.bbsentials.chat.Chat;
 import de.hype.bbsentials.client.BBsentials;
-import de.hype.bbsentials.constants.enviromentShared.AuthenticationConstants;
-import de.hype.bbsentials.constants.enviromentShared.ChChestItem;
-import de.hype.bbsentials.constants.enviromentShared.Islands;
-import de.hype.bbsentials.constants.enviromentShared.MiningEvents;
+import de.hype.bbsentials.constants.enviromentShared.*;
 import de.hype.bbsentials.packets.AbstractPacket;
 import de.hype.bbsentials.packets.PacketManager;
 import de.hype.bbsentials.packets.PacketUtils;
@@ -36,6 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import static de.hype.bbsentials.client.BBsentials.config;
+import static de.hype.bbsentials.client.BBsentials.executionService;
 
 public class BBsentialConnection {
     private Socket socket;
@@ -377,12 +375,13 @@ public class BBsentialConnection {
 
     public void onChChestPacket(ChChestPacket packet) {
         if (isCommandSafe(packet.bbcommand)) {
+            if (showChChest(packet.items)){
             String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
             tellrawText = tellrawText.replace("@username", packet.announcerUsername).replace("@item", Arrays.stream(packet.items).map(ChChestItem::getDisplayName).toList().toString()).replace("@coords", packet.locationCoords).replace("@inviteCommand", packet.bbcommand);
             if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
                 tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
             }
-            Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(tellrawText));
+            Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(tellrawText));}
         }
         else {
             Chat.sendPrivateMessageToSelf("§cFiltered out a suspicious packet! Please send a screenshot of this message with ping Hype_the_Time (hackthetime) in Bingo Apothecary, BB, SBZ, offical Hypixel,...");
@@ -393,6 +392,7 @@ public class BBsentialConnection {
     public void onMiningEventPacket(MiningEventPacket packet) {
         if (config.toDisplayConfig.getValue("disableAll")) {
             //its will returns false cause disabled is checked already before.
+            if (config.toDisplayConfig.blockChEvents&&packet.island.equals(Islands.CRYSTAL_HOLLOWS)) return;
             if (packet.event.equals(MiningEvents.RAFFLE)) {
                 if (!config.toDisplayConfig.raffle) return;
             }
@@ -477,9 +477,25 @@ public class BBsentialConnection {
         }
     }
 
+    public boolean showChChest(ChChestItem[] items) {
+        if (config.toDisplayConfig.allChChestItem) return true;
+        for (ChChestItem item : items) {
+            if (config.toDisplayConfig.customChChestItem&&item.isCustom()) return true;
+            if (config.toDisplayConfig.allRoboPart&&item.isRoboPart()) return true;
+            if (config.toDisplayConfig.prehistoricEgg&&item.equals(ChChestItems.PrehistoricEgg)) return true;
+            if (config.toDisplayConfig.pickonimbus2000&&item.equals(ChChestItems.Pickonimbus2000)) return true;
+            if (config.toDisplayConfig.controlSwitch&&item.equals(ChChestItems.ControlSwitch)) return true;
+            if (config.toDisplayConfig.electronTransmitter&&item.equals(ChChestItems.ElectronTransmitter)) return true;
+            if (config.toDisplayConfig.robotronReflector&&item.equals(ChChestItems.RobotronReflector)) return true;
+            if (config.toDisplayConfig.superliteMotor&&item.equals(ChChestItems.SuperliteMotor)) return true;
+            if (config.toDisplayConfig.syntheticHeart&&item.equals(ChChestItems.SyntheticHeart)) return true;
+            if (config.toDisplayConfig.flawlessGemstone&&item.equals(ChChestItems.FlawlessGemstone)) return true;
+            if (config.toDisplayConfig.jungleHeart&&item.equals(ChChestItems.JungleHeart)) return true;
+        }
+        return false;
+    }
 
     public interface MessageReceivedCallback {
         void onMessageReceived(String message);
     }
-
 }

@@ -25,6 +25,8 @@ public class ToDisplayConfig {
     public boolean superliteMotor = false;
     public boolean syntheticHeart = false;
     public boolean flawlessGemstone = false;
+    public boolean jungleHeart = false;
+
     //Mining Events.
     public boolean allEvents = true;
     public boolean blockChEvents = false;

@@ -1,5 +1,19 @@
-Copyright (c) 2023 
-All rights reserved.
+Copyright (c) 2023 hackthetime
 
-Copying and changing code for own projects is allowed as long as you don't copy a lot and use it for different things (Inspiration, looking for solutions etc is normally fine).
-Modifying this code to gain a personal advantage by abusing a feature unintentionally is STRICTLY forbidden. Sharing such modified code may even result in legal actions.
+**The Software is provided as is. Use is at own risk.**
+
+
+The Code is under the CC BY-NC-ND 4.0 license however with modifications listed below:
+
+Copying and changing code for own projects is allowed as long as you dont do so to abuse the Systems in place.
+If you have credits somehwere and you used a signicant amount of Code (or get a request) of this project you have to link to it. If used next to no code dont bother.
+There are some restricted areas which are not allowed to be modifed/removed etc. Those will be marked with start and end.
+Modifying this code to gain a personal advantage by abusing a feature unintentionally is STRICTLY forbidden. Sharing such modifications is not allowed either. All modifications have to be pull requested after they have been fully implemented and work like exspected
+
+Summary:
+No monetarysations
+Sharing modified versions is disallowed. (If you want to do so feel free to make a pull reqeust and ask)
+You need to give credit f you use it. (If u used next to no code, have no credits build in as well as havent gotten a request too include it dont bother adding it).
+
+Too contributors:
+I may monetarise this mod in the future by allowing donations and will deffinetely allow donations for the Server costs.

@@ -16,6 +16,7 @@ public enum Islands implements BBDisplayNameProvider {
     SPIDERS_DEN("combat_1", "Spider's Den"),
     THE_END("combat_3", "The End"),
     THE_FARMING_ISLANDS("farming_1", "The Farming Islands"),
+    JERRYS_WORKSHOP("winter", "Jerry's Workshop"),
     THE_RIFT("rift", "The Rift");
 
 
@@ -34,4 +35,13 @@ public enum Islands implements BBDisplayNameProvider {
     public String getDisplayName() {
         return displayName;
     }
+    public static Islands getByDisplayName(String displayName) {
+        for (Islands island : values()) {
+            if (island.getDisplayName().equals(displayName)) {
+                return island;
+            }
+        }
+        return null; // Return null if the display name doesn't match any enum value
+    }
+
 }

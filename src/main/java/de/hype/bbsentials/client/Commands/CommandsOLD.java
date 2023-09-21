@@ -4,9 +4,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.chat.Chat;
+import de.hype.bbsentials.client.BBUtils;
 import de.hype.bbsentials.client.BBsentials;
 import de.hype.bbsentials.constants.enviromentShared.ChChestItems;
-import de.hype.bbsentials.constants.enviromentShared.Islands;
 import de.hype.bbsentials.constants.enviromentShared.MiningEvents;
 import de.hype.bbsentials.packets.AbstractPacket;
 import de.hype.bbsentials.packets.packets.*;
@@ -18,6 +18,7 @@ import net.minecraft.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static de.hype.bbsentials.client.BBsentials.*;
 
@@ -276,7 +277,7 @@ public class CommandsOLD {
                                                                         String extramessage = StringArgumentType.getString(context, "extramessage");
                                                                         String location = StringArgumentType.getString(context, "location");
                                                                         boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                                        sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, Islands.HUB, extramessage, lessWaste));
+                                                                        sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, BBUtils.getCurrentIsland() , extramessage, lessWaste));
                                                                         return 1;
                                                                     })
                                                             )
@@ -284,14 +285,14 @@ public class CommandsOLD {
                                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
                                                                 String location = "bea";
                                                                 boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                                sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, Islands.HUB, "", lessWaste));
+                                                                sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", lessWaste));
                                                                 return 1;
                                                             })
                                                     ))
                                             .executes((context) -> {
                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
                                                 String location = StringArgumentType.getString(context, "location");
-                                                sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, Islands.HUB, "", true));
+                                                sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", true));
                                                 return 1;
                                             })
 
@@ -320,7 +321,7 @@ public class CommandsOLD {
                         .executes((context) -> {
                             try {
                                 BBsentials.bbserver.sendPacket(new MiningEventPacket(event,//TODO get the island
-                                        config.getUsername(), Islands.HUB));
+                                        config.getUsername(), Objects.requireNonNull(BBUtils.getCurrentIsland())));
                             } catch (Exception e) {
                                 Chat.sendPrivateMessageToSelf("§c" + e.getMessage());
                             }

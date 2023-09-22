@@ -277,7 +277,7 @@ public class CommandsOLD {
                                                                         String extramessage = StringArgumentType.getString(context, "extramessage");
                                                                         String location = StringArgumentType.getString(context, "location");
                                                                         boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                                        sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, BBUtils.getCurrentIsland() , extramessage, lessWaste));
+                                                                        sendPacket(new SplashNotifyPacket(0,hub, config.getUsername(), location, BBUtils.getCurrentIsland() , extramessage, lessWaste));
                                                                         return 1;
                                                                     })
                                                             )
@@ -285,14 +285,14 @@ public class CommandsOLD {
                                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
                                                                 String location = "bea";
                                                                 boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                                sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", lessWaste));
+                                                                sendPacket(new SplashNotifyPacket(0,hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", lessWaste));
                                                                 return 1;
                                                             })
                                                     ))
                                             .executes((context) -> {
                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
                                                 String location = StringArgumentType.getString(context, "location");
-                                                sendPacket(new SplashNotifyPacket(hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", true));
+                                                sendPacket(new SplashNotifyPacket(0,hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", true));
                                                 return 1;
                                             })
 

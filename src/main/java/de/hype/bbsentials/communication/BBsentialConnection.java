@@ -49,14 +49,14 @@ public class BBsentialConnection {
     }
 
     public static int getPotTime() {
-        int remainingTimeInMinutes = 0;
+        int remainingDuration = 0;
         StatusEffectInstance potTimeRequest = MinecraftClient.getInstance().player.getStatusEffect(StatusEffects.STRENGTH);
         if (potTimeRequest != null) {
             if (potTimeRequest.getAmplifier() >= 7) {
-                remainingTimeInMinutes = (int) (potTimeRequest.getDuration() / 20.0);
+                remainingDuration = (int) (potTimeRequest.getDuration() / 20.0);
             }
         }
-        return remainingTimeInMinutes;
+        return remainingDuration;
     }
 
     public static boolean isCommandSafe(String command) {
@@ -345,7 +345,7 @@ public class BBsentialConnection {
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
         int waitTime;
         if (packet.lessWaste) {
-            waitTime = (getPotTime() * 1000) / 80;
+            waitTime = Math.min(((getPotTime() * 1000) / 80),25*1000);
         }
         else {
             waitTime = 0;

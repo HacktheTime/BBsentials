@@ -2,6 +2,7 @@ package de.hype.bbsentials.communication;
 
 import de.hype.bbsentials.chat.Chat;
 import de.hype.bbsentials.client.BBsentials;
+import de.hype.bbsentials.client.SplashManager;
 import de.hype.bbsentials.client.SplashStatusUpdateListener;
 import de.hype.bbsentials.constants.enviromentShared.*;
 import de.hype.bbsentials.packets.AbstractPacket;
@@ -352,27 +353,16 @@ public class BBsentialConnection {
             executionService.submit(splashStatusUpdateListener);
         }
         else {
+            SplashManager.addSplash(packet);
             if (packet.lessWaste) {
                 waitTime = Math.min(((getPotTime() * 1000) / 80), 25 * 1000);
             }
             else {
                 waitTime = 0;
             }
-            String where;
-            if (packet.hubType.equals(Islands.DUNGEON_HUB)) {
-                where = "§5DUNGEON HUB§6";
-            }
-            else {
-                where = "Hub";
-            }
             BBsentials.executionService.schedule(() -> {
-                splashHighlightItem("HUB #" + packet.hub, 20);
-                String timeLoss = "";
-                if (packet.lessWaste) {
-                    timeLoss = "§c(" + waitTime + ")";
-                }
-                Chat.sendPrivateMessageToSelf("§6" + packet.splasherUsername + " is Splashing in " + where + " #" + packet.hub + " at " + packet.location + ":" + packet.extraMessage + " | " + timeLoss);
-            }, waitTime, TimeUnit.MILLISECONDS);
+                SplashManager.display(packet.splashId);
+                }, waitTime, TimeUnit.MILLISECONDS);
         }
     }
 

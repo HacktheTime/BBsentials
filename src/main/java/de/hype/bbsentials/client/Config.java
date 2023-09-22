@@ -38,6 +38,7 @@ public class Config implements Serializable {
     public boolean showBingoChat = true;
     public boolean allowBBinviteMe = true;
     public boolean doDesktopNotifications = false;
+    public boolean showSplashStatusUpdates = true;
     public boolean acceptReparty;
     public boolean autoSplashStatusUpdates;
     public String nickname;

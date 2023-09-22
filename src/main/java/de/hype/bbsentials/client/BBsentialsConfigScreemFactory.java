@@ -70,6 +70,11 @@ public class BBsentialsConfigScreemFactory {
                 .setTooltip(Text.of("Select if you want the Bingo Chat to be show"))
                 .setSaveConsumer(newValue -> config.showBingoChat = newValue)
                 .build());
+        visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Splash Status Updates"), config.showSplashStatusUpdates)
+                .setDefaultValue(true)
+                .setTooltip(Text.of("Select if you want to see Splash Staus updates. Keep in mind that this will only send you status updates for the Splashes which you were shown.\nThose hidden due too too high Splash Time will still remain invisible"))
+                .setSaveConsumer(newValue -> config.showSplashStatusUpdates = newValue)
+                .build());
         //Notifications
         ConfigCategory notifications = builder.getOrCreateCategory(Text.of("Notifications"));
         notifications.addEntry(entryBuilder.startBooleanToggle(Text.of("Do Desktop Notifications"), config.doDesktopNotifications)
@@ -242,9 +247,9 @@ public class BBsentialsConfigScreemFactory {
         }
         if (config.hasBBRoles("splasher")){
             ConfigCategory dev = builder.getOrCreateCategory(Text.of("§dSplashes"));
-            dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), config.devMode)
+            dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Auto Update Statuses"), config.autoSplashStatusUpdates)
                     .setDefaultValue(true)
-                    .setTooltip(Text.of("Auto Update Statuses"))
+                    .setTooltip(Text.of("Automatically updates the Status of the Splash by sending packets to the Server"))
                     .setSaveConsumer(newValue -> config.autoSplashStatusUpdates = newValue)
                     .build());
         }

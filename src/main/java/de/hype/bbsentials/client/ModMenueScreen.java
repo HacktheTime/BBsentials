@@ -10,8 +10,9 @@ import net.minecraft.text.Text;
 public class ModMenueScreen implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        if (FabricLoader.getInstance().isModLoaded("cloth-config2"))
-            return BBsentialsConfigScreemFactory::create;
-        return parent -> new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(parent), Text.of("BBsentials"), Text.of("BBsentials requires Cloth Config to be able to show the config."));
+        if (!FabricLoader.getInstance().isModLoaded("cloth-config2")) {
+            return parent -> new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(parent), Text.of("BBsentials"), Text.of("BBsentials requires Cloth Config to be able to show the config."));
+        }
+        return BBsentialsConfigScreemFactory::create;
     }
 }

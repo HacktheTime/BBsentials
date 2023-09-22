@@ -228,7 +228,7 @@ public class BBsentialsConfigScreemFactory {
                     .build());
         } //Mining Events
         if (config.hasBBRoles("dev")){
-            ConfigCategory dev = builder.getOrCreateCategory(Text.of("Developing"));
+            ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing"));
             dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), config.devMode)
                     .setDefaultValue(false)
                     .setTooltip(Text.of("Dev Mode"))
@@ -238,6 +238,14 @@ public class BBsentialsConfigScreemFactory {
                     .setDefaultValue(false)
                     .setTooltip(Text.of("Detailed Dev Mode"))
                     .setSaveConsumer(newValue -> config.detailedDevMode = newValue)
+                    .build());
+        }
+        if (config.hasBBRoles("splasher")){
+            ConfigCategory dev = builder.getOrCreateCategory(Text.of("§dSplashes"));
+            dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), config.devMode)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Auto Update Statuses"))
+                    .setSaveConsumer(newValue -> config.autoSplashStatusUpdates = newValue)
                     .build());
         }
 

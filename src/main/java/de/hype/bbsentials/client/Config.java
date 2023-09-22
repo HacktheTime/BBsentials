@@ -39,6 +39,7 @@ public class Config implements Serializable {
     public boolean allowBBinviteMe = true;
     public boolean doDesktopNotifications = false;
     public boolean acceptReparty;
+    public boolean autoSplashStatusUpdates;
     public String nickname;
     public String NotifForPartyMessagesType;
 

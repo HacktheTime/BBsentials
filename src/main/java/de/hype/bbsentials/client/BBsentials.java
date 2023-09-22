@@ -35,6 +35,7 @@ public class BBsentials implements ClientModInitializer {
     public static boolean splashLobby;
     private static Thread bbthread;
     private boolean initialised = false;
+    public static SplashStatusUpdateListener splashStatusUpdateListener;
 
     public static Config getConfig() {
         return config;

@@ -2,6 +2,7 @@ package de.hype.bbsentials.chat;
 
 import de.hype.bbsentials.client.BBsentials;
 import de.hype.bbsentials.client.Config;
+import de.hype.bbsentials.packets.packets.SplashUpdatePacket;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.MinecraftClient;
@@ -27,8 +28,7 @@ import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.hype.bbsentials.client.BBsentials.config;
-import static de.hype.bbsentials.client.BBsentials.getConfig;
+import static de.hype.bbsentials.client.BBsentials.*;
 
 public class Chat {
     public Chat() {
@@ -293,6 +293,11 @@ public class Chat {
             }
             else if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
                 setChatPromtId(messageOriginal.toString());
+            }
+            else if (message.startsWith("BUFF! You splashed yourself with")){
+                if (splashStatusUpdateListener!=null){
+                    splashStatusUpdateListener.setStatus(SplashUpdatePacket.STATUS_SPLASHING);
+                }
             }
 
         }

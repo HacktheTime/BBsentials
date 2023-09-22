@@ -1,8 +1,8 @@
 package de.hype.bbsentials.communication;
 
 import de.hype.bbsentials.chat.Chat;
-import de.hype.bbsentials.client.BBUtils;
 import de.hype.bbsentials.client.BBsentials;
+import de.hype.bbsentials.client.SplashStatusUpdateListener;
 import de.hype.bbsentials.constants.enviromentShared.*;
 import de.hype.bbsentials.packets.AbstractPacket;
 import de.hype.bbsentials.packets.PacketManager;
@@ -34,7 +34,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import static de.hype.bbsentials.client.BBsentials.config;
-import static de.hype.bbsentials.client.BBsentials.splashLobby;
+import static de.hype.bbsentials.client.BBsentials.executionService;
 
 public class BBsentialConnection {
     private Socket socket;
@@ -347,23 +347,9 @@ public class BBsentialConnection {
         int waitTime;
 
         if (packet.splasherUsername.equals(config.getUsername())) {
-            BBsentials.splashLobby = true;
-            String status = SplashUpdatePacket.STATUS_WAITING;
-            String newStatus = SplashUpdatePacket.STATUS_WAITING;
-            int maxPlayerCount = BBUtils.getMaximumPlayerCount() - 5;
-            while (splashLobby && !status.equals(SplashUpdatePacket.STATUS_DONE)) {
-                if (BBUtils.getPlayerCount() >= maxPlayerCount) {
-                    newStatus = SplashUpdatePacket.STATUS_FULL;
-                }
-                if (!status.equals(newStatus)) {
-                    status = newStatus;
-                    sendPacket(new SplashUpdatePacket(packet.splashId, status));
-                }
-            }
-            if (!status.equals(newStatus)) {
-                status = newStatus;
-                sendPacket(new SplashUpdatePacket(packet.splashId, status));
-            }
+            SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this,packet);
+            BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
+            executionService.submit(splashStatusUpdateListener);
         }
         else {
             if (packet.lessWaste) {

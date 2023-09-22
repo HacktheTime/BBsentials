@@ -11,9 +11,10 @@
   "contact": {
     "homepage": "https://github.com/HacktheTime/BBsentials1.20",
     "issues": "https://github.com/HacktheTime/BBsentials1.20/issues",
-    "discord": "discord.gg"
+    "email": "s0844x76@duck.com",
+    "sources": "https://github.com/HacktheTime/BBsentials1.20"
   },
-  "license": "All-Rights-Reserved",
+  "license": "Look on Github (Sources). a Modified \"CC BY-NC-ND 4.0\" License",
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -28,5 +29,14 @@
   },
   "mixins": [
     "bbsentials.mixins.json"
-  ]
+  ],
+  "custom": {
+    "modmenu": {
+      "links": {
+        "License": "https://github.com/HacktheTime/BBsentials1.20/blob/master/LICENSE",
+        "modmenu.discord":"discord.gg/qr5mPRq8uG"
+      },
+      "update_checker": true
+    }
+  }
 }

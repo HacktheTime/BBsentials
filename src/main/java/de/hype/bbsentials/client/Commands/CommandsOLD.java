@@ -177,7 +177,7 @@ public class CommandsOLD {
                             )
                     )
             );
-        }); /*chchest*/
+        });/*chchest*/
         event.register((dispatcher, registryAccess) -> {
             dispatcher.register(
                     ClientCommandManager.literal("bbserver")
@@ -277,7 +277,7 @@ public class CommandsOLD {
                                                                         String extramessage = StringArgumentType.getString(context, "extramessage");
                                                                         String location = StringArgumentType.getString(context, "location");
                                                                         boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                                        sendPacket(new SplashNotifyPacket(0,hub, config.getUsername(), location, BBUtils.getCurrentIsland() , extramessage, lessWaste));
+                                                                        splashAnnounce(hub, location, extramessage, lessWaste);
                                                                         return 1;
                                                                     })
                                                             )
@@ -285,14 +285,14 @@ public class CommandsOLD {
                                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
                                                                 String location = "bea";
                                                                 boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                                sendPacket(new SplashNotifyPacket(0,hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", lessWaste));
+                                                                splashAnnounce(hub, location, "", lessWaste);
                                                                 return 1;
                                                             })
                                                     ))
                                             .executes((context) -> {
                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
                                                 String location = StringArgumentType.getString(context, "location");
-                                                sendPacket(new SplashNotifyPacket(0,hub, config.getUsername(), location, BBUtils.getCurrentIsland(), "", true));
+                                                splashAnnounce(hub, location, "", true);
                                                 return 1;
                                             })
 
@@ -328,6 +328,10 @@ public class CommandsOLD {
                             return 1;
                         })
         );
+    }
+
+    public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
+        sendPacket(new SplashNotifyPacket(0, hubNumber, config.getUsername(), locationInHub, BBUtils.getCurrentIsland(), extramessage, lessWaste));
     }
 
 

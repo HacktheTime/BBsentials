@@ -1,6 +1,7 @@
 package de.hype.bbsentials.communication;
 
 import de.hype.bbsentials.chat.Chat;
+import de.hype.bbsentials.client.BBUtils;
 import de.hype.bbsentials.client.BBsentials;
 import de.hype.bbsentials.constants.enviromentShared.*;
 import de.hype.bbsentials.packets.AbstractPacket;
@@ -33,7 +34,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import static de.hype.bbsentials.client.BBsentials.config;
-import static de.hype.bbsentials.client.BBsentials.executionService;
+import static de.hype.bbsentials.client.BBsentials.splashLobby;
 
 public class BBsentialConnection {
     private Socket socket;
@@ -126,7 +127,7 @@ public class BBsentialConnection {
             PublicKey serverPublicKey = serverCertificate.getPublicKey();
 
             // Create a TrustManager that trusts only the server's public key
-            TrustManager[] trustManagers = new TrustManager[] {new X509TrustManager() {
+            TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
                 public X509Certificate[] getAcceptedIssuers() {
                     return null; // We don't need to check the client's certificates
                 }
@@ -344,27 +345,49 @@ public class BBsentialConnection {
 
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
         int waitTime;
-        if (packet.lessWaste) {
-            waitTime = Math.min(((getPotTime() * 1000) / 80),25*1000);
-        }
-        else {
-            waitTime = 0;
-        }
-        String where;
-        if (packet.hubType.equals(Islands.DUNGEON_HUB)) {
-            where = "§5DUNGEON HUB§6";
-        }
-        else {
-            where = "Hub";
-        }
-        BBsentials.executionService.schedule(() -> {
-            splashHighlightItem("HUB #" + packet.hub, 20);
-            String timeLoss = "";
-            if (packet.lessWaste) {
-                timeLoss = "§c(" + waitTime + ")";
+
+        if (packet.splasherUsername.equals(config.getUsername())) {
+            BBsentials.splashLobby = true;
+            String status = SplashUpdatePacket.STATUS_WAITING;
+            String newStatus = SplashUpdatePacket.STATUS_WAITING;
+            int maxPlayerCount = BBUtils.getMaximumPlayerCount() - 5;
+            while (splashLobby && !status.equals(SplashUpdatePacket.STATUS_DONE)) {
+                if (BBUtils.getPlayerCount() >= maxPlayerCount) {
+                    newStatus = SplashUpdatePacket.STATUS_FULL;
+                }
+                if (!status.equals(newStatus)) {
+                    status = newStatus;
+                    sendPacket(new SplashUpdatePacket(packet.splashId, status));
+                }
             }
-            Chat.sendPrivateMessageToSelf("§6" + packet.splasherUsername + " is Splashing in " + where + " #" + packet.hub + " at " + packet.location + ":" + packet.extraMessage + " | " + timeLoss);
-        }, waitTime, TimeUnit.MILLISECONDS);
+            if (!status.equals(newStatus)) {
+                status = newStatus;
+                sendPacket(new SplashUpdatePacket(packet.splashId, status));
+            }
+        }
+        else {
+            if (packet.lessWaste) {
+                waitTime = Math.min(((getPotTime() * 1000) / 80), 25 * 1000);
+            }
+            else {
+                waitTime = 0;
+            }
+            String where;
+            if (packet.hubType.equals(Islands.DUNGEON_HUB)) {
+                where = "§5DUNGEON HUB§6";
+            }
+            else {
+                where = "Hub";
+            }
+            BBsentials.executionService.schedule(() -> {
+                splashHighlightItem("HUB #" + packet.hub, 20);
+                String timeLoss = "";
+                if (packet.lessWaste) {
+                    timeLoss = "§c(" + waitTime + ")";
+                }
+                Chat.sendPrivateMessageToSelf("§6" + packet.splasherUsername + " is Splashing in " + where + " #" + packet.hub + " at " + packet.location + ":" + packet.extraMessage + " | " + timeLoss);
+            }, waitTime, TimeUnit.MILLISECONDS);
+        }
     }
 
     public void onBingoChatMessagePacket(BingoChatMessagePacket packet) {
@@ -375,13 +398,14 @@ public class BBsentialConnection {
 
     public void onChChestPacket(ChChestPacket packet) {
         if (isCommandSafe(packet.bbcommand)) {
-            if (showChChest(packet.items)){
-            String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-            tellrawText = tellrawText.replace("@username", packet.announcerUsername).replace("@item", Arrays.stream(packet.items).map(ChChestItem::getDisplayName).toList().toString()).replace("@coords", packet.locationCoords).replace("@inviteCommand", packet.bbcommand);
-            if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
-                tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
+            if (showChChest(packet.items)) {
+                String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
+                tellrawText = tellrawText.replace("@username", packet.announcerUsername).replace("@item", Arrays.stream(packet.items).map(ChChestItem::getDisplayName).toList().toString()).replace("@coords", packet.locationCoords).replace("@inviteCommand", packet.bbcommand);
+                if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
+                    tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
+                }
+                Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(tellrawText));
             }
-            Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(tellrawText));}
         }
         else {
             Chat.sendPrivateMessageToSelf("§cFiltered out a suspicious packet! Please send a screenshot of this message with ping Hype_the_Time (hackthetime) in Bingo Apothecary, BB, SBZ, offical Hypixel,...");
@@ -392,7 +416,7 @@ public class BBsentialConnection {
     public void onMiningEventPacket(MiningEventPacket packet) {
         if (config.toDisplayConfig.getValue("disableAll")) {
             //its will returns false cause disabled is checked already before.
-            if (config.toDisplayConfig.blockChEvents&&packet.island.equals(Islands.CRYSTAL_HOLLOWS)) return;
+            if (config.toDisplayConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS)) return;
             if (packet.event.equals(MiningEvents.RAFFLE)) {
                 if (!config.toDisplayConfig.raffle) return;
             }
@@ -480,17 +504,18 @@ public class BBsentialConnection {
     public boolean showChChest(ChChestItem[] items) {
         if (config.toDisplayConfig.allChChestItem) return true;
         for (ChChestItem item : items) {
-            if (config.toDisplayConfig.customChChestItem&&item.isCustom()) return true;
-            if (config.toDisplayConfig.allRoboPart&&item.isRoboPart()) return true;
-            if (config.toDisplayConfig.prehistoricEgg&&item.equals(ChChestItems.PrehistoricEgg)) return true;
-            if (config.toDisplayConfig.pickonimbus2000&&item.equals(ChChestItems.Pickonimbus2000)) return true;
-            if (config.toDisplayConfig.controlSwitch&&item.equals(ChChestItems.ControlSwitch)) return true;
-            if (config.toDisplayConfig.electronTransmitter&&item.equals(ChChestItems.ElectronTransmitter)) return true;
-            if (config.toDisplayConfig.robotronReflector&&item.equals(ChChestItems.RobotronReflector)) return true;
-            if (config.toDisplayConfig.superliteMotor&&item.equals(ChChestItems.SuperliteMotor)) return true;
-            if (config.toDisplayConfig.syntheticHeart&&item.equals(ChChestItems.SyntheticHeart)) return true;
-            if (config.toDisplayConfig.flawlessGemstone&&item.equals(ChChestItems.FlawlessGemstone)) return true;
-            if (config.toDisplayConfig.jungleHeart&&item.equals(ChChestItems.JungleHeart)) return true;
+            if (config.toDisplayConfig.customChChestItem && item.isCustom()) return true;
+            if (config.toDisplayConfig.allRoboPart && item.isRoboPart()) return true;
+            if (config.toDisplayConfig.prehistoricEgg && item.equals(ChChestItems.PrehistoricEgg)) return true;
+            if (config.toDisplayConfig.pickonimbus2000 && item.equals(ChChestItems.Pickonimbus2000)) return true;
+            if (config.toDisplayConfig.controlSwitch && item.equals(ChChestItems.ControlSwitch)) return true;
+            if (config.toDisplayConfig.electronTransmitter && item.equals(ChChestItems.ElectronTransmitter))
+                return true;
+            if (config.toDisplayConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector)) return true;
+            if (config.toDisplayConfig.superliteMotor && item.equals(ChChestItems.SuperliteMotor)) return true;
+            if (config.toDisplayConfig.syntheticHeart && item.equals(ChChestItems.SyntheticHeart)) return true;
+            if (config.toDisplayConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone)) return true;
+            if (config.toDisplayConfig.jungleHeart && item.equals(ChChestItems.JungleHeart)) return true;
         }
         return false;
     }

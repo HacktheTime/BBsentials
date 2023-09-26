@@ -188,8 +188,9 @@ public class Chat {
                 else if (message.contains("invited you to join their party")) {
                     if (lastPartyDisbandedMessage != null && partyDisbandedMap != null) {
                         Instant lastDisbandedInstant = partyDisbandedMap.get(getPlayerNameFromMessage(lastPartyDisbandedMessage));
+                        if (config.acceptReparty){
                         if (lastDisbandedInstant != null && lastDisbandedInstant.isAfter(Instant.now().minusSeconds(20)) && (getPlayerNameFromMessage(message).equals(getPlayerNameFromMessage(lastPartyDisbandedMessage)))) {
-                            sendCommand("/p accept " + getPlayerNameFromMessage(lastPartyDisbandedMessage));
+                            sendCommand("/p accept " + getPlayerNameFromMessage(lastPartyDisbandedMessage));}
                         }
                     }
                     if (!MinecraftClient.getInstance().isWindowFocused()) {

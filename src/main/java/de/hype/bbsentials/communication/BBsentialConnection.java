@@ -198,6 +198,7 @@ public class BBsentialConnection {
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (NullPointerException ignored) {
                 }
             });
             messageSenderThread.start();
@@ -227,8 +228,11 @@ public class BBsentialConnection {
         if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
             Chat.sendPrivateMessageToSelf("§bBBDev-s: " + message);
         }
-        if (socket.isConnected() && writer != null) {
-            writer.println(message);
+        try {
+            if (socket.isConnected() && writer != null) {
+                writer.println(message);
+            }
+        } catch (NullPointerException ignored) {
         }
     }
 
@@ -348,7 +352,7 @@ public class BBsentialConnection {
         int waitTime;
 
         if (packet.splasherUsername.equals(config.getUsername())) {
-            SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this,packet);
+            SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet);
             BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
             executionService.submit(splashStatusUpdateListener);
         }
@@ -362,7 +366,7 @@ public class BBsentialConnection {
             }
             BBsentials.executionService.schedule(() -> {
                 SplashManager.display(packet.splashId);
-                }, waitTime, TimeUnit.MILLISECONDS);
+            }, waitTime, TimeUnit.MILLISECONDS);
         }
     }
 

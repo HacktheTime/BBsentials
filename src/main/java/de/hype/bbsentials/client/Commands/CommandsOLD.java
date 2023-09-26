@@ -158,7 +158,7 @@ public class CommandsOLD {
                                             .then(ClientCommandManager.argument("Z", IntegerArgumentType.integer())
                                                     .then(ClientCommandManager.argument("ContactWay", StringArgumentType.string())
                                                             .suggests(((context, builder) -> {
-                                                                return CommandSource.suggestMatching(new String[]{"/msg " + getConfig().getUsername() + " bb:party me", "/p join " + config.getUsername()}, builder);
+                                                                return CommandSource.suggestMatching(new String[]{"\"/msg " + getConfig().getUsername() + " bb:party me\"", "\"/p join " + config.getUsername()+"\""}, builder);
                                                             }))
                                                             .executes((context) -> {
                                                                         String item = StringArgumentType.getString(context, "Item");
@@ -178,23 +178,6 @@ public class CommandsOLD {
                     )
             );
         });/*chchest*/
-        event.register((dispatcher, registryAccess) -> {
-            dispatcher.register(
-                    ClientCommandManager.literal("bbserver")
-                            .then(ClientCommandManager.argument("Message", StringArgumentType.greedyString())
-                                    .executes((context) -> {
-                                        String message = StringArgumentType.getString(context, "Message");
-                                        if (message.equals("bb:reconnect")) {
-                                            BBsentials.connectToBBserver();
-                                        }
-                                        else {
-                                            BBsentials.bbserver.sendMessage(message);
-                                        }
-                                        return 1;
-                                    })
-                            )
-            );
-        });/*BBserver*/
         event.register((dispatcher, registryAccess) -> {
             dispatcher.register(
                     ClientCommandManager.literal("bc")
@@ -283,7 +266,7 @@ public class CommandsOLD {
                                                             )
                                                             .executes((context) -> {
                                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
-                                                                String location = "bea";
+                                                                String location = StringArgumentType.getString(context, "location");
                                                                 boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
                                                                 splashAnnounce(hub, location, "", lessWaste);
                                                                 return 1;
@@ -291,7 +274,7 @@ public class CommandsOLD {
                                                     ))
                                             .executes((context) -> {
                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
-                                                String location = StringArgumentType.getString(context, "location");
+                                                String location = "bea";
                                                 splashAnnounce(hub, location, "", true);
                                                 return 1;
                                             })
@@ -320,7 +303,7 @@ public class CommandsOLD {
                 ClientCommandManager.literal(commandName)
                         .executes((context) -> {
                             try {
-                                BBsentials.bbserver.sendPacket(new MiningEventPacket(event,//TODO get the island
+                                BBsentials.bbserver.sendPacket(new MiningEventPacket(event,
                                         config.getUsername(), Objects.requireNonNull(BBUtils.getCurrentIsland())));
                             } catch (Exception e) {
                                 Chat.sendPrivateMessageToSelf("§c" + e.getMessage());

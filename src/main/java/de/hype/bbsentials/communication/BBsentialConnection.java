@@ -66,7 +66,7 @@ public class BBsentialConnection {
             return true;
         }
         else {
-            BBsentials.bbserver.sendCommand("?emergency server-hacked? chchest command " + command);
+            BBsentials.connection.sendCommand("?emergency server-hacked? chchest command " + command);
             String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and Developer Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
             System.out.println(emergencyMessage);
             Chat.sendPrivateMessageToSelf("§4" + emergencyMessage + "\n\n");
@@ -445,7 +445,12 @@ public class BBsentialConnection {
     }
 
     public void onDisconnectPacket(DisconnectPacket packet) {
-
+        Chat.sendPrivateMessageToSelf(packet.displayMessage);
+        for (int i : packet.waitBeforeReconnect) {
+            executionService.schedule(() -> {
+                BBsentials.conditionalReconnectToBBserver();
+            }, i, TimeUnit.SECONDS);
+        }
     }
 
     public void onDisplayMessagePacket(DisplayMessagePacket packet) {
@@ -502,5 +507,14 @@ public class BBsentialConnection {
 
     public interface MessageReceivedCallback {
         void onMessageReceived(String message);
+    }
+
+    public boolean isConnected() {
+        try {
+            socket.isConnected();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

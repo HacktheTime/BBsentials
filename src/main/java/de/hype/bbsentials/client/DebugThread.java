@@ -2,13 +2,11 @@ package de.hype.bbsentials.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DebugThread implements Runnable {
-    Scoreboard temp;
 
     @Override
     public void run() {

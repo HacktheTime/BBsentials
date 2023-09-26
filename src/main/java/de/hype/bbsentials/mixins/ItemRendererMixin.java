@@ -27,7 +27,7 @@ public class ItemRendererMixin {
     @Inject(method = "renderItem", at = @At("HEAD"), cancellable = true)
     private void renderItemMixin(ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
         if (BBsentials.config.highlightitem) {
-            setCustomName(stack, BBsentials.bbserver.getItemName());
+            setCustomName(stack, BBsentials.connection.getItemName());
         }
     }
 

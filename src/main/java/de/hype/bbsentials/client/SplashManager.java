@@ -43,7 +43,7 @@ public class SplashManager {
         else {
             where = "Hub";
         }
-        BBsentials.bbserver.splashHighlightItem("HUB #" + splash.hub, 20);
+        BBsentials.connection.splashHighlightItem("HUB #" + splash.hub, 20);
         Chat.sendPrivateMessageToSelf("§6" + splash.splasherUsername + " is Splashing in " + where + " #" + splash.hub + " at " + splash.location + ":" + splash.extraMessage);
     }
 

@@ -29,7 +29,7 @@ import static de.hype.bbsentials.chat.Chat.*;
 
 public class BBsentials implements ClientModInitializer {
     public static Config config;
-    public static BBsentialConnection bbserver;
+    public static BBsentialConnection connection;
     public static CommandsOLD coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     public static boolean splashLobby;
@@ -45,9 +45,22 @@ public class BBsentials implements ClientModInitializer {
         connectToBBserver(config.connectToBeta);
     }
 
+    /**
+     * Checks if still connected to the Server.
+     * @return true if it connected; false if old connection is kept.
+     */
+    public static boolean conditionalReconnectToBBserver() {
+        if (!connection.isConnected()) {
+            Chat.sendPrivateMessageToSelf("Reconnecting");
+            connectToBBserver(config.connectToBeta);
+            return true;
+        }
+        return false;
+    }
+
     public static void connectToBBserver(boolean beta) {
-        if (bbserver != null) {
-            bbserver.sendHiddenMessage("exit");
+        if (connection != null) {
+            connection.sendHiddenMessage("exit");
         }
         if (bbthread != null) {
             if (bbthread.isAlive()) {
@@ -55,14 +68,14 @@ public class BBsentials implements ClientModInitializer {
             }
         }
         bbthread = new Thread(() -> {
-            bbserver = new BBsentialConnection();
+            connection = new BBsentialConnection();
             coms = new CommandsOLD();
-            bbserver.setMessageReceivedCallback(message -> executionService.execute(() -> bbserver.onMessageReceived(message)));
+            connection.setMessageReceivedCallback(message -> executionService.execute(() -> connection.onMessageReceived(message)));
             if (beta) {
-                bbserver.connect(config.getBBServerURL(), 5011);
+                connection.connect(config.getBBServerURL(), 5011);
             }
             else {
-                bbserver.connect(config.getBBServerURL(), 5000);
+                connection.connect(config.getBBServerURL(), 5000);
             }
             executionService.scheduleAtFixedRate(new DebugThread(), 0, 20, TimeUnit.SECONDS);
         });
@@ -83,7 +96,7 @@ public class BBsentials implements ClientModInitializer {
             splashLobby = false;
             if (!initialised) {
                 config = Config.load();
-                Options.setGamma(10);
+                if (config.doGammaOverride) Options.setGamma(10);
                 Chat chat = new Chat();
                 if (Config.isBingoTime() || config.overrideBingoTime()) {
                     connectToBBserver();
@@ -92,6 +105,7 @@ public class BBsentials implements ClientModInitializer {
             }
         });
     }
+
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("bbi")

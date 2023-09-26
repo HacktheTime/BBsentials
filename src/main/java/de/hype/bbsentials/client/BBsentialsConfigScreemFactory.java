@@ -16,7 +16,7 @@ public class BBsentialsConfigScreemFactory {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Text.of("BBsentials Config"));
-        //builder.setSavingRunnable(BBsentials.getConfig()::save);
+        builder.setSavingRunnable(BBsentials.getConfig()::save);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory server = builder.getOrCreateCategory(Text.of("Server"));
         if (config.getUsername().equalsIgnoreCase("Hype_the_Time")) {
@@ -96,6 +96,11 @@ public class BBsentialsConfigScreemFactory {
                 .build());
         //other
         ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));
+        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Gamma Override"), config.doGammaOverride)
+                .setDefaultValue(true)
+                .setTooltip(Text.of("Select if you want BBsentials to enable full bright"))
+                .setSaveConsumer(newValue -> config.doGammaOverride = newValue)
+                .build());
         other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), config.acceptReparty)
                 .setDefaultValue(true)
                 .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))

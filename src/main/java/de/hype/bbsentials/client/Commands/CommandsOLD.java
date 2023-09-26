@@ -158,7 +158,7 @@ public class CommandsOLD {
                                             .then(ClientCommandManager.argument("Z", IntegerArgumentType.integer())
                                                     .then(ClientCommandManager.argument("ContactWay", StringArgumentType.string())
                                                             .suggests(((context, builder) -> {
-                                                                return CommandSource.suggestMatching(new String[]{"\"/msg " + getConfig().getUsername() + " bb:party me\"", "\"/p join " + config.getUsername()+"\""}, builder);
+                                                                return CommandSource.suggestMatching(new String[]{"\"/msg " + getConfig().getUsername() + " bb:party me\"", "\"/p join " + config.getUsername() + "\""}, builder);
                                                             }))
                                                             .executes((context) -> {
                                                                         String item = StringArgumentType.getString(context, "Item");
@@ -167,7 +167,7 @@ public class CommandsOLD {
                                                                         int z = IntegerArgumentType.getInteger(context, "Z");
                                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
 
-                                                                        bbserver.sendPacket(new ChChestPacket("", ChChestItems.getItem(item.split(";")), x + " " + y + " " + z, contactWay, ""));
+                                                                        connection.sendPacket(new ChChestPacket("", ChChestItems.getItem(item.split(";")), x + " " + y + " " + z, contactWay, ""));
                                                                         return 1;
                                                                     }
                                                             )
@@ -217,29 +217,53 @@ public class CommandsOLD {
                     );
                 });/*bAnnounce*/
                 event.register((dispatcher, registryAccess) -> {
-                    dispatcher.register(
-                            ClientCommandManager.literal("bmute")
-                                    .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
-                                            .executes((context) -> {
-                                                String message = StringArgumentType.getString(context, "message");
-                                                sendCommand("?mute " + message);
-                                                return 1;
-                                            })
+                    dispatcher.register(ClientCommandManager.literal("bmute")
+                            .then(ClientCommandManager.argument("userId/mcusername", StringArgumentType.string())
+                                    .then(ClientCommandManager.argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+                                            .then(ClientCommandManager.argument("reason", StringArgumentType.greedyString())
+                                                    .executes((context) -> {
+                                                        String identification = StringArgumentType.getString(context, "userId/mcusername");
+                                                        String duration = StringArgumentType.getString(context,"[Duration(d/h/m/s) | 0 forever]");
+                                                        String reason = StringArgumentType.getString(context, "reason");
+                                                        int userId = -1;
+                                                        String mcusername = "";
+                                                        if (identification.replaceAll("[\\d]","").trim().isEmpty()){
+                                                            userId=Integer.parseInt(identification);
+                                                        }else {
+                                                            mcusername=identification;
+                                                        }
+                                                        sendPacket(new PunishUserPacket(PunishUserPacket.PUNISHMENT_TYPE_MUTE,userId,mcusername,duration,reason));
+                                                        return 1;
+                                                    })
+                                            )
                                     )
+                            )
                     );
                 });/*bmute*/
                 event.register((dispatcher, registryAccess) -> {
-                    dispatcher.register(
-                            ClientCommandManager.literal("bban")
-                                    .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
-                                            .executes((context) -> {
-                                                String message = StringArgumentType.getString(context, "message");
-                                                sendCommand("?bban " + message);
-                                                return 1;
-                                            })
+                    dispatcher.register(ClientCommandManager.literal("bban")
+                            .then(ClientCommandManager.argument("userId/mcusername", StringArgumentType.string())
+                                    .then(ClientCommandManager.argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+                                            .then(ClientCommandManager.argument("reason", StringArgumentType.greedyString())
+                                                    .executes((context) -> {
+                                                        String identification = StringArgumentType.getString(context, "userId/mcusername");
+                                                        String duration = StringArgumentType.getString(context,"[Duration(d/h/m/s) | 0 forever]");
+                                                        String reason = StringArgumentType.getString(context, "reason");
+                                                        int userId = -1;
+                                                        String mcusername = "";
+                                                        if (identification.replaceAll("[\\d]","").trim().isEmpty()){
+                                                            userId=Integer.parseInt(identification);
+                                                        }else {
+                                                            mcusername=identification;
+                                                        }
+                                                        sendPacket(new PunishUserPacket(PunishUserPacket.PUNISHMENT_TYPE_BAN,userId,mcusername,duration,reason));
+                                                        return 1;
+                                                    })
+                                            )
                                     )
+                            )
                     );
-                });/*bmute*/
+                });/*ban*/
             }
             if (getConfig().hasBBRoles("splasher")) {
                 event.register((dispatcher, registryAccess) -> {
@@ -292,7 +316,7 @@ public class CommandsOLD {
         dispatcher.register(
                 ClientCommandManager.literal(commandName)
                         .executes((context) -> {
-                            BBsentials.bbserver.sendPacket(new InternalCommandPacket(commandName, parameters));
+                            BBsentials.connection.sendPacket(new InternalCommandPacket(commandName, parameters));
                             return 1;
                         })
         );
@@ -303,7 +327,7 @@ public class CommandsOLD {
                 ClientCommandManager.literal(commandName)
                         .executes((context) -> {
                             try {
-                                BBsentials.bbserver.sendPacket(new MiningEventPacket(event,
+                                BBsentials.connection.sendPacket(new MiningEventPacket(event,
                                         config.getUsername(), Objects.requireNonNull(BBUtils.getCurrentIsland())));
                             } catch (Exception e) {
                                 Chat.sendPrivateMessageToSelf("§c" + e.getMessage());
@@ -319,10 +343,10 @@ public class CommandsOLD {
 
 
     public void sendCommand(String message) {
-        BBsentials.bbserver.sendCommand(message);
+        BBsentials.connection.sendCommand(message);
     }
 
     public <E extends AbstractPacket> void sendPacket(E packet) {
-        BBsentials.bbserver.sendPacket(packet);
+        BBsentials.connection.sendPacket(packet);
     }
 }

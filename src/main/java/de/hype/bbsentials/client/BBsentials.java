@@ -15,7 +15,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
-import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +50,7 @@ public class BBsentials implements ClientModInitializer {
      */
     public static boolean conditionalReconnectToBBserver() {
         if (!connection.isConnected()) {
-            Chat.sendPrivateMessageToSelf("Reconnecting");
+            Chat.sendPrivateMessageToSelfInfo("Reconnecting");
             connectToBBserver(config.connectToBeta);
             return true;
         }
@@ -80,11 +79,6 @@ public class BBsentials implements ClientModInitializer {
             executionService.scheduleAtFixedRate(new DebugThread(), 0, 20, TimeUnit.SECONDS);
         });
         bbthread.start();
-    }
-
-    public static void refreshCommands() {
-        Chat.sendPrivateMessageToSelf("Setting up commands");
-        coms = new CommandsOLD();
     }
 
     /**
@@ -134,7 +128,7 @@ public class BBsentials implements ClientModInitializer {
                                         switch (category) {
                                             case "save":
                                                 getConfig().save();
-                                                sendPrivateMessageToSelf(Formatting.GREEN + "Saved config successfully");
+                                                sendPrivateMessageToSelfSuccess("Saved config successfully");
                                                 break;
                                             case "load":
                                                 BBsentials.config = Config.load();
@@ -177,7 +171,7 @@ public class BBsentials implements ClientModInitializer {
                                                                          InstantiationException |
                                                                          InvocationTargetException |
                                                                          NoSuchMethodException e) {
-                                                                    Chat.sendPrivateMessageToSelf("§cInvalid variable or value");
+                                                                    Chat.sendPrivateMessageToSelfError("Invalid variable or value");
                                                                 }
                                                                 return 1;
                                                             })))))
@@ -228,7 +222,7 @@ public class BBsentials implements ClientModInitializer {
             if (promptKeyBind.wasPressed()) {
                 if (config.getLastChatPromptAnswer() != null) {
                     if (config.isDetailedDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelf(config.getLastChatPromptAnswer());
+                        Chat.sendPrivateMessageToSelfDebug(config.getLastChatPromptAnswer());
                     }
                     MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(config.getLastChatPromptAnswer());
                 }

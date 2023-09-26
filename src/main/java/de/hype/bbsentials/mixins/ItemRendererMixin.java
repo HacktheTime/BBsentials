@@ -1,6 +1,5 @@
 package de.hype.bbsentials.mixins;
 
-import de.hype.bbsentials.chat.Chat;
 import de.hype.bbsentials.client.BBsentials;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -35,8 +34,6 @@ public class ItemRendererMixin {
     private void setCustomName(ItemStack stack, String triggerName) {
         String temp = stack.getName().getString();
         if ((!temp.contains("Splash")) && temp.contains(triggerName)) {
-            String tem2 = stack.getNbt().getString("Display");
-            Chat.sendPrivateMessageToSelf(tem2);
             stack.setCustomName(Text.literal("§6(Bingo Splash) " + temp));
         }
     }

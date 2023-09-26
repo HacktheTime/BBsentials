@@ -9,7 +9,7 @@ public class BBUtils {
         try {
             String string = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-b").getDisplayName().getString();
             if (!string.startsWith("Area: ")) {
-                Chat.sendPrivateMessageToSelf("§4Could not get Area data. Are you in Skyblock?");
+                Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
             }
             else {
                 return Islands.getByDisplayName(string.replace("Area: ", "").trim());

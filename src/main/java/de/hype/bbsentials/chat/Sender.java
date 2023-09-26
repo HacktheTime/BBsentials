@@ -7,7 +7,7 @@ import net.minecraft.util.Formatting;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.hype.bbsentials.chat.Chat.sendPrivateMessageToSelf;
+import static de.hype.bbsentials.chat.Chat.sendPrivateMessageToSelfInfo;
 import static de.hype.bbsentials.chat.Chat.sendPrivateMessageToSelfText;
 
 public class Sender {
@@ -99,7 +99,7 @@ public class Sender {
             }
             MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(toSend);
             if (!hidden) {
-                sendPrivateMessageToSelf("Sent Command to Server: " + toSend);
+                sendPrivateMessageToSelfInfo("Sent Command to Server: " + toSend);
             }
         }
     }

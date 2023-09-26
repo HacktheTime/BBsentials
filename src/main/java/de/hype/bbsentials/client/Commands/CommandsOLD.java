@@ -330,7 +330,7 @@ public class CommandsOLD {
                                 BBsentials.connection.sendPacket(new MiningEventPacket(event,
                                         config.getUsername(), Objects.requireNonNull(BBUtils.getCurrentIsland())));
                             } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelf("§c" + e.getMessage());
+                                Chat.sendPrivateMessageToSelfError(e.getMessage());
                             }
                             return 1;
                         })

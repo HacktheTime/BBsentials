@@ -53,7 +53,7 @@ public class Discord {
                 }
 
                 String responseString = responseBuilder.toString();
-                Chat.sendPrivateMessageToSelf(responseString);
+                Chat.sendPrivateMessageToSelfInfo(responseString);
             }
 
             response.close();

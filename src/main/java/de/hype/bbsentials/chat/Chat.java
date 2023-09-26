@@ -71,7 +71,7 @@ public class Chat {
     public static void setVariableValue(Object obj, String variableName, String value) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         if (value == null) {
             // Handle null value case
-            sendPrivateMessageToSelf(Formatting.RED + "Invalid value: null");
+            sendPrivateMessageToSelfError("Invalid value: null");
             return;
         }
 
@@ -94,7 +94,7 @@ public class Chat {
         }
 
         // Check and output the value of the variable
-        sendPrivateMessageToSelf(Formatting.GREEN + "The variable " + field.getName() + " is now: " + field.get(obj));
+        sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is now: " + field.get(obj));
     }
 
     private static Object parseValue(String value, Class<?> targetType) {
@@ -123,7 +123,7 @@ public class Chat {
         Class<?> objClass = object.getClass();
         Field field = objClass.getDeclaredField(variableName);
         field.setAccessible(true);
-        sendPrivateMessageToSelf(Formatting.GREEN + "The variable " + field.getName() + " is: " + field.get(object));
+        sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is: " + field.get(object));
     }
 
     private void init() {
@@ -169,7 +169,7 @@ public class Chat {
         String message = messageOriginal.getString().trim();
         if (getConfig().messageFromAlreadyReported(message) && getPlayerNameFromMessage(message) != " " && getPlayerNameFromMessage(message) != "") {
             System.out.println("Message: " + message);
-            sendPrivateMessageToSelf(Formatting.RED + "B: " + message);
+            sendPrivateMessageToSelfBase(Formatting.RED + "B: " + message);
             return null;
         }
         if (getConfig().isDetailedDevModeEnabled()) {
@@ -181,8 +181,8 @@ public class Chat {
                 if (message.contains("disbanded the party")) {
                     lastPartyDisbandedMessage = message;
                     partyDisbandedMap.put(getPlayerNameFromMessage(message), Instant.now());
-                    if (getConfig().isDevModeEnabled()) {
-                        sendPrivateMessageToSelf("Watching next 20 Sec for invite: " + getPlayerNameFromMessage(message));
+                    if (getConfig().isDevModeEnabled()&&config.acceptReparty) {
+                        sendPrivateMessageToSelfDebug("Watching next 20 Sec for invite: " + getPlayerNameFromMessage(message));
                     }
                 }
                 else if (message.contains("invited you to join their party")) {
@@ -245,7 +245,7 @@ public class Chat {
 
             }
             else if (message.contains("bb:test")) {
-                sendPrivateMessageToSelf(test());
+                sendPrivateMessageToSelfDebug(test());
             }
             else if ((message.endsWith("is visiting Your Garden !") || message.endsWith("is visiting Your Island !")) && !MinecraftClient.getInstance().isWindowFocused()&& config.doDesktopNotifications) {
                 sendNotification("BBsentials Visit-Watcher", message);
@@ -270,18 +270,18 @@ public class Chat {
                     if ((message.contains("Party Leader:") && !message.contains(getConfig().getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(getConfig().getUsername()) || (!message.startsWith("The party was transferred to " + getConfig().getUsername()) && message.startsWith("The party was transferred to"))) || message.equals(getConfig().getUsername() + " is now a Party Moderator") || (message.equals("The party was disbanded because all invites expired and the party was empty.")) || (message.contains("You have joined ") && message.contains("'s party!")) || (message.contains("Party Leader, ") && message.contains(" , summoned you to their server.")) || (message.contains("warped to your dungeon"))) {
                         BBsentials.getConfig().setIsLeader(false);
                         if (getConfig().isDetailedDevModeEnabled()) {
-                            sendPrivateMessageToSelf("Leader: " + getConfig().isLeader());
+                            sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
                         }
                     }
                     if ((message.equals("Party Leader: " + getConfig().getUsername() + " ●")) || (message.contains(getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + getConfig().getUsername()) || message.equals("Raul_J has promoted " + getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
                         BBsentials.getConfig().setIsLeader(true);
                         if (getConfig().isDetailedDevModeEnabled()) {
-                            sendPrivateMessageToSelf("Leader: " + getConfig().isLeader());
+                            sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
                         }
                     }
                     else if (repartyActive && !BBsentials.getConfig().isLeader()) {
                         repartyActive = false;
-                        sendPrivateMessageToSelf("Resetted Reparty is Active since you are not leader ");
+                        sendPrivateMessageToSelfInfo("Resetted Reparty is Active since you are not leader ");
                     }
                 }
                 else {
@@ -388,10 +388,28 @@ public class Chat {
         return input.replaceAll("\\s+", " ");
     }
 
-    public static void sendPrivateMessageToSelf(String message) {
+    public static void sendPrivateMessageToSelfError(String message) {
+        sendPrivateMessageToSelfBase(Formatting.RED + message);
+    }
+    public static void sendPrivateMessageToSelfFatal(String message) {
+        sendPrivateMessageToSelfBase(Formatting.DARK_RED + message);
+    }
+    public static void sendPrivateMessageToSelfSuccess(String message) {
+        sendPrivateMessageToSelfBase(Formatting.GREEN + message);
+    }
+    public static void sendPrivateMessageToSelfInfo(String message) {
+        sendPrivateMessageToSelfBase(Formatting.YELLOW + message);
+    }
+    public static void sendPrivateMessageToSelfImportantInfo(String message) {
+        sendPrivateMessageToSelfBase(Formatting.GOLD + message);
+    }
+    public static void sendPrivateMessageToSelfDebug(String message) {
+        sendPrivateMessageToSelfBase(Formatting.AQUA + message);
+    }
+    private static void sendPrivateMessageToSelfBase(String message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
-            client.player.sendMessage(Text.of((Formatting.RED + message.formatted(Formatting.RED))));
+            client.player.sendMessage(Text.of(Formatting.RED + message));
         }
     }
 
@@ -472,7 +490,7 @@ public class Chat {
             }
             else {
                 // Handle unrecognized menu argument
-                sendPrivateMessageToSelf(Formatting.RED + "Unrecognized menu argument! Do not use this command unless you know exactly what you are doing aka only use it as a developer!");
+                sendPrivateMessageToSelfError("Unrecognized menu argument! Do not use this command unless you know exactly what you are doing aka only use it as a developer!");
                 return;
             }
             command = command.replaceAll("@username", username);
@@ -480,7 +498,7 @@ public class Chat {
             sendPrivateMessageToSelfText(createClientSideTellraw(command));
         }
         else {
-            sendPrivateMessageToSelf("Invalid message!: " + message);
+            sendPrivateMessageToSelfError("Invalid message!: " + message);
         }
     }
 
@@ -502,7 +520,7 @@ public class Chat {
                     String promptCommand = "/cb " + finalLastPrompt1;
                     BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
                     if (config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelf("set the last prompt action too + \""+promptCommand+"\"");
+                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \""+promptCommand+"\"");
                     }
                     try {
                         Thread.sleep(10 * 1000);
@@ -523,7 +541,7 @@ public class Chat {
                     String promptCommand = "/chatprompt " + finalLastPrompt + " YES";
                     getConfig().setLastChatPromptAnswer(promptCommand);
                     if (config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelf("set the last prompt action too + \""+promptCommand+"\"");
+                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \""+promptCommand+"\"");
                     }
                     try {
                         Thread.sleep(10 * 1000);

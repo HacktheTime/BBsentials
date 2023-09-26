@@ -24,7 +24,7 @@ public class SplashManager {
         if (splash != null) {
             if (splash.alreadyDisplayed) {
                 if (BBsentials.config.showSplashStatusUpdates) {
-                    Chat.sendPrivateMessageToSelf(splash.hubType.getDisplayName() + " #" + splash.hub + " is " + packet.status);
+                    Chat.sendPrivateMessageToSelfImportantInfo(splash.hubType.getDisplayName() + " #" + splash.hub + " is " + packet.status);
                 }
             }
             else {
@@ -44,7 +44,7 @@ public class SplashManager {
             where = "Hub";
         }
         BBsentials.connection.splashHighlightItem("HUB #" + splash.hub, 20);
-        Chat.sendPrivateMessageToSelf("§6" + splash.splasherUsername + " is Splashing in " + where + " #" + splash.hub + " at " + splash.location + ":" + splash.extraMessage);
+        Chat.sendPrivateMessageToSelfImportantInfo(splash.splasherUsername + " is Splashing in " + where + " #" + splash.hub + " at " + splash.location + ":" + splash.extraMessage);
     }
 
     private static class DisplaySplash extends SplashNotifyPacket {

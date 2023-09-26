@@ -69,8 +69,7 @@ public class BBsentialConnection {
             BBsentials.connection.sendCommand("?emergency server-hacked? chchest command " + command);
             String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and Developer Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
             System.out.println(emergencyMessage);
-            Chat.sendPrivateMessageToSelf("§4" + emergencyMessage + "\n\n");
-            Chat.sendPrivateMessageToSelf("§4" + emergencyMessage + "\n\n");
+            Chat.sendPrivateMessageToSelfFatal("§4" + emergencyMessage + "\n\n");
             /*try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -174,7 +173,7 @@ public class BBsentialConnection {
                                 messageReceivedCallback.onMessageReceived(message);
                             }
                             else {
-                                Chat.sendPrivateMessageToSelf("BB: It seemed like you disconnected. Reconnecting...");
+                                Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected. Reconnecting...");
                                 BBsentials.connectToBBserver();
                                 try {
                                     Thread.sleep(1000 * 10);
@@ -216,17 +215,17 @@ public class BBsentialConnection {
 
     public void sendMessage(String message) {
         if (messageQueue != null) {
-            Chat.sendPrivateMessageToSelf("§aBBs: " + message);
+            Chat.sendPrivateMessageToSelfDebug("BBs: " + message);
             messageQueue.offer(message);
         }
         else {
-            Chat.sendPrivateMessageToSelf("§4BB: It seems like the connection was lost. Please try to reconnect with /bbi reconnect");
+            Chat.sendPrivateMessageToSelfError("BB: It seems like the connection was lost. Please try to reconnect with /bbi reconnect");
         }
     }
 
     public void sendHiddenMessage(String message) {
         if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-            Chat.sendPrivateMessageToSelf("§bBBDev-s: " + message);
+            Chat.sendPrivateMessageToSelfDebug("BBDev-s: " + message);
         }
         try {
             if (socket.isConnected() && writer != null) {
@@ -238,13 +237,13 @@ public class BBsentialConnection {
 
     public void sendCommand(String message) {
         if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-            Chat.sendPrivateMessageToSelf("§bBBDev-s: " + message);
+            Chat.sendPrivateMessageToSelfDebug("BBDev-s: " + message);
         }
         if (socket.isConnected() && writer != null) {
             writer.println(message);
         }
         else {
-            Chat.sendPrivateMessageToSelf("§4BB: It seems like the connection was lost. Please try to reconnect with /bbi reconnect");
+            Chat.sendPrivateMessageToSelfFatal("BB: It seems like the connection was lost. Please try to reconnect with /bbi reconnect");
         }
     }
 
@@ -254,7 +253,7 @@ public class BBsentialConnection {
         if (!PacketUtils.handleIfPacket(this, message)) {
             if (message.startsWith("H-")) {
                 if (message.equals("H-BB-Login: ")) {
-                    Chat.sendPrivateMessageToSelf("§aLogging into BBsentials-online");
+                    Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -295,11 +294,11 @@ public class BBsentialConnection {
                     }
                 }
                 if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                    Chat.sendPrivateMessageToSelf("BBDev-r: " + message);
+                    Chat.sendPrivateMessageToSelfDebug("BBDev-r: " + message);
                 }
             }
             else {
-                Chat.sendPrivateMessageToSelf("§aBB: " + message);
+                Chat.sendPrivateMessageToSelfSuccess("BB: " + message);
             }
         }
     }
@@ -334,18 +333,18 @@ public class BBsentialConnection {
         String packetName = packet.getClass().getSimpleName();
         String rawjson = PacketUtils.parsePacketToJson(packet);
         if (BBsentials.getConfig().isDetailedDevModeEnabled() && !(packet.getClass().equals(RequestConnectPacket.class))) {
-            Chat.sendPrivateMessageToSelf("BBDev-sP: " + packetName + ": " + rawjson);
+            Chat.sendPrivateMessageToSelfDebug("BBDev-sP: " + packetName + ": " + rawjson);
         }
         if (socket.isConnected() && writer != null) {
             writer.println(packetName + "." + rawjson);
         }
         else {
-            Chat.sendPrivateMessageToSelf("BB: Couldn't send a Packet? did you get disconnected?");
+            Chat.sendPrivateMessageToSelfError("BB: Couldn't send a Packet? did you get disconnected?");
         }
     }
 
     public void onBroadcastMessagePacket(BroadcastMessagePacket packet) {
-        Chat.sendPrivateMessageToSelf("§6[A]§r [" + packet.prefix + "] " + packet.username + ": " + packet.message);
+        Chat.sendPrivateMessageToSelfImportantInfo("[A] §r[" + packet.prefix + "§r]§6 " + packet.username + ": " + packet.message);
     }
 
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
@@ -372,7 +371,7 @@ public class BBsentialConnection {
 
     public void onBingoChatMessagePacket(BingoChatMessagePacket packet) {
         if (config.showBingoChat) {
-            Chat.sendPrivateMessageToSelf("[" + packet.prefix + "] " + packet.username + ": " + packet.message);
+            Chat.sendPrivateMessageToSelfInfo("[" + packet.prefix + "] " + packet.username + ": " + packet.message);
         }
     }
 
@@ -388,8 +387,8 @@ public class BBsentialConnection {
             }
         }
         else {
-            Chat.sendPrivateMessageToSelf("§cFiltered out a suspicious packet! Please send a screenshot of this message with ping Hype_the_Time (hackthetime) in Bingo Apothecary, BB, SBZ, offical Hypixel,...");
-            Chat.sendPrivateMessageToSelf(PacketUtils.parsePacketToJson(packet));
+            Chat.sendPrivateMessageToSelfImportantInfo("§cFiltered out a suspicious packet! Please send a screenshot of this message with ping Hype_the_Time (hackthetime) in Bingo Apothecary, BB, SBZ, offical Hypixel,...");
+            Chat.sendPrivateMessageToSelfImportantInfo(PacketUtils.parsePacketToJson(packet));
         }
     }
 
@@ -427,25 +426,25 @@ public class BBsentialConnection {
                 if (config.toDisplayConfig.goneWithTheWind.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
                     return;
             }
-            Chat.sendPrivateMessageToSelf(packet.username + "There is a " + packet.event.getDisplayName() + "in the " + packet.island.getDisplayName() + " now/soon.");
+            Chat.sendPrivateMessageToSelfImportantInfo(packet.username + "There is a " + packet.event.getDisplayName() + "in the " + packet.island.getDisplayName() + " now/soon.");
         }
     }
 
     public void onWelcomePacket(WelcomeClientPacket packet) {
         if (packet.success) {
             config.bbsentialsRoles = packet.roles;
-            Chat.sendPrivateMessageToSelf("§aLogin Success");
+            Chat.sendPrivateMessageToSelfSuccess("Login Success");
             if (!packet.motd.isEmpty()) {
-                Chat.sendPrivateMessageToSelf(packet.motd);
+                Chat.sendPrivateMessageToSelfImportantInfo(packet.motd);
             }
         }
         else {
-            Chat.sendPrivateMessageToSelf("Login Failed");
+            Chat.sendPrivateMessageToSelfError("Login Failed");
         }
     }
 
     public void onDisconnectPacket(DisconnectPacket packet) {
-        Chat.sendPrivateMessageToSelf(packet.displayMessage);
+        Chat.sendPrivateMessageToSelfError(packet.displayMessage);
         for (int i : packet.waitBeforeReconnect) {
             executionService.schedule(() -> {
                 BBsentials.conditionalReconnectToBBserver();
@@ -453,13 +452,9 @@ public class BBsentialConnection {
         }
     }
 
-    public void onDisplayMessagePacket(DisplayMessagePacket packet) {
-        Chat.sendPrivateMessageToSelf("§r" + packet.message);
-    }
-
     public void onDisplayTellrawMessagePacket(DisplayTellrawMessagePacket packet) {
         /*Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(packet.rawJson));*/
-        Chat.sendPrivateMessageToSelf("You received a tellraw Packet but it got ignored due too there being no safety checks in this version.");
+        Chat.sendPrivateMessageToSelfImportantInfo("You received a tellraw Packet but it got ignored due too there being no safety checks in this version.");
     }
 
     public void onInternalCommandPacket(InternalCommandPacket packet) {
@@ -467,7 +462,7 @@ public class BBsentialConnection {
     }
 
     public void onInvalidCommandFeedbackPacket(InvalidCommandFeedbackPacket packet) {
-        Chat.sendPrivateMessageToSelf(packet.displayMessage);
+        Chat.sendPrivateMessageToSelfError(packet.displayMessage);
     }
 
     public void onPartyPacket(PartyPacket packet) {
@@ -476,10 +471,10 @@ public class BBsentialConnection {
 
     public void onSystemMessagePacket(SystemMessagePacket packet) {
         if (packet.important) {
-            Chat.sendPrivateMessageToSelf("§c§n" + packet.message);
+            Chat.sendPrivateMessageToSelfImportantInfo("§n" + packet.message);
         }
         else {
-            Chat.sendPrivateMessageToSelf("§r" + packet.message);
+            Chat.sendPrivateMessageToSelfInfo(packet.message);
         }
         if (packet.ping) {
             playsound(SoundEvents.ENTITY_WARDEN_DIG);

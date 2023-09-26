@@ -27,7 +27,6 @@ public class PacketManager {
         packets.add(new Packet<>(BroadcastMessagePacket.class, connection::onBroadcastMessagePacket));
         packets.add(new Packet<>(ChChestPacket.class, connection::onChChestPacket));
         packets.add(new Packet<>(DisconnectPacket.class, connection::onDisconnectPacket));
-        packets.add(new Packet<>(DisplayMessagePacket.class, connection::onDisplayMessagePacket));
         packets.add(new Packet<>(DisplayTellrawMessagePacket.class, connection::onDisplayTellrawMessagePacket));
 //        packets.add(new Packet<>(InternalCommandPacket.class, connection::dummy));
         packets.add(new Packet<>(InvalidCommandFeedbackPacket.class, connection::onInvalidCommandFeedbackPacket));

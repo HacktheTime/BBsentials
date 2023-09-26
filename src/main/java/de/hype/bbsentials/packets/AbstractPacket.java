@@ -20,7 +20,7 @@ public class AbstractPacket {
 
     public boolean isValid(BBsentialConnection connection, String[] allowedNullFields) {
         if (isApiSupported(BBsentials.config)) {
-            Chat.sendPrivateMessageToSelf("You are using an outdated version of the mod");
+            Chat.sendPrivateMessageToSelfFatal("You are using an outdated version of the mod");
         }
         return true;
     }

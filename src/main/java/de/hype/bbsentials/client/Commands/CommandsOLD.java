@@ -244,7 +244,7 @@ public class CommandsOLD {
                                         return 1;
                                     })
                     );
-                });/*SplashAnnounce*/
+                });/*requestpottimes*/
             }
             if (getConfig().hasBBRoles("admin")) {
                 event.register((dispatcher, registryAccess) -> {

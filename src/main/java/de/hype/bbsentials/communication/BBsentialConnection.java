@@ -442,7 +442,12 @@ public class BBsentialConnection {
         Chat.sendPrivateMessageToSelfError(packet.displayMessage);
         for (int i : packet.waitBeforeReconnect) {
             executionService.schedule(() -> {
-                BBsentials.conditionalReconnectToBBserver();
+                if (i == 1) {
+                    BBsentials.connectToBBserver();
+                }
+                else {
+                    BBsentials.conditionalReconnectToBBserver();
+                }
             }, i, TimeUnit.SECONDS);
         }
     }

@@ -1,13 +1,17 @@
-# BingoBrewers1.20
-The BingoBrewers mod for the newer versions of the game.
+# BBsentials1.20
+The BBsentials mod for the newer versions of the game.
 THIS MOD IS NOT AFFILIATED WITH BINGO BREWERS ANYMORE since indigo had a problem with me focusing
 on 1.20 and refusing to collaborate with me on request. 
 
+The mod is availibel on modrinth https://modrinth.com/mod/bbsentials
+
 Worked on by 
 Hype_the_Time alias HacktheTime (Developer)
+Contributors:
+hannibal2
 
 IMPORTANT:
-This mod is currently for 1.20.1 Fabric.
+This mod is currently for 1.20.2 Fabric.
 
 I recommend using Fabulously Optimized together with this mod.
 Some Features require at least Cit Resewn which is included there.

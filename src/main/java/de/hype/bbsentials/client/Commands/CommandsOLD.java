@@ -25,17 +25,6 @@ import static de.hype.bbsentials.client.BBsentials.*;
 public class CommandsOLD {
     public CommandsOLD() {
         Event<ClientCommandRegistrationCallback> event = ClientCommandRegistrationCallback.EVENT;
-//        event.register((dispatcher, registryAccess) -> {
-//            dispatcher.register(ClientCommandManager.literal("warp").then(ClientCommandManager.argument("destination", StringArgumentType.string()).suggests((context, builder) -> {
-//                // Provide tab-completion options for menu subfolder
-//                return CommandSource.suggestMatching(new String[]{"desert", "hub", "dhub", "nether", "isle", "wizard", "portal", "mines", "forge", "ch", "crystals", "nucleus", "end", "drag", "void", "castle", "howl", "park", "jungle", "nest", "arachne", "spider", "deep", "barn", "home", "kuurda", "wasteland", "dragontail", "scarleton", "smold", "garden", "da", "crypt", "museum", "trapper", "dungeon_hub"}, builder);
-//            }).executes((context) -> {
-//                // Handle "variableName" and "variableValue" logic here
-//                String destination = StringArgumentType.getString(context, "destination");
-//                getConfig().sender.addSendTask("/warp " + destination, 0);
-//                return 1;
-//            })));
-//        }); //warp test
         event.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("creport")
                     .then(ClientCommandManager.argument("Player_Name", StringArgumentType.string())
@@ -46,78 +35,6 @@ public class CommandsOLD {
                                 return 1;
                             })));
         });//creport helper → no double report during same launch
-//        event.register((dispatcher, registryAccess) -> {
-//            dispatcher.register(ClientCommandManager.literal("hp").then(ClientCommandManager.literal("accept").then(ClientCommandManager.argument("player", StringArgumentType.string()).executes((context) -> {
-//                String player = StringArgumentType.getString(context, "player");
-//                getConfig().sender.addImmediateSendTask("/party accept " + player);
-//                return 1;
-//            }))).then(ClientCommandManager.literal("chat").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party chat");
-//                return 1;
-//            })).then(ClientCommandManager.literal("demote").then(ClientCommandManager.argument("player", StringArgumentType.string()).suggests((context, builder) -> {
-//                // Provide tab-completion options for menu subfolder
-//                return CommandSource.suggestMatching(getConfig().getPlayersInParty(), builder);
-//            }).executes((context) -> {
-//                String player = StringArgumentType.getString(context, "player");
-//                getConfig().sender.addImmediateSendTask("/party demote " + player);
-//                return 1;
-//            }))).then(ClientCommandManager.literal("disband").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party disband");
-//                return 1;
-//            })).then(ClientCommandManager.literal("kick").then(ClientCommandManager.argument("player", StringArgumentType.string()).suggests((context, builder) -> {
-//                // Provide tab-completion options for menu subfolder
-//                return CommandSource.suggestMatching(getConfig().getPlayersInParty(), builder);
-//            }).executes((context) -> {
-//                String player = StringArgumentType.getString(context, "player");
-//                getConfig().sender.addImmediateSendTask("/party kick " + player);
-//                return 1;
-//            }))).then(ClientCommandManager.literal("kickoffline").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party kickoffline");
-//                return 1;
-//            })).then(ClientCommandManager.literal("leave").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party leave");
-//                return 1;
-//            })).then(ClientCommandManager.literal("list").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party list");
-//                return 1;
-//            })).then(ClientCommandManager.literal("mute").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party mute");
-//                return 1;
-//            })).then(ClientCommandManager.literal("poll").then(ClientCommandManager.argument("question/answer/answer/answer", StringArgumentType.greedyString()).executes((context) -> {
-//                String questionAndAnswers = StringArgumentType.getString(context, "question answer answer (answer)");
-//                getConfig().sender.addImmediateSendTask("/party poll " + questionAndAnswers);
-//                return 1;
-//            }))).then(ClientCommandManager.literal("private").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party private");
-//                return 1;
-//            })).then(ClientCommandManager.literal("promote").then(ClientCommandManager.argument("player", StringArgumentType.string()).suggests((context, builder) -> {
-//                // Provide tab-completion options for menu subfolder
-//                return CommandSource.suggestMatching(getConfig().getPlayersInParty(), builder);
-//            }).executes((context) -> {
-//                String player = StringArgumentType.getString(context, "player");
-//                getConfig().sender.addImmediateSendTask("/party promote " + player);
-//                return 1;
-//            }))).then(ClientCommandManager.literal("setting").then(ClientCommandManager.literal("allinvite")).executes((context) -> {
-//                        String setting = StringArgumentType.getString(context, "setting");
-//                        getConfig().sender.addImmediateSendTask("/party setting " + setting);
-//                        return 1;
-//                    })
-//
-//            ).then(ClientCommandManager.literal("transfer").then(ClientCommandManager.argument("player", StringArgumentType.string()).suggests((context, builder) -> {
-//                // Provide tab-completion options for menu subfolder
-//                return CommandSource.suggestMatching(getConfig().getPlayersInParty(), builder);
-//            }).executes((context) -> {
-//                String player = StringArgumentType.getString(context, "player");
-//                getConfig().sender.addImmediateSendTask("/party transfer " + player);
-//                return 1;
-//            }))).then(ClientCommandManager.literal("warp").executes((context) -> {
-//                getConfig().sender.addImmediateSendTask("/party warp");
-//                return 1;
-//            })).executes(context -> {
-//                getConfig().sender.addImmediateSendTask("/p");
-//                return 1;
-//            }));
-//        }); //party test
         event.register((dispatcher, registryAccess) -> {
             miningEvent(dispatcher, "goblinraid", MiningEvents.GOBLIN_RAID);
         });/*goblinraid*/
@@ -223,16 +140,17 @@ public class CommandsOLD {
                                             .then(ClientCommandManager.argument("reason", StringArgumentType.greedyString())
                                                     .executes((context) -> {
                                                         String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                        String duration = StringArgumentType.getString(context,"[Duration(d/h/m/s) | 0 forever]");
+                                                        String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
                                                         String reason = StringArgumentType.getString(context, "reason");
                                                         int userId = -1;
                                                         String mcusername = "";
-                                                        if (identification.replaceAll("[\\d]","").trim().isEmpty()){
-                                                            userId=Integer.parseInt(identification);
-                                                        }else {
-                                                            mcusername=identification;
+                                                        if (identification.replaceAll("[\\d]", "").trim().isEmpty()) {
+                                                            userId = Integer.parseInt(identification);
                                                         }
-                                                        sendPacket(new PunishUserPacket(PunishUserPacket.PUNISHMENT_TYPE_MUTE,userId,mcusername,duration,reason));
+                                                        else {
+                                                            mcusername = identification;
+                                                        }
+                                                        sendPacket(new PunishUserPacket(PunishUserPacket.PUNISHMENT_TYPE_MUTE, userId, mcusername, duration, reason));
                                                         return 1;
                                                     })
                                             )
@@ -247,16 +165,17 @@ public class CommandsOLD {
                                             .then(ClientCommandManager.argument("reason", StringArgumentType.greedyString())
                                                     .executes((context) -> {
                                                         String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                        String duration = StringArgumentType.getString(context,"[Duration(d/h/m/s) | 0 forever]");
+                                                        String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
                                                         String reason = StringArgumentType.getString(context, "reason");
                                                         int userId = -1;
                                                         String mcusername = "";
-                                                        if (identification.replaceAll("[\\d]","").trim().isEmpty()){
-                                                            userId=Integer.parseInt(identification);
-                                                        }else {
-                                                            mcusername=identification;
+                                                        if (identification.replaceAll("[\\d]", "").trim().isEmpty()) {
+                                                            userId = Integer.parseInt(identification);
                                                         }
-                                                        sendPacket(new PunishUserPacket(PunishUserPacket.PUNISHMENT_TYPE_BAN,userId,mcusername,duration,reason));
+                                                        else {
+                                                            mcusername = identification;
+                                                        }
+                                                        sendPacket(new PunishUserPacket(PunishUserPacket.PUNISHMENT_TYPE_BAN, userId, mcusername, duration, reason));
                                                         return 1;
                                                     })
                                             )
@@ -264,6 +183,17 @@ public class CommandsOLD {
                             )
                     );
                 });/*ban*/
+                event.register((dispatcher, registryAccess) -> {
+                    dispatcher.register(ClientCommandManager.literal("bgetinfo")
+                            .then(ClientCommandManager.argument("userId/mcusername", StringArgumentType.string())
+                                    .executes((context) -> {
+                                        String identification = StringArgumentType.getString(context, "userId/mcusername");
+                                        sendPacket(new InternalCommandPacket(InternalCommandPacket.GET_USER_INFO,new String[]{identification}));
+                                        return 1;
+                                    })
+                            )
+                    );
+                });/*getInfo*/
             }
             if (getConfig().hasBBRoles("splasher")) {
                 event.register((dispatcher, registryAccess) -> {
@@ -306,6 +236,47 @@ public class CommandsOLD {
                                     )
                     );
                 });/*SplashAnnounce*/
+                event.register((dispatcher, registryAccess) -> {
+                    dispatcher.register(
+                            ClientCommandManager.literal("requestpottimes")
+                                    .executes((context) -> {
+                                        sendPacket(new InternalCommandPacket(InternalCommandPacket.REQUEST_POT_DURATION, new String[0]));
+                                        return 1;
+                                    })
+                    );
+                });/*SplashAnnounce*/
+            }
+            if (getConfig().hasBBRoles("admin")) {
+                event.register((dispatcher, registryAccess) -> {
+                    dispatcher.register(
+                            ClientCommandManager.literal("bshutdown")
+                                    .then(ClientCommandManager.argument("Reason", StringArgumentType.greedyString())
+                                            .suggests((context, builder) -> {
+                                                return CommandSource.suggestMatching(new String[]{"Emergency Shutdown", "System Shutdown", "Other"}, builder);
+                                            })
+                                            .executes((context) -> {
+                                                String reason = StringArgumentType.getString(context, "Reason");
+                                                sendPacket(new InternalCommandPacket(InternalCommandPacket.SHUTDOWN_SERVER, new String[]{reason}));
+                                                return 1;
+                                            })
+                                    )
+                    );
+                });/*BBShutdown*/
+                event.register((dispatcher, registryAccess) -> {
+                    dispatcher.register(
+                            ClientCommandManager.literal("bsetmotd")
+                                    .then(ClientCommandManager.argument("Message", StringArgumentType.greedyString())
+                                            .suggests((context, builder) -> {
+                                                return CommandSource.suggestMatching(new String[]{""}, builder);
+                                            })
+                                            .executes((context) -> {
+                                                String message = StringArgumentType.getString(context, "Message").trim();
+                                                sendPacket(new InternalCommandPacket(InternalCommandPacket.SET_MOTD, new String[]{message}));
+                                                return 1;
+                                            })
+                                    )
+                    );
+                });/*BBServerMotd*/
             }
             else {
             }

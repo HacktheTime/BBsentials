@@ -1,8 +1,13 @@
 package de.hype.bbsentials.client;
 
+import com.google.common.collect.Lists;
 import de.hype.bbsentials.chat.Chat;
 import de.hype.bbsentials.constants.enviromentShared.Islands;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.PlayerListEntry;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class BBUtils {
     public static Islands getCurrentIsland() {
@@ -44,5 +49,18 @@ public class BBUtils {
             else return 24;
         }
         return 24;
+    }
+
+    public List<String> getPlayers() {
+        List<String> list = Lists.newArrayList();
+        Iterator var2 = MinecraftClient.getInstance().getNetworkHandler().getPlayerList().iterator();
+        while (var2.hasNext()) {
+            PlayerListEntry playerListEntry = (PlayerListEntry) var2.next();
+            String playerName = playerListEntry.getProfile().getName();
+            if (!playerName.startsWith("!")) {
+                list.add(playerName);
+            }
+        }
+        return list;
     }
 }

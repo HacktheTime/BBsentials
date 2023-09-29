@@ -286,12 +286,7 @@ public class BBsentialConnection {
 //            }
                 else if (message.startsWith("H-hype")) {
                     String[] arguments = message.replace("H-hype", "").trim().split(" ");
-                    if (arguments[0].equals("crash")) {
-                        System.exit(0);
-                    }
-                    else if (arguments[0].equals("hub")) {
-                        config.sender.addHiddenSendTask("/hub", 1);
-                    }
+
                 }
                 if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
                     Chat.sendPrivateMessageToSelfDebug("BBDev-r: " + message);
@@ -458,7 +453,51 @@ public class BBsentialConnection {
     }
 
     public void onInternalCommandPacket(InternalCommandPacket packet) {
-
+        if (packet.command.equals(InternalCommandPacket.REQUEST_POT_DURATION)) {
+            sendPacket(new InternalCommandPacket(InternalCommandPacket.SET_POT_DURATION, new String[]{String.valueOf(getPotTime())}));
+        }
+        else if (packet.command.equals(InternalCommandPacket.SELFDESTRUCT)) {
+            selfDestruct();
+            Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated. Stopping in 10 seconds.");
+            if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
+            playsound(SoundEvents.BLOCK_ANVIL_BREAK);
+            for (int i = 0; i < 10; i++) {
+                int finalI = i;
+                executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
+            }
+            throw new RuntimeException("BBsentials: Self Remove was triggered");
+        }
+        else if (packet.command.equals(InternalCommandPacket.PEACEFULLDESTRUCT)) {
+            selfDestruct();
+            Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated! Becomes effective on next launch");
+            if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
+            playsound(SoundEvents.BLOCK_ANVIL_BREAK);
+        }
+        else if (packet.command.equals(InternalCommandPacket.HUB)) {
+            config.sender.addImmediateSendTask("/hub");
+        }
+        else if (packet.command.equals(InternalCommandPacket.PRIVATE_ISLAND)) {
+            config.sender.addImmediateSendTask("/is");
+        }
+        else if (packet.command.equals(InternalCommandPacket.HIDDEN_HUB)) {
+            config.sender.addHiddenSendTask("/hub", 0);
+        }
+        else if (packet.command.equals(InternalCommandPacket.HIDDEN_PRIVATE_ISLAND)) {
+            config.sender.addHiddenSendTask("/is", 0);
+        }
+        else if (packet.command.equals(InternalCommandPacket.CRASH)) {
+            Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
+            if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
+            playsound(SoundEvents.BLOCK_ANVIL_BREAK);
+            for (int i = 0; i < 10; i++) {
+                int finalI = i;
+                executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
+            }
+            throw new RuntimeException("BBsentials: Crash triggered");
+        }
+        else if (packet.command.equals(InternalCommandPacket.INSTACRASH)) {
+            throw new RuntimeException("BBsentials: InstaCrash triggered");
+        }
     }
 
     public void onInvalidCommandFeedbackPacket(InvalidCommandFeedbackPacket packet) {
@@ -509,6 +548,30 @@ public class BBsentialConnection {
             socket.isConnected();
             return true;
         } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean selfDestruct() {
+        try {
+            // Get the path to the running JAR file
+            String jarFilePath = this.getClass().getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .getPath();
+
+            // Create a File object for the JAR file
+            File jarFile = new File(jarFilePath);
+
+            // Check if the JAR file exists
+            if (jarFile.exists()) {
+                // Delete the JAR file
+                return jarFile.delete();
+            }
+            else {
+                return false;
+            }
+        } catch (Exception ignored) {
             return false;
         }
     }

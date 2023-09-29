@@ -86,6 +86,7 @@ public class BBsentials implements ClientModInitializer {
     /**
      * Runs the mod initializer on the client environment.
      */
+
     @Override
     public void onInitializeClient() {
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {

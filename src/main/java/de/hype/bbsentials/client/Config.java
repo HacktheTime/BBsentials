@@ -24,6 +24,7 @@ public class Config implements Serializable {
     public String[] bbsentialsRoles = {""};
     public static ArrayList<String> partyMembers = new ArrayList<>();
     public transient ToDisplayConfig toDisplayConfig = ToDisplayConfig.loadFromFile();
+    public transient WaypointManager waypointManager = new WaypointManager();
     public transient final Sender sender = new Sender();
     public transient boolean highlightitem = false;
     public transient String lastChatPromptAnswer = null;

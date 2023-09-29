@@ -5,6 +5,7 @@ import de.hype.bbsentials.api.Options;
 import de.hype.bbsentials.chat.Chat;
 import de.hype.bbsentials.client.Commands.CommandsOLD;
 import de.hype.bbsentials.communication.BBsentialConnection;
+import de.hype.bbsentials.constants.enviromentShared.Islands;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -15,6 +16,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
@@ -90,6 +92,7 @@ public class BBsentials implements ClientModInitializer {
             splashLobby = false;
             if (!initialised) {
                 config = Config.load();
+                BBsentials.getConfig().waypointManager.addWaypoint(new Waypoint("test",new BlockPos(1,100,-90), Islands.HUB));
                 if (config.doGammaOverride) Options.setGamma(10);
                 Chat chat = new Chat();
                 if (Config.isBingoTime() || config.overrideBingoTime()) {

@@ -1,8 +1,13 @@
 package de.hype.bbsentials.client;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import org.joml.Matrix4f;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +20,11 @@ public class DebugThread implements Runnable {
     }
 
     public void loop() {
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static List<String> test() {
@@ -49,4 +58,32 @@ public class DebugThread implements Runnable {
     public static List<String> playersOnTabList() {
         return test().stream().map((string) -> string.replaceAll("[^\\p{L}\\p{N}]+", "")).toList();
     }
+
+    public void renderTextAtCoordinates(String text, double x, double y, double z) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        TextRenderer textRenderer = client.textRenderer;
+        Text renderedText = Text.of(text);
+
+        MatrixStack matrices = new MatrixStack(); // Create a new MatrixStack
+
+        matrices.push();
+        matrices.translate(x, y, z);
+        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+
+        int textColor = 0xFFFFFF; // Default color: white
+//        public int draw(     String text,
+//        float x,
+//        float y,
+//        int color,
+//        boolean shadow,
+//        Matrix4f matrix,
+//        VertexConsumerProvider vertexConsumers,
+//        TextRenderer.TextLayerType layerType,
+//        int backgroundColor,
+//        int light )
+        textRenderer.draw(text,0f,0f,textColor,false,matrix4f,, textRenderer, Color.RED.getRGB(),10); // Default color: white
+
+        matrices.pop();
+    }
+
 }

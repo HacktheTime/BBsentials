@@ -167,6 +167,7 @@ public class Chat {
     //Handle in client
     public Text handleInClient(Text messageOriginal) {
         String message = messageOriginal.getString().trim();
+        String messageUnformatted = message.replaceAll("§.","");
         if (getConfig().messageFromAlreadyReported(message) && getPlayerNameFromMessage(message) != " " && getPlayerNameFromMessage(message) != "") {
             System.out.println("Message: " + message);
             sendPrivateMessageToSelfBase(Formatting.RED + "B: " + message);
@@ -295,7 +296,7 @@ public class Chat {
             else if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
                 setChatPromtId(messageOriginal.toString());
             }
-            else if (message.startsWith("BUFF! You splashed yourself with")){
+            else if (messageUnformatted.startsWith("BUFF! You splashed yourself with")){
                 if (splashStatusUpdateListener!=null){
                     splashStatusUpdateListener.setStatus(SplashUpdatePacket.STATUS_SPLASHING);
                 }

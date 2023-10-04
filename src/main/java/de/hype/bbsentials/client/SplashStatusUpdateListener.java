@@ -55,8 +55,8 @@ public class SplashStatusUpdateListener implements Runnable {
     public void setStatus(String newStatus) {
         this.newStatus = newStatus;
         if (newStatus.equals(SplashUpdatePacket.STATUS_SPLASHING)) {
+            splashed=true;
             executionService.schedule(() -> {
-                splashed=true;
                 setStatus(SplashUpdatePacket.STATUS_DONE);
                 splashLobby = false;
             }, 1, TimeUnit.MINUTES);

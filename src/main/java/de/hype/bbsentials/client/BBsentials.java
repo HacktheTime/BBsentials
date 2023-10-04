@@ -46,6 +46,7 @@ public class BBsentials implements ClientModInitializer {
 
     /**
      * Checks if still connected to the Server.
+     *
      * @return true if it connected; false if old connection is kept.
      */
     public static boolean conditionalReconnectToBBserver() {
@@ -233,7 +234,12 @@ public class BBsentials implements ClientModInitializer {
         KeyBinding craftKeyBind = new KeyBinding("Craft", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "BBsentials");
         KeyBindingHelper.registerKeyBinding(craftKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (craftKeyBind.wasPressed()) Chat.sendCommand("/craft");
+            if (craftKeyBind.wasPressed()) MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/craft");
+        });
+        KeyBinding petKeyBind = new KeyBinding("Open Pet Menu", InputUtil.Type.KEYSYM,  -1, "BBsentials");
+        KeyBindingHelper.registerKeyBinding(petKeyBind);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (petKeyBind.wasPressed()) MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/pets");
         });
         for (int i = 1; i <= 9; i++) {
             KeyBinding ecPageKeyBind = new KeyBinding("Ender Chest Page " + i, InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_1 + (i - 1), "BBsentials");

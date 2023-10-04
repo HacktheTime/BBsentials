@@ -25,9 +25,8 @@ public class SplashStatusUpdateListener implements Runnable {
     @Override
     public void run() {
         BBsentials.splashLobby = true;
+        int maxPlayerCount = BBUtils.getMaximumPlayerCount() - 5;
         while (BBsentials.splashLobby) {
-            int maxPlayerCount = BBUtils.getMaximumPlayerCount() - 5;
-            while (splashLobby && !(status.equals(SplashUpdatePacket.STATUS_DONE) || status.equals(SplashUpdatePacket.STATUS_CANCELED))) {
                 if (!full&&(BBUtils.getPlayerCount() >= maxPlayerCount)) {
                     newStatus = SplashUpdatePacket.STATUS_FULL;
                     full=true;
@@ -36,10 +35,9 @@ public class SplashStatusUpdateListener implements Runnable {
                     status = newStatus;
                     connection.sendPacket(new SplashUpdatePacket(packet.splashId, status));
                 }
-            }
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
+                Thread.sleep(250);
+            } catch (InterruptedException ignored) {
             }
         }
         if (splashed) {

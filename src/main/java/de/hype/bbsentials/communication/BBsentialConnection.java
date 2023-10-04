@@ -344,11 +344,10 @@ public class BBsentialConnection {
 
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
         int waitTime;
-
         if (packet.splasherUsername.equals(config.getUsername())) {
             SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet);
             BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
-            executionService.submit(splashStatusUpdateListener);
+            executionService.execute(splashStatusUpdateListener);
         }
         else {
             SplashManager.addSplash(packet);

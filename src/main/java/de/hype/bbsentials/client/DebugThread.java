@@ -15,7 +15,7 @@ public class DebugThread implements Runnable {
 
     @Override
     public void run() {
-        loop();
+         loop();
         //place a breakpoint for only this thread here.
     }
 

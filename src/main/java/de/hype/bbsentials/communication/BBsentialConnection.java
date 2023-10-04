@@ -261,36 +261,6 @@ public class BBsentialConnection {
                     }
                     sendPacket(new RequestConnectPacket(MinecraftClient.getInstance().player.getUuid().toString().replace("-", ""), BBsentials.getConfig().getApiKey(), BBsentials.getConfig().getApiVersion(), AuthenticationConstants.DATABASE));
                 }
-                else if (message.contains("H-potdurations?")) {
-                    sendHiddenMessage("?potduration " + getPotTime());
-                }
-//            else if (message.startsWith("H-reconnect")) {
-//                Chat.sendPrivateMessageToSelf("§4BBserver-online is going to restart soon. You will be automatically reconnected.\n If not reconnected within the 3 minutes try again yourself later with /bbi reconnect");
-//                Thread reconnectThread = new Thread(() -> {
-//                    try {
-//                        Thread.sleep((long) ((30 * 1000) + (Math.random() * 30 * 1000)));
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    BBsentials.connectToBBserver();
-//                    if (!socket.isConnected()) {
-//                        try {
-//                            Thread.sleep((long) ((30 * 1000) + (Math.random() * 30 * 1000)));
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        BBsentials.connectToBBserver();
-//                    }
-//                });
-//                reconnectThread.start();
-//            }
-                else if (message.startsWith("H-hype")) {
-                    String[] arguments = message.replace("H-hype", "").trim().split(" ");
-
-                }
-                if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                    Chat.sendPrivateMessageToSelfDebug("BBDev-r: " + message);
-                }
             }
             else {
                 Chat.sendPrivateMessageToSelfSuccess("BB: " + message);
@@ -345,6 +315,7 @@ public class BBsentialConnection {
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
         int waitTime;
         if (packet.splasherUsername.equals(config.getUsername())) {
+            Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard");
             SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet);
             BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
             executionService.execute(splashStatusUpdateListener);
@@ -387,7 +358,7 @@ public class BBsentialConnection {
     }
 
     public void onMiningEventPacket(MiningEventPacket packet) {
-        if (config.toDisplayConfig.getValue("disableAll")) {
+        if (!config.toDisplayConfig.getValue("disableAll")) {
             //its will returns false cause disabled is checked already before.
             if (config.toDisplayConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS)) return;
             if (packet.event.equals(MiningEvents.RAFFLE)) {
@@ -492,15 +463,22 @@ public class BBsentialConnection {
         else if (packet.command.equals(InternalCommandPacket.CRASH)) {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-            playsound(SoundEvents.BLOCK_ANVIL_BREAK);
-            for (int i = 0; i < 10; i++) {
-                int finalI = i;
-                executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
-            }
-            throw new RuntimeException("BBsentials: Crash triggered");
+            Thread crashThread = new Thread(() -> {
+                playsound(SoundEvents.BLOCK_ANVIL_BREAK);
+                for (int i = 10; i >= 0; i--) {
+                    Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + i);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+                System.exit(69);
+            });
+            crashThread.start();
         }
         else if (packet.command.equals(InternalCommandPacket.INSTACRASH)) {
-            throw new RuntimeException("BBsentials: InstaCrash triggered");
+            System.out.println("BBsentials: InstaCrash triggered");
+            System.exit(69);
         }
     }
 

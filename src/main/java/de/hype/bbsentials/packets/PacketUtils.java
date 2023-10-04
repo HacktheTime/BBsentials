@@ -113,7 +113,9 @@ public class PacketUtils {
                 if (BBsentials.getConfig().isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug(packetName+":"+rawJson);
                 tryToProcessPacket(packet, rawJson);
                 return true;
-            } catch (Throwable t) {
+            }catch (RuntimeException e){
+                throw e;
+            }catch (Exception t) {
                 showError(t, "Could not process packet '" + packetName + "' from " + EnviromentPacketConfig.notEnviroment);
             }
         }

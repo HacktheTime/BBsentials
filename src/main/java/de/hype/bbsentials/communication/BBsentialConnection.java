@@ -361,35 +361,37 @@ public class BBsentialConnection {
         if (!config.toDisplayConfig.getValue("disableAll")) {
             //its will returns false cause disabled is checked already before.
             if (config.toDisplayConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS)) return;
-            if (packet.event.equals(MiningEvents.RAFFLE)) {
-                if (!config.toDisplayConfig.raffle) return;
-            }
-            else if (packet.event.equals(MiningEvents.GOBLIN_RAID)) {
-                if (!config.toDisplayConfig.goblinRaid) return;
-            }
-            else if (packet.event.equals(MiningEvents.MITHRIL_GOURMAND)) {
-                if (!config.toDisplayConfig.mithrilGourmand) return;
-            }
-            else if (packet.event.equals(MiningEvents.BETTER_TOGETHER)) {
-                if (config.toDisplayConfig.betterTogether.equals("none")) return;
-                if (config.toDisplayConfig.betterTogether.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                    return;
-                if (config.toDisplayConfig.betterTogether.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                    return;
-            }
-            else if (packet.event.equals(MiningEvents.DOUBLE_POWDER)) {
-                if (config.toDisplayConfig.doublePowder.equals("none")) return;
-                if (config.toDisplayConfig.doublePowder.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                    return;
-                if (config.toDisplayConfig.doublePowder.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                    return;
-            }
-            else if (packet.event.equals(MiningEvents.GONE_WITH_THE_WIND)) {
-                if (config.toDisplayConfig.goneWithTheWind.equals("none")) return;
-                if (config.toDisplayConfig.goneWithTheWind.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                    return;
-                if (config.toDisplayConfig.goneWithTheWind.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                    return;
+            if (!(config.toDisplayConfig.allEvents)) {
+                if (packet.event.equals(MiningEvents.RAFFLE)) {
+                    if (!config.toDisplayConfig.raffle) return;
+                }
+                else if (packet.event.equals(MiningEvents.GOBLIN_RAID)) {
+                    if (!config.toDisplayConfig.goblinRaid) return;
+                }
+                else if (packet.event.equals(MiningEvents.MITHRIL_GOURMAND)) {
+                    if (!config.toDisplayConfig.mithrilGourmand) return;
+                }
+                else if (packet.event.equals(MiningEvents.BETTER_TOGETHER)) {
+                    if (config.toDisplayConfig.betterTogether.equals("none")) return;
+                    if (config.toDisplayConfig.betterTogether.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                        return;
+                    if (config.toDisplayConfig.betterTogether.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                        return;
+                }
+                else if (packet.event.equals(MiningEvents.DOUBLE_POWDER)) {
+                    if (config.toDisplayConfig.doublePowder.equals("none")) return;
+                    if (config.toDisplayConfig.doublePowder.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                        return;
+                    if (config.toDisplayConfig.doublePowder.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                        return;
+                }
+                else if (packet.event.equals(MiningEvents.GONE_WITH_THE_WIND)) {
+                    if (config.toDisplayConfig.goneWithTheWind.equals("none")) return;
+                    if (config.toDisplayConfig.goneWithTheWind.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                        return;
+                    if (config.toDisplayConfig.goneWithTheWind.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                        return;
+                }
             }
             Chat.sendPrivateMessageToSelfImportantInfo(packet.username + "There is a " + packet.event.getDisplayName() + "in the " + packet.island.getDisplayName() + " now/soon.");
         }
@@ -521,10 +523,6 @@ public class BBsentialConnection {
         return false;
     }
 
-    public interface MessageReceivedCallback {
-        void onMessageReceived(String message);
-    }
-
     public boolean isConnected() {
         try {
             socket.isConnected();
@@ -556,5 +554,9 @@ public class BBsentialConnection {
         } catch (Exception ignored) {
             return false;
         }
+    }
+
+    public interface MessageReceivedCallback {
+        void onMessageReceived(String message);
     }
 }

@@ -412,15 +412,17 @@ public class BBsentialConnection {
 
     public void onDisconnectPacket(DisconnectPacket packet) {
         Chat.sendPrivateMessageToSelfError(packet.displayMessage);
-        for (int i : packet.waitBeforeReconnect) {
+        BBsentials.connection = null;
+        for (int i = 0; i < packet.waitBeforeReconnect.length; i++) {
+            int finalI = i;
             executionService.schedule(() -> {
-                if (i == 1) {
+                if (finalI == 1) {
                     BBsentials.connectToBBserver();
                 }
                 else {
                     BBsentials.conditionalReconnectToBBserver();
                 }
-            }, i, TimeUnit.SECONDS);
+            }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.random)), TimeUnit.SECONDS);
         }
     }
 

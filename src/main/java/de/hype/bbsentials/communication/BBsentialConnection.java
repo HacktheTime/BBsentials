@@ -422,7 +422,7 @@ public class BBsentialConnection {
                 else {
                     BBsentials.conditionalReconnectToBBserver();
                 }
-            }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.random)), TimeUnit.SECONDS);
+            }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)), TimeUnit.SECONDS);
         }
     }
 

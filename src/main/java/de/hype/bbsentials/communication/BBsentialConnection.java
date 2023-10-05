@@ -437,7 +437,7 @@ public class BBsentialConnection {
             selfDestruct();
             Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated. Stopping in 10 seconds.");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-            playsound(SoundEvents.BLOCK_ANVIL_BREAK);
+            playsound(SoundEvents.BLOCK_ANVIL_DESTROY);
             for (int i = 0; i < 10; i++) {
                 int finalI = i;
                 executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
@@ -448,7 +448,7 @@ public class BBsentialConnection {
             selfDestruct();
             Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated! Becomes effective on next launch");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-            playsound(SoundEvents.BLOCK_ANVIL_BREAK);
+            playsound(SoundEvents.BLOCK_ANVIL_DESTROY);
         }
         else if (packet.command.equals(InternalCommandPacket.HUB)) {
             config.sender.addImmediateSendTask("/hub");
@@ -466,7 +466,7 @@ public class BBsentialConnection {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
             Thread crashThread = new Thread(() -> {
-                playsound(SoundEvents.BLOCK_ANVIL_BREAK);
+                playsound(SoundEvents.BLOCK_ANVIL_DESTROY);
                 for (int i = 10; i >= 0; i--) {
                     Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + i);
                     try {

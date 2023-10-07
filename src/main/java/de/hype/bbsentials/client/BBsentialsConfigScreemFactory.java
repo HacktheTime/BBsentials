@@ -69,6 +69,11 @@ public class BBsentialsConfigScreemFactory {
                     .setTooltip(Text.of("Override the Bingo Time and connect always to the Server. (Bingo time is 14 days cause Extreme Bingo)"))
                     .setSaveConsumer(newValue -> config.overrideBingoTime = newValue)
                     .build());
+            server.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Server Partying"), config.allowServerPartyInvite)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Allow the Server to party players for you automatically. (Convenience Feature. Is used for example for services to automatically party the persons which joined it)"))
+                    .setSaveConsumer(newValue -> config.allowServerPartyInvite = newValue)
+                    .build());
             //Visual
             ConfigCategory visual = builder.getOrCreateCategory(Text.of("Visual"));
             visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Chat"), config.showBingoChat)

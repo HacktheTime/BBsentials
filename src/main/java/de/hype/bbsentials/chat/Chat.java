@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -139,245 +136,154 @@ public class Chat {
         });
     }
 
-    private Text onEvent(Text message) {
-        Callable<Text> callable = () -> {
-            if (!isSpam(message.toString())) {
-                if (getConfig().isDetailedDevModeEnabled()) {
-                    System.out.println("got a message: " + Text.Serializer.toJson(message));
-                }
-                return handleInClient(message);
+    private Text onEvent(Text text) {
+        if (!isSpam(text.toString())) {
+            if (getConfig().isDetailedDevModeEnabled()) {
+                System.out.println("got a message: " + Text.Serializer.toJson(text));
             }
-            return message; // Return the original message if it is spam
-        };
-
-        FutureTask<Text> future = new FutureTask<>(callable);
-        Thread thread = new Thread(future);
-        thread.start();
-
-        try {
-            return future.get(); // Retrieve the result from the background thread
-        } catch (InterruptedException | ExecutionException e) {
-            // Handle exceptions, if needed
-            e.printStackTrace();
+            Message message = new Message(text);
+            executionService.execute(() -> processThreaded(message));
+            return processNotThreaded(message);
         }
-
-        return message; // Return the original message if an exception occurred
+        return text; // Return the original message if it is spam
     }
 
-    //Handle in client
-    public Text handleInClient(Text messageOriginal) {
-        String message = messageOriginal.getString().trim();
-        String messageUnformatted = message.replaceAll("§.","");
-        if (getConfig().messageFromAlreadyReported(message) && getPlayerNameFromMessage(message) != " " && getPlayerNameFromMessage(message) != "") {
-            System.out.println("Message: " + message);
+    //Handle in the messages which need to be modified here
+    public Text processNotThreaded(Message message) {
+//        if (message.isFromParty()) {
+//           message.replaceInJson("\"action\":\"run_command\",\"value\":\"/viewprofile", "\"action\":\"run_command\",\"value\":\"/bviewprofile " + messageUnformatted.split(">", 1)[1].trim());
+//        }
+        if (message.isFromReportedUser()) {
             sendPrivateMessageToSelfBase(Formatting.RED + "B: " + message);
             return null;
         }
-        if (getConfig().isDetailedDevModeEnabled()) {
-            System.out.println("Got message to analyse internally: " + message);
-        }
-        //party accepter
-        if (message != null) {
-            if (message.contains("party")) {
-                if (message.contains("disbanded the party")) {
-                    lastPartyDisbandedMessage = message;
-                    partyDisbandedMap.put(getPlayerNameFromMessage(message), Instant.now());
-                    if (getConfig().isDevModeEnabled()&&config.acceptReparty) {
-                        sendPrivateMessageToSelfDebug("Watching next 20 Sec for invite: " + getPlayerNameFromMessage(message));
+        return message.text;
+    }
+
+    public void processThreaded(Message message) {
+        if (message.getString() != null) {
+            String messageUnformatted = message.getUnformattedString();
+            String username = message.getPlayerName();
+            if (message.isFromReportedUser()) {
+
+            }
+            else if (!MinecraftClient.getInstance().isWindowFocused()) {
+                if (config.doDesktopNotifications) {
+                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !MinecraftClient.getInstance().isWindowFocused() && config.doDesktopNotifications) {
+                        sendNotification("BBsentials Visit-Watcher", messageUnformatted);
                     }
+                    else if (message.isMsg()) {
+                        sendNotification("BBsentials Message Notifier", username + " sent you the following message: " + message.getMessageContent());
+                    }
+                    else {
+                        if (message.getMessageContent().toLowerCase().contains(getConfig().getUsername().toLowerCase()) || message.getMessageContent().toLowerCase().contains(config.getNickname().toLowerCase() + " ")) {
+                            sendNotification("BBsentials Notifier", "You got mentioned in chat! " + message.getMessageContent());
+                        }
+                    }
+                }
+            }
+            else if (message.isServerMessage()) {
+                if (messageUnformatted.contains("disbanded the party")) {
+                    lastPartyDisbandedUsername = username;
+                    partyDisbandedMap.put(username, Instant.now());
                 }
                 else if (message.contains("invited you to join their party")) {
-                    if (lastPartyDisbandedMessage != null && partyDisbandedMap != null) {
-                        Instant lastDisbandedInstant = partyDisbandedMap.get(getPlayerNameFromMessage(lastPartyDisbandedMessage));
-                        if (config.acceptReparty){
-                        if (lastDisbandedInstant != null && lastDisbandedInstant.isAfter(Instant.now().minusSeconds(20)) && (getPlayerNameFromMessage(message).equals(getPlayerNameFromMessage(lastPartyDisbandedMessage)))) {
-                            sendCommand("/p accept " + getPlayerNameFromMessage(lastPartyDisbandedMessage));}
-                        }
-                    }
-                    if (!MinecraftClient.getInstance().isWindowFocused()) {
-                        sendNotification("BBsentials Party Notifier", "You got invited too a party by: " + getPlayerNameFromMessage(message));
-                    }
-
-                }
-                else if (message.equals("Party > " + BBsentials.getConfig().getUsername() + ": rp")) {
-                    sendCommand("/pl");
-                    repartyActive = true;
-                }
-                else if (message.startsWith("Party Members (")) {
-                    Config.partyMembers = new ArrayList<String>();
-                }
-                else if (message.startsWith("Party Moderators:") && repartyActive) {
-                    message = message.replace("Party Moderators:", "").replace(" ●", "").replaceAll("\\s*\\[[^\\]]+\\]", "").trim();
-                    if (message.contains(",")) {
-                        for (int i = 0; i < message.split(",").length; i++) {
-                            Config.partyMembers.add(message.split(",")[i - 1]);
-                        }
-                    }
-                    else {
-                        Config.partyMembers.add(message);
-                    }
-                }
-                else if (message.startsWith("Party Members:")) {
-                    message = message.replace("Party Members:", "").replace(" ●", "").replaceAll("\\s*\\[[^\\]]+\\]", "").trim();
-                    if (message.contains(",")) {
-                        for (int i = 0; i < message.split(",").length; i++) {
-                            System.out.println("Added to plist: " + (message.split(",")[i - 1]));
-                            Config.partyMembers.add(message.split(",")[i - 1]);
-                        }
-                    }
-                    else {
-                        Config.partyMembers.add(message);
-                    }
-                    if (repartyActive) {
-                        repartyActive = false;
-                        sendCommand("/p disband");
-                        for (int i = 0; i < Integer.max(4, getConfig().getPlayersInParty().length); i++) {
-                            if (i < getConfig().getPlayersInParty().length) {
-                                sendCommand("/p invite " + getConfig().getPlayersInParty()[i]);
+                    if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
+                        Instant lastDisbandedInstant = partyDisbandedMap.get(lastPartyDisbandedUsername);
+                        if (config.acceptReparty) {
+                            if (lastDisbandedInstant != null && lastDisbandedInstant.isAfter(Instant.now().minusSeconds(20)) && (username.equals(lastPartyDisbandedUsername))) {
+                                sendCommand("/p accept " + username);
                             }
                         }
                     }
+                    if (!MinecraftClient.getInstance().isWindowFocused()) {
+                        sendNotification("BBsentials Party Notifier", "You got invited too a party by: " + username);
+                    }
+
                 }
-                else if (message.endsWith("bb:party me") && message.startsWith("From ")) {
+                else if (message.startsWith("Party Members (")) {
+                    Config.partyMembers = new ArrayList<>();
+                }
+                else if (message.startsWith("Party Moderators:")) {
+                    String temp = messageUnformatted.replace("Party Moderators:", "").replace(" ●", "").replaceAll("\\s*\\[[^\\]]+\\]", "").trim();
+                    if (temp.contains(",")) {
+                        for (int i = 0; i < temp.split(",").length; i++) {
+                            Config.partyMembers.add(temp.split(",")[i - 1]);
+                        }
+                    }
+                    else {
+                        Config.partyMembers.add(temp);
+                    }
+                }
+                else if (message.startsWith("Party Members:")) {
+                    String temp = messageUnformatted.replace("Party Members:", "").replace(" ●", "").replaceAll("\\s*\\[[^\\]]+\\]", "").trim();
+                    if (temp.contains(",")) {
+                        for (int i = 0; i < temp.split(",").length; i++) {
+                            System.out.println("Added to plist: " + (temp.split(",")[i - 1]));
+                            Config.partyMembers.add(temp.split(",")[i - 1]);
+                        }
+                    }
+                    else {
+                        Config.partyMembers.add(temp);
+                    }
+                }
+                else if ((message.contains("Party Leader:") && !message.contains(getConfig().getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(getConfig().getUsername()) || (!message.startsWith("The party was transferred to " + getConfig().getUsername()) && message.startsWith("The party was transferred to"))) || message.equals(getConfig().getUsername() + " is now a Party Moderator") || (message.equals("The party was disbanded because all invites expired and the party was empty.")) || (message.contains("You have joined ") && message.contains("'s party!")) || (message.contains("Party Leader, ") && message.contains(" , summoned you to their server.")) || (message.contains("warped to your dungeon"))) {
+                    BBsentials.getConfig().setIsLeader(false);
+                    if (getConfig().isDetailedDevModeEnabled()) {
+                        sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
+                    }
+                }
+                else if ((messageUnformatted.equals("Party Leader: " + getConfig().getUsername() + " ●")) || (message.contains(getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + getConfig().getUsername()) || message.equals("Raul_J has promoted " + getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
+                    BBsentials.getConfig().setIsLeader(true);
+                    if (getConfig().isDetailedDevModeEnabled()) {
+                        sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
+                    }
+                }
+                else if (message.getUnformattedString().equals("Please type /report confirm to log your report for staff review.")) {
+                    sendCommand("/report confirm");
+                }
+                else if (messageUnformatted.startsWith("BUFF! You splashed yourself with")) {
+                    if (splashStatusUpdateListener != null) {
+                        splashStatusUpdateListener.setStatus(SplashUpdatePacket.STATUS_SPLASHING);
+                    }
+                }
+            }
+
+            else if (message.isFromGuild()) {
+
+            }
+            else if (message.isFromParty()) {
+                if (message.getMessageContent().toLowerCase().contains(getConfig().getUsername().toLowerCase()) || (message.getMessageContent().toLowerCase().contains(getConfig().getNickname().toLowerCase() + " ") && getConfig().getNotifForParty().toLowerCase().equals("nick")) || getConfig().getNotifForParty().toLowerCase().equals("all")) {
+                    sendNotification("BBsentials Party Chat Notification", username + " : " + message.getMessageContent());
+                }
+            }
+            else if (message.isMsg()) {
+                if (messageUnformatted.endsWith("bb:party me")) {
                     if (BBsentials.getConfig().allowBBinviteMe()) {
-                        sendCommand("/p " + getPlayerNameFromMessage(message.replace("From ", "")));
-                    }
-                }
-
-            }
-            else if (message.contains("bb:test")) {
-                sendPrivateMessageToSelfDebug(test());
-            }
-            else if ((message.endsWith("is visiting Your Garden !") || message.endsWith("is visiting Your Island !")) && !MinecraftClient.getInstance().isWindowFocused()&& config.doDesktopNotifications) {
-                sendNotification("BBsentials Visit-Watcher", message);
-            }
-            else if (message.equals("Please type /report confirm to log your report for staff review.")) {
-                sendCommand("/report confirm");
-            }
-            else if (message.contains(":") && !MinecraftClient.getInstance().isWindowFocused()&&config.doDesktopNotifications) {
-                if (message.startsWith("Party >")) {
-                    String partyMessage = message.replaceFirst("Party >", "").trim();
-                    messageOriginal = replaceAllForText(messageOriginal, "\"action\":\"run_command\",\"value\":\"/viewprofile", "\"action\":\"run_command\",\"value\":\"/hci menu pcm " + partyMessage);
-                    if (partyMessage.split(":", 2)[1].toLowerCase().contains(getConfig().getUsername().toLowerCase()) || (partyMessage.toLowerCase().contains(getConfig().getNickname().toLowerCase() + " ") && getConfig().getNotifForParty().toLowerCase().equals("nick")) || getConfig().getNotifForParty().toLowerCase().equals("all")) {
-                        sendNotification("BBsentials Party Chat Notification", partyMessage);
-                    }
-                }
-                else if (message.startsWith("From ")) {
-                    String sender = getPlayerNameFromMessage(message.replaceFirst("From", "").trim());
-                    String content = message.split(":", 2)[1];
-                    sendNotification("BBsentials Message Notifier", sender + " sent you the following message: " + content);
-                }
-                else if (message.toLowerCase().contains("party")) {
-                    if ((message.contains("Party Leader:") && !message.contains(getConfig().getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(getConfig().getUsername()) || (!message.startsWith("The party was transferred to " + getConfig().getUsername()) && message.startsWith("The party was transferred to"))) || message.equals(getConfig().getUsername() + " is now a Party Moderator") || (message.equals("The party was disbanded because all invites expired and the party was empty.")) || (message.contains("You have joined ") && message.contains("'s party!")) || (message.contains("Party Leader, ") && message.contains(" , summoned you to their server.")) || (message.contains("warped to your dungeon"))) {
-                        BBsentials.getConfig().setIsLeader(false);
-                        if (getConfig().isDetailedDevModeEnabled()) {
-                            sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
-                        }
-                    }
-                    if ((message.equals("Party Leader: " + getConfig().getUsername() + " ●")) || (message.contains(getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + getConfig().getUsername()) || message.equals("Raul_J has promoted " + getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
-                        BBsentials.getConfig().setIsLeader(true);
-                        if (getConfig().isDetailedDevModeEnabled()) {
-                            sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
-                        }
-                    }
-                    else if (repartyActive && !BBsentials.getConfig().isLeader()) {
-                        repartyActive = false;
-                        sendPrivateMessageToSelfInfo("Resetted Reparty is Active since you are not leader ");
-                    }
-                }
-                else {
-                    String[] temp = message.split(":", 2);
-                    String content = temp[temp.length - 1];
-                    if (temp.length == 2 && (content.toLowerCase().contains(getConfig().getUsername().toLowerCase()) || content.toLowerCase().contains(config.getNickname().toLowerCase() + " "))) {
-                        sendNotification("BBsentials Notifier", "You got mentioned in chat! " + content);
+                        sendCommand("/p " + username);
                     }
                 }
             }
-            else if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
-                setChatPromtId(messageOriginal.toString());
-            }
-            else if (messageUnformatted.startsWith("BUFF! You splashed yourself with")){
-                if (splashStatusUpdateListener!=null){
-                    splashStatusUpdateListener.setStatus(SplashUpdatePacket.STATUS_SPLASHING);
+            else {
+                if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
+                    setChatPromtId(message.getText().toString());
                 }
             }
-
         }
-        return messageOriginal;
     }
 
     //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}// {"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile f772b2c7-bd2a-46e1-b1a2-41fa561157d6"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bShourtu§e's profile"}},"text":"§9Party §8> §b[MVP§c+§b] Shourtu§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Hype_the_Time TEST"}],"text":""}
     //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}
     private final Map<String, Instant> partyDisbandedMap = new HashMap<>();
-    private String lastPartyDisbandedMessage = null;
+    private String lastPartyDisbandedUsername = null;
 
-    public static String getPlayerNameFromMessage(String message) {
-        message = message.replaceAll("\\[.*?\\]", "").trim();
-        message = message.replaceAll("-----------------------------------------------------", "").replaceAll(":", "");
-        String[] temp = message.split(" ");
-        String playerName = "";
-
-        for (int i = 0; i < temp.length; i++) {
-            if (!temp[i].equals(" ") && !temp[i].equals("")) {
-                playerName = temp[i];
-                break; // Stop looping after finding the first non-empty value
-            }
-        }
-
-        // Remove the rank from the player name, if it exists
-        Pattern rankPattern = Pattern.compile("\\s*\\[[^\\]]+\\]");
-        playerName = rankPattern.matcher(playerName).replaceAll(" ");
-
-        return playerName;
-    }
-
-    public String extractPlainText(String input) {
-        String returns = "";
-        String[] literals = input.split("literal\\{");
-        if (!input.startsWith("literal")) {
-            literals[0] = "";
-        }
-        for (int i = 0; i < literals.length; i++) {
-            if (dontExclude(literals, i) && !literals[i].equals("")) {
-                String literal = literals[i].split("}")[0];
-
-                if (!literal.isEmpty()) {
-                    returns = returns + literal;
-                }
-            }
-        }
-        // Remove § formatting
-        returns = returns.replaceAll("§.", "");
-        // Remove brackets that contain only uppercase letters or pluses
-        returns = returns.replaceAll("\\[[A-Z+]+\\]", "");
-        returns = returns.replaceAll("\\[[0-9]+\\]", "");
-        returns = returns.trim();
-        returns = returns.replaceAll("\\s+", " ");
-
-        return returns;
-    }
-
-    private boolean dontExclude(String[] s, int i) {
-        if ((i - 1) < 0) {
-            return true;
-        }
-        else {
-            if (s[i - 1].endsWith("value='")) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-    }
 
     public boolean isSpam(String message) {
         if (message.contains("Mana")) return true;
+        if (message.contains("Status")) return true;
         if (message.contains("Achievement Points")) return true;
         return false;
     }
-
-    private boolean repartyActive = false;
 
     public String test() {
         //put test code here
@@ -385,28 +291,30 @@ public class Chat {
         return new String();
     }
 
-    private static String removeMultipleSpaces(String input) {
-        return input.replaceAll("\\s+", " ");
-    }
-
     public static void sendPrivateMessageToSelfError(String message) {
         sendPrivateMessageToSelfBase(Formatting.RED + message);
     }
+
     public static void sendPrivateMessageToSelfFatal(String message) {
         sendPrivateMessageToSelfBase(Formatting.DARK_RED + message);
     }
+
     public static void sendPrivateMessageToSelfSuccess(String message) {
         sendPrivateMessageToSelfBase(Formatting.GREEN + message);
     }
+
     public static void sendPrivateMessageToSelfInfo(String message) {
         sendPrivateMessageToSelfBase(Formatting.YELLOW + message);
     }
+
     public static void sendPrivateMessageToSelfImportantInfo(String message) {
         sendPrivateMessageToSelfBase(Formatting.GOLD + message);
     }
+
     public static void sendPrivateMessageToSelfDebug(String message) {
         sendPrivateMessageToSelfBase(Formatting.AQUA + message);
     }
+
     private static void sendPrivateMessageToSelfBase(String message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -426,7 +334,7 @@ public class Chat {
     }
 
     public void sendNotification(String title, String text) {
-        Thread soundThread = new Thread(() -> {
+        executionService.execute(() -> {
             try {
                 InputStream inputStream = getClass().getResourceAsStream("/sounds/mixkit-sci-fi-confirmation-914.wav");
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
@@ -440,9 +348,6 @@ public class Chat {
                 e.printStackTrace();
             }
         });
-
-        soundThread.start();
-
         List<String> argsList = new ArrayList<>();
         argsList.add("--title");
         argsList.add(title);
@@ -476,7 +381,7 @@ public class Chat {
     public static void followMenu(String menu, String message) {
         // Check the "menu" argument and execute the appropriate logic
         String command;
-        String username = getPlayerNameFromMessage(message);
+        String username = message.split(" ", 1)[0];
         if (message.contains(":")) {
             message = message.split(":", 2)[1].trim();
             if (menu.equalsIgnoreCase("pcm")) {
@@ -521,7 +426,7 @@ public class Chat {
                     String promptCommand = "/cb " + finalLastPrompt1;
                     BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
                     if (config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \""+promptCommand+"\"");
+                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
                     }
                     try {
                         Thread.sleep(10 * 1000);
@@ -542,7 +447,7 @@ public class Chat {
                     String promptCommand = "/chatprompt " + finalLastPrompt + " YES";
                     getConfig().setLastChatPromptAnswer(promptCommand);
                     if (config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \""+promptCommand+"\"");
+                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
                     }
                     try {
                         Thread.sleep(10 * 1000);

@@ -2,7 +2,6 @@ package de.hype.bbsentials.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.hype.bbsentials.chat.Chat;
 import de.hype.bbsentials.chat.Sender;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -14,13 +13,14 @@ import java.util.ArrayList;
 public class Config implements Serializable {
     //DO NOT Change any of the following unless you know what you are doing!
     public int apiVersion = 1;
-     boolean devMode = false;
+    public boolean allowServerPartyInvite = true;
+    boolean devMode = false;
      boolean detailedDevMode = false;
     //You can change again
 
     // set automatically
     private transient boolean isLeader;
-    private transient String alreadyReported = "";
+    public transient String alreadyReported = "";
     public String[] bbsentialsRoles = {""};
     public static ArrayList<String> partyMembers = new ArrayList<>();
     public transient ToDisplayConfig toDisplayConfig = ToDisplayConfig.loadFromFile();
@@ -143,10 +143,6 @@ public class Config implements Serializable {
         return partyMembers.toArray(new String[0]);
     }
 
-    public boolean messageFromAlreadyReported(String message) {
-        return alreadyReported.contains(Chat.getPlayerNameFromMessage(message));
-    }
-
     public void addReported(String playerName) {
         alreadyReported = alreadyReported + " , " + playerName;
     }
@@ -196,5 +192,9 @@ public class Config implements Serializable {
 
     public int getApiVersion() {
         return apiVersion;
+    }
+
+    public String getMCUUID() {
+        return MinecraftClient.getInstance().player.getUuid().toString().replace("-", "");
     }
 }

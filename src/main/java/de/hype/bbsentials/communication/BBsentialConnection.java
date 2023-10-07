@@ -259,7 +259,7 @@ public class BBsentialConnection {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    sendPacket(new RequestConnectPacket(MinecraftClient.getInstance().player.getUuid().toString().replace("-", ""), BBsentials.getConfig().getApiKey(), BBsentials.getConfig().getApiVersion(), AuthenticationConstants.DATABASE));
+                    sendPacket(new RequestConnectPacket(config.getMCUUID(), BBsentials.getConfig().getApiKey(), BBsentials.getConfig().getApiVersion(), AuthenticationConstants.DATABASE));
                 }
             }
             else {
@@ -314,7 +314,7 @@ public class BBsentialConnection {
 
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
         int waitTime;
-        if (packet.splasherUsername.equals(config.getUsername())) {
+        if (packet.splasherUsername.equals(config.getUsername())&&config.autoSplashStatusUpdates) {
             Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard");
             SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet);
             BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
@@ -491,7 +491,12 @@ public class BBsentialConnection {
     }
 
     public void onPartyPacket(PartyPacket packet) {
-        Chat.sendCommand("/p " + packet.type + String.join(" ", packet.users));
+        if (config.allowServerPartyInvite) {
+            Chat.sendCommand("/p " + packet.type + String.join(" ", packet.users));
+        }
+        else {
+          Chat.sendPrivateMessageToSelfImportantInfo("Blocked a Party Command from the Server: "+packet.type+" : "+String.join(" ", packet.users));
+        }
     }
 
     public void onSystemMessagePacket(SystemMessagePacket packet) {

@@ -44,7 +44,7 @@ public class Config implements Serializable {
     public boolean acceptReparty;
     public boolean autoSplashStatusUpdates;
     public String nickname;
-    public String NotifForPartyMessagesType;
+    public String notifForMessagesType;
 
     // Set default attribute values
     private void setDefaults() {
@@ -52,12 +52,12 @@ public class Config implements Serializable {
         acceptReparty = true;
         if (username.equals("Hype_the_Time")) {
             nickname = "Hype";
-            NotifForPartyMessagesType = "nick";
+            notifForMessagesType = "nick";
             doDesktopNotifications=true;
         } //Gimmic for Developer due too things which dont make it into releases (bugs)
         else {
             nickname = "";
-            NotifForPartyMessagesType = "none";
+            notifForMessagesType = "none";
         }
     }
 
@@ -129,7 +129,7 @@ public class Config implements Serializable {
     }
 
     public String getNotifForParty() {
-        return NotifForPartyMessagesType;
+        return notifForMessagesType;
     }
 
     public boolean isDevModeEnabled() {

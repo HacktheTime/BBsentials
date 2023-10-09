@@ -4,6 +4,10 @@ import de.hype.bbsentials.constants.enviromentShared.Islands;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.api.Requirement;
+import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
+import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
+import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -46,7 +50,6 @@ public class BBsentialsConfigScreemFactory {
                         .setSaveConsumer(newValue -> config.bbServerURL = newValue)
                         .build());
             }
-
             server.addEntry(entryBuilder.startStrField(Text.of("BBsentials API key"), config.apiKey.replaceAll(".", "*"))
                     .setDefaultValue("unset")
                     .setTooltip(Text.of("Put you API Key here (the one generated in the Discord! with /link). §cThe Text is visually censored. Not saved unless you changed it."))
@@ -88,23 +91,31 @@ public class BBsentialsConfigScreemFactory {
                     .build());
             //Notifications
             ConfigCategory notifications = builder.getOrCreateCategory(Text.of("Notifications"));
-            notifications.addEntry(entryBuilder.startBooleanToggle(Text.of("Do Desktop Notifications"), config.doDesktopNotifications)
+            BooleanListEntry doNotifications = entryBuilder.startBooleanToggle(Text.of("Do Desktop Notifications"), config.doDesktopNotifications)
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
                     .setSaveConsumer(newValue -> config.doDesktopNotifications = newValue)
-                    .build());
-            notifications.addEntry(entryBuilder.startStrField(Text.of("Nickname"), config.nickname)
+                    .build();
+            DropdownBoxEntry<String> notificationOn = entryBuilder.startStringDropdownMenu(Text.of("Notification on"), config.notifForMessagesType) // Start the StringDropdownMenu entry
+                    .setSelections(List.of("all", "nick", "none"))
+                    .setTooltip(Text.of("When do you want to receive Desktop Notifications? on all party, messages containing nickname"))
+                    .setDefaultValue("all")
+                    .setRequirement(Requirement.isTrue(doNotifications))
+                    .setSuggestionMode(false)
+                    .setSaveConsumer(newValue -> config.notifForMessagesType = newValue)
+                    .build();
+            StringListEntry nickname = entryBuilder.startStrField(Text.of("Nickname"), config.nickname)
                     .setDefaultValue("")
                     .setTooltip(Text.of("Nickname. you will get send desktop notifications if a message contains one"))
+                    .setRequirement(() -> {
+                        return doNotifications.getValue() && notificationOn.getValue().equals("nick");
+                    })
                     .setSaveConsumer(newValue -> config.nickname = newValue)
-                    .build());
-            notifications.addEntry(entryBuilder.startStringDropdownMenu(Text.of("Notification on"), config.NotifForPartyMessagesType) // Start the StringDropdownMenu entry
-                    .setSelections(List.of("all", "nick", "none"))
-                    .setTooltip(Text.of("When do you want to receive Desktop Notifications? on all party, party messages containing nickname or no party messages"))
-                    .setDefaultValue("all")
-                    .setSuggestionMode(false)
-                    .setSaveConsumer(newValue -> config.NotifForPartyMessagesType = newValue)
-                    .build());
+                    .build();
+
+            notifications.addEntry(doNotifications);
+            notifications.addEntry(notificationOn);
+            notifications.addEntry(nickname);
             //other
             ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));
             other.addEntry(entryBuilder.startBooleanToggle(Text.of("Gamma Override"), config.doGammaOverride)
@@ -124,11 +135,13 @@ public class BBsentialsConfigScreemFactory {
                     .build());
             ConfigCategory chChestItems = builder.getOrCreateCategory(Text.of("Ch Chest Items"));
             {
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("All Chest Items"), config.toDisplayConfig.allChChestItem)
+
+                BooleanListEntry allItems = entryBuilder.startBooleanToggle(Text.of("All Chest Items"), config.toDisplayConfig.allChChestItem)
                         .setDefaultValue(true)
                         .setTooltip(Text.of("Select to receive notifications when an any Item is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.allChChestItem = newValue)
-                        .build());
+                        .build();
+                chChestItems.addEntry(allItems);
 
                 chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("ALL Robo Parts "), config.toDisplayConfig.allRoboPart)
                         .setDefaultValue(false)

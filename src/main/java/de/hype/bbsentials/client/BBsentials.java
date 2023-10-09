@@ -255,4 +255,10 @@ public class BBsentials implements ClientModInitializer {
             });
         }
     } // KeyBinds
+
+    public void manualLoad() {
+        initialised = true;
+        config = Config.load();
+        connectToBBserver();
+    }
 }

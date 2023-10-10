@@ -28,7 +28,7 @@ public class Message {
 
     public String getMessageContent() {
         if (isServerMessage()) return unformattedString;
-        return getUnformattedString().split(":", 1)[1];
+        return getUnformattedString().split(":", 2)[1];
     }
 
     Boolean guild = null;
@@ -61,7 +61,7 @@ public class Message {
         if (server != null) return server;
         int space = getUnformattedString().indexOf(" ");
         int doublepoint = getUnformattedString().indexOf(":");
-        return ((space + 2 < doublepoint)&&doublepoint!=-1&&space!=-1);
+        return ((space + 2 < doublepoint)||doublepoint==-1||space==-1);
     }
 
     public String getPlayerName() {
@@ -71,21 +71,22 @@ public class Message {
             playerName = "";
             return "";
         }
-        playerName = playerName.split(":", 1)[0];
+        playerName = playerName.split(":", 2)[0];
         if (isMsg()) {
             playerName = playerName.replaceFirst("From", "").replace("To", "").trim();
         }
-        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?\\[[^\\]]*\\])*", "").trim();
-        if (playerName.matches("^[a-zA-Z0-9_-]+$")) playerName = "";
+        if (playerName.contains(">")){
+            playerName=playerName.split(">",2)[1];
+        }
+//        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?[^\\x00-\\x7F]?\\s?\\[[^\\]]*\\])*", "").trim()// replaces every [] and unicode character before a asci character.
+        playerName = playerName.replaceAll("[^\\x00-\\x7F]","").replaceAll("\\[[^\\]]*\\]","").trim();
+        if (playerName.matches("[^a-zA-Z0-9_-]+")) playerName = "";
         return playerName;
     }
 
     public void replaceInJson(String replace, String replaceWith) {
         String textString = toJson();
-        if (textString.contains(replace)) {
-            textString = textString.replaceAll("\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "");
-        }
-        textString = textString.replace(replace, replaceWith);
+        textString = textString.replaceFirst(replace, replaceWith);
         text = Text.Serializer.fromJson(textString);
     }
 
@@ -107,5 +108,10 @@ public class Message {
 
     public boolean startsWith(String string) {
         return getUnformattedString().startsWith(string);
+    }
+
+    @Override
+    public String toString() {
+        return getUnformattedString();
     }
 }

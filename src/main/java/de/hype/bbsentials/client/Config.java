@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Config implements Serializable {
     //DO NOT Change any of the following unless you know what you are doing!
@@ -22,7 +23,7 @@ public class Config implements Serializable {
     private transient boolean isLeader;
     public transient String alreadyReported = "";
     public String[] bbsentialsRoles = {""};
-    public static ArrayList<String> partyMembers = new ArrayList<>();
+    public static List<String> partyMembers = new ArrayList<>();
     public transient ToDisplayConfig toDisplayConfig = ToDisplayConfig.loadFromFile();
     public transient final Sender sender = new Sender();
     public transient boolean highlightitem = false;
@@ -36,6 +37,10 @@ public class Config implements Serializable {
     public String bbServerURL = "localhost";
      String apiKey = "";
     public boolean showBingoChat = true;
+    public boolean doAllChatCustomMenu=true;
+    public boolean doPartyChatCustomMenu=true;
+    public boolean doGuildChatCustomMenu=true;
+
     public boolean allowBBinviteMe = true;
     public boolean doDesktopNotifications = false;
     public boolean showSplashStatusUpdates = true;

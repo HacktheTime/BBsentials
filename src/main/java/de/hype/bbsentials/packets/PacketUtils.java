@@ -57,30 +57,6 @@ public class PacketUtils {
         return null;
     }
 
-//    public static <T extends AbstractPacket> T getAsPacket(String message) {
-//        if (!message.contains(".")) return null;
-//        String packetName = message.split("\\.")[0];
-//        String rawJson = message.substring(packetName.length() + 1);
-//
-//        for (Class<? extends AbstractPacket> clazz : PacketManager.getAllPacketClasses()) {
-//            if (packetName.equals(clazz.getSimpleName())) {
-//                try {
-//                    if (clazz.isAssignableFrom(clazz)) {
-//                        //TODO the problem
-//                        T parsedPacket = (T) gson.fromJson(rawJson, clazz);
-//                        return parsedPacket;
-//                    }
-//                    else {
-//                        return null;
-//                    }
-//                } catch (Throwable t) {
-//                    showError(t, "Could not process packet '" + packetName + "' from " + EnviromentPacketConfig.notEnviroment);
-//                }
-//            }
-//        }
-//        return null;
-//    }
-
     public static boolean isPacket(String message, Class<? extends AbstractPacket> clazz) {
         if (!message.contains(".")) return false;
         String packetName = message.split("\\.")[0];

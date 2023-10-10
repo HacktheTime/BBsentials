@@ -8,6 +8,7 @@ import me.shedaniel.clothconfig2.api.Requirement;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
+import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -135,90 +136,98 @@ public class BBsentialsConfigScreemFactory {
                     .build());
             ConfigCategory chChestItems = builder.getOrCreateCategory(Text.of("Ch Chest Items"));
             {
-
                 BooleanListEntry allItems = entryBuilder.startBooleanToggle(Text.of("All Chest Items"), config.toDisplayConfig.allChChestItem)
                         .setDefaultValue(true)
                         .setTooltip(Text.of("Select to receive notifications when an any Item is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.allChChestItem = newValue)
                         .build();
                 chChestItems.addEntry(allItems);
-
+                Requirement notAllItemsRequirement = () -> !allItems.getValue();
                 chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("ALL Robo Parts "), config.toDisplayConfig.allRoboPart)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when an allRoboPartCustomChChestItem is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.allRoboPart = newValue)
+                        .setRequirement(notAllItemsRequirement)
                         .build());
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Custom (Other) Items"), config.toDisplayConfig.customChChestItem)
+                BooleanListEntry allRoboParts = (entryBuilder.startBooleanToggle(Text.of("Custom (Other) Items"), config.toDisplayConfig.customChChestItem)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when any not already defined Item is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.customChChestItem = newValue)
+                        .setRequirement(notAllItemsRequirement)
                         .build());
+                chChestItems.addEntry(allRoboParts);
+                Requirement notAllRoboPartsRequirement = () -> !allRoboParts.getValue();
                 chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Prehistoric Egg"), config.toDisplayConfig.prehistoricEgg)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a Prehistoric Egg is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.prehistoricEgg = newValue)
+                        .setRequirement(notAllItemsRequirement)
                         .build());
 
                 chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Pickonimbus 2000"), config.toDisplayConfig.pickonimbus2000)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a Pickonimbus 2000 is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.pickonimbus2000 = newValue)
+                        .setRequirement(notAllItemsRequirement)
                         .build());
-
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Control Switch"), config.toDisplayConfig.controlSwitch)
+                SubCategoryBuilder roboParts = entryBuilder.startSubCategory(Text.of("Robo Parts")).setRequirement(Requirement.all(notAllRoboPartsRequirement, notAllItemsRequirement)).setExpanded(true);
+                roboParts.add(entryBuilder.startBooleanToggle(Text.of("Control Switch"), config.toDisplayConfig.controlSwitch)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a Control Switch is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.controlSwitch = newValue)
                         .build());
 
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Electron Transmitter"), config.toDisplayConfig.electronTransmitter)
+                roboParts.add(entryBuilder.startBooleanToggle(Text.of("Electron Transmitter"), config.toDisplayConfig.electronTransmitter)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when an Electron Transmitter is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.electronTransmitter = newValue)
                         .build());
 
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("FTX 3070"), config.toDisplayConfig.ftx3070)
+                roboParts.add(entryBuilder.startBooleanToggle(Text.of("FTX 3070"), config.toDisplayConfig.ftx3070)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a FTX 3070 is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.ftx3070 = newValue)
                         .build());
 
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Robotron Reflector"), config.toDisplayConfig.robotronReflector)
+                roboParts.add(entryBuilder.startBooleanToggle(Text.of("Robotron Reflector"), config.toDisplayConfig.robotronReflector)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a Robotron Reflector is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.robotronReflector = newValue)
                         .build());
 
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Superlite Motor"), config.toDisplayConfig.superliteMotor)
+                roboParts.add(entryBuilder.startBooleanToggle(Text.of("Superlite Motor"), config.toDisplayConfig.superliteMotor)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a Superlite Motor is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.superliteMotor = newValue)
                         .build());
 
-                chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Synthetic Heart"), config.toDisplayConfig.syntheticHeart)
+                roboParts.add(entryBuilder.startBooleanToggle(Text.of("Synthetic Heart"), config.toDisplayConfig.syntheticHeart)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a Synthetic Heart is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.syntheticHeart = newValue)
                         .build());
-
+                chChestItems.addEntry(roboParts.build());
                 chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Flawless Gemstone"), config.toDisplayConfig.flawlessGemstone)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when any Flawless Gemstone is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.flawlessGemstone = newValue)
+                        .setRequirement(notAllItemsRequirement)
                         .build());
                 chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Jungle Heart"), config.toDisplayConfig.jungleHeart)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Select to receive notifications when a JungleHeart is found"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.jungleHeart = newValue)
+                        .setRequirement(notAllItemsRequirement)
                         .build());
             }//CHChestItems
             ConfigCategory miningEvents = builder.getOrCreateCategory(Text.of("Mining Events"));
             {
-                miningEvents.addEntry(entryBuilder.startBooleanToggle(Text.of("All Events"), config.toDisplayConfig.allEvents)
+                BooleanListEntry allEvents = entryBuilder.startBooleanToggle(Text.of("All Events"), config.toDisplayConfig.allEvents)
                         .setDefaultValue(true)
                         .setTooltip(Text.of("Get updated for any Mining Event"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.allEvents = newValue)
-                        .build());
+                        .build();
+                miningEvents.addEntry(allEvents);
                 miningEvents.addEntry(entryBuilder.startBooleanToggle(Text.of("§cBlock Crystal Hollow Events"), config.toDisplayConfig.blockChEvents)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Block getting Crystal Hollow Events. Maybe if you haven't accessed Crystal Hollows yet "))
@@ -229,6 +238,7 @@ public class BBsentialsConfigScreemFactory {
                         .setTooltip(Text.of("Get notified when a Gone with the Wind happens in the specified Island"))
                         .setDefaultValue("none")
                         .setSuggestionMode(false)
+                        .setRequirement(() -> !allEvents.getValue())
                         .setSaveConsumer(newValue -> config.toDisplayConfig.goneWithTheWind = newValue)
                         .build());
                 miningEvents.addEntry(entryBuilder.startStringDropdownMenu(Text.of("Better Together"), config.toDisplayConfig.betterTogether) // Start the StringDropdownMenu entry
@@ -236,29 +246,34 @@ public class BBsentialsConfigScreemFactory {
                         .setTooltip(Text.of("Get notified when a Better Together happens in the specified Island"))
                         .setDefaultValue("none")
                         .setSuggestionMode(false)
+                        .setRequirement(() -> !allEvents.getValue())
                         .setSaveConsumer(newValue -> config.toDisplayConfig.betterTogether = newValue)
                         .build());
                 miningEvents.addEntry(entryBuilder.startStringDropdownMenu(Text.of("Double Powder"), config.toDisplayConfig.doublePowder) // Start the StringDropdownMenu entry
                         .setSelections(List.of("both", Islands.DWARVEN_MINES.getDisplayName(), Islands.CRYSTAL_HOLLOWS.getDisplayName(), "none"))
                         .setTooltip(Text.of("Get notified when a Double Powder happens in the specified Island"))
                         .setDefaultValue("none")
+                        .setRequirement(() -> !allEvents.getValue())
                         .setSuggestionMode(false)
                         .setSaveConsumer(newValue -> config.toDisplayConfig.doublePowder = newValue)
                         .build());
                 miningEvents.addEntry(entryBuilder.startBooleanToggle(Text.of("Mithril Gourmand"), config.toDisplayConfig.mithrilGourmand)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Get notified when a Mithril Gourmand happens"))
+                        .setRequirement(() -> !allEvents.getValue())
                         .setSaveConsumer(newValue -> config.toDisplayConfig.mithrilGourmand = newValue)
                         .build());
                 miningEvents.addEntry(entryBuilder.startBooleanToggle(Text.of("Raffle"), config.toDisplayConfig.raffle)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Get notified when a Raffle happens"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.raffle = newValue)
+                        .setRequirement(() -> !allEvents.getValue())
                         .build());
                 miningEvents.addEntry(entryBuilder.startBooleanToggle(Text.of("Goblin Raid"), config.toDisplayConfig.goblinRaid)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Get notified when a Goblin Raid happens"))
                         .setSaveConsumer(newValue -> config.toDisplayConfig.goblinRaid = newValue)
+                        .setRequirement(() -> !allEvents.getValue())
                         .build());
             } //Mining Events
             if (config.hasBBRoles("dev")) {

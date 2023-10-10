@@ -154,9 +154,20 @@ public class Chat {
 //           message.replaceInJson("\"action\":\"run_command\",\"value\":\"/viewprofile", "\"action\":\"run_command\",\"value\":\"/bviewprofile " + messageUnformatted.split(">", 1)[1].trim());
 //        }
         if (message.isFromReportedUser()) {
-            sendPrivateMessageToSelfBase(Formatting.RED + "B: " + message);
+            sendPrivateMessageToSelfBase(Formatting.RED + "B: " + message.getUnformattedString());
             return null;
         }
+        if (config.doPartyChatCustomMenu && message.isFromParty()) {
+            message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions party " + message.getPlayerName() + " " + message.getUnformattedString());
+        }
+        else if (config.doGuildChatCustomMenu && message.isFromGuild()) {
+            message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions guild " + message.getPlayerName() + " " + message.getUnformattedString());
+        }
+        else if (config.doAllChatCustomMenu) {
+            System.out.println("User: '" + message.getPlayerName() + "' | Message: " + message.getUnformattedString());
+            message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
+        }
+
         return message.text;
     }
 
@@ -174,6 +185,9 @@ public class Chat {
                     }
                     else if (message.isMsg()) {
                         sendNotification("BBsentials Message Notifier", username + " sent you the following message: " + message.getMessageContent());
+                    }
+                    if (message.getMessageContent().toLowerCase().contains(getConfig().getUsername().toLowerCase()) || (message.getMessageContent().toLowerCase().contains(getConfig().getNickname().toLowerCase() + " ") && getConfig().getNotifForParty().toLowerCase().equals("nick")) || getConfig().getNotifForParty().toLowerCase().equals("all")) {
+                        sendNotification("BBsentials Party Chat Notification", username + " : " + message.getMessageContent());
                     }
                     else {
                         if (message.getMessageContent().toLowerCase().contains(getConfig().getUsername().toLowerCase()) || message.getMessageContent().toLowerCase().contains(config.getNickname().toLowerCase() + " ")) {
@@ -199,7 +213,6 @@ public class Chat {
                     if (!MinecraftClient.getInstance().isWindowFocused()) {
                         sendNotification("BBsentials Party Notifier", "You got invited too a party by: " + username);
                     }
-
                 }
                 else if (message.startsWith("Party Members (")) {
                     Config.partyMembers = new ArrayList<>();
@@ -227,13 +240,24 @@ public class Chat {
                         Config.partyMembers.add(temp);
                     }
                 }
-                else if ((message.contains("Party Leader:") && !message.contains(getConfig().getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(getConfig().getUsername()) || (!message.startsWith("The party was transferred to " + getConfig().getUsername()) && message.startsWith("The party was transferred to"))) || message.equals(getConfig().getUsername() + " is now a Party Moderator") || (message.equals("The party was disbanded because all invites expired and the party was empty.")) || (message.contains("You have joined ") && message.contains("'s party!")) || (message.contains("Party Leader, ") && message.contains(" , summoned you to their server.")) || (message.contains("warped to your dungeon"))) {
+                else if ((message.contains("Party Leader:") && !message.contains(getConfig().getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(getConfig().getUsername()) || (!message.startsWith("The party was transferred to " + getConfig().getUsername()) && message.startsWith("The party was transferred to"))) || messageUnformatted.endsWith(getConfig().getUsername() + " is now a Party Moderator") || (message.startsWith("The party was disbanded")) || (message.contains("You have joined ") && message.contains("'s party!")) || (message.contains("Party Leader, ") && message.contains(" , summoned you to their server.")) || (message.contains("warped to your dungeon"))) {
                     BBsentials.getConfig().setIsLeader(false);
                     if (getConfig().isDetailedDevModeEnabled()) {
                         sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
                     }
                 }
-                else if ((messageUnformatted.equals("Party Leader: " + getConfig().getUsername() + " ●")) || (message.contains(getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + getConfig().getUsername()) || message.equals("Raul_J has promoted " + getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
+                else if (config.getPlayersInParty().length == 0 && messageUnformatted.endsWith("to the party! They have 60 seconds to accept")) {
+                    config.setIsLeader(true);
+                }
+                else if (messageUnformatted.startsWith("You'll be partying with:")) {
+                    List<String> members = new ArrayList<>();
+                    for (String users : messageUnformatted.replace("You'll be partying with:", "").replaceAll("\\[[^\\]]*\\]","").trim().split(",")) {
+                        if (users.contains("and ")){break;}
+                        members.add(users);
+                    }
+                    Config.partyMembers=members;
+                }
+                else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(getConfig().getUsername() + " ●"))) || (message.contains(getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + getConfig().getUsername()) || message.getUnformattedString().endsWith(" has promoted " + getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
                     BBsentials.getConfig().setIsLeader(true);
                     if (getConfig().isDetailedDevModeEnabled()) {
                         sendPrivateMessageToSelfDebug("Leader: " + getConfig().isLeader());
@@ -253,9 +277,7 @@ public class Chat {
 
             }
             else if (message.isFromParty()) {
-                if (message.getMessageContent().toLowerCase().contains(getConfig().getUsername().toLowerCase()) || (message.getMessageContent().toLowerCase().contains(getConfig().getNickname().toLowerCase() + " ") && getConfig().getNotifForParty().toLowerCase().equals("nick")) || getConfig().getNotifForParty().toLowerCase().equals("all")) {
-                    sendNotification("BBsentials Party Chat Notification", username + " : " + message.getMessageContent());
-                }
+
             }
             else if (message.isMsg()) {
                 if (messageUnformatted.endsWith("bb:party me")) {
@@ -376,36 +398,6 @@ public class Chat {
             System.out.println("Invalid Json: \n" + tellrawInput);
         }
         return formattedMessage;
-    }
-
-    public static void followMenu(String menu, String message) {
-        // Check the "menu" argument and execute the appropriate logic
-        String command;
-        String username = message.split(" ", 1)[0];
-        if (message.contains(":")) {
-            message = message.split(":", 2)[1].trim();
-            if (menu.equalsIgnoreCase("pcm")) {
-                command = "[\"\",{\"text\":\"@@username\",\"color\":\"gray\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/pc @username\"}},{\"text\":\" [Copy_Message]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"Copy-Text-Message\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Copy the message the Player send without their name into the clipboard.\"]}},{\"text\":\" [Kick_Player]\",\"color\":\"dark_red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p kick @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Kick the player from the party\"]}},{\"text\":\" [Promote_Player]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p promote @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Promote the player\"]}},{\"text\":\" [Demote_Player]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p demote @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Demote the player\"]}},{\"text\":\" [Transfer_to_Player]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p transfer @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Transfer the Party to the player\"]}},{\"text\":\" [Mute/Unmute_Party]\",\"color\":\"dark_aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p mute @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Mutes the ENTIRE party but party moderators or Hypixel Staff can still type.\"]}}]";
-                //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"suggest_command","click_event_value":"/pc @username","hover_event_type":"none","hover_event_value":"","hover_event_object":{},"hover_event_children":[],"text":"@username"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"Copy-Text-Message","hover_event_type":"show_text","hover_event_value":"","hover_event_object":{},"hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_object":{},"hover_event_children":[],"text":"Copy the message the Player send without their name into the clipboard."}],"text":" [Copy_Message]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_red","insertion":"","click_event_type":"run_command","click_event_value":"/p kick @username","hover_event_type":"show_text","hover_event_value":"","hover_event_object":{},"hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_object":{},"hover_event_children":[],"text":"Kick the player from the party"}],"text":" [Kick_Player]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_green","insertion":"","click_event_type":"run_command","click_event_value":"/p promote @username","hover_event_type":"show_text","hover_event_value":"","hover_event_object":{},"hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_object":{},"hover_event_children":[],"text":"Promote the player"}],"text":" [Promote_Player]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"run_command","click_event_value":"/p demote @username","hover_event_type":"show_text","hover_event_value":"","hover_event_object":{},"hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_object":{},"hover_event_children":[],"text":"Demote the player"}],"text":" [Demote_Player]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"run_command","click_event_value":"/p transfer @username","hover_event_type":"show_text","hover_event_value":"","hover_event_object":{},"hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_object":{},"hover_event_children":[],"text":"Transfer the Party to the player"}],"text":" [Transfer_to_Player]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_aqua","insertion":"","click_event_type":"run_command","click_event_value":"/p mute @username","hover_event_type":"show_text","hover_event_value":"","hover_event_object":{},"hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_object":{},"hover_event_children":[],"text":"Mutes the ENTIRE party but party moderators or Hypixel Staff can still type."}],"text":" [Mute/Unmute_Party]"}],"command":"%s","jtemplate":"tellraw"}
-            }
-            else if (menu.equalsIgnoreCase("sbacm")) {
-                command = "[\"\",\"\\n\",{\"text\":\"@@username\",\"color\":\"gray\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"@username\"}},{\"text\":\" [Party_Player]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p invite @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Invite the player to the party\"]}},{\"text\":\" [Ignore_Player]\",\"color\":\"yellow\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/ignore add @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Add the player to your ignore list.\"]}},{\"text\":\" [Chat_Report_Player]\",\"color\":\"dark_red\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/creport @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Chat report the user with /creport.\"]}},{\"text\":\" [Visit_Player]\",\"color\":\"dark_green\",\"insertion\":\" \",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/visit @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[]}},{\"text\":\" [/Invite_Player]\",\"color\":\"green\",\"insertion\":\" \",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/invite @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"/invite the player to visit your Island / Garden.\"]}},{\"text\":\" [Copy_Message] \",\"color\":\"blue\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"Copy-Text-Message\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Copy the message the user send without their prefixes nor their username\"]}},{\"text\":\" [Copy_Username]\",\"color\":\"dark_aqua\",\"insertion\":\" \",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"@username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Copy the players username into the clipboard.\"]}},{\"text\":\" [/msg_Chat_Player]\",\"color\":\"light_purple\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/msg @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"/msg the Player. the chat will be set to message them. This means you do not need to type /msg upfront. To return to normal do /chat a\"]}},{\"text\":\" [Sky_shiiyu_player]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"https://sky.shiiyu.moe/stats/@username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Opens the players Skyblock Profile in Sky Crypt (sky.shiiyu.moe)\"]}},\"\\n\"]";
-            }
-            else if (menu.equalsIgnoreCase("acm")) {
-                command = "[\"\",\"\\n\",{\"text\":\"@@username\",\"color\":\"gray\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"@username\"}},{\"text\":\" [Party_Player]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p invite @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Invite the player to the party\"]}},{\"text\":\" [Ignore_Player]\",\"color\":\"yellow\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/ignore add @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Add the player to your ignore list.\"]}},{\"text\":\" [Chat_Report_Player]\",\"color\":\"dark_red\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/creport @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Chat report the user with /creport.\"]}},{\"text\":\" [Copy_Message] \",\"color\":\"blue\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"Copy-Text-Message\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Copy the message the user send without their prefixes nor their username\"]}},{\"text\":\" [Copy_Username]\",\"color\":\"dark_aqua\",\"insertion\":\" \",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"@username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Copy the players username into the clipboard.\"]}},{\"text\":\" [/msg_Chat_Player]\",\"color\":\"light_purple\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/msg @username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"/msg the Player. the chat will be set to message them. This means you do not need to type /msg upfront. To return to normal do /chat a\"]}}";
-            }
-            else {
-                // Handle unrecognized menu argument
-                sendPrivateMessageToSelfError("Unrecognized menu argument! Do not use this command unless you know exactly what you are doing aka only use it as a developer!");
-                return;
-            }
-            command = command.replaceAll("@username", username);
-            command = command.replaceAll("Copy-Text-Message", message);
-            sendPrivateMessageToSelfText(createClientSideTellraw(command));
-        }
-        else {
-            sendPrivateMessageToSelfError("Invalid message!: " + message);
-        }
     }
 
     public static void setChatPromtId(String logMessage) {

@@ -9,7 +9,7 @@ import net.minecraft.client.network.PlayerListEntry;
 import java.util.Iterator;
 import java.util.List;
 
-public class BBUtils extends de.hype.bbsentials.common.mclibraries.BBUtils {
+public class BBUtils implements de.hype.bbsentials.common.mclibraries.BBUtils {
     public Islands getCurrentIsland() {
         try {
             String string = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-b").getDisplayName().getString();

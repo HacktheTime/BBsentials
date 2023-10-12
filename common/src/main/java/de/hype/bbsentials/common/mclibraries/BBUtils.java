@@ -4,18 +4,18 @@ import de.hype.bbsentials.common.constants.enviromentShared.Islands;
 
 import java.util.List;
 
-public abstract class BBUtils {
-    public abstract Islands getCurrentIsland();
+public interface BBUtils {
+    Islands getCurrentIsland();
 
-    public abstract int getPlayerCount();
+    int getPlayerCount();
 
-    public abstract String getServer();
+    String getServer();
 
-    public abstract boolean isOnMegaServer();
+    boolean isOnMegaServer();
 
-    public abstract boolean isOnMiniServer();
+    boolean isOnMiniServer();
 
-    public abstract int getMaximumPlayerCount();
+    int getMaximumPlayerCount();
 
-    public abstract List<String> getPlayers();
+    List<String> getPlayers();
 }

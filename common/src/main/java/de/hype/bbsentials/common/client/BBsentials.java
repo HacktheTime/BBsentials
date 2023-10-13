@@ -1,14 +1,10 @@
 package de.hype.bbsentials.common.client;
 
 import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.client.Commands.CommandsOLD;
+import de.hype.bbsentials.common.client.Commands.Commands;
 import de.hype.bbsentials.common.communication.BBsentialConnection;
-import de.hype.bbsentials.common.mclibraries.Options;
-import org.lwjgl.glfw.GLFW;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class BBsentials {
     public static Config config;
     public static BBsentialConnection connection;
-    public static CommandsOLD coms;
+    public static Commands coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     public static boolean splashLobby;
     private static Thread bbthread;
@@ -56,7 +52,7 @@ public class BBsentials {
         }
         bbthread = new Thread(() -> {
             connection = new BBsentialConnection();
-            coms = new CommandsOLD();
+            coms = new Commands();
             connection.setMessageReceivedCallback(message -> executionService.execute(() -> connection.onMessageReceived(message)));
             if (beta) {
                 connection.connect(config.getBBServerURL(), 5011);
@@ -64,7 +60,7 @@ public class BBsentials {
             else {
                 connection.connect(config.getBBServerURL(), 5000);
             }
-            executionService.scheduleAtFixedRate(new DebugThread(), 0, 20, TimeUnit.SECONDS);
+            executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
         });
         bbthread.start();
     }
@@ -77,7 +73,7 @@ public class BBsentials {
             splashLobby = false;
             if (!initialised) {
                 config = Config.load();
-                if (config.doGammaOverride) Options.setGamma(10);
+                if (config.doGammaOverride) EnvironmentCore.mcoptions.setGamma(10);
                 Chat chat = new Chat();
                 if (Config.isBingoTime() || config.overrideBingoTime()) {
                     connectToBBserver();

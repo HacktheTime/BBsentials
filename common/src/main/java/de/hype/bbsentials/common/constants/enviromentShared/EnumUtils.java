@@ -143,6 +143,14 @@ public class EnumUtils {
             return null; // Enum value not found
         }
     }
+    public static <T extends Enum<T> & BBDisplayNameProvider, U extends Enum<U>> U getEnumByName(Class<T> enumClass, Class<U> enumType, String enumName) {
+        try {
+            return Enum.valueOf(enumType, enumName);
+        } catch (IllegalArgumentException e) {
+            return null; // Enum value not found
+        }
+    }
+
 
     public static <T extends Enum<T> & BBDisplayNameProvider> T getEnumByValue(Class<T> enumClass, String value) {
         for (T enumValue : enumClass.getEnumConstants()) {

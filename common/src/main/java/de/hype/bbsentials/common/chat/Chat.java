@@ -3,8 +3,8 @@ package de.hype.bbsentials.common.chat;
 import de.hype.bbsentials.common.api.Formatting;
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.client.Config;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.common.packets.packets.SplashUpdatePacket;
-import net.minecraft.text.Text;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -159,9 +159,9 @@ public class Chat {
             if (message.isFromReportedUser()) {
 
             }
-            else if (!MCUtils.isWindowFocused()) {
+            else if (!EnvironmentCore.mcUtils.isWindowFocused()) {
                 if (config.doDesktopNotifications) {
-                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !MCUtils.isWindowFocused() && config.doDesktopNotifications) {
+                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.mcUtils.isWindowFocused() && config.doDesktopNotifications) {
                         sendNotification("BBsentials Visit-Watcher", messageUnformatted);
                     }
                     else if (message.isMsg()) {
@@ -191,7 +191,7 @@ public class Chat {
                             }
                         }
                     }
-                    if (!MCUtils.isWindowFocused()) {
+                    if (!EnvironmentCore.mcUtils.isWindowFocused()) {
                         sendNotification("BBsentials Party Notifier", "You got invited too a party by: " + username);
                     }
                 }
@@ -282,6 +282,8 @@ public class Chat {
 
 
     public boolean isSpam(String message) {
+        if (message==null) return true;
+        if (message.isEmpty()) return true;
         if (message.contains("Mana")) return true;
         if (message.contains("Status")) return true;
         if (message.contains("Achievement Points")) return true;
@@ -319,11 +321,11 @@ public class Chat {
     }
 
     private static void sendPrivateMessageToSelfBase(String message) {
-        MCUtils.sendClientSideMessage(Message.of(message));
+        EnvironmentCore.chat.sendClientSideMessage(Message.of(message));
     }
 
     public static void sendPrivateMessageToSelfText(Message message) {
-        MCUtils.sendClientSideMessage(message);
+        EnvironmentCore.chat.sendClientSideMessage(message);
     }
 
     public static void sendCommand(String s) {
@@ -363,18 +365,6 @@ public class Chat {
             e.printStackTrace();
         }
     }
-
-    public static Text createClientSideTellraw(String tellrawInput) {
-        Text formattedMessage = null;
-        try {
-            formattedMessage = Text.Serializer.fromJson(tellrawInput);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Invalid Json: \n" + tellrawInput);
-        }
-        return formattedMessage;
-    }
-
     public static void setChatPromtId(String logMessage) {
         String cbUUIDPattern = "/cb ([a-fA-F0-9-]+)";
         Pattern cbPattern = Pattern.compile(cbUUIDPattern);
@@ -427,15 +417,5 @@ public class Chat {
             }).start();
 
         }
-    }
-
-    public static Text replaceAllForText(Text input, String replace, String replaceWith) {
-        String text = Text.Serializer.toJson(input);
-        if (text.contains(replace)) {
-            text = text.replaceAll("\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "");
-        }
-        text = text.replace(replace, replaceWith);
-        Text output = Text.Serializer.fromJson(text);
-        return output;
     }
 }

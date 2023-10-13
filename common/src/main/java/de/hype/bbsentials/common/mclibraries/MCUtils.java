@@ -1,7 +1,5 @@
 package de.hype.bbsentials.common.mclibraries;
 
-import de.hype.bbsentials.common.chat.Message;
-
 import java.io.File;
 
 public interface MCUtils {
@@ -12,12 +10,7 @@ public interface MCUtils {
     String getUsername();
 
     String getMCUUID();
-
-    void sendChatMessage(String message);
-
     void playsound(String eventName);
-
-    void sendClientSideMessage(Message message);
 
     int getPotTime();
 }

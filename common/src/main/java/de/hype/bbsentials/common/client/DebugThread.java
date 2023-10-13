@@ -1,22 +1,20 @@
 package de.hype.bbsentials.common.client;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class DebugThread implements Runnable {
+public interface DebugThread extends Runnable {
 
     @Override
-    public void run() {
+    public default void run() {
          loop();
         //place a breakpoint for only this thread here.
     }
 
-    public void loop() {
-
+    public default void loop() {
     }
 
-    public static List<String> test() {
+    public default List<String> test() {
         return List.of("");
     }
 }

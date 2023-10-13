@@ -9,7 +9,8 @@ public class Message {
     private String string;
 
     public Message(String textJson,String string) {
-        this.text = text;
+        this.text = textJson;
+        if (string==null) string = "";
         this.string=string;
     }
     public static Message of(String string){

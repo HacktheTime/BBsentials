@@ -2,7 +2,7 @@ package de.hype.bbsentials.common.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.hype.bbsentials.fabric.MCUtils;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,7 +40,7 @@ public class ToDisplayConfig {
 
     // Serialize the object to JSON and save to file
     public void saveToFile() {
-        File configFile = new File(MCUtils.getConfigPath(), "BBsentials_display_Config.json");
+        File configFile = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_display_Config.json");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try (FileWriter writer = new FileWriter(configFile)) {
@@ -52,7 +52,7 @@ public class ToDisplayConfig {
 
     // Deserialize the object from JSON file
     public static ToDisplayConfig loadFromFile() {
-        File configFile = new File(MCUtils.getConfigPath(), "BBsentials_display_Config.json");
+        File configFile = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_display_Config.json");
         Gson gson = new Gson();
 
         try (FileReader reader = new FileReader(configFile)) {

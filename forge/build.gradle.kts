@@ -1,11 +1,18 @@
 plugins {
-    id("idea")
-    id("java")
+    idea
+    java
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
 }
+
+//Constants:
+
+val baseGroup: String by project
+val mcVersion: String by project
+val version: String by project
+val mixinGroup = "$baseGroup.mixin"
+val modid: String by project
 
 // Toolchains:
 java {
@@ -27,11 +34,11 @@ loom {
     forge {
         pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
         // If you don't want mixins, remove this lines
-        mixinConfig("mixins.bbsentials.json")
+        mixinConfig("mixins.$modid.json")
     }
     // If you don't want mixins, remove these lines
     mixin {
-        defaultRefmapName.set("mixins.bbsentials.refmap.json")
+        defaultRefmapName.set("mixins.$modid.refmap.json")
     }
 }
 
@@ -94,10 +101,8 @@ tasks.processResources {
 
     filesMatching(listOf("mcmod.info", "mixins.$modid.json")) {
         expand(inputs.properties)
-        rename { fileName ->
-            fileName.replaceAll("(.+_at.cfg)", "META-INF/" + fileName)
-        }
     }
+    rename("(.+_at.cfg)", "META-INF/$1")
 }
 
 
@@ -121,6 +126,9 @@ tasks.shadowJar {
             println("Copying jars into mod: ${it.files}")
         }
     }
+
+    // If you want to include other dependencies and shadow them, you can relocate them in here
+    fun relocate(name: String) = relocate(name, "$baseGroup.deps.$name")
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

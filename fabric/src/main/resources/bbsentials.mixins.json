@@ -1,14 +1,14 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "de.hype.bbsentials.mixins",
+  "package": "de.hype.bbsentials.fabric.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [],
   "client": [
-    "de.hype.bbsentials.common.mixins.ClientCommandSourceMixin",
-    "de.hype.bbsentials.common.mixins.ItemRendererMixin",
-    "de.hype.bbsentials.common.mixins.ScreenMixin",
-    "de.hype.bbsentials.common.mixins.SimpleOptionMixin"
+    "ClientCommandSourceMixin",
+    "ItemRendererMixin",
+    "ScreenMixin",
+    "SimpleOptionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

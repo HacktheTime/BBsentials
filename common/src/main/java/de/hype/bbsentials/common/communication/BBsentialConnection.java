@@ -1,13 +1,12 @@
 package de.hype.bbsentials.common.communication;
 
+import de.hype.bbsentials.common.chat.Chat;
 import de.hype.bbsentials.common.chat.Message;
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.client.SplashManager;
 import de.hype.bbsentials.common.client.SplashStatusUpdateListener;
-import de.hype.bbsentials.common.constants.enviromentShared.ChChestItem;
-import de.hype.bbsentials.common.constants.enviromentShared.ChChestItems;
-import de.hype.bbsentials.common.constants.enviromentShared.Islands;
-import de.hype.bbsentials.common.constants.enviromentShared.MiningEvents;
+import de.hype.bbsentials.common.constants.enviromentShared.*;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.common.packets.AbstractPacket;
 import de.hype.bbsentials.common.packets.PacketManager;
 import de.hype.bbsentials.common.packets.PacketUtils;
@@ -305,7 +304,7 @@ public class BBsentialConnection {
         else {
             SplashManager.addSplash(packet);
             if (packet.lessWaste) {
-                waitTime = Math.min(((getPotTime() * 1000) / 80), 25 * 1000);
+                waitTime = Math.min(((EnvironmentCore.mcUtils.getPotTime() * 1000) / 80), 25 * 1000);
             }
             else {
                 waitTime = 0;
@@ -415,13 +414,13 @@ public class BBsentialConnection {
 
     public void onInternalCommandPacket(InternalCommandPacket packet) {
         if (packet.command.equals(InternalCommandPacket.REQUEST_POT_DURATION)) {
-            sendPacket(new InternalCommandPacket(InternalCommandPacket.SET_POT_DURATION, new String[]{String.valueOf(getPotTime())}));
+            sendPacket(new InternalCommandPacket(InternalCommandPacket.SET_POT_DURATION, new String[]{String.valueOf(EnvironmentCore.mcUtils.getPotTime())}));
         }
         else if (packet.command.equals(InternalCommandPacket.SELFDESTRUCT)) {
             selfDestruct();
             Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated. Stopping in 10 seconds.");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-            playsound(SoundEvents.BLOCK_ANVIL_DESTROY);
+            EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
             for (int i = 0; i < 10; i++) {
                 int finalI = i;
                 BBsentials.executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
@@ -432,7 +431,7 @@ public class BBsentialConnection {
             selfDestruct();
             Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated! Becomes effective on next launch");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-            playsound(SoundEvents.BLOCK_ANVIL_DESTROY);
+            EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
         }
         else if (packet.command.equals(InternalCommandPacket.HUB)) {
             BBsentials.config.sender.addImmediateSendTask("/hub");
@@ -450,7 +449,7 @@ public class BBsentialConnection {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
             Thread crashThread = new Thread(() -> {
-                playsound(SoundEvents.BLOCK_ANVIL_DESTROY);
+                EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
                 for (int i = 10; i >= 0; i--) {
                     Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + i);
                     try {
@@ -489,7 +488,7 @@ public class BBsentialConnection {
             Chat.sendPrivateMessageToSelfInfo(packet.message);
         }
         if (packet.ping) {
-            playsound(SoundEvents.ENTITY_WARDEN_DIG);
+            EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
         }
     }
 

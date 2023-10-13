@@ -1,6 +1,7 @@
 package de.hype.bbsentials.common.client;
 
 import de.hype.bbsentials.common.communication.BBsentialConnection;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.common.packets.packets.SplashNotifyPacket;
 import de.hype.bbsentials.common.packets.packets.SplashUpdatePacket;
 
@@ -22,9 +23,9 @@ public class SplashStatusUpdateListener implements Runnable {
     @Override
     public void run() {
         BBsentials.splashLobby = true;
-        int maxPlayerCount = BBUtils.getMaximumPlayerCount() - 5;
+        int maxPlayerCount = EnvironmentCore.utils.getMaximumPlayerCount() - 5;
         while (BBsentials.splashLobby) {
-                if (!full&&(BBUtils.getPlayerCount() >= maxPlayerCount)) {
+                if (!full&&(EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
                     newStatus = SplashUpdatePacket.STATUS_FULL;
                     full=true;
                 }

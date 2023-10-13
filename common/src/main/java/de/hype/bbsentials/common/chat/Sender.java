@@ -1,6 +1,7 @@
 package de.hype.bbsentials.common.chat;
 
 import de.hype.bbsentials.common.api.Formatting;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class Sender {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            MC.sendChatMessage(toSend);
+            EnvironmentCore.chat.sendChatMessage(toSend);
             if (!hidden) {
                 sendPrivateMessageToSelfInfo("Sent Command to Server: " + toSend);
             }

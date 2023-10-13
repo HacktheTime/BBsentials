@@ -19,7 +19,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "de.hype.bbsentials.common.client.BBsentials"
+      "de.hype.bbsentials.fabric.ModInitialiser"
     ],
     "modmenu": [
       "de.hype.bbsentials.fabric.ModMenueScreen"

@@ -199,6 +199,6 @@ public class Config implements Serializable {
     }
 
     public String getMCUUID() {
-        return MCUtils.getMCUUID().replace("-", "");
+        return EnvironmentCore.mcUtils.getMCUUID().replace("-", "");
     }
 }

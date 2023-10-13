@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
 
 import java.io.File;
 
-public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
+public class MCUtils implements de.hype.bbsentials.forge.common.mclibraries.MCUtils {
     public boolean isWindowFocused() {
         return MinecraftClient.getInstance().isWindowFocused();
     }

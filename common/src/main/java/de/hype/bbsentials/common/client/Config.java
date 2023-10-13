@@ -3,6 +3,7 @@ package de.hype.bbsentials.common.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.hype.bbsentials.common.chat.Sender;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -51,7 +52,7 @@ public class Config implements Serializable {
 
     // Set default attribute values
     private void setDefaults() {
-        username = MCUtils.getUsername();
+        username = EnvironmentCore.mcUtils.getUsername();
         acceptReparty = true;
         if (username.equals("Hype_the_Time")) {
             nickname = "Hype";
@@ -67,7 +68,7 @@ public class Config implements Serializable {
     // Gson object for serialization
     private final transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     // File object for storing the config
-    private final transient File CONFIG_FILE = new File(MCUtils.getConfigPath(), "BBsential_settings.json");
+    private final transient File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
 
     // Constructor
     public Config() {
@@ -77,7 +78,7 @@ public class Config implements Serializable {
     // Load the config from file
     public static Config load() {
         Config settings;
-        File CONFIG_FILE = new File(MCUtils.getConfigPath(), "BBsential_settings.json");
+        File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
         Gson GSON = new GsonBuilder().setPrettyPrinting().create();
         if (CONFIG_FILE.exists()) {
             try (FileReader reader = new FileReader(CONFIG_FILE)) {
@@ -94,7 +95,7 @@ public class Config implements Serializable {
         }
         else {
             settings = new Config(); // Use default values if the file doesn't exist
-            settings.username = MCUtils.getUsername();
+            settings.username = EnvironmentCore.mcUtils.getUsername();
         }
         if (!settings.hasBBRoles("dev")) {
             settings.detailedDevMode = false;

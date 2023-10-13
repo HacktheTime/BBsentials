@@ -7,4 +7,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-include("common","fabric")
+include(":common", ":fabric")

@@ -3,7 +3,6 @@ package de.hype.bbsentials.common.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.hype.bbsentials.common.chat.Sender;
-import de.hype.bbsentials.fabric.MCUtils;
 
 import java.io.*;
 import java.time.LocalDate;

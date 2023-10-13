@@ -274,7 +274,7 @@ public class BBsentialConnection {
                     throw new RuntimeException(arguments[1]);
                 }
                 else if (arguments[0].equals("hub")) {
-//TODO                    BBsentials.config.sender.addHiddenSendTask("/hub", 1);
+                   BBsentials.config.sender.addHiddenSendTask("/hub", 1);
                 }
             }
             if (BBsentials.getConfig().isDetailedDevModeEnabled()) {

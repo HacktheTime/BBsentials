@@ -1,11 +1,11 @@
 package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.chat.Message;
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.client.Config;
-import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.forge.common.chat.Chat;
+import de.hype.bbsentials.forge.common.chat.Message;
+import de.hype.bbsentials.forge.common.client.BBsentials;
+import de.hype.bbsentials.forge.common.client.Config;
+import de.hype.bbsentials.forge.common.mclibraries.EnvironmentCore;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -22,7 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.hype.bbsentials.common.client.BBsentials.*;
+import static de.hype.bbsentials.forge.common.client.BBsentials.*;
 
 public class ModInitialiser implements ClientModInitializer {
     @Override

@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric.mixins;
 
-import de.hype.bbsentials.common.client.BBsentials;
+import de.hype.bbsentials.forge.common.client.BBsentials;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;

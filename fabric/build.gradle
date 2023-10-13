@@ -17,7 +17,7 @@ repositories {
     // for more information about repositories.
 }
 dependencies {
-    implementation project(path: ':common')
+    implementation project(":common")
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -76,7 +76,12 @@ jar {
                 'MixinConfigs': 'modid.mixin.json'
     }
 }
+task copyCustomJar(type: Copy) {
+    from jar // Specify the customJar task as the source
+    into project.projectDir // Set the destination directory (e.g., project root)
+}
 
+copyCustomJar.dependsOn jar
 // configure the maven publication
 publishing {
     publications {
@@ -91,5 +96,12 @@ publishing {
         // Notice: This block does NOT have the same function as the block in the top level.
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
+    }
+}
+sourceSets {
+    main {
+        resources {
+            project(':common').sourceSets.main.resources.srcDirs
+        }
     }
 }

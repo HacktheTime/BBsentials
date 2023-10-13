@@ -1,7 +1,7 @@
 package de.hype.bbsentials.fabric;
 
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.constants.enviromentShared.Islands;
+import de.hype.bbsentials.forge.common.client.BBsentials;
+import de.hype.bbsentials.forge.common.constants.enviromentShared.Islands;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;

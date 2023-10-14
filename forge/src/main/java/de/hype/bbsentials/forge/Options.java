@@ -1,14 +1,13 @@
 package de.hype.bbsentials.forge;
 
-import de.hype.bbsentials.common.api.ISimpleOption;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class Options implements de.hype.bbsentials.common.mclibraries.Options {
     public void setFov(int value) {
-        ((ISimpleOption) (Object) MinecraftClient.getInstance().options.getFov()).set(value);
+        Minecraft.getMinecraft().gameSettings.fovSetting=value;
     }
     public void setGamma(double value) {
-        ((ISimpleOption) (Object) MinecraftClient.getInstance().options.getGamma()).set(value);
+        Minecraft.getMinecraft().gameSettings.gammaSetting= (float) value;
     }
 }
 

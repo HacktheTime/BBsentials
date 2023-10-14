@@ -1,8 +1,7 @@
 package de.hype.bbsentials.forge;
 
 import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.forge.client.CommandBBI;
-import net.minecraftforge.client.ClientCommandHandler;
+import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -15,21 +14,13 @@ public class ExampleMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        EnvironmentCore core = new EnvironmentCore(new BBUtils(), new ForgeChat(), new MCUtils(), new Commands(), new Options(), new DebugThread());
         MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    public void clientSetup() {
-        if (!alreadyInialised) {
-            ClientCommandHandler.instance.registerCommand(new CommandBBI());
-            alreadyInialised = true;
-            sentials.init();
-        }
     }
 
     @SubscribeEvent
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
-        EnvironmentCore core = new EnvironmentCore(new BBUtils(), new FabricChat(), new MCUtils(), new Commands(), new Options(), new DebugThread());
-        BBsentials.();
+        BBsentials.onServerSwap();
     }
 }
 

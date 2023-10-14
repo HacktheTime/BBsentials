@@ -1,8 +1,9 @@
-package de.hype.bbsentials.forge.client.Commands;
+package de.hype.bbsentials.forge.CommandImplementations;
 
+import de.hype.bbsentials.common.client.BBsentials;
 import net.minecraftforge.client.ClientCommandHandler;
 
-import static de.hype.bbsentials.forge.client.BBsentials.getConfig;
+import static de.hype.bbsentials.common.client.BBsentials.getConfig;
 
 
 public class CommandsOLD {
@@ -17,12 +18,12 @@ public class CommandsOLD {
         ClientCommandHandler.instance.registerCommand(new CommandBC());
         ClientCommandHandler.instance.registerCommand(new CommandBingoChat());
         if (getConfig().bbsentialsRoles != null) {
-            if (getConfig().bbsentialsRoles.contains("mod")) {
+            if (getConfig().hasBBRoles("mod")) {
                 ClientCommandHandler.instance.registerCommand(new CommandBAnnounce());
                 ClientCommandHandler.instance.registerCommand(new CommandBMute());
                 ClientCommandHandler.instance.registerCommand(new CommandBBan());
             }
-            if (getConfig().bbsentialsRoles.contains("splasher")) {
+            if (getConfig().hasBBRoles("splasher")) {
                 ClientCommandHandler.instance.registerCommand(new CommandSplashAnnounce());
             }
             else {
@@ -31,7 +32,7 @@ public class CommandsOLD {
     }
 
     public void sendCommand(String message) {
-        BBsentials.bbserver.sendCommand(message);
+        BBsentials.connection.sendCommand(message);
     }
 }
 

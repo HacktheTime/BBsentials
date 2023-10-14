@@ -1,26 +1,26 @@
-package de.hype.bbsentials.forge.client.Commands;
+package de.hype.bbsentials.forge.CommandImplementations;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 
-import static de.hype.bbsentials.forge.client.BBsentials.bbserver;
+import static de.hype.bbsentials.common.client.BBsentials.connection;
 
 
-public class CommandRaffle extends CommandBase {
+public class Command2xPowder extends CommandBase {
 
     @Override
     public String getCommandName() {
-        return "raffle";
+        return "2xpowder";
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/raffle";
+        return "/2xpowder";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        bbserver.sendMessage("?dwevent raffle");
+        connection.sendMessage("?dwevent 2xpowder");
     }
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender) {

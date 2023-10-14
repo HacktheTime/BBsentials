@@ -1,13 +1,14 @@
 package de.hype.bbsentials.common.client;
 
 
+import java.util.Collections;
 import java.util.List;
 
 public interface DebugThread extends Runnable {
 
     @Override
     public default void run() {
-         loop();
+        loop();
         //place a breakpoint for only this thread here.
     }
 
@@ -15,6 +16,6 @@ public interface DebugThread extends Runnable {
     }
 
     public default List<String> test() {
-        return List.of("");
+        return Collections.singletonList("");
     }
 }

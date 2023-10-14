@@ -1,13 +1,16 @@
 package de.hype.bbsentials.forge.client;
 
+import de.hype.bbsentials.common.client.BBsentials;
+import de.hype.bbsentials.common.client.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-import static de.hype.bbsentials.forge.client.BBsentials.connectToBBserver;
-import static de.hype.bbsentials.forge.client.BBsentials.getConfig;
+import static de.hype.bbsentials.common.client.BBsentials.connectToBBserver;
+import static de.hype.bbsentials.common.client.BBsentials.getConfig;
+
 
 
 public class CommandBBI extends CommandBase {

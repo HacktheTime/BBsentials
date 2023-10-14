@@ -8,10 +8,10 @@
     "url": "https://github.com/romangraef/Forge1.8.9Template/",
     "updateUrl": "",
     "authorList": [
-      "Hype_the_Time"
+      "Hype_the_Time/hackthetime"
     ],
     "credits": "",
-    "logoFile": "",
+    "logoFile": "logo.png",
     "screenshots": [],
     "dependencies": []
   }

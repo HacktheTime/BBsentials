@@ -1,6 +1,6 @@
-package de.hype.bbsentials.forge.client.Commands;
+package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.forge.chat.Chat;
+import de.hype.bbsentials.common.chat.Chat;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.NumberInvalidException;
@@ -28,7 +28,7 @@ public class CommandSplashAnnounce extends CommandBase {
             try {
                 hub_Number = parseInt(args[0], 1, 28);
             } catch (NumberInvalidException e) {
-                Chat.sendPrivateMessageToSelf("§cInvalid hub number");
+                Chat.sendPrivateMessageToSelfError("§cInvalid hub number");
             }
             String location = args[1];
             String message = "";

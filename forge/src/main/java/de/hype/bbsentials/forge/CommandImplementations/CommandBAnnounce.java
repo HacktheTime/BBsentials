@@ -1,32 +1,32 @@
-package de.hype.bbsentials.forge.client.Commands;
+package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.forge.chat.Chat;
+import de.hype.bbsentials.common.chat.Chat;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-public class CommandBC extends CommandBase {
+public class CommandBAnnounce extends CommandBase {
 
     @Override
     public String getCommandName() {
-        return "bc";
+        return "bannounce";
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/bc <Message to Bingo Chat>";
+        return "/" + getCommandName() + " <message>";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        if (args.length < 1) {
-            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bc <Message to Bingo Chat>"));
-            return;
+        if (args.length >= 1) {
+            String message = String.join(" ", args);
+            Chat.sendCommand("?announce " + message);
         }
-
-        String message = args[0];
-        Chat.sendCommand("?bingochat " + message);
+        else {
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: " + getCommandUsage(sender)));
+        }
     }
 
     @Override

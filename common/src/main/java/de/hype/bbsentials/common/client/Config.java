@@ -98,6 +98,7 @@ public class Config implements Serializable {
             settings.username = EnvironmentCore.mcUtils.getUsername();
         }
         if (!settings.hasBBRoles("dev")) {
+            //Changing disallowed. doing will result in a permanent ban!
             settings.detailedDevMode = false;
             settings.devMode = false;
         }

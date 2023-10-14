@@ -24,6 +24,11 @@ import java.util.regex.Pattern;
 
 public class Chat {
 
+    //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}// {"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile f772b2c7-bd2a-46e1-b1a2-41fa561157d6"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bShourtu§e's profile"}},"text":"§9Party §8> §b[MVP§c+§b] Shourtu§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Hype_the_Time TEST"}],"text":""}
+    //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}
+    private final Map<String, Instant> partyDisbandedMap = new HashMap<>();
+    private String lastPartyDisbandedUsername = null;
+
     public static String[] getVariableInfo(String packageName, String className) {
         List<String> variableInfoList = new ArrayList<>();
 
@@ -113,6 +118,96 @@ public class Chat {
         Field field = objClass.getDeclaredField(variableName);
         field.setAccessible(true);
         sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is: " + field.get(object));
+    }
+
+    public static void sendPrivateMessageToSelfError(String message) {
+        sendPrivateMessageToSelfBase(Formatting.RED + message);
+    }
+
+    public static void sendPrivateMessageToSelfFatal(String message) {
+        sendPrivateMessageToSelfBase(Formatting.DARK_RED + message);
+    }
+
+    public static void sendPrivateMessageToSelfSuccess(String message) {
+        sendPrivateMessageToSelfBase(Formatting.GREEN + message);
+    }
+
+    public static void sendPrivateMessageToSelfInfo(String message) {
+        sendPrivateMessageToSelfBase(Formatting.YELLOW + message);
+    }
+
+    public static void sendPrivateMessageToSelfImportantInfo(String message) {
+        sendPrivateMessageToSelfBase(Formatting.GOLD + message);
+    }
+
+    public static void sendPrivateMessageToSelfDebug(String message) {
+        sendPrivateMessageToSelfBase(Formatting.AQUA + message);
+    }
+
+    private static void sendPrivateMessageToSelfBase(String message) {
+        EnvironmentCore.chat.sendClientSideMessage(Message.of(message));
+    }
+
+    public static void sendPrivateMessageToSelfText(Message message) {
+        EnvironmentCore.chat.sendClientSideMessage(message);
+    }
+
+    public static void sendCommand(String s) {
+        BBsentials.getConfig().sender.addSendTask(s);
+    }
+
+    public static void setChatPromtId(String logMessage) {
+        String cbUUIDPattern = "/cb ([a-fA-F0-9-]+)";
+        Pattern cbPattern = Pattern.compile(cbUUIDPattern);
+        Matcher cbMatcher = cbPattern.matcher(logMessage);
+
+        String yesClickAction = "/chatprompt ([a-fA-F0-9-]+) YES";
+        Pattern yesPattern = Pattern.compile(yesClickAction);
+        Matcher yesMatcher = yesPattern.matcher(logMessage);
+        String lastPrompt = null;
+        if (cbMatcher.find()) {
+            lastPrompt = cbMatcher.group(1);
+            String finalLastPrompt1 = lastPrompt;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String promptCommand = "/cb " + finalLastPrompt1;
+                    BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
+                    if (BBsentials.config.isDevModeEnabled()) {
+                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
+                    }
+                    try {
+                        Thread.sleep(10 * 1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    BBsentials.getConfig().setLastChatPromptAnswer(null);
+                    return;
+                }
+            }).start();
+        }
+        if (yesMatcher.find()) {
+            lastPrompt = yesMatcher.group(1);
+            String finalLastPrompt = lastPrompt;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String promptCommand = "/chatprompt " + finalLastPrompt + " YES";
+                    BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
+                    if (BBsentials.config.isDevModeEnabled()) {
+                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
+                    }
+                    try {
+                        Thread.sleep(10 * 1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    BBsentials.getConfig().setLastChatPromptAnswer(null);
+                    return;
+                }
+            }).start();
+
+        }
     }
 
     public Message onEvent(Message text) {
@@ -229,11 +324,13 @@ public class Chat {
                 }
                 else if (messageUnformatted.startsWith("You'll be partying with:")) {
                     List<String> members = new ArrayList<>();
-                    for (String users : messageUnformatted.replace("You'll be partying with:", "").replaceAll("\\[[^\\]]*\\]","").trim().split(",")) {
-                        if (users.contains("and ")){break;}
+                    for (String users : messageUnformatted.replace("You'll be partying with:", "").replaceAll("\\[[^\\]]*\\]", "").trim().split(",")) {
+                        if (users.contains("and ")) {
+                            break;
+                        }
                         members.add(users);
                     }
-                    Config.partyMembers=members;
+                    Config.partyMembers = members;
                 }
                 else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(BBsentials.getConfig().getUsername() + " ●"))) || (message.contains(BBsentials.getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + BBsentials.getConfig().getUsername()) || message.getUnformattedString().endsWith(" has promoted " + BBsentials.getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
                     BBsentials.getConfig().setIsLeader(true);
@@ -272,14 +369,8 @@ public class Chat {
         }
     }
 
-    //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}// {"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile f772b2c7-bd2a-46e1-b1a2-41fa561157d6"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bShourtu§e's profile"}},"text":"§9Party §8> §b[MVP§c+§b] Shourtu§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Hype_the_Time TEST"}],"text":""}
-    //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}
-    private final Map<String, Instant> partyDisbandedMap = new HashMap<>();
-    private String lastPartyDisbandedUsername = null;
-
-
     public boolean isSpam(String message) {
-        if (message==null) return true;
+        if (message == null) return true;
         if (message.isEmpty()) return true;
         if (message.contains("Mana")) return true;
         if (message.contains("Status")) return true;
@@ -293,43 +384,11 @@ public class Chat {
         return new String();
     }
 
-    public static void sendPrivateMessageToSelfError(String message) {
-        sendPrivateMessageToSelfBase(Formatting.RED + message);
-    }
-
-    public static void sendPrivateMessageToSelfFatal(String message) {
-        sendPrivateMessageToSelfBase(Formatting.DARK_RED + message);
-    }
-
-    public static void sendPrivateMessageToSelfSuccess(String message) {
-        sendPrivateMessageToSelfBase(Formatting.GREEN + message);
-    }
-
-    public static void sendPrivateMessageToSelfInfo(String message) {
-        sendPrivateMessageToSelfBase(Formatting.YELLOW + message);
-    }
-
-    public static void sendPrivateMessageToSelfImportantInfo(String message) {
-        sendPrivateMessageToSelfBase(Formatting.GOLD + message);
-    }
-
-    public static void sendPrivateMessageToSelfDebug(String message) {
-        sendPrivateMessageToSelfBase(Formatting.AQUA + message);
-    }
-
-    private static void sendPrivateMessageToSelfBase(String message) {
-        EnvironmentCore.chat.sendClientSideMessage(Message.of(message));
-    }
-
-    public static void sendPrivateMessageToSelfText(Message message) {
-        EnvironmentCore.chat.sendClientSideMessage(message);
-    }
-
-    public static void sendCommand(String s) {
-        BBsentials.getConfig().sender.addSendTask(s);
-    }
-
     public void sendNotification(String title, String text) {
+        sendNotification(title, text,1);
+    }
+
+    public void sendNotification(String title, String text, float volume) {
         BBsentials.executionService.execute(() -> {
             try {
                 InputStream inputStream = getClass().getResourceAsStream("/sounds/mixkit-sci-fi-confirmation-914.wav");
@@ -360,59 +419,6 @@ public class Chat {
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-        }
-    }
-    public static void setChatPromtId(String logMessage) {
-        String cbUUIDPattern = "/cb ([a-fA-F0-9-]+)";
-        Pattern cbPattern = Pattern.compile(cbUUIDPattern);
-        Matcher cbMatcher = cbPattern.matcher(logMessage);
-
-        String yesClickAction = "/chatprompt ([a-fA-F0-9-]+) YES";
-        Pattern yesPattern = Pattern.compile(yesClickAction);
-        Matcher yesMatcher = yesPattern.matcher(logMessage);
-        String lastPrompt = null;
-        if (cbMatcher.find()) {
-            lastPrompt = cbMatcher.group(1);
-            String finalLastPrompt1 = lastPrompt;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    String promptCommand = "/cb " + finalLastPrompt1;
-                    BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
-                    if (BBsentials.config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
-                    }
-                    try {
-                        Thread.sleep(10 * 1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    BBsentials.getConfig().setLastChatPromptAnswer(null);
-                    return;
-                }
-            }).start();
-        }
-        if (yesMatcher.find()) {
-            lastPrompt = yesMatcher.group(1);
-            String finalLastPrompt = lastPrompt;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    String promptCommand = "/chatprompt " + finalLastPrompt + " YES";
-                    BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
-                    if (BBsentials.config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
-                    }
-                    try {
-                        Thread.sleep(10 * 1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    BBsentials.getConfig().setLastChatPromptAnswer(null);
-                    return;
-                }
-            }).start();
-
         }
     }
 }

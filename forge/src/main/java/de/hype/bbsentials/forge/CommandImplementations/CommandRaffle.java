@@ -1,26 +1,26 @@
-package de.hype.bbsentials.forge.client.Commands;
+package de.hype.bbsentials.forge.CommandImplementations;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 
-import static de.hype.bbsentials.forge.client.BBsentials.bbserver;
+import static de.hype.bbsentials.common.client.BBsentials.connection;
 
 
-public class CommandBetterTogether extends CommandBase {
+public class CommandRaffle extends CommandBase {
 
     @Override
     public String getCommandName() {
-        return "bettertogether";
+        return "raffle";
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/bettertogether";
+        return "/raffle";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        bbserver.sendMessage("?dwevent bettertogether");
+        connection.sendMessage("?dwevent raffle");
     }
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender) {

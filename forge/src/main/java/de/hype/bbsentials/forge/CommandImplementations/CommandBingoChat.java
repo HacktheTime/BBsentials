@@ -1,38 +1,34 @@
-package de.hype.bbsentials.forge.client.Commands;
+package de.hype.bbsentials.forge.CommandImplementations;
 
+
+import de.hype.bbsentials.common.chat.Chat;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-public class CommandBBServer extends CommandBase {
+public class CommandBingoChat extends CommandBase {
 
     @Override
     public String getCommandName() {
-        return "bbserver";
+        return "bingochat";
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/bbserver <Message>";
+        return "/bingochat <Message to Bingo Chat>";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length < 1) {
-            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbserver <Message>"));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bingochat <Message to Bingo Chat>"));
             return;
         }
 
         String message = args[0];
-        if (message.equals("bb:reconnect")) {
-            BBsentials.connectToBBserver();
-        }
-        else {
-            BBsentials.bbserver.sendMessage(message);
-        }
+        Chat.sendCommand("?bingochat " + message);
     }
-
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender) {
         return true;

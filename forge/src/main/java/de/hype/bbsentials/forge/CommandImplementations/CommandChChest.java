@@ -1,12 +1,12 @@
-package de.hype.bbsentials.forge.client.Commands;
+package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.forge.chat.Chat;
+import de.hype.bbsentials.common.chat.Chat;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-import static de.hype.bbsentials.forge.client.BBsentials.bbserver;
+import static de.hype.bbsentials.common.client.BBsentials.connection;
 
 
 public class CommandChChest extends CommandBase {
@@ -36,9 +36,9 @@ public class CommandChChest extends CommandBase {
             String contactWay = args[4];
 
             String combinedString = "?chchest " + item + " " + x + " " + y + " " + z + " " + contactWay;
-            bbserver.sendMessage(combinedString);
+            connection.sendMessage(combinedString);
         } catch (Exception e) {
-            Chat.sendPrivateMessageToSelf("§cYour coords were invalid.");
+            Chat.sendPrivateMessageToSelfError("Your coords were invalid.");
         }
     }
     @Override

@@ -1,18 +1,20 @@
 # BBsentials1.20
-The BBsentials mod for the newer versions of the game.
 THIS MOD IS NOT AFFILIATED WITH BINGO BREWERS ANYMORE since indigo had a problem with me focusing
 on 1.20 and refusing to collaborate with me on request. 
 
 The mod is availibel on modrinth https://modrinth.com/mod/bbsentials
 
 Worked on by 
-Hype_the_Time alias HacktheTime (Developer)
+Hype_the_Time/hackthetime (Main Developer)
+
 Contributors:
-hannibal2
+
+hannibal2 (never made a push but was very helpful with questions and did some parts of the code)
 
 IMPORTANT:
-This mod is currently for 1.20.2 Fabric.
+While this mod is supported for both 1.20.2 and 1.8.9 some features may be one version only. My (hackthetime) focus is on 1.20.2. Due too that some things may not be done in 1.8.9 by my personally.
 
+1.20.2
 I recommend using Fabulously Optimized together with this mod.
 Some Features require at least Cit Resewn which is included there.
 
@@ -23,22 +25,12 @@ I worked together with ic22487, and he included a costume Splash Hub texture in 
 (https://hypixel.net/threads/0-19-1-hypixel-for-1-8-1-12-and-1-20.4174260/)
 If you don't want to use a Full texturepack there are texturepacks with only the hub ui and another with only Splash hub over in the release Section.
 
+Depenendencies:
+1.20.2: mod menu, cloth config, fabric api
+
+1.8.9: nothing
+
+
 **Do not expect any kind of support during Bingo times since those moderating it are likely to sweat it too.
 If you have any kind of request**
 
-You may apply for preannouce¹ if you have a good reason. (Normally people who did something good for the community like splashes,... Specific Bingo maniacs may get it too.)
-Do this BEFORE Bingo starts! Bribing (already try) on any Side will Result in a permanent unappealable ban!
-
-
-
-
-
-
-¹ preannounce has a slight advantage in timing. (15 sec early chchest) (Splash is notified in intervals of how much time you have left. Preannounce has a slight buff here.)
-Splash announce order:
-pre with less than 10 mins
-everybody with less than 1 min splash
-everybody with less than 10 splash
-pre with less then 25 mins of splash
-everybody else with less than 25 mins remaining
-Discord and everybody

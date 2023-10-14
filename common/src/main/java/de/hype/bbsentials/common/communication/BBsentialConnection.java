@@ -29,6 +29,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class BBsentialConnection {
     private Socket socket;
@@ -325,7 +326,13 @@ public class BBsentialConnection {
         if (isCommandSafe(packet.bbcommand)) {
             if (showChChest(packet.items)) {
                 String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-                tellrawText = tellrawText.replace("@username", packet.announcerUsername).replace("@item", Arrays.stream(packet.items).map(ChChestItem::getDisplayName).toList().toString()).replace("@coords", packet.locationCoords).replace("@inviteCommand", packet.bbcommand);
+                tellrawText = tellrawText.replace("@username", packet.announcerUsername);
+                tellrawText = tellrawText.replace("@item", Arrays.stream(packet.items)
+                        .map(ChChestItem::getDisplayName)
+                        .collect(Collectors.toList())
+                        .toString());
+                tellrawText = tellrawText.replace("@coords", packet.locationCoords);
+                tellrawText = tellrawText.replace("@inviteCommand", packet.bbcommand);
                 if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
                     tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
                 }

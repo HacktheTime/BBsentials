@@ -23,6 +23,6 @@ plugins {
 }
 
 
-rootProject.name = "BBsentials All"
+rootProject.name = "BBsentialsAll"
 
 include(":common", ":fabric", ":forge")

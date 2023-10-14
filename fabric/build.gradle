@@ -76,12 +76,7 @@ jar {
                 'MixinConfigs': 'modid.mixin.json'
     }
 }
-task copyCustomJar(type: Copy) {
-    from jar // Specify the customJar task as the source
-    into project.projectDir // Set the destination directory (e.g., project root)
-}
 
-copyCustomJar.dependsOn jar
 // configure the maven publication
 publishing {
     publications {

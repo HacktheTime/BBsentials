@@ -1,7 +1,6 @@
 package de.hype.bbsentials.forge.communication;
 
 import de.hype.bbsentials.forge.chat.Chat;
-import de.hype.bbsentials.forge.client.BBsentials;
 import net.minecraft.client.Minecraft;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;

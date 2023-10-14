@@ -1,6 +1,6 @@
 package de.hype.bbsentials.forge;
 
-import de.hype.bbsentials.forge.client.BBsentials;
+import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.forge.client.CommandBBI;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -8,7 +8,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
 @Mod(modid = "bbsentials", useMetadata = true)
 public class ExampleMod {
     static boolean alreadyInialised = false;
@@ -29,8 +28,8 @@ public class ExampleMod {
 
     @SubscribeEvent
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
-        clientSetup();
-        MinecraftForge.EVENT_BUS.unregister(this);
+        EnvironmentCore core = new EnvironmentCore(new BBUtils(), new FabricChat(), new MCUtils(), new Commands(), new Options(), new DebugThread());
+        BBsentials.();
     }
 }
 

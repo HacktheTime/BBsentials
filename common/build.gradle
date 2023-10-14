@@ -15,7 +15,6 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.lwjgl:lwjgl-glfw:3.3.3")
-    // Add your common dependencies for Forge and any other libraries here.
 }
 
 processResources {

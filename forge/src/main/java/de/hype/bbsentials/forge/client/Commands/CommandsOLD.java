@@ -1,6 +1,5 @@
 package de.hype.bbsentials.forge.client.Commands;
 
-import de.hype.bbsentials.forge.client.BBsentials;
 import net.minecraftforge.client.ClientCommandHandler;
 
 import static de.hype.bbsentials.forge.client.BBsentials.getConfig;

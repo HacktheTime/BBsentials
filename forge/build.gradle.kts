@@ -10,13 +10,14 @@ plugins {
 
 val baseGroup: String by project
 val mcVersion: String by project
-val version: String by project
+val mod_version: String by project
 val mixinGroup = "$baseGroup.mixin"
 val modid: String by project
 
 // Toolchains:
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+    withSourcesJar()
 }
 
 // Minecraft configuration:
@@ -81,7 +82,7 @@ tasks.withType(JavaCompile::class) {
 }
 
 tasks.withType(Jar::class) {
-    archiveBaseName.set(modid)
+    archiveBaseName.set("forge-$mod_version")
     manifest.attributes.run {
         this["FMLCorePluginContainsFMLMod"] = "true"
         this["ForceLoadAsMod"] = "true"
@@ -93,7 +94,7 @@ tasks.withType(Jar::class) {
 }
 
 tasks.processResources {
-    inputs.property("version", project.version)
+    inputs.property("mod_version", project.version)
     inputs.property("mcversion", mcVersion)
     inputs.property("modid", modid)
     inputs.property("mixinGroup", mixinGroup)
@@ -129,5 +130,17 @@ tasks.shadowJar {
     // If you want to include other dependencies and shadow them, you can relocate them in here
     fun relocate(name: String) = relocate(name, "$baseGroup.deps.$name")
 }
+sourceSets {
+    main {
+        java {
+            srcDir(project(":common").sourceSets["main"].java.srcDirs)
+        }
+        resources {
+            srcDir(project(":common").sourceSets["main"].resources.srcDirs)
+        }
+    }
+}
+
+
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

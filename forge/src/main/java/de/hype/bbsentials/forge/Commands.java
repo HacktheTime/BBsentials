@@ -5,6 +5,7 @@ import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.common.mclibraries.MCCommand;
 import de.hype.bbsentials.common.packets.AbstractPacket;
 import de.hype.bbsentials.common.packets.packets.SplashNotifyPacket;
+import de.hype.bbsentials.forge.CommandImplementations.*;
 import de.hype.bbsentials.forge.client.CommandBBI;
 import net.minecraftforge.client.ClientCommandHandler;
 
@@ -15,65 +16,14 @@ public class Commands implements MCCommand {
 
     public void registerMain() {
         ClientCommandHandler.instance.registerCommand(new CommandBBI());
-//        event.register((dispatcher, registryAccess) -> {
-//            miningEvent(dispatcher, "goblinraid", MiningEvents.GOBLIN_RAID);
-//        });/*goblinraid*/
-//        event.register((dispatcher, registryAccess) -> {
-//            miningEvent(dispatcher, "2xpowder", MiningEvents.DOUBLE_POWDER);
-//        });/*2xpowder*/
-//        event.register((dispatcher, registryAccess) -> {
-//            miningEvent(dispatcher, "bettertogether", MiningEvents.BETTER_TOGETHER);
-//        });/*b2g*/
-//        event.register((dispatcher, registryAccess) -> {
-//            miningEvent(dispatcher, "raffle", MiningEvents.RAFFLE);
-//        });/*raffle*/
-//        event.register((dispatcher, registryAccess) -> {
-//            miningEvent(dispatcher, "gonewiththewind", MiningEvents.GONE_WITH_THE_WIND);
-//        });/*gonewiththewind*/
-//        event.register((dispatcher, registryAccess) -> {
-//            miningEvent(dispatcher, "mithrilgourmand", MiningEvents.MITHRIL_GOURMAND);
-//        });/*gonewiththewind*/
-//        event.register((dispatcher, registryAccess) -> {
-//            dispatcher.register(ClientCommandManager.literal("chchest").then(ClientCommandManager.argument("Item", StringArgumentType.string()).suggests((context, builder) -> {
-//                String[] items = new String[]{"PrehistoricEgg", "Pickonimbus2000", "ElectronTransmitter", "FTX3070", "RobotronReflector", "ControlSwitch", "SyntheticHeart", "SuperliteMotor", "BlueGoblinEgg", "YellowGoblinEgg", "FlawlessAmberGemstone", "FlawlessJadeGemstone", "FlawlessSapphireGemstone", "FlawlessRubyGemstone", "FlawlessAmethystGemstone", "JungleHeart", "FlawlessTopazGemstone", "FlawlessJasperGemstone"};
-//                String input = builder.getRemaining().toLowerCase();
-//                int lastSemicolonIndex = input.lastIndexOf(";");
-//                List<String> suggestions = new ArrayList<>();
-//                if (lastSemicolonIndex >= 0) {
-//                    String inputBeforeSemicolon = input.substring(0, lastSemicolonIndex + 1); // Include the semicolon
-//
-//                    for (String item : items) {
-//                        suggestions.add(inputBeforeSemicolon + item);
-//                    }
-//                }
-//                return CommandSource.suggestMatching(suggestions, builder);
-//            }).then(ClientCommandManager.argument("X", IntegerArgumentType.integer()).then(ClientCommandManager.argument("Y", IntegerArgumentType.integer()).then(ClientCommandManager.argument("Z", IntegerArgumentType.integer()).then(ClientCommandManager.argument("ContactWay", StringArgumentType.string()).suggests(((context, builder) -> {
-//                return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.getConfig().getUsername() + " bb:party me\"", "\"/p join " + BBsentials.config.getUsername() + "\""}, builder);
-//            })).executes((context) -> {
-//                String item = StringArgumentType.getString(context, "Item");
-//                int x = IntegerArgumentType.getInteger(context, "X");
-//                int y = IntegerArgumentType.getInteger(context, "Y");
-//                int z = IntegerArgumentType.getInteger(context, "Z");
-//                String contactWay = StringArgumentType.getString(context, "ContactWay");
-//
-//                sendPacket(new ChChestPacket("", ChChestItems.getItem(item.split(";")), x + " " + y + " " + z, contactWay, ""));
-//                return 1;
-//            })))))));
-//        });/*chchest*/
-//        event.register((dispatcher, registryAccess) -> {
-//            dispatcher.register(ClientCommandManager.literal("bc").then(ClientCommandManager.argument("Message to Bingo Chat", StringArgumentType.greedyString()).executes((context) -> {
-//                String message = StringArgumentType.getString(context, "Message to Bingo Chat");
-//                sendPacket(new BingoChatMessagePacket("", "", message, 0));
-//                return 1;
-//            })));
-//        });/*BincoChatShort*/
-//        event.register((dispatcher, registryAccess) -> {
-//            dispatcher.register(ClientCommandManager.literal("bingochat").then(ClientCommandManager.argument("Message to Bingo Chat", StringArgumentType.greedyString()).executes((context) -> {
-//                String message = StringArgumentType.getString(context, "Message to Bingo Chat");
-//                sendPacket(new BingoChatMessagePacket("", "", message, 0));
-//                return 1;
-//            })));
-//        });/*BingoChatLong*/
+        ClientCommandHandler.instance.registerCommand(new CommandGoblinRaid());
+        ClientCommandHandler.instance.registerCommand(new Command2xPowder());
+        ClientCommandHandler.instance.registerCommand(new CommandBetterTogether());
+        ClientCommandHandler.instance.registerCommand(new CommandRaffle());
+        ClientCommandHandler.instance.registerCommand(new CommandGoneWithTheWind());
+        ClientCommandHandler.instance.registerCommand(new CommandChChest());
+        ClientCommandHandler.instance.registerCommand(new CommandBC());
+        ClientCommandHandler.instance.registerCommand(new CommandBingoChat());
     }
 
     public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher, boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {
@@ -182,6 +132,15 @@ public class Commands implements MCCommand {
 //                })));
 //            });/*BBServerMotd*/
 //        }
+        if (hasMod) {
+            ClientCommandHandler.instance.registerCommand(new CommandBAnnounce());
+            ClientCommandHandler.instance.registerCommand(new CommandBMute());
+            ClientCommandHandler.instance.registerCommand(new CommandBBan());
+        }
+        if (hasSplasher) {
+            ClientCommandHandler.instance.registerCommand(new CommandSplashAnnounce());
+        }
+
     }
 
     public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {

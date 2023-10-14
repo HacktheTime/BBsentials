@@ -1,11 +1,13 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
 
-import de.hype.bbsentials.common.chat.Chat;
+import de.hype.bbsentials.common.packets.packets.BingoChatMessagePacket;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+
+import static de.hype.bbsentials.common.client.BBsentials.connection;
 
 public class CommandBC extends CommandBase {
 
@@ -27,7 +29,7 @@ public class CommandBC extends CommandBase {
         }
 
         String message = args[0];
-        Chat.sendCommand("?bingochat " + message);
+        connection.sendPacket(new BingoChatMessagePacket("","",message,0));
     }
 
     @Override

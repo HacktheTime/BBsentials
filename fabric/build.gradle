@@ -96,7 +96,11 @@ publishing {
 sourceSets {
     main {
         resources {
-            project(':common').sourceSets.main.resources.srcDirs
+            srcDir(project(':common').sourceSets.main.resources.srcDirs)
+        }
+        java {
+            srcDir(project(':common').sourceSets.main.java.srcDirs)
         }
     }
 }
+

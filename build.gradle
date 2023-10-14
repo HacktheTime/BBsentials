@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+}
+
+task copyJars(type: Copy) {
+    from project(":forge").fileTree("build/libs") // Copy JARs from the :forge subproject
+    into file("$rootDir/build/libs") // Copy them to the global output directory
+    from project(":fabric").fileTree("build/libs") // Copy JARs from the :fabric subproject
+    into file("$rootDir/build/libs") // Copy them to the global output directory
+}
+

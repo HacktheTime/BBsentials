@@ -116,13 +116,12 @@ public class Chat {
     }
 
     public Message onEvent(Message text) {
-        if (!isSpam(text.toString())) {
+        if (!isSpam(text.getString())) {
             if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
                 System.out.println("got a message: " + text.getJson());
             }
-            Message message = new Message(text.toString(),text.getString());
-            BBsentials.executionService.execute(() -> processThreaded(message));
-            return processNotThreaded(message);
+            BBsentials.executionService.execute(() -> processThreaded(text));
+            return processNotThreaded(text);
         }
         return text; // Return the original message if it is spam
     }

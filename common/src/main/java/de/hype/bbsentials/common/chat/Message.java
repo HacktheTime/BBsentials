@@ -7,11 +7,18 @@ public class Message {
     private String unformattedString = null;
     private String playerName = null;
     private String string;
+    public boolean actionBar = false;
 
     public Message(String textJson,String string) {
         this.text = textJson;
         if (string==null) string = "";
         this.string=string;
+    }
+    public Message(String textJson,String string,boolean actionbar) {
+        this.text = textJson;
+        if (string==null) string = "";
+        this.string=string;
+        this.actionBar = actionbar;
     }
     public static Message of(String string){
         return new Message("{\"text\":\""+string+"\"}",string);

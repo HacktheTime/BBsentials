@@ -1,6 +1,5 @@
 package de.hype.bbsentials.forge;
 
-import de.hype.bbsentials.forge.client.BBsentials;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;

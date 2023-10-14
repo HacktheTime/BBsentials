@@ -1,6 +1,5 @@
 package de.hype.bbsentials.forge.chat;
 
-import de.hype.bbsentials.forge.client.BBsentials;
 import de.hype.bbsentials.forge.client.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;

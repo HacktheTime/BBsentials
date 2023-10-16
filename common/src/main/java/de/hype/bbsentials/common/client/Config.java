@@ -49,6 +49,10 @@ public class Config implements Serializable {
     public boolean autoSplashStatusUpdates;
     public String nickname;
     public String notifForMessagesType;
+    // trols
+    public boolean swapActionBarChat = false;
+    public boolean swapOnlyNormal = true;
+    public boolean swapOnlyBBsentials = false;
 
     // Set default attribute values
     private void setDefaults() {

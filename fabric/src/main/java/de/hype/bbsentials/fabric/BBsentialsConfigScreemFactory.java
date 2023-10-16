@@ -67,6 +67,11 @@ public class BBsentialsConfigScreemFactory {
                     .setTooltip(Text.of("Makes you connect to the Test Server instead of the Main Server. Keep in mind that all announces may be tests and the main announces are not transferred over to here!")) // Optional: Shown when the user hover over this option
                     .setSaveConsumer(newValue -> BBsentials.config.connectToBeta = newValue)
                     .build());
+            server.addEntry(entryBuilder.startBooleanToggle(Text.of("Mojang Auth"), BBsentials.config.useMojangAuth)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Uses mojang as authenticator instead of api key"))
+                    .setSaveConsumer(newValue -> BBsentials.config.useMojangAuth = newValue)
+                    .build());
             server.addEntry(entryBuilder.startBooleanToggle(Text.of("Override Bingo Time"), BBsentials.config.overrideBingoTime)
                     .setDefaultValue(false)
                     .setTooltip(Text.of("Override the Bingo Time and connect always to the Server. (Bingo time is 14 days cause Extreme Bingo)"))

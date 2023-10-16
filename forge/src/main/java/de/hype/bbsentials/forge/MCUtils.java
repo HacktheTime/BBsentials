@@ -1,5 +1,6 @@
 package de.hype.bbsentials.forge;
 
+import com.mojang.authlib.exceptions.AuthenticationException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.potion.Potion;
@@ -8,6 +9,8 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.Display;
 
 import java.io.File;
+import java.math.BigInteger;
+import java.util.Random;
 
 public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
     public boolean isWindowFocused() {
@@ -41,4 +44,18 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
         }
         return remainingDuration;
     }
+
+
+    public String mojangAuth(String serverId) {
+        try {
+            Minecraft.getMinecraft().getSessionService().joinServer(Minecraft
+                    .getMinecraft()
+                    .getSession()
+                    .getProfile(), Minecraft.getMinecraft().getSession().getToken(), serverId);
+        } catch (AuthenticationException e) {
+            return null;
+        }
+        return serverId;
+    }
+
 }

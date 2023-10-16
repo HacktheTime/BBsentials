@@ -10,5 +10,8 @@ public enum InternalReasonConstants {
     INVALID_LOGIN,
     KICKED,
     ANOTHER_LOGIN,
-    SERVER_RESTART
+    SERVER_RESTART,
+    NOT_REGISTERED,
+    ON_COOLDOWN,
+    OTHER
 }

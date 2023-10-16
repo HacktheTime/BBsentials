@@ -33,6 +33,7 @@ public class Config implements Serializable {
     // Set via load / default you may change these
     public boolean overrideBingoTime = false;
     public boolean connectToBeta = false;
+    public boolean useMojangAuth = false;
 
     public String bbServerURL = "localhost";
     public String apiKey = "";

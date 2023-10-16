@@ -17,6 +17,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyManagementException;
@@ -27,6 +28,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -43,7 +45,6 @@ public class BBsentialConnection {
     public BBsentialConnection() {
         packetManager = new PacketManager(this);
     }
-
 
 
     public static boolean isCommandSafe(String command) {
@@ -64,7 +65,6 @@ public class BBsentialConnection {
         }
         return false;
     }
-
 
 
     public void connect(String serverIP, int serverPort) {
@@ -234,15 +234,6 @@ public class BBsentialConnection {
     public void onMessageReceived(String message) {
         if (!PacketUtils.handleIfPacket(this, message)) {
             if (message.startsWith("H-")) {
-                if (message.equals("H-BB-Login: ")) {
-                    Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    sendPacket(new RequestConnectPacket(BBsentials.config.getMCUUID(), BBsentials.getConfig().getApiKey(), BBsentials.getConfig().getApiVersion(), AuthenticationConstants.DATABASE));
-                }
             }
             else {
                 Chat.sendPrivateMessageToSelfSuccess("BB: " + message);
@@ -295,8 +286,9 @@ public class BBsentialConnection {
     }
 
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
+        //influencing the delay in any way is disallowed!
         int waitTime;
-        if (packet.splasherUsername.equals(BBsentials.config.getUsername())&& BBsentials.config.autoSplashStatusUpdates) {
+        if (packet.splasherUsername.equals(BBsentials.config.getUsername()) && BBsentials.config.autoSplashStatusUpdates) {
             Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard");
             SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet);
             BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
@@ -336,7 +328,7 @@ public class BBsentialConnection {
                 if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
                     tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
                 }
-                Chat.sendPrivateMessageToSelfText(new Message(tellrawText,""));
+                Chat.sendPrivateMessageToSelfText(new Message(tellrawText, ""));
             }
         }
         else {
@@ -348,7 +340,8 @@ public class BBsentialConnection {
     public void onMiningEventPacket(MiningEventPacket packet) {
         if (!BBsentials.config.toDisplayConfig.getValue("disableAll")) {
             //its will returns false cause disabled is checked already before.
-            if (BBsentials.config.toDisplayConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS)) return;
+            if (BBsentials.config.toDisplayConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                return;
             if (!(BBsentials.config.toDisplayConfig.allEvents)) {
                 if (packet.event.equals(MiningEvents.RAFFLE)) {
                     if (!BBsentials.config.toDisplayConfig.raffle) return;
@@ -483,7 +476,7 @@ public class BBsentialConnection {
             Chat.sendCommand("/p " + packet.type + String.join(" ", packet.users));
         }
         else {
-          Chat.sendPrivateMessageToSelfImportantInfo("Blocked a Party Command from the Server: "+packet.type+" : "+String.join(" ", packet.users));
+            Chat.sendPrivateMessageToSelfImportantInfo("Blocked a Party Command from the Server: " + packet.type + " : " + String.join(" ", packet.users));
         }
     }
 
@@ -499,20 +492,50 @@ public class BBsentialConnection {
         }
     }
 
+    public void onRequestAuthentication(RequestAuthentication packet) {
+        Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Random r1 = new Random();
+        Random r2 = new Random(System.identityHashCode(new Object()));
+        BigInteger random1Bi = new BigInteger(128, r1);
+        BigInteger random2Bi = new BigInteger(128, r2);
+        BigInteger serverBi = random1Bi.xor(random2Bi);
+        String clientRandom = serverBi.toString(16);
+
+        String serverId = clientRandom + packet.serverIdSuffix;
+        if (BBsentials.config.useMojangAuth) {
+            String serverID = EnvironmentCore.mcUtils.mojangAuth(serverId);
+            sendPacket(new RequestConnectPacket(BBsentials.config.getMCUUID(), serverID, BBsentials.getConfig().getApiVersion(), AuthenticationConstants.MOJANG));
+        }
+        else {
+            sendPacket(new RequestConnectPacket(BBsentials.config.getMCUUID(), BBsentials.getConfig().getApiKey(), BBsentials.getConfig().getApiVersion(), AuthenticationConstants.DATABASE));
+        }
+    }
+
     public boolean showChChest(ChChestItem[] items) {
         if (BBsentials.config.toDisplayConfig.allChChestItem) return true;
         for (ChChestItem item : items) {
             if (BBsentials.config.toDisplayConfig.customChChestItem && item.isCustom()) return true;
             if (BBsentials.config.toDisplayConfig.allRoboPart && item.isRoboPart()) return true;
-            if (BBsentials.config.toDisplayConfig.prehistoricEgg && item.equals(ChChestItems.PrehistoricEgg)) return true;
-            if (BBsentials.config.toDisplayConfig.pickonimbus2000 && item.equals(ChChestItems.Pickonimbus2000)) return true;
+            if (BBsentials.config.toDisplayConfig.prehistoricEgg && item.equals(ChChestItems.PrehistoricEgg))
+                return true;
+            if (BBsentials.config.toDisplayConfig.pickonimbus2000 && item.equals(ChChestItems.Pickonimbus2000))
+                return true;
             if (BBsentials.config.toDisplayConfig.controlSwitch && item.equals(ChChestItems.ControlSwitch)) return true;
             if (BBsentials.config.toDisplayConfig.electronTransmitter && item.equals(ChChestItems.ElectronTransmitter))
                 return true;
-            if (BBsentials.config.toDisplayConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector)) return true;
-            if (BBsentials.config.toDisplayConfig.superliteMotor && item.equals(ChChestItems.SuperliteMotor)) return true;
-            if (BBsentials.config.toDisplayConfig.syntheticHeart && item.equals(ChChestItems.SyntheticHeart)) return true;
-            if (BBsentials.config.toDisplayConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone)) return true;
+            if (BBsentials.config.toDisplayConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector))
+                return true;
+            if (BBsentials.config.toDisplayConfig.superliteMotor && item.equals(ChChestItems.SuperliteMotor))
+                return true;
+            if (BBsentials.config.toDisplayConfig.syntheticHeart && item.equals(ChChestItems.SyntheticHeart))
+                return true;
+            if (BBsentials.config.toDisplayConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone))
+                return true;
             if (BBsentials.config.toDisplayConfig.jungleHeart && item.equals(ChChestItems.JungleHeart)) return true;
         }
         return false;

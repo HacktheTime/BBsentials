@@ -7,15 +7,15 @@ import java.util.List;
 public interface DebugThread extends Runnable {
 
     @Override
-    public default void run() {
+    default void run() {
         loop();
         //place a breakpoint for only this thread here.
     }
 
-    public default void loop() {
+    default void loop() {
     }
 
-    public default List<String> test() {
+    default List<String> test() {
         return Collections.singletonList("");
     }
 }

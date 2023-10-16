@@ -13,4 +13,6 @@ public interface MCUtils {
     void playsound(String eventName);
 
     int getPotTime();
+
+    String mojangAuth(String serverId);
 }

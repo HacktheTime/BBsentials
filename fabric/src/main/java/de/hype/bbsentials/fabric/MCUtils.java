@@ -1,5 +1,6 @@
 package de.hype.bbsentials.fabric;
 
+import com.mojang.authlib.exceptions.AuthenticationException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -9,6 +10,8 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
+import java.math.BigInteger;
+import java.util.Random;
 
 public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
     public boolean isWindowFocused() {
@@ -32,6 +35,7 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
         MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance
                 .master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
     }
+
     public int getPotTime() {
         int remainingDuration = 0;
         StatusEffectInstance potTimeRequest = MinecraftClient.getInstance().player.getStatusEffect(StatusEffects.STRENGTH);
@@ -41,5 +45,14 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
             }
         }
         return remainingDuration;
+    }
+
+    public String mojangAuth(String serverId) {
+        try {
+            MinecraftClient.getInstance().getSessionService().joinServer(MinecraftClient.getInstance().getGameProfile().getId(), MinecraftClient.getInstance().getSession().getAccessToken(), serverId);
+        } catch (AuthenticationException ignored) {
+            return "";
+        }
+        return serverId;
     }
 }

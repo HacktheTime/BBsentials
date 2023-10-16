@@ -36,6 +36,7 @@ public class PacketManager {
         packets.add(new Packet<>(SplashNotifyPacket.class, connection::onSplashNotifyPacket));
         packets.add(new Packet<>(SystemMessagePacket.class, connection::onSystemMessagePacket));
         packets.add(new Packet<>(WelcomeClientPacket.class, connection::onWelcomePacket));
+        packets.add(new Packet<>(RequestAuthentication.class, connection::onRequestAuthentication));
     }
 
     // Method to handle a received packet

@@ -133,6 +133,29 @@ public class BBsentialsConfigScreemFactory {
                     .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
                     .setSaveConsumer(newValue -> BBsentials.config.allowBBinviteMe = newValue)
                     .build());
+            SubCategoryBuilder trolls = entryBuilder.startSubCategory(Text.of("Trolls")).setExpanded(false);
+            BooleanListEntry swapActionBarAndChat = (entryBuilder.startBooleanToggle(Text.of("Actionbar-Chat switch"), BBsentials.config.swapActionBarChat)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Swap that chat messages are shown in actionbar and reverse"))
+                    .setSaveConsumer(newValue -> BBsentials.config.swapActionBarChat = newValue)
+                    .build());
+            Requirement trollSwapEnabled = swapActionBarAndChat::getValue;
+            BooleanListEntry swapActionBarAndChatOnlyNormal = (entryBuilder.startBooleanToggle(Text.of("Only normal messages"), BBsentials.config.swapOnlyNormal)
+                    .setDefaultValue(false)
+                    .setRequirement(trollSwapEnabled)
+                    .setTooltip(Text.of("Swap only the default messages (→ everything not from BBsentials)"))
+                    .setSaveConsumer(newValue -> BBsentials.config.swapOnlyNormal = newValue)
+                    .build());
+            BooleanListEntry swapActionBarAndChatOnlyBB = (entryBuilder.startBooleanToggle(Text.of("Only BBsentials messages"), BBsentials.config.swapOnlyBBsentials)
+                    .setDefaultValue(false)
+                    .setRequirement(trollSwapEnabled)
+                    .setTooltip(Text.of("Swap only the messages from BBsentials"))
+                    .setSaveConsumer(newValue -> BBsentials.config.swapOnlyBBsentials = newValue)
+                    .build());
+            trolls.add(swapActionBarAndChat);
+            trolls.add(swapActionBarAndChatOnlyNormal);
+            trolls.add(swapActionBarAndChatOnlyBB);
+            other.addEntry(trolls.build());
             ConfigCategory chChestItems = builder.getOrCreateCategory(Text.of("Ch Chest Items"));
             {
                 BooleanListEntry allItems = entryBuilder.startBooleanToggle(Text.of("All Chest Items"), BBsentials.config.toDisplayConfig.allChChestItem)

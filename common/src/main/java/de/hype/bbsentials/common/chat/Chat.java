@@ -145,7 +145,7 @@ public class Chat {
     }
 
     private static void sendPrivateMessageToSelfBase(String message) {
-        EnvironmentCore.chat.sendClientSideMessage(Message.of(message));
+        EnvironmentCore.chat.sendClientSideMessage(Message.of(message), false);
     }
 
     public static void sendPrivateMessageToSelfText(Message message) {

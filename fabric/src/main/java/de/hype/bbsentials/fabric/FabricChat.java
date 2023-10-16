@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric;
 
 import de.hype.bbsentials.common.chat.Chat;
 import de.hype.bbsentials.common.chat.Message;
+import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.mclibraries.MCChat;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
@@ -21,10 +22,7 @@ public class FabricChat implements MCChat {
             chat.onEvent(new Message(Text.Serializer.toJson(message), message.getString()));
         });
         ClientReceiveMessageEvents.MODIFY_GAME.register((message, actionbar) -> {
-            if (!actionbar) {
-                return prepareOnEvent(message, actionbar);
-            }
-            return message;
+            return prepareOnEvent(message, actionbar);
         });
         ClientSendMessageEvents.CHAT.register(message -> {
             if (message.startsWith("/")) {
@@ -36,8 +34,19 @@ public class FabricChat implements MCChat {
     public Text prepareOnEvent(Text text, boolean actionbar) {
         String json = Text.Serializer.toJson(text);
         Message message = new Message(json, text.getString(), actionbar);
-        Message returned = chat.onEvent(message);
-        Text toReturn = Text.Serializer.fromJson(returned.getJson());
+        if (!actionbar) {
+            message = chat.onEvent(message);
+        }
+        Text toReturn = Text.Serializer.fromJson(message.getJson());
+        if (BBsentials.config.swapActionBarChat && !BBsentials.config.swapOnlyBBsentials) {
+            if (!actionbar) {
+                showActionBar(message);
+            }
+            else {
+                sendClientSideMessage(message);
+            }
+            return null;
+        }
         return toReturn;
     }
 
@@ -49,6 +58,9 @@ public class FabricChat implements MCChat {
     }
 
     public void sendClientSideMessage(Message message, boolean actionbar) {
+        if (BBsentials.config.swapActionBarChat && !BBsentials.config.swapOnlyNormal) {
+            actionbar = !actionbar;
+        }
         if (actionbar) {
             showActionBar(message);
         }
@@ -56,7 +68,6 @@ public class FabricChat implements MCChat {
             sendClientSideMessage(message);
         }
     }
-
     public void showActionBar(Message message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {

@@ -315,6 +315,11 @@ public class BBsentialsConfigScreemFactory {
                         .setTooltip(Text.of("Detailed Dev Mode"))
                         .setSaveConsumer(newValue -> BBsentials.config.detailedDevMode = newValue)
                         .build());
+                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Security"), BBsentials.config.devSecurity)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Shows dev debug even when its sensetive information"))
+                        .setSaveConsumer(newValue -> BBsentials.config.devSecurity = newValue)
+                        .build());
             }
             if (BBsentials.config.hasBBRoles("splasher")) {
                 ConfigCategory dev = builder.getOrCreateCategory(Text.of("§dSplashes"));

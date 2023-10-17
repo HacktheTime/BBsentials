@@ -1,6 +1,7 @@
 package de.hype.bbsentials.fabric;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
+import de.hype.bbsentials.common.chat.Chat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -53,8 +54,15 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
             try {
                 MinecraftClient.getInstance().getSessionService().joinServer(MinecraftClient.getInstance().getGameProfile().getId(), MinecraftClient.getInstance().getSession().getAccessToken(), serverId);
                 success = true;
-            } catch (AuthenticationException ignored) {
-
+            } catch (AuthenticationException e) {
+                try {
+                    Thread.sleep(1000);
+                }catch (Exception ignored){
+                }
+                if (tries==0){
+                    Chat.sendPrivateMessageToSelfError("Could not authenticate at mojang: "+e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
         return serverId;

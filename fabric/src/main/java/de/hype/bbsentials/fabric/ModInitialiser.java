@@ -84,6 +84,11 @@ public class ModInitialiser implements ClientModInitializer {
                                 connectToBBserver();
                                 return 1;
                             }))
+                    .then(ClientCommandManager.literal("disconnect")
+                            .executes((context) -> {
+                                connection.close();
+                                return 1;
+                            }))
                     .then(ClientCommandManager.literal("reconnect-stable-server")
                             .executes((context) -> {
                                 connectToBBserver(false);

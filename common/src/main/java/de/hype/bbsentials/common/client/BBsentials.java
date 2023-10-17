@@ -44,7 +44,9 @@ public class BBsentials {
     public static void connectToBBserver(boolean beta) {
         if (connection != null) {
             connection.sendHiddenMessage("exit");
+            connection.close();
         }
+        connection=null;
         if (bbthread != null) {
             if (bbthread.isAlive()) {
                 bbthread.interrupt();

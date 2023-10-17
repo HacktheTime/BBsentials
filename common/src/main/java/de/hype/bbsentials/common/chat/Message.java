@@ -20,8 +20,10 @@ public class Message {
         this.string=string;
         this.actionBar = actionbar;
     }
-    public static Message of(String string){
-        return new Message("{\"text\":\""+string+"\"}",string);
+    public static Message of(String string) {
+        String escapedString = string.replace("\\", "\\\\").replace("\"", "\\\"");
+        String json = "{\"text\":\"" + escapedString + "\"}";
+        return new Message(json, string);
     }
     //
     public String getJson() {

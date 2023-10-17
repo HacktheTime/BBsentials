@@ -16,6 +16,7 @@ public class Config implements Serializable {
     public boolean allowServerPartyInvite = true;
     public boolean devMode = false;
     public boolean detailedDevMode = false;
+    public boolean devSecurity = true;
     //You can change again
 
     // set automatically

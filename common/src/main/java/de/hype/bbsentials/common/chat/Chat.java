@@ -237,7 +237,6 @@ public class Chat {
             message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions guild " + message.getPlayerName() + " " + message.getUnformattedString());
         }
         else if (BBsentials.config.doAllChatCustomMenu) {
-            System.out.println("User: '" + message.getPlayerName() + "' | Message: " + message.getUnformattedString());
             message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
         }
 

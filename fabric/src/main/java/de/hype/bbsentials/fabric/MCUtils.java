@@ -10,8 +10,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
-import java.math.BigInteger;
-import java.util.Random;
 
 public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
     public boolean isWindowFocused() {
@@ -48,10 +46,16 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
     }
 
     public String mojangAuth(String serverId) {
-        try {
-            MinecraftClient.getInstance().getSessionService().joinServer(MinecraftClient.getInstance().getGameProfile().getId(), MinecraftClient.getInstance().getSession().getAccessToken(), serverId);
-        } catch (AuthenticationException ignored) {
-            return "";
+        boolean success = false;
+        int tries = 10;
+        while (tries > 0 && !success) {
+            tries--;
+            try {
+                MinecraftClient.getInstance().getSessionService().joinServer(MinecraftClient.getInstance().getGameProfile().getId(), MinecraftClient.getInstance().getSession().getAccessToken(), serverId);
+                success = true;
+            } catch (AuthenticationException ignored) {
+
+            }
         }
         return serverId;
     }

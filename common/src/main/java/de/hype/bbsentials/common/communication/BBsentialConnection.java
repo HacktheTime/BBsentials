@@ -52,16 +52,9 @@ public class BBsentialConnection {
             return true;
         }
         else {
-            BBsentials.connection.sendCommand("?emergency server-hacked? chchest command " + command);
             String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and Developer Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
             System.out.println(emergencyMessage);
             Chat.sendPrivateMessageToSelfFatal("§4" + emergencyMessage + "\n\n");
-            /*try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            throw new RuntimeException(emergencyMessage);*/
         }
         return false;
     }
@@ -501,15 +494,16 @@ public class BBsentialConnection {
         }
         Random r1 = new Random();
         Random r2 = new Random(System.identityHashCode(new Object()));
-        BigInteger random1Bi = new BigInteger(128, r1);
-        BigInteger random2Bi = new BigInteger(128, r2);
+        BigInteger random1Bi = new BigInteger(64, r1);
+        BigInteger random2Bi = new BigInteger(64, r2);
         BigInteger serverBi = random1Bi.xor(random2Bi);
         String clientRandom = serverBi.toString(16);
 
         String serverId = clientRandom + packet.serverIdSuffix;
         if (BBsentials.config.useMojangAuth) {
-            String serverID = EnvironmentCore.mcUtils.mojangAuth(serverId);
-            sendPacket(new RequestConnectPacket(BBsentials.config.getMCUUID(), serverID, BBsentials.getConfig().getApiVersion(), AuthenticationConstants.MOJANG));
+            EnvironmentCore.mcUtils.mojangAuth(serverId);
+            RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.config.getMCUUID(), clientRandom, BBsentials.getConfig().getApiVersion(), AuthenticationConstants.MOJANG);
+            sendPacket(connectPacket);
         }
         else {
             sendPacket(new RequestConnectPacket(BBsentials.config.getMCUUID(), BBsentials.getConfig().getApiKey(), BBsentials.getConfig().getApiVersion(), AuthenticationConstants.DATABASE));

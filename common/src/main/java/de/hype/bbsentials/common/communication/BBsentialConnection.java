@@ -313,7 +313,7 @@ public class BBsentialConnection {
                 if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
                     tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
                 }
-                Chat.sendPrivateMessageToSelfText(new Message(tellrawText, ""));
+                Chat.sendPrivateMessageToSelfText(Message.tellraw(tellrawText));
             }
         }
         else {

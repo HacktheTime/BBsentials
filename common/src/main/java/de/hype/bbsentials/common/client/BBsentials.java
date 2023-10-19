@@ -15,9 +15,9 @@ public class BBsentials {
     public static Commands coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     public static boolean splashLobby;
+    public static SplashStatusUpdateListener splashStatusUpdateListener;
     private static Thread bbthread;
     private static boolean initialised = false;
-    public static SplashStatusUpdateListener splashStatusUpdateListener;
 
     public static Config getConfig() {
         return config;
@@ -42,15 +42,17 @@ public class BBsentials {
     }
 
     public static void connectToBBserver(boolean beta) {
-        if (connection != null) {
-            connection.sendHiddenMessage("exit");
-            connection.close();
-        }
-        connection=null;
         if (bbthread != null) {
-            if (bbthread.isAlive()) {
+            try {
                 bbthread.interrupt();
+                connection.messageReceiverThread.interrupt();
+                connection.messageSenderThread.interrupt();
+            } catch (Exception ignored) {
             }
+        }
+        connection = null;
+        if (connection != null) {
+            connection.close();
         }
         bbthread = new Thread(() -> {
             connection = new BBsentialConnection();
@@ -62,7 +64,6 @@ public class BBsentials {
             else {
                 connection.connect(config.getBBServerURL(), 5000);
             }
-            executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
         });
         bbthread.start();
     }
@@ -72,17 +73,19 @@ public class BBsentials {
      */
 
     public static void onServerSwap() {
-            splashLobby = false;
-            if (!initialised) {
-                config = Config.load();
-                if (config.doGammaOverride) EnvironmentCore.mcoptions.setGamma(10);
-                Chat chat = new Chat();
-                if (Config.isBingoTime() || config.overrideBingoTime()) {
-                    connectToBBserver();
-                }
-                initialised = true;
+        splashLobby = false;
+        if (!initialised) {
+            config = Config.load();
+            executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
+            if (config.doGammaOverride) EnvironmentCore.mcoptions.setGamma(10);
+            Chat chat = new Chat();
+            if (Config.isBingoTime() || config.overrideBingoTime()) {
+                connectToBBserver();
             }
+            initialised = true;
+        }
     }
+
     public void manualLoad() {
         initialised = true;
         config = Config.load();

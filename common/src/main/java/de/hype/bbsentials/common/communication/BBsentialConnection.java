@@ -41,6 +41,8 @@ public class BBsentialConnection {
     private MessageReceivedCallback messageReceivedCallback;
     private String itemName = "Hub #0";
     private PacketManager packetManager;
+    public Thread messageReceiverThread;
+    public Thread messageSenderThread;
 
     public BBsentialConnection() {
         packetManager = new PacketManager(this);
@@ -133,13 +135,12 @@ public class BBsentialConnection {
             socket = sslSocketFactory.createSocket(serverIP, serverPort);
 
             socket.setKeepAlive(true); // Enable Keep-Alive
-
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
             messageQueue = new LinkedBlockingQueue<>();
 
             // Start message receiver thread
-            Thread messageReceiverThread = new Thread(() -> {
+            messageReceiverThread = new Thread(() -> {
                 try {
                     while (true) {
                         String message = reader.readLine();
@@ -164,7 +165,7 @@ public class BBsentialConnection {
             messageReceiverThread.start();
             messageReceiverThread.setName("bb receiver thread");
             // Start message sender thread
-            Thread messageSenderThread = new Thread(() -> {
+            messageSenderThread = new Thread(() -> {
                 try {
                     while (true) {
                         String message = messageQueue.take();
@@ -215,8 +216,6 @@ public class BBsentialConnection {
     }
 
 
-    //The following onMessageReceived may or may not be modified
-    // or taken out of order in private/ non official versions of the mod!
     public void onMessageReceived(String message) {
         if (!PacketUtils.handleIfPacket(this, message)) {
             if (message.startsWith("H-")) {
@@ -227,8 +226,8 @@ public class BBsentialConnection {
         }
     }
 
-    public void dummy(Object o) {
-        //this does absoloutely nothing
+    public <T extends AbstractPacket> void dummy(T o) {
+        //this does absolutely nothing. dummy for packet in packt manager
     }
 
     public void splashHighlightItem(String itemName, long displayTimeInMilliseconds) {
@@ -256,14 +255,14 @@ public class BBsentialConnection {
     public <E extends AbstractPacket> void sendPacket(E packet) {
         String packetName = packet.getClass().getSimpleName();
         String rawjson = PacketUtils.parsePacketToJson(packet);
-        if (BBsentials.getConfig().isDetailedDevModeEnabled() && !(packet.getClass().equals(RequestConnectPacket.class)&&BBsentials.config.devSecurity)) {
-            Chat.sendPrivateMessageToSelfDebug("BBDev-sP: " + packetName + ": " + rawjson);
-        }
         if (socket.isConnected() && writer != null) {
+            if (BBsentials.getConfig().isDetailedDevModeEnabled() && !(packet.getClass().equals(RequestConnectPacket.class) && BBsentials.config.devSecurity)) {
+                Chat.sendPrivateMessageToSelfDebug("BBDev-sP: " + packetName + ": " + rawjson);
+            }
             writer.println(packetName + "." + rawjson);
         }
         else {
-            Chat.sendPrivateMessageToSelfError("BB: Couldn't send a Packet? did you get disconnected?");
+            Chat.sendPrivateMessageToSelfError("BB: Couldn't send a " + packetName + "! did you get disconnected?");
         }
     }
 
@@ -563,6 +562,8 @@ public class BBsentialConnection {
     public void close() {
         try {
             socket.close();
+            reader = null;
+            writer = null;
         } catch (IOException ignored) {
         }
     }

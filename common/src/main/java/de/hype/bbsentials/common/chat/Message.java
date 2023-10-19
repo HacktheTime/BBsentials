@@ -25,6 +25,10 @@ public class Message {
         String json = "{\"text\":\"" + escapedString + "\"}";
         return new Message(json, string);
     }
+    public static Message tellraw(String json) {
+        json=json.replace("@username",BBsentials.config.getUsername());
+        return new Message(json, "");
+    }
     //
     public String getJson() {
         return text;

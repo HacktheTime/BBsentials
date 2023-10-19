@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -167,47 +168,27 @@ public class Chat {
         String lastPrompt = null;
         if (cbMatcher.find()) {
             lastPrompt = cbMatcher.group(1);
-            String finalLastPrompt1 = lastPrompt;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    String promptCommand = "/cb " + finalLastPrompt1;
-                    BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
-                    if (BBsentials.config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
-                    }
-                    try {
-                        Thread.sleep(10 * 1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    BBsentials.getConfig().setLastChatPromptAnswer(null);
-                    return;
-                }
-            }).start();
+            setChatCommand("/cb " + lastPrompt,10);
         }
         if (yesMatcher.find()) {
             lastPrompt = yesMatcher.group(1);
-            String finalLastPrompt = lastPrompt;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    String promptCommand = "/chatprompt " + finalLastPrompt + " YES";
-                    BBsentials.getConfig().setLastChatPromptAnswer(promptCommand);
-                    if (BBsentials.config.isDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + promptCommand + "\"");
-                    }
-                    try {
-                        Thread.sleep(10 * 1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    BBsentials.getConfig().setLastChatPromptAnswer(null);
-                    return;
-                }
-            }).start();
-
+            setChatCommand("/chatprompt " + lastPrompt + " YES",10);
         }
+    }
+
+    /**
+     *
+     * @param command the command to be executed
+     * @param timeBeforePerish in seconds before its reset to nothing
+     */
+    public static void setChatCommand(String command,int timeBeforePerish) {
+        BBsentials.getConfig().setLastChatPromptAnswer(command);
+        if (BBsentials.config.isDevModeEnabled()) {
+            Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + command + "\"");
+        }
+        BBsentials.executionService.schedule(() -> {
+            BBsentials.getConfig().setLastChatPromptAnswer(null);
+        },10, TimeUnit.SECONDS);
     }
 
     public Message onEvent(Message text) {
@@ -315,7 +296,7 @@ public class Chat {
                 else if ((message.contains("Party Leader:") && !message.contains(BBsentials.getConfig().getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(BBsentials.getConfig().getUsername()) || (!message.startsWith("The party was transferred to " + BBsentials.getConfig().getUsername()) && message.startsWith("The party was transferred to"))) || messageUnformatted.endsWith(BBsentials.getConfig().getUsername() + " is now a Party Moderator") || (message.startsWith("The party was disbanded")) || (message.contains("You have joined ") && message.contains("'s party!")) || (message.contains("Party Leader, ") && message.contains(" , summoned you to their server.")) || (message.contains("warped to your dungeon"))) {
                     BBsentials.getConfig().setIsLeader(false);
                     if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isLeader());
+                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isPartyLeader());
                     }
                 }
                 else if (BBsentials.config.getPlayersInParty().length == 0 && messageUnformatted.endsWith("to the party! They have 60 seconds to accept")) {
@@ -334,7 +315,7 @@ public class Chat {
                 else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(BBsentials.getConfig().getUsername() + " ●"))) || (message.contains(BBsentials.getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + BBsentials.getConfig().getUsername()) || message.getUnformattedString().endsWith(" has promoted " + BBsentials.getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
                     BBsentials.getConfig().setIsLeader(true);
                     if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isLeader());
+                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isPartyLeader());
                     }
                 }
                 else if (message.getUnformattedString().equals("Please type /report confirm to log your report for staff review.")) {
@@ -351,7 +332,18 @@ public class Chat {
 
             }
             else if (message.isFromParty()) {
-
+                if (message.getMessageContent().equals("warp")&&BBsentials.config.isPartyLeader()) {
+                    if (BBsentials.config.getPlayersInParty().length == 1) {
+                        Chat.sendCommand("/p warp");
+                    }
+                    else if (BBsentials.config.getPlayersInParty().length >= 10) {
+                        //ignored because soo many players
+                    }
+                    else if (BBsentials.config.getPlayersInParty().length > 1) {
+                        Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a warp. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to warp the entire \",{\"text\":\"Party\",\"color\":\"gold\"},\".\"]"));
+                        setChatCommand("/p warp",10);
+                    }
+                }
             }
             else if (message.isMsg()) {
                 if (messageUnformatted.endsWith("bb:party me")) {
@@ -384,7 +376,7 @@ public class Chat {
     }
 
     public void sendNotification(String title, String text) {
-        sendNotification(title, text,1);
+        sendNotification(title, text, 1);
     }
 
     public void sendNotification(String title, String text, float volume) {

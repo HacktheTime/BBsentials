@@ -127,7 +127,7 @@ public class Config implements Serializable {
         return username;
     }
 
-    public boolean isLeader() {
+    public boolean isPartyLeader() {
         return isLeader;
     }
 

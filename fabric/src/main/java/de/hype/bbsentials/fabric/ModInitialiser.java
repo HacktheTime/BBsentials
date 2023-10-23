@@ -6,6 +6,7 @@ import de.hype.bbsentials.common.chat.Message;
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.client.Config;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -25,14 +26,7 @@ import java.util.List;
 import static de.hype.bbsentials.common.client.BBsentials.*;
 
 public class ModInitialiser implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        EnvironmentCore core = new EnvironmentCore(new BBUtils(),new FabricChat(),new MCUtils(),new Commands(),new Options(),new DebugThread());
-        ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
-            BBsentials.onServerSwap();
-        });
-    }
-
+    public static NumPadCodes codes;
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
@@ -189,8 +183,7 @@ public class ModInitialiser implements ClientModInitializer {
             );
         }); //bbi
 
-        KeyBinding devKeyBind = new KeyBinding("Open Mod Menu Config", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_ADD, "BBsentials: Developing Tools");
-        KeyBindingHelper.registerKeyBinding(devKeyBind);
+        KeyBinding devKeyBind = new KeyBinding("Open Mod Menu Config", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (devKeyBind.wasPressed()) {
                 MinecraftClient.getInstance().setScreen(BBsentialsConfigScreemFactory.create(MinecraftClient.getInstance().currentScreen));
@@ -220,16 +213,25 @@ public class ModInitialiser implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (petKeyBind.wasPressed()) MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/pets");
         });
-        for (int i = 1; i <= 9; i++) {
-            KeyBinding ecPageKeyBind = new KeyBinding("Ender Chest Page " + i, InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_1 + (i - 1), "BBsentials");
-            KeyBindingHelper.registerKeyBinding(ecPageKeyBind);
-            int pageNum = i; // Capture the page number for lambda
-            ClientTickEvents.END_CLIENT_TICK.register(client -> {
-                if (ecPageKeyBind.wasPressed()) {
-                    getConfig().sender.addImmediateSendTask("/ec " + pageNum);
-                }
-            });
-        }
+//        for (int i = 1; i <= 9; i++) {
+//            KeyBinding ecPageKeyBind = new KeyBinding("Ender Chest Page " + i, InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_1 + (i - 1), "BBsentials");
+//            KeyBindingHelper.registerKeyBinding(ecPageKeyBind);
+//            int pageNum = i; // Capture the page number for lambda
+//            ClientTickEvents.END_CLIENT_TICK.register(client -> {
+//                if (ecPageKeyBind.wasPressed()) {
+//                    getConfig().sender.addImmediateSendTask("/ec " + pageNum);
+//                }
+//            });
+//        }
     } // KeyBinds
+
+    @Override
+    public void onInitializeClient() {
+        EnvironmentCore core = new EnvironmentCore(new BBUtils(), new FabricChat(), new MCUtils(), new Commands(), new Options(), new DebugThread());
+        codes = new NumPadCodes();
+        ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
+            BBsentials.onServerSwap();
+        });
+    }
 
 }

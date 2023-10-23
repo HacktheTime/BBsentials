@@ -18,6 +18,7 @@ public class BBsentials {
     public static SplashStatusUpdateListener splashStatusUpdateListener;
     private static Thread bbthread;
     private static boolean initialised = false;
+    public static Chat chat = new Chat();
 
     public static Config getConfig() {
         return config;
@@ -78,7 +79,6 @@ public class BBsentials {
             config = Config.load();
             executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
             if (config.doGammaOverride) EnvironmentCore.mcoptions.setGamma(10);
-            Chat chat = new Chat();
             if (Config.isBingoTime() || config.overrideBingoTime()) {
                 connectToBBserver();
             }

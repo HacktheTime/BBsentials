@@ -191,22 +191,28 @@ public class Chat {
         },10, TimeUnit.SECONDS);
     }
 
-    public Message onEvent(Message text) {
+    public Message onEvent(Message text, boolean actionbar) {
         if (!isSpam(text.getString())) {
             if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
                 System.out.println("got a message: " + text.getJson());
             }
             BBsentials.executionService.execute(() -> processThreaded(text));
-            return processNotThreaded(text);
+            return processNotThreaded(text, actionbar);
         }
         return text; // Return the original message if it is spam
     }
 
     //Handle in the messages which need to be modified here
-    public Message processNotThreaded(Message message) {
+    public Message processNotThreaded(Message message, boolean actionbar) {
 //        if (message.isFromParty()) {
 //           message.replaceInJson("\"action\":\"run_command\",\"value\":\"/viewprofile", "\"action\":\"run_command\",\"value\":\"/bviewprofile " + messageUnformatted.split(">", 1)[1].trim());
 //        }
+        if (actionbar && !BBsentials.config.overwriteActionBar.isEmpty()) {
+            if (message.getUnformattedString().equals(BBsentials.config.overwriteActionBar.replaceAll("§.", ""))) {
+                return message;
+            }
+            return null;
+        }
         if (message.isFromReportedUser()) {
             sendPrivateMessageToSelfBase(Formatting.RED + "B: " + message.getUnformattedString());
             return null;

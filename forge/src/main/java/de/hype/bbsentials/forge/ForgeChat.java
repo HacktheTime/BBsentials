@@ -2,11 +2,9 @@ package de.hype.bbsentials.forge;
 
 import de.hype.bbsentials.common.chat.Chat;
 import de.hype.bbsentials.common.chat.Message;
-import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.mclibraries.MCChat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.ChatStyle;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,7 +27,7 @@ public class ForgeChat implements MCChat {
             //2 means action bar
 //            Chat.sendPrivateMessageToSelfDebug(String.valueOf(((int) event.type)));
             Message message = new Message(IChatComponent.Serializer.componentToJson(event.message), event.message.getUnformattedText());
-            Message newMessage = chat.onEvent(message);
+            Message newMessage = chat.onEvent(message, false);
             if (!newMessage.equals(message)) {
                 event.setCanceled(true);
                 sendClientSideMessage(newMessage);
@@ -43,19 +41,6 @@ public class ForgeChat implements MCChat {
             String json = message.getJson();
             IChatComponent text = IChatComponent.Serializer.jsonToComponent(json);
             player.addChatMessage(text);
-        }
-    }
-
-
-    public void sendClientSideMessage(Message message, boolean actionbar) {
-        if (BBsentials.config.swapActionBarChat && !BBsentials.config.swapOnlyNormal) {
-            actionbar = !actionbar;
-        }
-        if (actionbar) {
-            showActionBar(message);
-        }
-        else {
-            sendClientSideMessage(message);
         }
     }
 

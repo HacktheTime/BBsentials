@@ -20,7 +20,9 @@ public class Config implements Serializable {
     //You can change again
 
     // set automatically
-    private transient boolean isLeader;
+    private transient boolean isPartyLeader;
+    public transient String overwriteActionBar = "";
+
     public transient String alreadyReported = "";
     public String[] bbsentialsRoles = {""};
     public static List<String> partyMembers = new ArrayList<>();
@@ -128,11 +130,11 @@ public class Config implements Serializable {
     }
 
     public boolean isPartyLeader() {
-        return isLeader;
+        return isPartyLeader;
     }
 
     public void setIsLeader(boolean value) {
-        isLeader = value;
+        isPartyLeader = value;
     }
 
     public String getNickname() {
@@ -194,6 +196,8 @@ public class Config implements Serializable {
     }
 
     public boolean hasBBRoles(String roleName) {
+        if (roleName == null) return true;
+        if (roleName.isEmpty()) return true;
         for (String role : bbsentialsRoles) {
             if (role.equalsIgnoreCase(roleName)) {
                 return true;

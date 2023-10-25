@@ -12,7 +12,13 @@ public class NumPadConfigScreen extends Screen {
     public List<NumCode> hiddenNumCodes = new ArrayList<>();
     ButtonWidget addButton;
     ButtonWidget okButton;
+
+    ButtonWidget firstPage;
+    ButtonWidget lastPage;
+    ButtonWidget nextPage;
+    ButtonWidget previosPage;
     NumPadCodes codes;
+    int page = 0;
     private List<NumCodeInputField> codeTextFields;
     private List<TextFieldWidget> commandTextFields;
     private List<ButtonWidget> removeButtonFields;
@@ -35,6 +41,10 @@ public class NumPadConfigScreen extends Screen {
                     addButton = new ButtonWidget.Builder(Text.of("+"), button -> {
                         addNewRow();
                     }).build();
+                    firstPage = new ButtonWidget.Builder(Text.of("First"), button -> setPage(0)).build();
+                    lastPage = new ButtonWidget.Builder(Text.of("Last"), button -> setPage(-2)).build();
+                    nextPage = new ButtonWidget.Builder(Text.of("Next"), button -> setPage(page + 1)).build();
+                    previosPage = new ButtonWidget.Builder(Text.of("Previous"), button -> setPage(page - 1)).build();
                 }
                 else {
                     hiddenNumCodes.add(numCode);
@@ -51,6 +61,14 @@ public class NumPadConfigScreen extends Screen {
         removeButtonFields.forEach((this::addDrawableChild));
         updateFields();
 
+    }
+
+    public void setPage(int newPage) {
+        int max = commandTextFields.size() / ((height - 100) / 30);
+        if (newPage < 0) newPage = 0;
+        if (newPage > max) newPage = max;
+        page = newPage;
+        updateFields();
     }
 
     private void addRow(String code, String command) {
@@ -72,9 +90,9 @@ public class NumPadConfigScreen extends Screen {
 
     private void removeRow(int i) {
         if (!codeTextFields.isEmpty()) {
-            TextFieldWidget removedCodeField = codeTextFields.remove(i - 1);
-            TextFieldWidget removedCommandField = commandTextFields.remove(i - 1);
-            ButtonWidget removeButton = removeButtonFields.remove(i - 1);
+            TextFieldWidget removedCodeField = codeTextFields.remove(i - 2);
+            TextFieldWidget removedCommandField = commandTextFields.remove(i - 2);
+            ButtonWidget removeButton = removeButtonFields.remove(i - 2);
             remove(removeButton);
             remove(removedCodeField);
             remove(removedCommandField);
@@ -88,8 +106,8 @@ public class NumPadConfigScreen extends Screen {
 
         clearChildren();
 
-        for (int i = 0; i < codeTextFields.size(); i++) {
-            int hight = 60 + i * 30;
+        for (int i = getMinimumEntry(); i < getHighestEntry(); i++) {
+            int hight = 60 + (i - getMinimumEntry()) * 30;
 
             // Set the positions for codeTextFields
             codeTextFields.get(i).setX(leftX);
@@ -105,14 +123,38 @@ public class NumPadConfigScreen extends Screen {
             removeButtonFields.get(i).setWidth(width / 12);
             removeButtonFields.get(i).setX(rightX + width / 3 + width / 18 - removeButtonFields.get(i).getWidth() / 2); // Place the remove button to the right
             removeButtonFields.get(i).setY(hight);
-
+            firstPage.setPosition(0, 20);
+            lastPage.setPosition(0, height - 10 - lastPage.getHeight());
+            nextPage.setPosition(0, firstPage.getHeight() + firstPage.getY() + 10);
+            previosPage.setPosition(0, lastPage.getY() - lastPage.getHeight() - 10);
+            nextPage.setWidth(width / 12);
+            previosPage.setWidth(width / 12);
+            lastPage.setWidth(width / 12);
+            firstPage.setWidth(width / 12);
             addDrawableChild(codeTextFields.get(i));
             addDrawableChild(commandTextFields.get(i));
             addDrawableChild(removeButtonFields.get(i));
+            addDrawableChild(nextPage);
+            addDrawableChild(previosPage);
+            addDrawableChild(lastPage);
+            addDrawableChild(firstPage);
         }
 
         addDrawableChild(addButton);
         addDrawableChild(okButton);
+    }
+
+    public int getMinimumEntry() {
+        return Math.min(entriesPerPage() * page, commandTextFields.size());
+    }
+
+    public int entriesPerPage() {
+        return Math.min((height - 100) / 30, commandTextFields.size());
+    }
+
+    public int getHighestEntry() {
+        int max = Math.min(entriesPerPage() * (page + 1) - 1, commandTextFields.size());
+        return max;
     }
 
     public void updateCodes() {

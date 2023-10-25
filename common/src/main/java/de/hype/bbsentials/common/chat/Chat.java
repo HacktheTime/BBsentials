@@ -1,4 +1,5 @@
-package de.hype.bbsentials.common.chat;
+
+ de.hype.bbsentials.common.chat;
 
 import de.hype.bbsentials.common.api.Formatting;
 import de.hype.bbsentials.common.client.BBsentials;
@@ -158,18 +159,10 @@ public class Chat {
     }
 
     public static void setChatPromtId(String logMessage) {
-        String cbUUIDPattern = "/cb ([a-fA-F0-9-]+)";
-        Pattern cbPattern = Pattern.compile(cbUUIDPattern);
-        Matcher cbMatcher = cbPattern.matcher(logMessage);
-
         String yesClickAction = "/chatprompt ([a-fA-F0-9-]+) YES";
         Pattern yesPattern = Pattern.compile(yesClickAction);
         Matcher yesMatcher = yesPattern.matcher(logMessage);
         String lastPrompt = null;
-        if (cbMatcher.find()) {
-            lastPrompt = cbMatcher.group(1);
-            setChatCommand("/cb " + lastPrompt,10);
-        }
         if (yesMatcher.find()) {
             lastPrompt = yesMatcher.group(1);
             setChatCommand("/chatprompt " + lastPrompt + " YES",10);
@@ -321,7 +314,7 @@ public class Chat {
                 else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(BBsentials.getConfig().getUsername() + " ●"))) || (message.contains(BBsentials.getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + BBsentials.getConfig().getUsername()) || message.getUnformattedString().endsWith(" has promoted " + BBsentials.getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
                     BBsentials.getConfig().setIsLeader(true);
                     if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isPartyLeader());
+                         ("Leader: " + BBsentials.getConfig().isPartyLeader());
                     }
                 }
                 else if (message.getUnformattedString().equals("Please type /report confirm to log your report for staff review.")) {
@@ -331,6 +324,9 @@ public class Chat {
                     if (BBsentials.splashStatusUpdateListener != null) {
                         BBsentials.splashStatusUpdateListener.setStatus(SplashUpdatePacket.STATUS_SPLASHING);
                     }
+                }
+                else if (messageUnformatted.equals("Click here to purchase a new 6 hour pass for 10,000 Coins"){
+                 setChatCommand("/purchasecrystallhollowspass",30);
                 }
             }
 
@@ -350,6 +346,7 @@ public class Chat {
                         setChatCommand("/p warp",10);
                     }
                 }
+
             }
             else if (message.isMsg()) {
                 if (messageUnformatted.endsWith("bb:party me")) {

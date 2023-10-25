@@ -43,30 +43,23 @@ public class BBsentials {
     }
 
     public static void connectToBBserver(boolean beta) {
-        if (bbthread != null) {
-            try {
-                bbthread.interrupt();
-                connection.messageReceiverThread.interrupt();
-                connection.messageSenderThread.interrupt();
-            } catch (Exception ignored) {
+        executionService.execute(() -> {
+            if (connection != null) {
+                connection.close();
             }
-        }
-        connection = null;
-        if (connection != null) {
-            connection.close();
-        }
-        bbthread = new Thread(() -> {
-            connection = new BBsentialConnection();
-            coms = new Commands();
-            connection.setMessageReceivedCallback(message -> executionService.execute(() -> connection.onMessageReceived(message)));
-            if (beta) {
-                connection.connect(config.getBBServerURL(), 5011);
-            }
-            else {
-                connection.connect(config.getBBServerURL(), 5000);
-            }
+            bbthread = new Thread(() -> {
+                connection = new BBsentialConnection();
+                coms = new Commands();
+                if (beta) {
+                    connection.connect(config.getBBServerURL(), 5011);
+                }
+                else {
+                    connection.connect(config.getBBServerURL(), 5000);
+                }
+                connection.setMessageReceivedCallback(message -> executionService.execute(() -> connection.onMessageReceived(message)));
+            });
+            bbthread.start();
         });
-        bbthread.start();
     }
 
     /**

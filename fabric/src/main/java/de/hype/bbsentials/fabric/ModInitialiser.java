@@ -81,6 +81,7 @@ public class ModInitialiser implements ClientModInitializer {
                     .then(ClientCommandManager.literal("disconnect")
                             .executes((context) -> {
                                 connection.close();
+                                Chat.sendPrivateMessageToSelfInfo("Disconnected");
                                 return 1;
                             }))
                     .then(ClientCommandManager.literal("reconnect-stable-server")

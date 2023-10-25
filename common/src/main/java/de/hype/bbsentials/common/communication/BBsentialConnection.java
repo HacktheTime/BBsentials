@@ -148,14 +148,14 @@ public class BBsentialConnection {
                             if (messageReceivedCallback != null) {
                                 messageReceivedCallback.onMessageReceived(message);
                             }
-                            else {
-                                Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected. Reconnecting...");
-                                BBsentials.connectToBBserver();
-                                try {
-                                    Thread.sleep(1000 * 10);
-                                } catch (Exception ignored) {
-                                }
-                            }
+//                            else {
+//                                Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected. Reconnecting...");
+//                                BBsentials.connectToBBserver();
+//                                try {
+//                                    Thread.sleep(1000 * 10);
+//                                } catch (Exception ignored) {
+//                                }
+//                            }
                         }
                     }
                 } catch (IOException e) {
@@ -172,9 +172,7 @@ public class BBsentialConnection {
                         if (BBsentials.config.isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug("BBs: "+message);
                         writer.println(message);
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException ignored) {
+                } catch (InterruptedException | NullPointerException ignored) {
                 }
             });
             messageSenderThread.start();
@@ -255,8 +253,8 @@ public class BBsentialConnection {
     public <E extends AbstractPacket> void sendPacket(E packet) {
         String packetName = packet.getClass().getSimpleName();
         String rawjson = PacketUtils.parsePacketToJson(packet);
-        if (socket.isConnected() && writer != null) {
-            if (BBsentials.getConfig().isDetailedDevModeEnabled() && !(packet.getClass().equals(RequestConnectPacket.class) && BBsentials.config.devSecurity)) {
+        if (isConnected() && writer != null) {
+            if (BBsentials.getConfig().isDetailedDevModeEnabled() && !((packet.getClass().equals(RequestConnectPacket.class) && !BBsentials.config.useMojangAuth) && BBsentials.config.devSecurity)) {
                 Chat.sendPrivateMessageToSelfDebug("BBDev-sP: " + packetName + ": " + rawjson);
             }
             writer.println(packetName + "." + rawjson);
@@ -561,10 +559,16 @@ public class BBsentialConnection {
 
     public void close() {
         try {
+            Thread.currentThread().interrupt();
+            messageReceiverThread.interrupt();
+            messageSenderThread.interrupt();
+            messageQueue.clear();
             socket.close();
-            reader = null;
-            writer = null;
-        } catch (IOException ignored) {
+            writer.close();
+            reader.close();
+        } catch (Exception e) {
+            Chat.sendPrivateMessageToSelfError(e.getMessage());
+            e.printStackTrace();
         }
     }
 

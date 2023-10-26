@@ -147,14 +147,14 @@ public class BBsentialConnection {
                         String message = reader.readLine();
                         if (message != null) {
                             onMessageReceived(message);
-//                            else {
-//                                Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected. Reconnecting...");
-//                                BBsentials.connectToBBserver();
-//                                try {
-//                                    Thread.sleep(1000 * 10);
-//                                } catch (Exception ignored) {
-//                                }
-//                            }
+                        }
+                        else {
+                            Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected. Reconnecting...");
+                            BBsentials.connectToBBserver();
+                            try {
+                                Thread.sleep(1000 * 10);
+                            } catch (Exception ignored) {
+                            }
                         }
                     }
                 } catch (IOException e) {

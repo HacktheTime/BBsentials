@@ -33,16 +33,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static de.hype.bbsentials.common.client.BBsentials.bbthread;
+
 public class BBsentialConnection {
+    public Thread messageReceiverThread;
+    public Thread messageSenderThread;
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
     private LinkedBlockingQueue<String> messageQueue;
-    private MessageReceivedCallback messageReceivedCallback;
     private String itemName = "Hub #0";
     private PacketManager packetManager;
-    public Thread messageReceiverThread;
-    public Thread messageSenderThread;
 
     public BBsentialConnection() {
         packetManager = new PacketManager(this);
@@ -142,12 +143,10 @@ public class BBsentialConnection {
             // Start message receiver thread
             messageReceiverThread = new Thread(() -> {
                 try {
-                    while (true) {
+                    while (!Thread.interrupted()) {
                         String message = reader.readLine();
                         if (message != null) {
-                            if (messageReceivedCallback != null) {
-                                messageReceivedCallback.onMessageReceived(message);
-                            }
+                            onMessageReceived(message);
 //                            else {
 //                                Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected. Reconnecting...");
 //                                BBsentials.connectToBBserver();
@@ -167,9 +166,10 @@ public class BBsentialConnection {
             // Start message sender thread
             messageSenderThread = new Thread(() -> {
                 try {
-                    while (true) {
+                    while (!Thread.interrupted()) {
                         String message = messageQueue.take();
-                        if (BBsentials.config.isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug("BBs: "+message);
+                        if (BBsentials.config.isDetailedDevModeEnabled())
+                            Chat.sendPrivateMessageToSelfDebug("BBs: " + message);
                         writer.println(message);
                     }
                 } catch (InterruptedException | NullPointerException ignored) {
@@ -178,14 +178,11 @@ public class BBsentialConnection {
             messageSenderThread.start();
             messageSenderThread.setName("bb sender thread");
 
-        } catch (IOException | NoSuchAlgorithmException |
-                 KeyManagementException e) {
+        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
-        } catch (
-                CertificateException e) {
+        } catch (CertificateException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public void sendMessage(String message) {
@@ -205,7 +202,8 @@ public class BBsentialConnection {
             }
             try {
                 if (socket.isConnected() && writer != null) {
-                    if (BBsentials.config.isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug("BBHs: "+message);
+                    if (BBsentials.config.isDetailedDevModeEnabled())
+                        Chat.sendPrivateMessageToSelfDebug("BBHs: " + message);
                     writer.println(message);
                 }
             } catch (NullPointerException ignored) {
@@ -246,9 +244,6 @@ public class BBsentialConnection {
     }
     //TODO search
 
-    public void setMessageReceivedCallback(MessageReceivedCallback callback) {
-        this.messageReceivedCallback = callback;
-    }
 
     public <E extends AbstractPacket> void sendPacket(E packet) {
         String packetName = packet.getClass().getSimpleName();
@@ -559,13 +554,34 @@ public class BBsentialConnection {
 
     public void close() {
         try {
-            Thread.currentThread().interrupt();
-            messageReceiverThread.interrupt();
-            messageSenderThread.interrupt();
-            messageQueue.clear();
-            socket.close();
+            if (messageReceiverThread != null) {
+                messageReceiverThread.interrupt();
+            }
+            if (messageSenderThread != null) {
+                messageSenderThread.interrupt();
+            }
+            if (bbthread != null) {
+                bbthread.interrupt();
+            }
             writer.close();
             reader.close();
+            socket.close();
+            messageQueue.clear();
+            if (bbthread != null) {
+                bbthread.join();
+                bbthread = null;
+            }
+            if (messageSenderThread != null) {
+                messageSenderThread.join();
+                messageSenderThread = null;
+            }
+            if (messageReceiverThread != null) {
+                messageReceiverThread.join();
+                messageReceiverThread = null;
+            }
+            writer = null;
+            reader = null;
+            socket = null;
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
             e.printStackTrace();

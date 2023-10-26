@@ -16,9 +16,9 @@ public class BBsentials {
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     public static boolean splashLobby;
     public static SplashStatusUpdateListener splashStatusUpdateListener;
-    private static Thread bbthread;
-    private static boolean initialised = false;
+    public static Thread bbthread;
     public static Chat chat = new Chat();
+    private static boolean initialised = false;
 
     public static Config getConfig() {
         return config;
@@ -56,7 +56,6 @@ public class BBsentials {
                 else {
                     connection.connect(config.getBBServerURL(), 5000);
                 }
-                connection.setMessageReceivedCallback(message -> executionService.execute(() -> connection.onMessageReceived(message)));
             });
             bbthread.start();
         });

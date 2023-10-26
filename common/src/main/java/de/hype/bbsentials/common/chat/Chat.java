@@ -1,5 +1,4 @@
-
- de.hype.bbsentials.common.chat;
+package de.hype.bbsentials.common.chat;
 
 import de.hype.bbsentials.common.api.Formatting;
 import de.hype.bbsentials.common.client.BBsentials;
@@ -165,23 +164,22 @@ public class Chat {
         String lastPrompt = null;
         if (yesMatcher.find()) {
             lastPrompt = yesMatcher.group(1);
-            setChatCommand("/chatprompt " + lastPrompt + " YES",10);
+            setChatCommand("/chatprompt " + lastPrompt + " YES", 10);
         }
     }
 
     /**
-     *
-     * @param command the command to be executed
+     * @param command          the command to be executed
      * @param timeBeforePerish in seconds before its reset to nothing
      */
-    public static void setChatCommand(String command,int timeBeforePerish) {
+    public static void setChatCommand(String command, int timeBeforePerish) {
         BBsentials.getConfig().setLastChatPromptAnswer(command);
         if (BBsentials.config.isDevModeEnabled()) {
             Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + command + "\"");
         }
         BBsentials.executionService.schedule(() -> {
             BBsentials.getConfig().setLastChatPromptAnswer(null);
-        },10, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS);
     }
 
     public Message onEvent(Message text, boolean actionbar) {
@@ -314,7 +312,7 @@ public class Chat {
                 else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(BBsentials.getConfig().getUsername() + " ●"))) || (message.contains(BBsentials.getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + BBsentials.getConfig().getUsername()) || message.getUnformattedString().endsWith(" has promoted " + BBsentials.getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
                     BBsentials.getConfig().setIsLeader(true);
                     if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                         ("Leader: " + BBsentials.getConfig().isPartyLeader());
+                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isPartyLeader());
                     }
                 }
                 else if (message.getUnformattedString().equals("Please type /report confirm to log your report for staff review.")) {
@@ -325,8 +323,8 @@ public class Chat {
                         BBsentials.splashStatusUpdateListener.setStatus(SplashUpdatePacket.STATUS_SPLASHING);
                     }
                 }
-                else if (messageUnformatted.equals("Click here to purchase a new 6 hour pass for 10,000 Coins"){
-                 setChatCommand("/purchasecrystallhollowspass",30);
+                else if (messageUnformatted.equals("Click here to purchase a new 6 hour pass for 10,000 Coins")) {
+                    setChatCommand("/purchasecrystallhollowspass", 30);
                 }
             }
 
@@ -334,7 +332,7 @@ public class Chat {
 
             }
             else if (message.isFromParty()) {
-                if (message.getMessageContent().equals("warp")&&BBsentials.config.isPartyLeader()) {
+                if (message.getMessageContent().equals("warp") && BBsentials.config.isPartyLeader()) {
                     if (BBsentials.config.getPlayersInParty().length == 1) {
                         Chat.sendCommand("/p warp");
                     }
@@ -343,7 +341,7 @@ public class Chat {
                     }
                     else if (BBsentials.config.getPlayersInParty().length > 1) {
                         Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a warp. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to warp the entire \",{\"text\":\"Party\",\"color\":\"gold\"},\".\"]"));
-                        setChatCommand("/p warp",10);
+                        setChatCommand("/p warp", 10);
                     }
                 }
 

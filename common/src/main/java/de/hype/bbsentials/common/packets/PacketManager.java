@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PacketManager {
-    private static List<Packet<? extends AbstractPacket>> packets = new ArrayList<>();
+
+    private static PacketManager lastPacketManager = null;
+    List<Packet<? extends AbstractPacket>> packets = new ArrayList<>();
 
     public List<Packet<? extends AbstractPacket>> getPackets() {
         return packets;
@@ -20,9 +22,10 @@ public class PacketManager {
     public PacketManager(BBsentialConnection connection) {
         this.connection = connection;
         initializePacketActions(connection);
+        lastPacketManager = this;
     }
 
-    public static void initializePacketActions(BBsentialConnection connection) {
+    public void initializePacketActions(BBsentialConnection connection) {
         packets.add(new Packet<>(BingoChatMessagePacket.class, connection::onBingoChatMessagePacket));
         packets.add(new Packet<>(BroadcastMessagePacket.class, connection::onBroadcastMessagePacket));
         packets.add(new Packet<>(ChChestPacket.class, connection::onChChestPacket));
@@ -44,10 +47,12 @@ public class PacketManager {
 
     //   method to get a list of all packets
     public static List<Class<? extends AbstractPacket>> getAllPacketClasses() {
-        initializePacketActions(null);
+        if (lastPacketManager == null) {
+            lastPacketManager = new PacketManager(null);
+        }
         List<Class<? extends AbstractPacket>> allPackets = new ArrayList<>();
-        for (int i = 0; i < allPackets.size(); i++) {
-            allPackets.add(packets.get(i).getClazz());
+        for (int i = 0; i < lastPacketManager.packets.size(); i++) {
+            allPackets.add(lastPacketManager.packets.get(i).getClazz());
         }
         return allPackets;
     }

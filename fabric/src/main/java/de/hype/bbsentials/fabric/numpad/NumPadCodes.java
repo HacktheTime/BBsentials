@@ -187,8 +187,7 @@ public class NumPadCodes {
                 toSaveCodes.add(numCode);
             }
         }
-        try (Writer writer = new FileWriter(new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_Numpad_codes.json")
-        )) {
+        try (Writer writer = new FileWriter(new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_Numpad_codes.json"))) {
             gson.toJson(toSaveCodes, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -197,14 +196,24 @@ public class NumPadCodes {
 
 
     public void loadNumCodesFromFile() {
-        try (Reader reader = new FileReader(new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_Numpad_codes.json"))) {
+        File file = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_Numpad_codes.json");
+        try (Reader reader = new FileReader(file)) {
             Type listType = new TypeToken<List<NumCode>>() {
             }.getType();
             numCodes = gson.fromJson(reader, listType);
         } catch (IOException e) {
-            e.printStackTrace();
+            if (!file.exists()) {
+                try {
+                    file.createNewFile();
+                    loadNumCodesFromFile();
+                } catch (IOException ex) {
+                    System.out.println("Couldnt create new file");
+                    e.printStackTrace();
+                }
+            }
+            else {
+                e.printStackTrace();
+            }
         }
     }
-
-
 }

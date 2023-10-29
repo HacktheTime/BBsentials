@@ -5,7 +5,6 @@ import de.hype.bbsentials.common.api.Formatting;
 import de.hype.bbsentials.common.chat.Message;
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import org.lwjgl.glfw.GLFW;
@@ -20,6 +19,7 @@ import static de.hype.bbsentials.common.packets.PacketUtils.gson;
 public class NumPadCodes {
     private static final int NUMPAD_KEY_COUNT = 10;
     public List<NumCode> numCodes = new ArrayList<>();
+    int enterPresses = 0;
     private KeyBinding[] numpadKeybindings = new KeyBinding[NUMPAD_KEY_COUNT];
     private String enteredCode = "";
     private boolean[] keyReleased = new boolean[NUMPAD_KEY_COUNT + 3];
@@ -39,15 +39,15 @@ public class NumPadCodes {
         }
         for (int i = 0; i < NUMPAD_KEY_COUNT; i++) {
             int keyCode = GLFW.GLFW_KEY_KP_0 + i;
-            numpadKeybindings[i] = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            numpadKeybindings[i] = new KeyBinding(
                     String.valueOf(i),
                     keyCode,
                     "bbsentials.numpad"
-            ));
+            );
         }
-        KeyBinding enterKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Enter", GLFW.GLFW_KEY_KP_ENTER, "bbsentials.numpad"));
-        KeyBinding clear = KeyBindingHelper.registerKeyBinding(new KeyBinding("Clear", GLFW.GLFW_KEY_KP_ADD, "bbsentials.numpad"));
-        KeyBinding remove = KeyBindingHelper.registerKeyBinding(new KeyBinding("Remove", GLFW.GLFW_KEY_KP_DECIMAL, "bbsentials.numpad"));
+        KeyBinding enterKey = new KeyBinding("Enter", GLFW.GLFW_KEY_KP_ENTER, "bbsentials.numpad");
+        KeyBinding clear = new KeyBinding("Clear", GLFW.GLFW_KEY_KP_ADD, "bbsentials.numpad");
+        KeyBinding remove = new KeyBinding("Remove", GLFW.GLFW_KEY_KP_DECIMAL, "bbsentials.numpad");
         Thread t = new Thread(() -> {
             while (true) {
                 for (int i = 0; i < numpadKeybindings.length; i++) {
@@ -63,14 +63,13 @@ public class NumPadCodes {
                 }
                 if (enterKey.isPressed() && keyReleased[10]) {
                     executeCode();
-                    enteredCode = "";
                     keyReleased[10] = false;
                 }
                 else if (!enterKey.isPressed()) {
                     keyReleased[10] = true;
                 }
                 if (clear.isPressed() && keyReleased[11]) {
-                    enteredCode = "";
+                    resetCode();
                     keyReleased[11] = false;
                 }
                 else if (!clear.isPressed()) {
@@ -87,12 +86,19 @@ public class NumPadCodes {
                 }
                 // Reset key cooldowns after 5 seconds
                 if (System.currentTimeMillis() - lastKeyPressTime >= 5000) {
-                    enteredCode = "";
+                    resetCode();
                 }
                 if (!enteredCode.isEmpty()) {
-                    BBsentials.config.overwriteActionBar = getColorCode() + enteredCode;
+                    String actionbarText = getColorCode() + enteredCode;
+                    if (enterPresses > 0) {
+                        int count = getMorePressesNeeded();
+                        if (count != 0) {
+                            actionbarText = Formatting.GOLD + enteredCode + " (" + count + ")";
+                        }
+                    }
+                    BBsentials.config.overwriteActionBar = actionbarText;
                     overidedActionBar = true;
-                    EnvironmentCore.chat.showActionBar(Message.of(getColorCode() + enteredCode));
+                    EnvironmentCore.chat.showActionBar(Message.of(actionbarText));
                 }
                 else if (overidedActionBar) {
                     BBsentials.config.overwriteActionBar = "";
@@ -111,7 +117,7 @@ public class NumPadCodes {
 
     public void addDefaultCodes(boolean all) {
         List<NumCode> defaultCodes = new ArrayList();
-        defaultCodes.add((new NumCode("042", Formatting.DARK_BLUE, "dev", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new NumPadConfigScreen(this))))));
+        defaultCodes.add((new NumCode("042", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new NumPadCodesConfigScreen(this))))));
         defaultCodes.add((new NumCode("11", "/l")));
         if (all) {
             numCodes.addAll(defaultCodes);
@@ -128,7 +134,6 @@ public class NumPadCodes {
         int index = getCodeIndex();
         boolean exists = codeExists();
         boolean devCode = enteredCode.startsWith("0");
-
         if (devCode) {
             if (index != -1 && !exists) {
                 return Formatting.DARK_BLUE.toString();
@@ -157,8 +162,24 @@ public class NumPadCodes {
     public void executeCode() {
         int index = getCodeIndex();
         if (index != -1) {
-            numCodes.get(index).execute();
+            if (getMorePressesNeeded() <= 1) {
+                numCodes.get(index).execute();
+                resetCode();
+            }
+            else {
+                enterPresses++;
+            }
         }
+    }
+
+    public int getMorePressesNeeded() {
+        int index = getCodeIndex();
+        if (index == -1) return 0;
+        int extraInputNeeded = numCodes.get(index).pressCount() - enterPresses;
+        if (extraInputNeeded < 0) {
+            return 0;
+        }
+        return extraInputNeeded;
     }
 
     public int getCodeIndex() {
@@ -167,6 +188,7 @@ public class NumPadCodes {
         }
         return -1;
     }
+
 
     /**
      * @return returns true if there is at least 1 code to go on. otherwise false
@@ -215,5 +237,10 @@ public class NumPadCodes {
                 e.printStackTrace();
             }
         }
+    }
+
+    void resetCode() {
+        enteredCode = "";
+        enterPresses = 0;
     }
 }

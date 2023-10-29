@@ -2,30 +2,34 @@ package de.hype.bbsentials.fabric.numpad;
 
 import de.hype.bbsentials.common.api.Formatting;
 import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.fabric.IntegerTextField;
+import de.hype.bbsentials.fabric.IntegerFieldWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-public class NumCodeInputField extends IntegerTextField {
-    public final NumPadConfigScreen codeConfigScreen;
+public class NumCodeInputFieldWidget extends IntegerFieldWidget {
+    public final NumPadCodeConfigScreen codeConfigScreen;
+    int index;
 
-    public NumCodeInputField(TextRenderer textRenderer, int width, int height, Text text, NumPadConfigScreen codeConfigScreen) {
+    public NumCodeInputFieldWidget(TextRenderer textRenderer, int width, int height, Text text, NumPadCodeConfigScreen codeConfigScreen, int index) {
         super(textRenderer, width, height, text);
+        this.index = index;
         this.codeConfigScreen = codeConfigScreen;
         setChangedListener(this::onChangeEvent);
     }
 
-    public NumCodeInputField(TextRenderer textRenderer, int x, int y, int width, int height, Text text, NumPadConfigScreen codeManager) {
+    public NumCodeInputFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height, Text text, NumPadCodeConfigScreen codeManager) {
         super(textRenderer, x, y, width, height, text);
+        this.index = index;
         this.codeConfigScreen = codeManager;
         setChangedListener(this::onChangeEvent);
     }
 
-    public NumCodeInputField(TextRenderer textRenderer, int x, int y, int width, int height, @Nullable TextFieldWidget copyFrom, Text text, NumPadConfigScreen codeManager) {
+    public NumCodeInputFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height, @Nullable TextFieldWidget copyFrom, Text text, NumPadCodeConfigScreen codeManager) {
         super(textRenderer, x, y, width, height, copyFrom, text);
+        this.index = index;
         this.codeConfigScreen = codeManager;
         setChangedListener(this::onChangeEvent);
     }
@@ -36,13 +40,9 @@ public class NumCodeInputField extends IntegerTextField {
     }
 
     private boolean codeIsFree(String input) {
-        int usedAlready = 0;
-        for (int i1 = 0; i1 < codeConfigScreen.codes.numCodes.size(); i1++) {
-            if (codeConfigScreen.codes.numCodes.get(i1).code.equals(input)) {
-                usedAlready++;
-                if (usedAlready > 1) {
-                    return false;
-                }
+        for (int i1 = 0; i1 < codeConfigScreen.codeManager.numCodes.size(); i1++) {
+            if (codeConfigScreen.codeManager.numCodes.get(i1).code.equals(input)) {
+                if (i1 != index) return false;
             }
         }
         return true;
@@ -57,11 +57,16 @@ public class NumCodeInputField extends IntegerTextField {
     }
 
     public void onChangeEvent(String newText) {
-        codeConfigScreen.updateCodes();
         if (!codeIsFree(newText) || forbiddenCode(newText)) {
             setTooltip(Tooltip.of(Text.of(Formatting.RED + "You can not use this code.§r\nWarning: This is only updated once clicking into the field!")));
+            if (codeConfigScreen.okButton != null) {
+                codeConfigScreen.okButton.active = false;
+            }
         }
         else {
+            if (codeConfigScreen.okButton != null) {
+                codeConfigScreen.okButton.active = true;
+            }
             setTooltip(Tooltip.of(Text.of("")));
         }
     }

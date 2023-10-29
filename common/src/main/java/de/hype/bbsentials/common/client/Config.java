@@ -34,6 +34,7 @@ public class Config implements Serializable {
     private transient String username;
 
     // Set via load / default you may change these
+    public boolean useNumCodes = true;
     public boolean overrideBingoTime = false;
     public boolean connectToBeta = false;
     public boolean useMojangAuth = false;

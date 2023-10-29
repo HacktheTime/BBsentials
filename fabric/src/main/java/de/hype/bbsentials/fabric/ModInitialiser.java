@@ -192,7 +192,6 @@ public class ModInitialiser implements ClientModInitializer {
         });
 
         KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
-        KeyBindingHelper.registerKeyBinding(promptKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (promptKeyBind.wasPressed()) {
                 if (config.getLastChatPromptAnswer() != null) {
@@ -216,7 +215,7 @@ public class ModInitialiser implements ClientModInitializer {
         });
 //        for (int i = 1; i <= 9; i++) {
 //            KeyBinding ecPageKeyBind = new KeyBinding("Ender Chest Page " + i, InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_1 + (i - 1), "BBsentials");
-//            KeyBindingHelper.registerKeyBinding(ecPageKeyBind);
+//            ecPageKeyBind);
 //            int pageNum = i; // Capture the page number for lambda
 //            ClientTickEvents.END_CLIENT_TICK.register(client -> {
 //                if (ecPageKeyBind.wasPressed()) {

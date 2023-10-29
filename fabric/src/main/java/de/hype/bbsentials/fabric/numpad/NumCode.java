@@ -4,8 +4,12 @@ import de.hype.bbsentials.common.api.Formatting;
 import de.hype.bbsentials.common.chat.Chat;
 import de.hype.bbsentials.common.client.BBsentials;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NumCode {
-    public String command;
+    public List<String> commands;
+    public List<Double> commandDelay;
     public String code;
     public boolean codeIsTransient;
     public Formatting formatting;
@@ -13,15 +17,30 @@ public class NumCode {
     public transient Runnable toPerform;
 
     public NumCode(String code, String command) {
-        this.command = command;
+        this.commands = new ArrayList<>(List.of(command));
+        this.commandDelay = new ArrayList<>(List.of(1.1));
         this.code = code;
         this.codeIsTransient = false;
         this.formatting = Formatting.DARK_GREEN;
         requiredPermission = "";
     }
 
+    public NumCode(String code, List<String> command, List<Double> commandDelay) {
+        this.commands = new ArrayList<>(command);
+        this.commandDelay = new ArrayList<>(commandDelay);
+        this.code = code;
+        this.codeIsTransient = false;
+        this.formatting = Formatting.DARK_GREEN;
+        requiredPermission = "";
+    }
+
+    public int pressCount() {
+        int count = commands.size() - (code.length());
+        if (count < 0) count = 0;
+        return count;
+    }
     public NumCode(String code, Formatting format, String requiredRole, Runnable toPerform) {
-        this.command = "";
+        this.commands = new ArrayList<>();
         this.code = code;
         this.formatting = format;
         requiredPermission = requiredRole;
@@ -31,11 +50,13 @@ public class NumCode {
 
     public void execute() {
         if (!BBsentials.config.hasBBRoles(requiredPermission)) {
-            Chat.sendPrivateMessageToSelfError("You don't have the required permissions to run '" + code + "' !");
+            Chat.sendPrivateMessageToSelfError("You don't have the required permissions to run '" + code + "' ! (Required: '" + requiredPermission + "')");
             return;
         }
-        if (!command.isEmpty()) {
-            BBsentials.config.sender.addImmediateSendTask(command);
+        if (!commands.isEmpty()) {
+            for (int i = 0; i < commands.size(); i++) {
+                BBsentials.config.sender.addHiddenSendTask(commands.get(i), commandDelay.get(i));
+            }
         }
         else {
             if (toPerform == null) {
@@ -50,6 +71,17 @@ public class NumCode {
             }
         }
         Chat.sendPrivateMessageToSelfInfo("'" + code + "' executed.");
+    }
+
+    @Override
+    public String toString() {
+        String toReturn = code;
+        if (commands != null) {
+            if (commands.isEmpty()) {
+                toReturn += ": " + String.join(", ", commands);
+            }
+        }
+        return toReturn;
     }
 
     @Override

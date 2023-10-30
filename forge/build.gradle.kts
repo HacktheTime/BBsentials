@@ -51,6 +51,7 @@ repositories {
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://maven.notenoughupdates.org/releases/")
 
 }
 
@@ -68,6 +69,8 @@ dependencies {
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
+    shadowImpl("org.notenoughupdates.moulconfig:MoulConfig:1.3.0")
+//    testMod("org.notenoughupdates.moulconfig:MoulConfig:1.3.0:test")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
     // If you don't want to log in with your real minecraft account, remove this line
@@ -121,6 +124,7 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl)
+    relocate("io.github.moulberry.moulconfig", "de.hype.bbsentials.deps.moulconfig")
     doLast {
         configurations.forEach {
             println("Copying jars into mod: ${it.files}")

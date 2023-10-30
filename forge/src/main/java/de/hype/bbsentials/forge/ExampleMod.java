@@ -2,6 +2,8 @@ package de.hype.bbsentials.forge;
 
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import io.github.moulberry.moulconfig.gui.MoulConfigEditor;
+import io.github.moulberry.moulconfig.processor.MoulConfigProcessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;

@@ -1,6 +1,6 @@
-# BBsentials1.20
+# BBsentials
 THIS MOD IS NOT AFFILIATED WITH BINGO BREWERS ANYMORE since indigo had a problem with me focusing
-on 1.20 and refusing to collaborate with me on request. 
+on 1.20 and refusing to collaborate with me on request.
 
 The mod is availibel on modrinth https://modrinth.com/mod/bbsentials
 
@@ -12,7 +12,7 @@ Contributors:
 hannibal2 (never made a push but was very helpful with questions and did some parts of the code)
 
 IMPORTANT:
-While this mod is supported for both 1.20.2 and 1.8.9 some features may be one version only. My (hackthetime) focus is on 1.20.2. Due too that some things may not be done in 1.8.9 by my personally.
+While this mod is supported for both 1.20.2 and 1.8.9 some features may be one version only. My (hackthetime) focus is on 1.20.2. Due too that some things may not be done in 1.8.9 by me personally.
 
 1.20.2
 I recommend using Fabulously Optimized together with this mod.

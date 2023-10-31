@@ -1,4 +1,4 @@
-package de.hype.bbsentials.forge.client;
+package de.hype.bbsentials.forge.CommandImplementations;
 
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.client.Config;

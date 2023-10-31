@@ -6,7 +6,7 @@ import de.hype.bbsentials.common.mclibraries.MCCommand;
 import de.hype.bbsentials.common.packets.AbstractPacket;
 import de.hype.bbsentials.common.packets.packets.SplashNotifyPacket;
 import de.hype.bbsentials.forge.CommandImplementations.*;
-import de.hype.bbsentials.forge.client.CommandBBI;
+import de.hype.bbsentials.forge.CommandImplementations.CommandBBI;
 import net.minecraftforge.client.ClientCommandHandler;
 
 public class Commands implements MCCommand {
@@ -24,6 +24,7 @@ public class Commands implements MCCommand {
         ClientCommandHandler.instance.registerCommand(new CommandChChest());
         ClientCommandHandler.instance.registerCommand(new CommandBC());
         ClientCommandHandler.instance.registerCommand(new CommandBingoChat());
+        ClientCommandHandler.instance.registerCommand(new CommandOpenConfig());
     }
 
     public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher, boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {

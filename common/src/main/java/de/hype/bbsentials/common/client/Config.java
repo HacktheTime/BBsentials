@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Config implements Serializable {
     //DO NOT Change any of the following unless you know what you are doing!
-    public int apiVersion = 1;
+    public static int apiVersion = 1;
     public boolean allowServerPartyInvite = true;
     public boolean devMode = false;
     public boolean detailedDevMode = false;

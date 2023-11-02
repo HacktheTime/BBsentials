@@ -19,4 +19,6 @@ logs
 /run/usercache.json
 /run/config/*
 /run/config/
-/run/saves/
+/run/saves/temp
+/run/saves/temp/*
+/run/saves

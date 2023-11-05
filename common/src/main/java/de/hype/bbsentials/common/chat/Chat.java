@@ -122,31 +122,31 @@ public class Chat {
     }
 
     public static void sendPrivateMessageToSelfError(String message) {
-        sendPrivateMessageToSelfBase(Formatting.RED + message);
+        sendPrivateMessageToSelfBase(message, Formatting.RED);
     }
 
     public static void sendPrivateMessageToSelfFatal(String message) {
-        sendPrivateMessageToSelfBase(Formatting.DARK_RED + message);
+        sendPrivateMessageToSelfBase(message, Formatting.DARK_RED);
     }
 
     public static void sendPrivateMessageToSelfSuccess(String message) {
-        sendPrivateMessageToSelfBase(Formatting.GREEN + message);
+        sendPrivateMessageToSelfBase(message, Formatting.GREEN);
     }
 
     public static void sendPrivateMessageToSelfInfo(String message) {
-        sendPrivateMessageToSelfBase(Formatting.YELLOW + message);
+        sendPrivateMessageToSelfBase(message, Formatting.YELLOW);
     }
 
     public static void sendPrivateMessageToSelfImportantInfo(String message) {
-        sendPrivateMessageToSelfBase(Formatting.GOLD + message);
+        sendPrivateMessageToSelfBase(message, Formatting.GOLD);
     }
 
     public static void sendPrivateMessageToSelfDebug(String message) {
-        sendPrivateMessageToSelfBase(Formatting.AQUA + message);
+        sendPrivateMessageToSelfBase(message, Formatting.AQUA);
     }
 
-    private static void sendPrivateMessageToSelfBase(String message) {
-        EnvironmentCore.chat.sendClientSideMessage(Message.of(message), false);
+    private static void sendPrivateMessageToSelfBase(String message, Formatting formatting) {
+        EnvironmentCore.chat.sendClientSideMessage(Message.of(formatting.toString() + message.replace("§r", "§r" + formatting.toString())), false);
     }
 
     public static void sendPrivateMessageToSelfText(Message message) {
@@ -205,7 +205,7 @@ public class Chat {
             return null;
         }
         if (message.isFromReportedUser()) {
-            sendPrivateMessageToSelfBase(Formatting.RED + "B: " + message.getUnformattedString());
+            sendPrivateMessageToSelfBase("B: " + message.getUnformattedString(), Formatting.RED);
             return null;
         }
         if (BBsentials.config.doPartyChatCustomMenu && message.isFromParty()) {
@@ -325,6 +325,9 @@ public class Chat {
                 }
                 else if (messageUnformatted.equals("Click here to purchase a new 6 hour pass for 10,000 Coins")) {
                     setChatCommand("/purchasecrystallhollowspass", 30);
+                }
+                else if (messageUnformatted.startsWith("FEAR. A Primal Fear")) {
+                    sendNotification("BB: Primal Fear", messageUnformatted);
                 }
             }
 

@@ -149,12 +149,7 @@ public class BBsentialConnection {
                             onMessageReceived(message);
                         }
                         else {
-                            Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected. Reconnecting...");
-                            BBsentials.connectToBBserver();
-                            try {
-                                Thread.sleep(1000 * 10);
-                            } catch (Exception ignored) {
-                            }
+                            Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected.");
                         }
                     }
                 } catch (IOException e) {
@@ -288,7 +283,7 @@ public class BBsentialConnection {
 
     public void onBingoChatMessagePacket(BingoChatMessagePacket packet) {
         if (BBsentials.config.showBingoChat) {
-            Chat.sendPrivateMessageToSelfInfo("[" + packet.prefix + "] " + packet.username + ": " + packet.message);
+            Chat.sendPrivateMessageToSelfInfo("[" + packet.prefix + "§r] " + packet.username + ": " + packet.message);
         }
     }
 
@@ -352,7 +347,7 @@ public class BBsentialConnection {
                         return;
                 }
             }
-            Chat.sendPrivateMessageToSelfImportantInfo(packet.username + "There is a " + packet.event.getDisplayName() + "in the " + packet.island.getDisplayName() + " now/soon.");
+            Chat.sendPrivateMessageToSelfImportantInfo(packet.username + ": There is a " + packet.event.getDisplayName() + " in the " + packet.island.getDisplayName() + " now/soon.");
         }
     }
 
@@ -371,7 +366,7 @@ public class BBsentialConnection {
 
     public void onDisconnectPacket(DisconnectPacket packet) {
         Chat.sendPrivateMessageToSelfError(packet.displayMessage);
-        BBsentials.connection = null;
+        BBsentials.connection.close();
         for (int i = 0; i < packet.waitBeforeReconnect.length; i++) {
             int finalI = i;
             BBsentials.executionService.schedule(() -> {

@@ -11,10 +11,6 @@ import java.util.Map;
 public class SplashManager {
     public static Map<Integer, DisplaySplash> splashPool = new HashMap<>();
 
-    public SplashManager() {
-
-    }
-
     public static void addSplash(SplashNotifyPacket packet) {
         splashPool.put(packet.splashId, new DisplaySplash(packet));
     }

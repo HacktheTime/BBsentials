@@ -71,7 +71,6 @@ public class BBsentials {
     public static void init() {
         config = Config.load();
         executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
-        if (config.doGammaOverride) EnvironmentCore.mcoptions.setGamma(10);
         if (Config.isBingoTime() || config.overrideBingoTime()) {
             connectToBBserver();
         }

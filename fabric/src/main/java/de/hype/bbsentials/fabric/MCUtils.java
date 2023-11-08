@@ -26,7 +26,7 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
     }
 
     public String getMCUUID() {
-        return MinecraftClient.getInstance().player.getUuid().toString();
+        return MinecraftClient.getInstance().getSession().getUuidOrNull().toString();
     }
 
 

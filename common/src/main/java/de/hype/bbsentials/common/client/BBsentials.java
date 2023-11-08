@@ -18,7 +18,6 @@ public class BBsentials {
     public static SplashStatusUpdateListener splashStatusUpdateListener;
     public static Thread bbthread;
     public static Chat chat = new Chat();
-    private static boolean initialised = false;
 
     public static Config getConfig() {
         return config;
@@ -67,20 +66,14 @@ public class BBsentials {
 
     public static void onServerSwap() {
         splashLobby = false;
-        if (!initialised) {
-            config = Config.load();
-            executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
-            if (config.doGammaOverride) EnvironmentCore.mcoptions.setGamma(10);
-            if (Config.isBingoTime() || config.overrideBingoTime()) {
-                connectToBBserver();
-            }
-            initialised = true;
-        }
     }
 
-    public void manualLoad() {
-        initialised = true;
+    public static void init() {
         config = Config.load();
-        connectToBBserver();
+        executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
+        if (config.doGammaOverride) EnvironmentCore.mcoptions.setGamma(10);
+        if (Config.isBingoTime() || config.overrideBingoTime()) {
+            connectToBBserver();
+        }
     }
 }

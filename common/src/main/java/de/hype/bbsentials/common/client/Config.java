@@ -13,25 +13,23 @@ import java.util.List;
 public class Config implements Serializable {
     //DO NOT Change any of the following unless you know what you are doing!
     public static int apiVersion = 1;
+    public static List<String> partyMembers = new ArrayList<>();
+    public transient final Sender sender = new Sender();
+    // Gson object for serialization
+    private final transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    // File object for storing the config
+    private final transient File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
+    //You can change again
     public boolean allowServerPartyInvite = true;
     public boolean devMode = false;
     public boolean detailedDevMode = false;
     public boolean devSecurity = true;
-    //You can change again
-
-    // set automatically
-    private transient boolean isPartyLeader;
     public transient String overwriteActionBar = "";
-
     public transient String alreadyReported = "";
     public String[] bbsentialsRoles = {""};
-    public static List<String> partyMembers = new ArrayList<>();
     public transient ToDisplayConfig toDisplayConfig = ToDisplayConfig.loadFromFile();
-    public transient final Sender sender = new Sender();
     public transient boolean highlightitem = false;
     public transient String lastChatPromptAnswer = null;
-    private transient String username;
-
     // Set via load / default you may change these
     public boolean useNumCodes = true;
     public boolean overrideBingoTime = false;
@@ -41,9 +39,9 @@ public class Config implements Serializable {
     public String bbServerURL = "localhost";
     public String apiKey = "";
     public boolean showBingoChat = true;
-    public boolean doAllChatCustomMenu=true;
-    public boolean doPartyChatCustomMenu=true;
-    public boolean doGuildChatCustomMenu=true;
+    public boolean doAllChatCustomMenu = true;
+    public boolean doPartyChatCustomMenu = true;
+    public boolean doGuildChatCustomMenu = true;
 
     public boolean allowBBinviteMe = true;
     public boolean doDesktopNotifications = false;
@@ -57,27 +55,9 @@ public class Config implements Serializable {
     public boolean swapActionBarChat = false;
     public boolean swapOnlyNormal = true;
     public boolean swapOnlyBBsentials = false;
-
-    // Set default attribute values
-    private void setDefaults() {
-        username = EnvironmentCore.mcUtils.getUsername();
-        acceptReparty = true;
-        if (username.equals("Hype_the_Time")) {
-            nickname = "Hype";
-            notifForMessagesType = "nick";
-            doDesktopNotifications=true;
-        } //Gimmic for Developer due too things which dont make it into releases (bugs)
-        else {
-            nickname = "";
-            notifForMessagesType = "none";
-        }
-    }
-
-    // Gson object for serialization
-    private final transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    // File object for storing the config
-    private final transient File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
-
+    // set automatically
+    private transient boolean isPartyLeader;
+    private transient String username;
     // Constructor
     public Config() {
         setDefaults();
@@ -89,14 +69,12 @@ public class Config implements Serializable {
         File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
         Gson GSON = new GsonBuilder().setPrettyPrinting().create();
         if (CONFIG_FILE.exists()) {
-            try (FileReader reader = new FileReader(CONFIG_FILE)) {
+            try {
+                FileReader reader = new FileReader(CONFIG_FILE);
                 settings = GSON.fromJson(reader, Config.class);
-            } catch (IOException e) {
+            } catch (IOException | RuntimeException e) {
+                System.err.println("Error loading config. Resetting it.");
                 e.printStackTrace();
-                settings = new Config(); // Use default values if loading fails
-                settings.save();
-            } catch (IllegalStateException e) {
-                System.out.println("Error loading config. Resetting it.");
                 settings = new Config();
                 settings.save();
             }
@@ -112,6 +90,30 @@ public class Config implements Serializable {
         }
         settings.save();
         return settings;
+    }
+
+    public static boolean isBingoTime() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate lastDayOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth());
+        LocalDate firstDayOfMonth = currentDate.withDayOfMonth(1);
+        Boolean isBefore = currentDate.isAfter(lastDayOfMonth.minusDays(4));
+        Boolean isInRange = currentDate.isBefore(firstDayOfMonth.plusDays(15));
+        return isBefore || isInRange;
+    }
+
+    // Set default attribute values
+    private void setDefaults() {
+        username = EnvironmentCore.mcUtils.getUsername();
+        acceptReparty = true;
+        if (username.equals("Hype_the_Time")) {
+            nickname = "Hype";
+            notifForMessagesType = "nick";
+            doDesktopNotifications = true;
+        } //Gimmic for Developer due too things which dont make it into releases (bugs)
+        else {
+            nickname = "";
+            notifForMessagesType = "none";
+        }
     }
 
     // Save the config to file
@@ -169,16 +171,6 @@ public class Config implements Serializable {
         return bbServerURL;
     }
 
-
-    public static boolean isBingoTime() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate lastDayOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth());
-        LocalDate firstDayOfMonth = currentDate.withDayOfMonth(1);
-        Boolean isBefore = currentDate.isAfter(lastDayOfMonth.minusDays(4));
-        Boolean isInRange = currentDate.isBefore(firstDayOfMonth.plusDays(15));
-        return isBefore || isInRange;
-    }
-
     public boolean overrideBingoTime() {
         return overrideBingoTime;
     }
@@ -187,12 +179,12 @@ public class Config implements Serializable {
         return lastChatPromptAnswer;
     }
 
-    public boolean allowBBinviteMe() {
-        return allowBBinviteMe;
-    }
-
     public void setLastChatPromptAnswer(String lastChatPromptAnswer) {
         this.lastChatPromptAnswer = lastChatPromptAnswer;
+    }
+
+    public boolean allowBBinviteMe() {
+        return allowBBinviteMe;
     }
 
     public boolean hasBBRoles(String roleName) {

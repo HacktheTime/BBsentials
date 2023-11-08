@@ -21,6 +21,7 @@ public class ExampleMod {
     public void init(FMLInitializationEvent event) {
         printLocation();
         EnvironmentCore core = new EnvironmentCore(new BBUtils(), new ForgeChat(), new MCUtils(), new Commands(), new Options(), new DebugThread());
+        BBsentials.init();
         MinecraftForge.EVENT_BUS.register(this);
     }
     public void printLocation() {

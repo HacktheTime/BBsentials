@@ -134,7 +134,6 @@ public class BBsentialConnection {
             // Create an SSL socket factory
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             socket = sslSocketFactory.createSocket(serverIP, serverPort);
-
             socket.setKeepAlive(true); // Enable Keep-Alive
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);

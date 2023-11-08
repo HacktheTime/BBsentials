@@ -22,7 +22,7 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
     }
 
     public String getUsername() {
-        return MinecraftClient.getInstance().player.getName().getString();
+        return MinecraftClient.getInstance().getSession().getUsername();
     }
 
     public String getMCUUID() {

@@ -124,12 +124,9 @@ public class NumPadCodeConfigScreen extends Screen {
             new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(this), Text.of(""), Text.of("§cInvalid Code / already used!"));
             return;
         }
-        if (codeTextField.forbiddenCode(codeTextField.getText())) {
-            new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(this), Text.of(""), Text.of("§cNo Command specified"));
-            return;
-        }
+        code.code = codeTextField.getText();
         code.commands = new ArrayList<>(commandFields.stream().map(TextFieldWidget::getText).toList());
-        code.commandDelay = new ArrayList<>(commandFields.stream().map((field) -> {
+        code.commandDelay = new ArrayList<>(delayFields.stream().map((field) -> {
                     String text = field.getText();
                     if (text.isEmpty()) return 1.0;
                     return Double.parseDouble(text);

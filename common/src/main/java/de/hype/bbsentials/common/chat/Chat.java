@@ -324,10 +324,8 @@ public class Chat {
                     }
                 }
                 else if (messageUnformatted.equals("Click here to purchase a new 6 hour pass for 10,000 Coins")) {
+                    Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",\"You can press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to buy it.\"]"));
                     setChatCommand("/purchasecrystallhollowspass", 30);
-                }
-                else if (messageUnformatted.startsWith("FEAR. A Primal Fear")) {
-                    sendNotification("BB: Primal Fear", messageUnformatted);
                 }
             }
 

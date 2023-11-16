@@ -7,7 +7,6 @@ import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class BBsentials {
     public static Config config;
@@ -18,6 +17,7 @@ public class BBsentials {
     public static SplashStatusUpdateListener splashStatusUpdateListener;
     public static Thread bbthread;
     public static Chat chat = new Chat();
+    public static Thread debugThread;
 
     public static Config getConfig() {
         return config;
@@ -70,7 +70,11 @@ public class BBsentials {
 
     public static void init() {
         config = Config.load();
-        executionService.scheduleAtFixedRate(EnvironmentCore.debug, 0, 20, TimeUnit.SECONDS);
+        debugThread = new Thread(
+                EnvironmentCore.debug
+        );
+        debugThread.start();
+        debugThread.setName("Debug Thread");
         if (Config.isBingoTime() || config.overrideBingoTime()) {
             connectToBBserver();
         }

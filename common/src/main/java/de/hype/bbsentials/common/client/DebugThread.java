@@ -8,7 +8,13 @@ public interface DebugThread extends Runnable {
 
     @Override
     default void run() {
+        while (true) {
         loop();
+            try {
+                Thread.sleep(20000);
+            } catch (InterruptedException e) {
+            }
+        }
         //place a breakpoint for only this thread here.
     }
 

@@ -1,6 +1,7 @@
 package de.hype.bbsentials.forge.client;
 
 import com.google.gson.annotations.Expose;
+import de.hype.bbsentials.forge.client.categories.FirstCategory;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -11,20 +12,17 @@ import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis;
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver;
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.config.ConfigCategory;
 
 import static de.hype.bbsentials.common.client.BBsentials.config;
 
 
 public class MoulConfig extends Config {
-    @Expose
-    @ConfigOption(name = "test", desc = "dropdown test")
-    @ConfigEditorDropdown(values = {"hi", "test"})
-    public String test;
     MoulConfigEditor<MoulConfig> editor;
     MoulConfigProcessor<MoulConfig> processor;
     @Expose
     @Category(name = "First Category", desc = "This is the first category.")
-    MoulConfig main = this;
+    public FirstCategory firstCategory = new FirstCategory();
 
     public MoulConfig() {
         processor = new MoulConfigProcessor<>(this);

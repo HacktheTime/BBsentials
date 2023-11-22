@@ -3,8 +3,6 @@ package de.hype.bbsentials.forge;
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.forge.client.MoulConfig;
-import io.github.moulberry.moulconfig.gui.MoulConfigEditor;
-import io.github.moulberry.moulconfig.processor.MoulConfigProcessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -12,7 +10,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod(modid = "bbsentials", useMetadata = true)
-public class ExampleMod {
+public class ForgeMod {
     static boolean alreadyInialised = false;
     static BBsentials sentials = new BBsentials();
     public static MoulConfig config = new MoulConfig();

@@ -55,7 +55,7 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
     "devenvMod"("org.notenoughupdates.moulconfig:MoulConfig:1.3.0:test")
     // If you don't want to log in with your real minecraft account, remove this line
-    runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
+    devenvMod("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
 
 }
 

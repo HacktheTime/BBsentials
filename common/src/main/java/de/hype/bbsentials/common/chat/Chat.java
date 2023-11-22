@@ -146,6 +146,7 @@ public class Chat {
     }
 
     private static void sendPrivateMessageToSelfBase(String message, Formatting formatting) {
+        if (EnvironmentCore.chat == null) return;
         EnvironmentCore.chat.sendClientSideMessage(Message.of(formatting.toString() + message.replace("§r", "§r" + formatting.toString())), false);
     }
 

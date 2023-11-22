@@ -22,3 +22,7 @@ logs
 /run/saves/temp
 /run/saves/temp/*
 /run/saves
+/runforge/config/
+/runforge/options.txt
+/runforge/usercache.json
+/runforge/usernamecache.json

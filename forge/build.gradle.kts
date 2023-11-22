@@ -19,31 +19,6 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
     withSourcesJar()
 }
-
-// Minecraft configuration:
-loom {
-    log4jConfigs.from(file("log4j2.xml"))
-    launchConfigs {
-        "client" {
-            // If you don't want mixins, remove these lines
-            property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--mixin", "mixins.$modid.json")
-        }
-    }
-    forge {
-        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
-        mixinConfig("mixins.$modid.json")
-    }
-    // If you don't want mixins, remove these lines
-    mixin {
-        defaultRefmapName.set("mixins.$modid.refmap.json")
-    }
-}
-
-
 // Dependencies:
 
 repositories {
@@ -54,11 +29,17 @@ repositories {
     maven("https://maven.notenoughupdates.org/releases/")
 
 }
+val devenvMod by configurations.creating {
+    isTransitive = false
+    isVisible = false
+}
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
+
+// Minecraft configuration:
 dependencies {
     implementation(project(":common"))
     minecraft("com.mojang:minecraft:1.8.9")
@@ -72,10 +53,34 @@ dependencies {
     shadowImpl("org.notenoughupdates.moulconfig:MoulConfig:1.3.0")
 //    testMod("org.notenoughupdates.moulconfig:MoulConfig:1.3.0:test")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
-
+    "devenvMod"("org.notenoughupdates.moulconfig:MoulConfig:1.3.0:test")
     // If you don't want to log in with your real minecraft account, remove this line
     runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
 
+}
+
+loom {
+    log4jConfigs.from(file("log4j2.xml"))
+    launchConfigs {
+        "client" {
+            // If you don't want mixins, remove these lines
+            property("mixin.debug", "true")
+            property("asmhelper.verbose", "true")
+            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--mixin", "mixins.$modid.json")
+            arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
+        }
+    }
+
+    forge {
+        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
+        // If you don't want mixins, remove this lines
+        mixinConfig("mixins.$modid.json")
+    }
+    // If you don't want mixins, remove these lines
+    mixin {
+        defaultRefmapName.set("mixins.$modid.refmap.json")
+    }
 }
 
 // Tasks:
@@ -144,7 +149,4 @@ sourceSets {
         }
     }
 }
-
-
-
 tasks.assemble.get().dependsOn(tasks.remapJar)

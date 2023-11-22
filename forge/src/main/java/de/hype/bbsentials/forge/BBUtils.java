@@ -1,16 +1,20 @@
 package de.hype.bbsentials.forge;
 
 import com.google.common.collect.Lists;
+import com.mojang.realmsclient.dto.PlayerInfo;
 import de.hype.bbsentials.common.chat.Chat;
 import de.hype.bbsentials.common.constants.enviromentShared.Islands;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.server.gui.PlayerListComponent;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class BBUtils implements de.hype.bbsentials.common.mclibraries.BBUtils {
     public Islands getCurrentIsland() {
         try {
-            String string = Minecraft.getMinecraft().getNetHandler().getPlayerInfo("!C-b").getDisplayName().getUnformattedText();
+            String string = getTabListPlayerName("!C-b");
             if (!string.startsWith("Area: ")) {
                 Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
             }
@@ -22,14 +26,15 @@ public class BBUtils implements de.hype.bbsentials.common.mclibraries.BBUtils {
         return null;
     }
 
+    public static String getTabListPlayerName(String id) {
+        return Minecraft.getMinecraft().getNetHandler().getPlayerInfo(id).getDisplayName().getUnformattedText();
+    }
     public int getPlayerCount() {
-//        return Integer.parseInt(MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!B-a").getDisplayName().getString().trim().replaceAll("[^0-9]", ""));
-        return 0;
+        return Integer.parseInt(getTabListPlayerName("!B-a").trim().replaceAll("[^0-9]", ""));
     }
 
     public String getServer() {
-//        return MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-c").getDisplayName().getString().replace("Server:", "").trim();
-        return "mini0b";
+        return getTabListPlayerName("!C-c").replace("Server:", "").trim();
     }
 
     public boolean isOnMegaServer() {
@@ -53,14 +58,14 @@ public class BBUtils implements de.hype.bbsentials.common.mclibraries.BBUtils {
 
     public List<String> getPlayers() {
         List<String> list = Lists.newArrayList();
-//        Iterator var2 = MinecraftClient.getInstance().getNetworkHandler().getPlayerList().iterator();
-//        while (var2.hasNext()) {
-//            PlayerListEntry playerListEntry = (PlayerListEntry) var2.next();
-//            String playerName = playerListEntry.getProfile().getName();
-//            if (!playerName.startsWith("!")) {
-//                list.add(playerName);
-//            }
-//        }
+        Iterator var2 = Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap().iterator();
+        while (var2.hasNext()) {
+            NetworkPlayerInfo playerListEntry = (NetworkPlayerInfo) var2.next();
+            String playerName = playerListEntry.getDisplayName().getUnformattedText();
+            if (!playerName.startsWith("!")) {
+                list.add(playerName);
+            }
+        }
         return list;
     }
 }

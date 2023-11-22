@@ -35,7 +35,6 @@ public class MoulConfig extends Config {
     public String getTitle() {
         return "BBsentials " + de.hype.bbsentials.common.client.Config.apiVersion;
     }
-
     @Override
     public void saveNow() {
         config.save();

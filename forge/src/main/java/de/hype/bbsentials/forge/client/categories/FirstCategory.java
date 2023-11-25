@@ -1,9 +1,8 @@
 package de.hype.bbsentials.forge.client.categories;
 
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.ChromaColour;
 import io.github.moulberry.moulconfig.annotations.*;
-
-import java.awt.*;
 
 public class FirstCategory {
     @Expose
@@ -19,7 +18,7 @@ public class FirstCategory {
     @Expose
     @ConfigOption(name = "Color Editor", desc = "Color Editor")
     @ConfigEditorColour
-    public Color color = Color.RED;
+    public String color = ChromaColour.fromRGB(255, 0, 0, 1000, 255).toLegacyString();
 
     @Expose
     @ConfigOption(name = "ConfigEditorInfoText", desc = "Info Text Sample")

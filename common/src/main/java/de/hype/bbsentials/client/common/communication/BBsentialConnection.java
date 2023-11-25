@@ -47,7 +47,7 @@ public class BBsentialConnection {
     private BufferedReader reader;
     private PrintWriter writer;
     private LinkedBlockingQueue<String> messageQueue;
-    private String itemName = "Hub #0";
+    private String itemName = "Hub #1";
     private PacketManager packetManager;
 
     public BBsentialConnection() {

@@ -1,6 +1,6 @@
 {
   "package": "de.hype.bbsentials.forge.mixin",
-  "refmap": "mixins.${modid}.refmap.json",
+  "refmap": "mixins.bbsentials.refmap.json",
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",
   "mixins": [

@@ -13,6 +13,10 @@ public class DebugThread implements de.hype.bbsentials.common.client.DebugThread
         }
     }
 
+    public void onNumpadCode() {
+
+    }
+
     public void doOnce() {
         doTest = true;
     }

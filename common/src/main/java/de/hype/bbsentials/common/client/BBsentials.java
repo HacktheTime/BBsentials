@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class BBsentials {
     public static Config config;
     public static BBsentialConnection connection;
+    private static boolean initialised = false;
     public static Commands coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     public static boolean splashLobby;
@@ -65,6 +66,11 @@ public class BBsentials {
      */
 
     public static void onServerSwap() {
+        if (!initialised) {
+            if (Config.isBingoTime() || config.overrideBingoTime()) {
+                connectToBBserver();
+            }
+        }
         splashLobby = false;
     }
 
@@ -75,8 +81,5 @@ public class BBsentials {
         );
         debugThread.start();
         debugThread.setName("Debug Thread");
-        if (Config.isBingoTime() || config.overrideBingoTime()) {
-            connectToBBserver();
-        }
     }
 }

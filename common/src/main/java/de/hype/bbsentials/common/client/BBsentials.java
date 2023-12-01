@@ -67,6 +67,7 @@ public class BBsentials {
 
     public static void onServerSwap() {
         if (!initialised) {
+            initialised = true;
             if (Config.isBingoTime() || config.overrideBingoTime()) {
                 connectToBBserver();
             }

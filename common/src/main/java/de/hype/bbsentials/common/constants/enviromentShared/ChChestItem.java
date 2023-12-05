@@ -1,5 +1,8 @@
 package de.hype.bbsentials.common.constants.enviromentShared;
 
+/**
+ * chchest Items. used to create custom ones which aren't in the {@link ChChestItems default list}
+ */
 public class ChChestItem {
     private String displayName;
     private boolean custom;

@@ -1,10 +1,17 @@
 package de.hype.bbsentials.common.packets.packets;
 
-
 import de.hype.bbsentials.common.packets.AbstractPacket;
 
+/**
+ * Message in the BBsentials Environment. Shared Discord and Mod in-game
+ */
 public class BingoChatMessagePacket extends AbstractPacket {
-
+    /**
+     * @param prefix      the prefix the sender has.
+     * @param username    the username the sender has. (In game name)
+     * @param message     message
+     * @param bingo_cards the count of cards the user has.
+     */
     public BingoChatMessagePacket(String prefix, String username, String message, int bingo_cards) {
         super(1, 1); //Min and Max supported Version
         this.message = message;
@@ -17,9 +24,4 @@ public class BingoChatMessagePacket extends AbstractPacket {
     public final String username;
     public final String prefix;
     public final int bingo_cards;
-
-    public boolean baseCheck() {
-        boolean cancelPacket = false;
-        return !cancelPacket;
-    }
 }

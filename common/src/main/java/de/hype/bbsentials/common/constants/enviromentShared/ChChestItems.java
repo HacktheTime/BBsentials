@@ -5,9 +5,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Enumeration representing various ChChest items in the game.
+ * These constants define specific ChChest items that players can obtain.
+ * Use these constants to refer to specific ChChest items. For non-listed use the Custom Value. Example usage below.
+ * <p>
+ * The available ChChest items are:
+ * <ul>
+ *     <li>{@code PrehistoricEgg}: Represents a prehistoric egg item.</li>
+ *     <li>{@code Pickonimbus2000}: Represents the Pickonimbus 2000 item.</li>
+ *     <li>{@code ControlSwitch}: Represents a control switch item.</li>
+ *     <li>{@code ElectronTransmitter}: Represents an electron transmitter item.</li>
+ *     <li>{@code FTX3070}: Represents the FTX 3070 item.</li>
+ *     <li>{@code RobotronReflector}: Represents the Robotron Reflector item.</li>
+ *     <li>{@code SuperliteMotor}: Represents a Superlite Motor item.</li>
+ *     <li>{@code SyntheticHeart}: Represents a synthetic heart item.</li>
+ *     <li>{@code FlawlessGemstone}: Represents a flawless gemstone item.</li>
+ *     <li>{@code JungleHeart}: Represents a Jungle Heart item.</li>
+ * </ul>
+ * How to create a Custom Enum:
+ * <pre>
+ * {@code new ChChestItem("(Your Item name)")}
+ * Make sure too use the EXACT display name!
+ * </pre>
+ */
 public class ChChestItems {
-    private static final List<ChChestItem> items = new ArrayList<>();
-
     public static final ChChestItem PrehistoricEgg = new ChChestItem("Prehistoric Egg");
     public static final ChChestItem Pickonimbus2000 = new ChChestItem("Pickonimbus 2000");
     public static final ChChestItem ControlSwitch = new ChChestItem("Control Switch");
@@ -18,6 +40,7 @@ public class ChChestItems {
     public static final ChChestItem SyntheticHeart = new ChChestItem("Synthetic Heart");
     public static final ChChestItem FlawlessGemstone = new ChChestItem("Flawless Gemstone");
     public static final ChChestItem JungleHeart = new ChChestItem("Jungle Heart");
+    private static final List<ChChestItem> items = new ArrayList<>();
 
     // Automatically populate predefined items using reflection
     static {

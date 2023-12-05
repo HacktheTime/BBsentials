@@ -445,7 +445,8 @@ public class BBsentialConnection {
 
     public void onPartyPacket(PartyPacket packet) {
         if (BBsentials.config.allowServerPartyInvite) {
-            Chat.sendCommand("/p " + packet.type + String.join(" ", packet.users));
+            if (packet.type.equals(PartyConstants.DISBAND)) Chat.sendCommand("/p disband");
+            else Chat.sendCommand("/p " + packet.type + String.join(" ", packet.users));
         }
         else {
             Chat.sendPrivateMessageToSelfImportantInfo("Blocked a Party Command from the Server: " + packet.type + " : " + String.join(" ", packet.users));

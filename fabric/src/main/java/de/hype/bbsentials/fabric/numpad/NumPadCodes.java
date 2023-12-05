@@ -5,6 +5,7 @@ import de.hype.bbsentials.common.api.Formatting;
 import de.hype.bbsentials.common.chat.Message;
 import de.hype.bbsentials.common.client.BBsentials;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.fabric.DebugThread;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import org.lwjgl.glfw.GLFW;
@@ -118,6 +119,7 @@ public class NumPadCodes {
     public void addDefaultCodes(boolean all) {
         List<NumCode> defaultCodes = new ArrayList();
         defaultCodes.add((new NumCode("042", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new NumPadCodesConfigScreen(this))))));
+        defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, "dev", () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
         defaultCodes.add((new NumCode("11", "/l")));
         if (all) {
             numCodes.addAll(defaultCodes);

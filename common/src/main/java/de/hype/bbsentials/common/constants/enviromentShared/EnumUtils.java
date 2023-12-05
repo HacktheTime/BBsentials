@@ -1,7 +1,6 @@
 package de.hype.bbsentials.common.constants.enviromentShared;
 
 import de.hype.bbsentials.common.constants.BBDisplayNameProvider;
-import de.hype.bbsentials.common.constants.BBDisplayNameProviderWithCustom;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,72 +69,6 @@ public class EnumUtils {
 //        }
 //    }
 
-
-
-    // Methods for BBDisplayNameProviderWithCustom
-
-    public static <T extends Enum<T> & BBDisplayNameProviderWithCustom> T getEnumByNameWithCustom(Class<T> enumClass, String enumName) {
-        boolean found = false;
-        for (T enumValue : enumClass.getEnumConstants()) {
-            if (enumValue.name().equals(enumName)) {
-                return (enumValue);
-            }
-        }
-        return createCustomEnum(enumClass, enumName);
-    }
-
-    public static <T extends Enum<T> & BBDisplayNameProviderWithCustom> T getEnumByValueWithCustom(Class<T> enumClass, String value) {
-        for (T enumValue : enumClass.getEnumConstants()) {
-            if (enumValue.getDisplayName().equals(value)) {
-                return enumValue;
-            }
-        }
-        return (createCustomEnum(enumClass, value));
-
-    }
-
-    public static <T extends Enum<T> & BBDisplayNameProviderWithCustom> T[] getEnumsByNameWithCustom(Class<T> enumClass, String[] names) {
-        List<T> matchingEnums = new ArrayList<>();
-
-        for (String name : names) {
-            boolean found = false;
-            for (T enumValue : enumClass.getEnumConstants()) {
-                if (enumValue.name().equals(name)) {
-                    matchingEnums.add(enumValue);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                matchingEnums.add(createCustomEnum(enumClass, name));
-            }
-        }
-
-        return matchingEnums.toArray((T[]) java.lang.reflect.Array.newInstance(enumClass, 0));
-    }
-
-    public static <T extends Enum<T> & BBDisplayNameProviderWithCustom> T[] getEnumsByValueWithCustom(Class<T> enumClass, String[] values) {
-        List<T> matchingEnums = new ArrayList<>();
-
-        for (String value : values) {
-            boolean found = false;
-            for (T enumValue : enumClass.getEnumConstants()) {
-                if (enumValue.toString().equals(value)) {
-                    matchingEnums.add(enumValue);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                matchingEnums.add(createCustomEnum(enumClass, value));
-            }
-        }
-
-        return matchingEnums.toArray((T[]) java.lang.reflect.Array.newInstance(enumClass, 0));
-    }
-
-    // Methods for BBDisplayNameProvider
-
     public static <T extends Enum<T> & BBDisplayNameProvider> T getEnumByName(Class<T> enumClass, String enumName) {
         try {
             return Enum.valueOf(enumClass, enumName);
@@ -143,14 +76,6 @@ public class EnumUtils {
             return null; // Enum value not found
         }
     }
-    public static <T extends Enum<T> & BBDisplayNameProvider, U extends Enum<U>> U getEnumByName(Class<T> enumClass, Class<U> enumType, String enumName) {
-        try {
-            return Enum.valueOf(enumType, enumName);
-        } catch (IllegalArgumentException e) {
-            return null; // Enum value not found
-        }
-    }
-
 
     public static <T extends Enum<T> & BBDisplayNameProvider> T getEnumByValue(Class<T> enumClass, String value) {
         for (T enumValue : enumClass.getEnumConstants()) {
@@ -193,23 +118,6 @@ public class EnumUtils {
         }
 
         return matchingEnums.toArray((T[]) java.lang.reflect.Array.newInstance(enumClass, 0));
-    }
-
-    private static <T extends Enum<T> & BBDisplayNameProviderWithCustom> T createCustomEnum(Class<T> enumClass, String value) {
-        T customEnum = null;
-        try {
-            customEnum = Enum.valueOf(enumClass, "Custom");
-        } catch (Exception ignored) {
-            try {
-                customEnum = Enum.valueOf(enumClass, "CUSTOM");
-            } catch (Exception ignored2) {
-            }
-        }
-        if (customEnum == null) {
-        }
-        customEnum.setDisplayName(value);
-        return customEnum;
-
     }
 }
 

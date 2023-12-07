@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric;
 
 import com.google.common.collect.Lists;
 import de.hype.bbsentials.common.chat.Chat;
+import de.hype.bbsentials.common.constants.enviromentShared.EnumUtils;
 import de.hype.bbsentials.common.constants.enviromentShared.Islands;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
@@ -17,7 +18,7 @@ public class BBUtils implements de.hype.bbsentials.common.mclibraries.BBUtils {
                 Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
             }
             else {
-                return Islands.getByDisplayName(string.replace("Area: ", "").trim());
+                return EnumUtils.getEnumByName(Islands.class, string.replace("Area: ", "").trim());
             }
         } catch (Exception e) {
         }

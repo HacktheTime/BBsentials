@@ -3,7 +3,18 @@ package de.hype.bbsentials.common.packets.packets;
 import de.hype.bbsentials.common.constants.enviromentShared.InternalReasonConstants;
 import de.hype.bbsentials.common.packets.AbstractPacket;
 
+/**
+ * Used to tell a client that they were disconnected by the Host.
+ */
 public class DisconnectPacket extends AbstractPacket {
+
+    /**
+     * @param internalReason      Reason for the disconnect {@link InternalReasonConstants}
+     * @param waitBeforeReconnect Time before client shall try to reconnect.
+     * @param randomExtraDelay    Max random delay that is added to put less stress on the Server
+     * @param displayReason       Reason to be displayed why Client was disconnected
+     * @param displayMessage      Message is shown on the client.
+     */
 
     public DisconnectPacket(InternalReasonConstants internalReason, int[] waitBeforeReconnect, int randomExtraDelay, String displayReason, String displayMessage) {
         super(1, 1); //Min and Max supportet Version

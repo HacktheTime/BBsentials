@@ -3,6 +3,9 @@ package de.hype.bbsentials.common.packets.packets;
 
 import de.hype.bbsentials.common.packets.AbstractPacket;
 
+/**
+ * Used when a Message is broadcast. Requires Mod Privilege.
+ */
 public class BroadcastMessagePacket extends AbstractPacket {
 
     public final String message;

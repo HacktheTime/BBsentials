@@ -2,6 +2,24 @@ package de.hype.bbsentials.common.constants.enviromentShared;
 
 import de.hype.bbsentials.common.constants.BBDisplayNameProvider;
 
+/**
+ * List of all Islands
+ * <li>{@link #CRYSTAL_HOLLOWS}
+ * <li>{@link #CRIMSON_ISLE}
+ * <li>{@link #DEEP_CAVERNS}
+ * <li>{@link #DUNGEON}
+ * <li>{@link #DUNGEON_HUB}
+ * <li>{@link #DWARVEN_MINES}
+ * <li>{@link #GOLD_MINE}
+ * <li>{@link #HUB}
+ * <li>{@link #KUUDRA}
+ * <li>{@link #PRIVATE_ISLAND}
+ * <li>{@link #SPIDERS_DEN}
+ * <li>{@link #THE_END}
+ * <li>{@link #THE_FARMING_ISLANDS}
+ * <li>{@link #JERRYS_WORKSHOP}
+ * <li>{@link #THE_RIFT}
+ */
 public enum Islands implements BBDisplayNameProvider {
     CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows"),
     CRIMSON_ISLE("crimson_isle", "Crimson Isle"),
@@ -35,13 +53,4 @@ public enum Islands implements BBDisplayNameProvider {
     public String getDisplayName() {
         return displayName;
     }
-    public static Islands getByDisplayName(String displayName) {
-        for (Islands island : values()) {
-            if (island.getDisplayName().equals(displayName)) {
-                return island;
-            }
-        }
-        return null; // Return null if the display name doesn't match any enum value
-    }
-
 }

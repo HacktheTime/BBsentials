@@ -1,6 +1,7 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
 import de.hype.bbsentials.forge.ForgeMod;
+import de.hype.bbsentials.forge.client.MoulConfigManager;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 
@@ -19,7 +20,7 @@ public class CommandOpenConfig extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        ForgeMod.config.openConfigGui();
+        new MoulConfigManager().openConfigGui();
     }
 
     @Override

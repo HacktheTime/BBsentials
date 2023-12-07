@@ -1,5 +1,26 @@
 package de.hype.bbsentials.common.constants.enviromentShared;
 
+/**
+ * Enumeration representing internal reasons constants for a specific functionality.
+ * These constants are used to provide detailed information about various scenarios or states.
+ * <p>
+ * The following are the possible reasons represented by this enumeration:
+ * <ul>
+ *     <li>{@link #INVALID_PARAMETER}: Invalid parameter was provided.</li>
+ *     <li>{@link #MISSING_PARAMETER}: Required parameter is missing.</li>
+ *     <li>{@link #INSUFFICIENT_PRIVILEGES}: Insufficient privileges to perform the operation.</li>
+ *     <li>{@link #MUTED}: User is muted.</li>
+ *     <li>{@link #BANNED}: User is banned.</li>
+ *     <li>{@link #API_UNSUPPORTED}: API feature is unsupported.</li>
+ *     <li>{@link #INVALID_LOGIN}: Invalid login attempt.</li>
+ *     <li>{@link #KICKED}: User was kicked from the server.</li>
+ *     <li>{@link #ANOTHER_LOGIN}: Another login detected for the same user.</li>
+ *     <li>{@link #SERVER_RESTART}: Server is restarting.</li>
+ *     <li>{@link #NOT_REGISTERED}: User is not registered.</li>
+ *     <li>{@link #ON_COOLDOWN}: Operation is on cooldown.</li>
+ *     <li>{@link #OTHER}: Other unspecified reason.</li>
+ * </ul>
+ */
 public enum InternalReasonConstants {
     INVALID_PARAMETER,
     MISSING_PARAMETER,

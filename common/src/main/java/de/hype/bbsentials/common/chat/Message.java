@@ -46,7 +46,7 @@ public class Message {
 
     public String getMessageContent() {
         if (isServerMessage()) return unformattedString;
-        return getUnformattedString().split(":", 2)[1];
+        return getUnformattedString().split(":", 2)[1].trim();
     }
 
     Boolean guild = null;
@@ -77,9 +77,7 @@ public class Message {
 
     public boolean isServerMessage() {
         if (server != null) return server;
-        int space = getUnformattedString().indexOf(" ");
-        int doublepoint = getUnformattedString().indexOf(":");
-        return ((space + 2 < doublepoint)||doublepoint==-1||space==-1);
+        return !(isFromParty() || isFromGuild() || isMsg());
     }
 
     public String getPlayerName() {

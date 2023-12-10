@@ -20,7 +20,7 @@ public class DoubleFieldWidget extends IntegerFieldWidget {
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        if (chr == '.' || chr == ',') return super.typeChar('.', modifiers);
+        if (chr == '.' || chr == ',') return super.typeChar('.', modifiers, true);
         return super.charTyped(chr, modifiers);
     }
 

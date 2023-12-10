@@ -20,6 +20,13 @@ public class IntegerFieldWidget extends TextFieldWidget {
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
+        return typeChar(chr, modifiers, false);
+    }
+
+    public boolean typeChar(char chr, int modifiers, boolean doNotBlock) {
+        if (doNotBlock) {
+            return super.charTyped(chr, modifiers);
+        }
         // Allow removal (backspace and delete) and specific key combinations (Ctrl+A)
         if (chr == 8 || chr == 127 || (modifiers & 1) == 1) {
             return super.charTyped(chr, modifiers);
@@ -30,12 +37,4 @@ public class IntegerFieldWidget extends TextFieldWidget {
         }
         return false; // Block other characters
     }
-
-    /**
-     * Use this to bypass the check from the own charTyped. Passes this to the super Class of this.
-     */
-    public boolean typeChar(char chr, int modifiers) {
-        return charTyped(chr, modifiers);
-    }
-
 }

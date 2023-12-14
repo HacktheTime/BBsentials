@@ -4,17 +4,16 @@ import de.hype.bbsentials.common.communication.BBsentialConnection;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.common.packets.packets.SplashNotifyPacket;
 import de.hype.bbsentials.common.packets.packets.SplashUpdatePacket;
-import sun.java2d.pipe.TextRenderer;
 
 import java.util.concurrent.TimeUnit;
 
 public class SplashStatusUpdateListener implements Runnable {
-    BBsentialConnection connection;
-    SplashNotifyPacket packet;
-    private String status = SplashUpdatePacket.STATUS_WAITING;
     public String newStatus = SplashUpdatePacket.STATUS_WAITING;
     public boolean splashed = false;
     public boolean full = false;
+    BBsentialConnection connection;
+    SplashNotifyPacket packet;
+    private String status = SplashUpdatePacket.STATUS_WAITING;
 
     public SplashStatusUpdateListener(BBsentialConnection connection, SplashNotifyPacket packet) {
         this.connection = connection;
@@ -27,14 +26,14 @@ public class SplashStatusUpdateListener implements Runnable {
         int maxPlayerCount = EnvironmentCore.utils.getMaximumPlayerCount() - 5;
 
         while (BBsentials.splashLobby) {
-                if (!full&&(EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
-                    newStatus = SplashUpdatePacket.STATUS_FULL;
-                    full=true;
-                }
-                if (!status.equals(newStatus)) {
-                    status = newStatus;
-                    connection.sendPacket(new SplashUpdatePacket(packet.splashId, status));
-                }
+            if (!full && (EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
+                newStatus = SplashUpdatePacket.STATUS_FULL;
+                full = true;
+            }
+            if (!status.equals(newStatus)) {
+                status = newStatus;
+                connection.sendPacket(new SplashUpdatePacket(packet.splashId, status));
+            }
             try {
                 Thread.sleep(250);
             } catch (InterruptedException ignored) {
@@ -51,10 +50,11 @@ public class SplashStatusUpdateListener implements Runnable {
             connection.sendPacket(new SplashUpdatePacket(packet.splashId, status));
         }
     }
+
     public void setStatus(String newStatus) {
         this.newStatus = newStatus;
         if (newStatus.equals(SplashUpdatePacket.STATUS_SPLASHING)) {
-            splashed=true;
+            splashed = true;
             BBsentials.executionService.schedule(() -> {
                 setStatus(SplashUpdatePacket.STATUS_DONE);
                 BBsentials.splashLobby = false;

@@ -4,21 +4,21 @@ import de.hype.bbsentials.common.constants.BBDisplayNameProvider;
 
 /**
  * List of all Islands
- * <li>{@link #CRYSTAL_HOLLOWS}
- * <li>{@link #CRIMSON_ISLE}
- * <li>{@link #DEEP_CAVERNS}
- * <li>{@link #DUNGEON}
- * <li>{@link #DUNGEON_HUB}
- * <li>{@link #DWARVEN_MINES}
- * <li>{@link #GOLD_MINE}
- * <li>{@link #HUB}
- * <li>{@link #KUUDRA}
- * <li>{@link #PRIVATE_ISLAND}
- * <li>{@link #SPIDERS_DEN}
- * <li>{@link #THE_END}
- * <li>{@link #THE_FARMING_ISLANDS}
- * <li>{@link #JERRYS_WORKSHOP}
- * <li>{@link #THE_RIFT}
+ * {@link #CRYSTAL_HOLLOWS}
+ * {@link #CRIMSON_ISLE}
+ * {@link #DEEP_CAVERNS}
+ * {@link #DUNGEON}
+ * {@link #DUNGEON_HUB}
+ * {@link #DWARVEN_MINES}
+ * {@link #GOLD_MINE}
+ * {@link #HUB}
+ * {@link #KUUDRA}
+ * {@link #PRIVATE_ISLAND}
+ * {@link #SPIDERS_DEN}
+ * {@link #THE_END}
+ * {@link #THE_FARMING_ISLANDS}
+ * {@link #JERRYS_WORKSHOP}
+ * {@link #THE_RIFT}
  */
 public enum Islands implements BBDisplayNameProvider {
     CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows"),

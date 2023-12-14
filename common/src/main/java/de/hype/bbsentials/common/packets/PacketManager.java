@@ -1,5 +1,6 @@
 package de.hype.bbsentials.common.packets;
 
+import de.hype.bbsentials.common.client.SplashManager;
 import de.hype.bbsentials.common.communication.BBsentialConnection;
 import de.hype.bbsentials.common.packets.packets.*;
 
@@ -40,6 +41,7 @@ public class PacketManager {
         packets.add(new Packet<>(SystemMessagePacket.class, connection::onSystemMessagePacket));
         packets.add(new Packet<>(WelcomeClientPacket.class, connection::onWelcomePacket));
         packets.add(new Packet<>(RequestAuthentication.class, connection::onRequestAuthentication));
+        packets.add(new Packet<>(SplashUpdatePacket.class, SplashManager::updateSplash));
     }
 
     // Method to handle a received packet

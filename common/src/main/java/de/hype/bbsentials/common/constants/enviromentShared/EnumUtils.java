@@ -1,7 +1,6 @@
 package de.hype.bbsentials.common.constants.enviromentShared;
 
 import de.hype.bbsentials.common.constants.BBDisplayNameProvider;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

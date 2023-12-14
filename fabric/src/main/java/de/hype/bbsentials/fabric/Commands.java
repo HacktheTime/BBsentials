@@ -246,6 +246,15 @@ public class Commands implements MCCommand {
                                 })
                 );
             });/*requestpottimes*/
+            event.register((dispatcher, registryAccess) -> {
+                dispatcher.register(
+                        ClientCommandManager.literal("getLeecher")
+                                .executes((context) -> {
+                                    Chat.sendPrivateMessageToSelfInfo("Leeching Players: " + String.join(", ", EnvironmentCore.mcUtils.getSplashLeechingPlayers()));
+                                    return 1;
+                                })
+                );
+            });/*getLeecher*/
         }
         if (hasAdmin) {
             event.register((dispatcher, registryAccess) -> {

@@ -4,6 +4,7 @@ import de.hype.bbsentials.common.communication.BBsentialConnection;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.common.packets.packets.SplashNotifyPacket;
 import de.hype.bbsentials.common.packets.packets.SplashUpdatePacket;
+import sun.java2d.pipe.TextRenderer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +25,7 @@ public class SplashStatusUpdateListener implements Runnable {
     public void run() {
         BBsentials.splashLobby = true;
         int maxPlayerCount = EnvironmentCore.utils.getMaximumPlayerCount() - 5;
+
         while (BBsentials.splashLobby) {
                 if (!full&&(EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
                     newStatus = SplashUpdatePacket.STATUS_FULL;
@@ -49,7 +51,6 @@ public class SplashStatusUpdateListener implements Runnable {
             connection.sendPacket(new SplashUpdatePacket(packet.splashId, status));
         }
     }
-
     public void setStatus(String newStatus) {
         this.newStatus = newStatus;
         if (newStatus.equals(SplashUpdatePacket.STATUS_SPLASHING)) {

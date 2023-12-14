@@ -1,17 +1,17 @@
 package de.hype.bbsentials.common.constants.enviromentShared;
 
-// Mining Events
-
 import de.hype.bbsentials.common.constants.BBDisplayNameProvider;
+
+// Mining Events
 
 /**
  * A List of all Mining Events
- * <li>{@link #BETTER_TOGETHER}
- * <li>{@link #DOUBLE_POWDER}
- * <li>{@link #GONE_WITH_THE_WIND}
- * <li>{@link #GOBLIN_RAID}
- * <li>{@link #MITHRIL_GOURMAND}
- * <li>{@link #RAFFLE}
+ * {@link #BETTER_TOGETHER}
+ * {@link #DOUBLE_POWDER}
+ * {@link #GONE_WITH_THE_WIND}
+ * {@link #GOBLIN_RAID}
+ * {@link #MITHRIL_GOURMAND}
+ * {@link #RAFFLE}
  */
 public enum MiningEvents implements BBDisplayNameProvider {
     BETTER_TOGETHER("Better Together"),

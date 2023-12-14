@@ -5,7 +5,6 @@ import de.hype.bbsentials.common.chat.Chat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -16,6 +15,7 @@ import net.minecraft.util.Identifier;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
     public boolean isWindowFocused() {
@@ -99,80 +99,29 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
         return nearbyPlayers;
     }
 
-    public List<String> getBingoPlayers() {
-        List<String> bingoPlayers = new ArrayList<>();
-
-        // Iterate through all players and check their distance from the source player
-        for (PlayerListEntry entry : MinecraftClient.getInstance().player.networkHandler.getPlayerList()) {
-            try {
-                if (entry.getProfile().getName().startsWith("!")) {
-                    String customName = entry.getDisplayName().getString();
-                    if (customName.contains("Ⓑ")) {
-                        bingoPlayers.add(customName.trim().split(" ")[1]);
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-
+    public static boolean isBingo(PlayerEntity player) {
+        try {
+            return player.getDisplayName().getString().contains("Ⓑ");
+        } catch (Exception e) {
+            return false;
         }
-        return bingoPlayers;
     }
 
-    public List<String> getIronmanPlayers() {
-        List<String> ironmanPlayers = new ArrayList<>();
-
-        // Iterate through all players and check their distance from the source player
-        for (PlayerListEntry entry : MinecraftClient.getInstance().player.networkHandler.getPlayerList()) {
-            try {
-                if (entry.getProfile().getName().startsWith("!")) {
-                    String customName = entry.getDisplayName().getString();
-                    if (customName.contains("♻")) {
-                        ironmanPlayers.add(customName.trim().split(" ")[1]);
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-
+    public static boolean isIronman(PlayerEntity player) {
+        try {
+            return player.getDisplayName().getString().contains("♻");
+        } catch (Exception e) {
+            return false;
         }
-        return ironmanPlayers;
     }
 
-    public List<PlayerEntity> onlyFromList(List<PlayerEntity> players, List<String> usernames) {
-        ArrayList<PlayerEntity> filtered = new ArrayList<>();
-        for (PlayerEntity player : players) {
-            String playerUsername = player.getGameProfile().getName();
-            for (int i = 0; i < usernames.size(); i++) {
-                if (playerUsername.equals(usernames.get(i))) {
-                    usernames.remove(i);
-                    filtered.add(player);
-                }
-            }
-        }
-        return filtered;
-    }
-
-    public List<PlayerEntity> filterOut(List<PlayerEntity> players, List<String> usernames) {
-        ArrayList<PlayerEntity> filtered = new ArrayList<>();
-        for (PlayerEntity player : players) {
-            String playerUsername = player.getGameProfile().getName();
-            boolean toAdd = true;
-            for (int i = 0; i < usernames.size(); i++) {
-                if (playerUsername.equals(usernames.get(i))) {
-                    toAdd = false;
-                    usernames.remove(i);
-                    break;
-                }
-            }
-            if (toAdd) {
-                filtered.add(player);
-            }
-        }
-        return filtered;
+    public List<PlayerEntity> filterOut(List<PlayerEntity> players, Predicate<PlayerEntity> predicate) {
+        return players.stream().filter(predicate).toList();
     }
 
     public List<String> getSplashLeechingPlayers() {
         List<PlayerEntity> players = getAllPlayers();
         players.remove(MinecraftClient.getInstance().player);
-        return getPlayersInRadius(MinecraftClient.getInstance().player, filterOut(getAllPlayers(), getBingoPlayers()), 5).stream().map((playerEntity -> playerEntity.getDisplayName().getString())).toList();
+        return getPlayersInRadius(MinecraftClient.getInstance().player, filterOut(getAllPlayers(), MCUtils::isBingo), 5).stream().map((playerEntity -> playerEntity.getDisplayName().getString())).toList();
     }
 }

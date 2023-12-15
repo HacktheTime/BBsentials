@@ -115,7 +115,7 @@ public class Commands implements MCCommand {
                                                                         int z = IntegerArgumentType.getInteger(context, "Z");
                                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
 
-                                                                        sendPacket(new ChChestPacket("", ChChestItems.getItem(item.split(";")), x + " " + y + " " + z, contactWay, ""));
+                                                                sendPacket(new ChChestPacket(0, "", ChChestItems.getItem(item.split(";")), x + " " + y + " " + z, contactWay, ""));
                                                                         return 1;
                                                                     }
                                                             )

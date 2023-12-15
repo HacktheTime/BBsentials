@@ -24,6 +24,7 @@ public class SplashStatusUpdateListener implements Runnable {
     }
 
     public boolean showSplashOverlay() {
+        if (!BBsentials.config.useSplashLeecherOverlayHud) return false;
         return splashLobby.get() || showSplashOverlayOverrideDisplay;
     }
 

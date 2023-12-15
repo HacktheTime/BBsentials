@@ -132,22 +132,25 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
 
         List<IChatComponent> toDisplay = new ArrayList<>();
         toDisplay.add(new ChatComponentText("§6Total: " + allParticipants.size() + " | Bingos: " + (allParticipants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
+        boolean doPants = BBsentials.config.showMusicPants;
         for (EntityPlayer participant : allParticipants) {
-            boolean hasPants = false;
-            for (ItemStack armorItem : participant.inventory.armorInventory) {
-                try {
-                    if (armorItem.getTagCompound().getCompoundTag("ExtraAttributes").getString("display").contains("MUSIC_PANTS")) {
-                        musicPants.add(participant);
-                        hasPants = true;
+            if (doPants) {
+                boolean hasPants = false;
+                for (ItemStack armorItem : participant.inventory.armorInventory) {
+                    try {
+                        if (armorItem.getTagCompound().getCompoundTag("ExtraAttributes").getString("display").contains("MUSIC_PANTS")) {
+                            musicPants.add(participant);
+                            hasPants = true;
+                        }
+                    } catch (Exception ignored) {
+                        continue;
                     }
-                } catch (Exception ignored) {
-                    continue;
                 }
-            }
-            if (hasPants) {
-                String pantsAddition = IChatComponent.Serializer.componentToJson(new ChatComponentText("§4[♪]§ "));
-                String normal = IChatComponent.Serializer.componentToJson(participant.getDisplayName());
-                toDisplay.add(IChatComponent.Serializer.jsonToComponent("[" + pantsAddition + "," + normal + "]"));
+                if (hasPants) {
+                    String pantsAddition = IChatComponent.Serializer.componentToJson(new ChatComponentText("§4[♪]§ "));
+                    String normal = IChatComponent.Serializer.componentToJson(participant.getDisplayName());
+                    toDisplay.add(IChatComponent.Serializer.jsonToComponent("[" + pantsAddition + "," + normal + "]"));
+                }
             }
         }
         toDisplay.addAll(splashLeechers.stream().map(EntityPlayer::getDisplayName).collect(Collectors.toList()));

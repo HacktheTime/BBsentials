@@ -15,14 +15,14 @@ public class Config implements Serializable {
     public static int apiVersion = 1;
     public static List<String> partyMembers = new ArrayList<>();
     public transient final Sender sender = new Sender();
+    public boolean devMode = false;
+    public boolean detailedDevMode = false;
     // Gson object for serialization
     private final transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     // File object for storing the config
     private final transient File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
     //You can change again
     public boolean allowServerPartyInvite = true;
-    public boolean devMode = false;
-    public boolean detailedDevMode = false;
     public boolean devSecurity = true;
     public transient String overwriteActionBar = "";
     public transient String alreadyReported = "";
@@ -46,6 +46,8 @@ public class Config implements Serializable {
     public boolean allowBBinviteMe = true;
     public boolean doDesktopNotifications = false;
     public boolean showSplashStatusUpdates = true;
+    public boolean useSplashLeecherOverlayHud = true;
+    public boolean showMusicPants = true;
     public boolean doGammaOverride = true;
     public boolean acceptReparty;
     public boolean autoSplashStatusUpdates;
@@ -58,6 +60,7 @@ public class Config implements Serializable {
     // set automatically
     private transient boolean isPartyLeader;
     private transient String username;
+
     // Constructor
     public Config() {
         setDefaults();

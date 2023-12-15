@@ -142,22 +142,26 @@ public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
         List<PlayerEntity> musicPants = new ArrayList<>();
         List<Text> toDisplay = new ArrayList<>();
         toDisplay.add(Text.of("§6Total: " + allParticipiants.size() + " | Bingos: " + (allParticipiants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
+        boolean doPants = BBsentials.config.showMusicPants;
         for (PlayerEntity participiant : allParticipiants) {
-            boolean hasPants = false;
-            for (ItemStack armorItem : participiant.getArmorItems()) {
-                try {
-                    if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
-                        musicPants.add(participiant);
-                        hasPants = true;
+            if (doPants) {
+
+                boolean hasPants = false;
+                for (ItemStack armorItem : participiant.getArmorItems()) {
+                    try {
+                        if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
+                            musicPants.add(participiant);
+                            hasPants = true;
+                        }
+                    } catch (Exception ignored) {
+                        continue;
                     }
-                } catch (Exception ignored) {
-                    continue;
                 }
-            }
-            if (hasPants) {
-                String pantsAddition = Text.Serializer.toJson(Text.of("§4[♪]§ "));
-                String normal = Text.Serializer.toJson(participiant.getDisplayName());
-                toDisplay.add(Text.Serializer.fromJson("[" + pantsAddition + "," + normal + "]"));
+                if (hasPants) {
+                    String pantsAddition = Text.Serializer.toJson(Text.of("§4[♪]§ "));
+                    String normal = Text.Serializer.toJson(participiant.getDisplayName());
+                    toDisplay.add(Text.Serializer.fromJson("[" + pantsAddition + "," + normal + "]"));
+                }
             }
         }
         toDisplay.addAll(splashLeechers.stream().map(PlayerEntity::getDisplayName).toList());

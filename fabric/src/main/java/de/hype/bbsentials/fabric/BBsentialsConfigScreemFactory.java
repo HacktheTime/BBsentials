@@ -322,12 +322,27 @@ public class BBsentialsConfigScreemFactory {
                         .build());
             }
             if (BBsentials.config.hasBBRoles("splasher")) {
-                ConfigCategory dev = builder.getOrCreateCategory(Text.of("§dSplashes"));
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Auto Update Statuses"), BBsentials.config.autoSplashStatusUpdates)
+                ConfigCategory splasher = builder.getOrCreateCategory(Text.of("§dSplashes"));
+                BooleanListEntry updateSplashStatus = entryBuilder.startBooleanToggle(Text.of("Auto Update Statuses"), BBsentials.config.autoSplashStatusUpdates)
                         .setDefaultValue(true)
                         .setTooltip(Text.of("Automatically updates the Status of the Splash by sending packets to the Server"))
                         .setSaveConsumer(newValue -> BBsentials.config.autoSplashStatusUpdates = newValue)
-                        .build());
+                        .build();
+                splasher.addEntry(updateSplashStatus);
+                BooleanListEntry showLeecherHud = entryBuilder.startBooleanToggle(Text.of("Do not show Splash Leecher Overlay"), BBsentials.config.autoSplashStatusUpdates)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Optional disabler for the Splash Leecher Overlay. Is normally automatically enabled when you announce a splash.\nAutomatically gets disabled when its marked done."))
+                        .setSaveConsumer(newValue -> BBsentials.config.autoSplashStatusUpdates = newValue)
+                        .setRequirement(updateSplashStatus::getValue)
+                        .build();
+                splasher.addEntry(showLeecherHud);
+                entryBuilder.startBooleanToggle(Text.of("Show Music Pants Users"), BBsentials.config.autoSplashStatusUpdates)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Displays a small red note in front of the username if they wear music pants. Displays everybody with it not just non Bingos"))
+                        .setRequirement(showLeecherHud::getValue)
+                        .setSaveConsumer(newValue -> BBsentials.config.autoSplashStatusUpdates = newValue)
+                        .build();
+
             }
             return builder.build();
         }

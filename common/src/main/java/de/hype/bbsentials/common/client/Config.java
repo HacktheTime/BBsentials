@@ -34,7 +34,7 @@ public class Config implements Serializable {
     public boolean useNumCodes = true;
     public boolean overrideBingoTime = false;
     public boolean connectToBeta = false;
-    public boolean useMojangAuth = false;
+    public boolean useMojangAuth = true;
 
     public String bbServerURL = "static.88-198-149-240.clients.your-server.de";
     public String apiKey = "";

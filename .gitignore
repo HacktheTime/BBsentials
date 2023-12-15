@@ -22,3 +22,7 @@ logs
 /run/saves/temp
 /run/saves/temp/*
 /run/saves
+/runforge/.mixin.out/*
+/run/servers.dat
+/run/servers.dat_old
+/runforge/config/splash.properties

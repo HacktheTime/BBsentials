@@ -26,7 +26,6 @@ public class DebugThread implements de.hype.bbsentials.common.client.DebugThread
     public void doOnce() {
         doTest = true;
     }
-
     @Override
     public List<String> test() {
         return List.of("");
@@ -72,7 +71,7 @@ public class DebugThread implements de.hype.bbsentials.common.client.DebugThread
 
     public List<String> getSplashLeechingPlayers() {
         List<PlayerEntity> players = getAllPlayers();
-        players.remove(MinecraftClient.getInstance().player);
+//        players.remove(MinecraftClient.getInstance().player);
         return getPlayersInRadius(MinecraftClient.getInstance().player, getNonBingoPlayers(players), 5).stream().map((playerEntity -> playerEntity.getDisplayName().getString())).toList();
     }
 }

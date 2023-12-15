@@ -36,7 +36,7 @@ public class Config implements Serializable {
     public boolean connectToBeta = false;
     public boolean useMojangAuth = false;
 
-    public String bbServerURL = "localhost";
+    public String bbServerURL = "static.88-198-149-240.clients.your-server.de";
     public String apiKey = "";
     public boolean showBingoChat = true;
     public boolean doAllChatCustomMenu = true;

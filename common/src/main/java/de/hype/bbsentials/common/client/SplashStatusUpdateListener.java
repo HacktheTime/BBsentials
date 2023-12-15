@@ -6,11 +6,14 @@ import de.hype.bbsentials.common.packets.packets.SplashNotifyPacket;
 import de.hype.bbsentials.common.packets.packets.SplashUpdatePacket;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SplashStatusUpdateListener implements Runnable {
     public String newStatus = SplashUpdatePacket.STATUS_WAITING;
     public boolean splashed = false;
     public boolean full = false;
+    AtomicBoolean splashLobby = new AtomicBoolean(false);
+    public static boolean showSplashOverlayOverrideDisplay = false;
     BBsentialConnection connection;
     SplashNotifyPacket packet;
     private String status = SplashUpdatePacket.STATUS_WAITING;
@@ -20,12 +23,16 @@ public class SplashStatusUpdateListener implements Runnable {
         this.packet = packet;
     }
 
+    public boolean showSplashOverlay() {
+        return splashLobby.get() || showSplashOverlayOverrideDisplay;
+    }
+
     @Override
     public void run() {
-        BBsentials.splashLobby = true;
+        BBsentials.onServerLeave.add(() -> splashLobby.set(false));
         int maxPlayerCount = EnvironmentCore.utils.getMaximumPlayerCount() - 5;
-
-        while (BBsentials.splashLobby) {
+        splashLobby.set(true);
+        while (splashLobby.get()) {
             if (!full && (EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
                 newStatus = SplashUpdatePacket.STATUS_FULL;
                 full = true;
@@ -57,7 +64,7 @@ public class SplashStatusUpdateListener implements Runnable {
             splashed = true;
             BBsentials.executionService.schedule(() -> {
                 setStatus(SplashUpdatePacket.STATUS_DONE);
-                BBsentials.splashLobby = false;
+                splashLobby.set(false);
             }, 1, TimeUnit.MINUTES);
         }
     }

@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.common.chat.Chat;
 import de.hype.bbsentials.common.client.BBsentials;
+import de.hype.bbsentials.common.client.SplashStatusUpdateListener;
 import de.hype.bbsentials.common.constants.enviromentShared.ChChestItems;
 import de.hype.bbsentials.common.constants.enviromentShared.MiningEvents;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
@@ -20,6 +21,7 @@ import net.minecraft.command.CommandSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class Commands implements MCCommand {
     Event<ClientCommandRegistrationCallback> event = ClientCommandRegistrationCallback.EVENT;
@@ -281,7 +283,10 @@ public class Commands implements MCCommand {
                         ClientCommandManager.literal("getLeecher")
                                 .executes((context) -> {
                                     BBsentials.executionService.execute(() -> {
+                                        SplashStatusUpdateListener.showSplashOverlayOverrideDisplay = true;
                                         Chat.sendPrivateMessageToSelfInfo("Leeching Players: " + String.join(", ", EnvironmentCore.mcUtils.getSplashLeechingPlayers()));
+                                        BBsentials.executionService.schedule(() -> SplashStatusUpdateListener.showSplashOverlayOverrideDisplay = false,
+                                                2, TimeUnit.MINUTES);
                                     });
                                     return 1;
                                 })

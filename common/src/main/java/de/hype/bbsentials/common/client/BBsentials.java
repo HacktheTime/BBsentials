@@ -5,6 +5,8 @@ import de.hype.bbsentials.common.client.Commands.Commands;
 import de.hype.bbsentials.common.communication.BBsentialConnection;
 import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -14,7 +16,8 @@ public class BBsentials {
     private static boolean initialised = false;
     public static Commands coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
-    public static boolean splashLobby;
+    public static List<Runnable> onServerJoin = new ArrayList<>();
+    public static List<Runnable> onServerLeave = new ArrayList<>();
     public static SplashStatusUpdateListener splashStatusUpdateListener;
     public static Thread bbthread;
     public static Chat chat = new Chat();
@@ -65,14 +68,22 @@ public class BBsentials {
      * Runs the mod initializer on the client environment.
      */
 
-    public static void onServerSwap() {
+    public static void onServerJoin() {
+        for (int i = 0; i < onServerJoin.size(); i++) {
+            onServerJoin.remove(i).run();
+        }
         if (!initialised) {
             initialised = true;
             if (Config.isBingoTime() || config.overrideBingoTime()) {
                 connectToBBserver();
             }
         }
-        splashLobby = false;
+    }
+
+    public static void onServerLeave() {
+        for (int i = 0; i < onServerLeave.size(); i++) {
+            onServerLeave.remove(i).run();
+        }
     }
 
     public static void init() {
@@ -82,5 +93,7 @@ public class BBsentials {
         );
         debugThread.start();
         debugThread.setName("Debug Thread");
+        splashStatusUpdateListener = new SplashStatusUpdateListener(null, null);
+        EnvironmentCore.mcUtils.registerSplashOverlay();
     }
 }

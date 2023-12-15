@@ -231,7 +231,10 @@ public class ModInitialiser implements ClientModInitializer {
         codes = new NumPadCodes();
         BBsentials.init();
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
-            BBsentials.onServerSwap();
+            BBsentials.onServerJoin();
+        });
+        ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
+            BBsentials.onServerLeave();
         });
     }
 

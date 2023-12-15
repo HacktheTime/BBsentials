@@ -40,7 +40,7 @@ public class ForgeMod {
     }
     @SubscribeEvent
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
-        BBsentials.onServerSwap();
+        BBsentials.onServerJoin();
     }
 }
 

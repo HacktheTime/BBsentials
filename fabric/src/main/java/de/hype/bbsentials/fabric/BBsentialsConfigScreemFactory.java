@@ -31,7 +31,7 @@ public class BBsentialsConfigScreemFactory {
             ConfigCategory server = builder.getOrCreateCategory(Text.of("Server"));
             if (BBsentials.config.getUsername().equalsIgnoreCase("Hype_the_Time")) {
                 server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.config.getBBServerURL().replaceAll(".", "*"))
-                        .setDefaultValue("localhost")
+                        .setDefaultValue("static.88-198-149-240.clients.your-server.de")
                         .setTooltip(Text.of("Place the Server URL of the BBsentials Server here"))
                         .setSaveConsumer((newValue) -> {
                             if (newValue.replace("*", "").trim().isEmpty()) {

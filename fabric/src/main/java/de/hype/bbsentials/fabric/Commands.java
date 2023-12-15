@@ -23,7 +23,37 @@ import java.util.Objects;
 
 public class Commands implements MCCommand {
     Event<ClientCommandRegistrationCallback> event = ClientCommandRegistrationCallback.EVENT;
-    public void registerMain(){
+
+    private static void simpleCommand(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, String[] parameters) {
+        dispatcher.register(
+                ClientCommandManager.literal(commandName)
+                        .executes((context) -> {
+                            sendPacket(new InternalCommandPacket(commandName, parameters));
+                            return 1;
+                        })
+        );
+    }
+
+    private static void miningEvent(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, MiningEvents event) {
+        dispatcher.register(
+                ClientCommandManager.literal(commandName)
+                        .executes((context) -> {
+                            try {
+                                sendPacket(new MiningEventPacket(event,
+                                        BBsentials.config.getUsername(), Objects.requireNonNull(EnvironmentCore.utils.getCurrentIsland())));
+                            } catch (Exception e) {
+                                Chat.sendPrivateMessageToSelfError(e.getMessage());
+                            }
+                            return 1;
+                        })
+        );
+    }
+
+    public static <T extends AbstractPacket> void sendPacket(T packet) {
+        BBsentials.connection.sendPacket(packet);
+    }
+
+    public void registerMain() {
         event.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("creport")
                     .then(ClientCommandManager.argument("Player_Name", StringArgumentType.string())
@@ -128,7 +158,7 @@ public class Commands implements MCCommand {
                                 .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
                                         .executes((context) -> {
                                             String message = StringArgumentType.getString(context, "message");
-                                            sendPacket(new BroadcastMessagePacket("","",message));
+                                            sendPacket(new BroadcastMessagePacket("", "", message));
                                             return 1;
                                         })
                                 )
@@ -250,7 +280,9 @@ public class Commands implements MCCommand {
                 dispatcher.register(
                         ClientCommandManager.literal("getLeecher")
                                 .executes((context) -> {
-                                    Chat.sendPrivateMessageToSelfInfo("Leeching Players: " + String.join(", ", EnvironmentCore.mcUtils.getSplashLeechingPlayers()));
+                                    BBsentials.executionService.execute(() -> {
+                                        Chat.sendPrivateMessageToSelfInfo("Leeching Players: " + String.join(", ", EnvironmentCore.mcUtils.getSplashLeechingPlayers()));
+                                    });
                                     return 1;
                                 })
                 );
@@ -290,33 +322,6 @@ public class Commands implements MCCommand {
         }
     }
 
-    private static void simpleCommand(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, String[] parameters) {
-        dispatcher.register(
-                ClientCommandManager.literal(commandName)
-                        .executes((context) -> {
-                            sendPacket(new InternalCommandPacket(commandName, parameters));
-                            return 1;
-                        })
-        );
-    }
-
-    private static void miningEvent(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, MiningEvents event) {
-        dispatcher.register(
-                ClientCommandManager.literal(commandName)
-                        .executes((context) -> {
-                            try {
-                                sendPacket(new MiningEventPacket(event,
-                                        BBsentials.config.getUsername(), Objects.requireNonNull(EnvironmentCore.utils.getCurrentIsland())));
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError(e.getMessage());
-                            }
-                            return 1;
-                        })
-        );
-    }
-    public static <T extends AbstractPacket> void sendPacket(T packet){
-        BBsentials.connection.sendPacket(packet);
-    }
     public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
         sendPacket(new SplashNotifyPacket(0, hubNumber, BBsentials.config.getUsername(), locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste));
     }

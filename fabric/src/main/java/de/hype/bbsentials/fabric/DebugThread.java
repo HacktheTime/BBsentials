@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DebugThread implements de.hype.bbsentials.common.client.DebugThread {
+    public static List<Object> store = new ArrayList<>();
     boolean doTest = false;
 
-    public static List<Object> store = new ArrayList<>();
     @Override
     public void loop() {
         if (doTest) {
@@ -22,9 +22,9 @@ public class DebugThread implements de.hype.bbsentials.common.client.DebugThread
     public void doOnce() {
         doTest = true;
     }
+
     @Override
     public List<String> test() {
         return List.of("");
     }
-
 }

@@ -1,7 +1,5 @@
 package de.hype.bbsentials.forge;
 
-//import de.hype.bbsentials.forge.client.MoulConfigManager;
-
 import java.util.Collections;
 import java.util.List;
 

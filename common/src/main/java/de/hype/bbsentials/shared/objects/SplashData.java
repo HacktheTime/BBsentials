@@ -6,7 +6,7 @@ import de.hype.bbsentials.shared.constants.StatusConstants;
 public abstract class SplashData {
     public String announcer;
     public StatusConstants status;
-    public int splashId; // Unused as of now
+    public int splashId;
     public int hubNumber;
     public String locationInHub;
     public Islands hubType;
@@ -26,7 +26,8 @@ public abstract class SplashData {
         this.status = StatusConstants.WAITING;
     }
 
-    public SplashData(String user, int hubNumber, String locationInHub, Islands hubType, String extraMessage, boolean lessWaste, StatusConstants status) throws Exception {
+    public SplashData(String user, int splashId, int hubNumber, String locationInHub, Islands hubType, String extraMessage, boolean lessWaste, StatusConstants status) throws Exception {
+        this.splashId = splashId;
         this.announcer = user;
         this.hubNumber = hubNumber;
         this.locationInHub = locationInHub;

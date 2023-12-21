@@ -11,6 +11,10 @@ import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.shared.constants.ChChestItems;
 import de.hype.bbsentials.shared.constants.MiningEvents;
+import de.hype.bbsentials.shared.constants.StatusConstants;
+import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.ChestLobbyData;
+import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
@@ -114,6 +118,23 @@ public class Commands implements MCCommand {
                                                             .suggests(((context, builder) -> {
                                                                 return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.getConfig().getUsername() + " bb:party me\"", "\"/p join " + BBsentials.config.getUsername() + "\""}, builder);
                                                             }))
+                                                            .then(ClientCommandManager.argument("extraMessage", StringArgumentType.greedyString())
+                                                                    .suggests(((context, builder) -> {
+                                                                        return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.getConfig().getUsername() + " bb:party me\"", "\"/p join " + BBsentials.config.getUsername() + "\""}, builder);
+                                                                    }))
+                                                                    .executes((context) -> {
+                                                                                String item = StringArgumentType.getString(context, "Item");
+                                                                                int x = IntegerArgumentType.getInteger(context, "X");
+                                                                                int y = IntegerArgumentType.getInteger(context, "Y");
+                                                                                int z = IntegerArgumentType.getInteger(context, "Z");
+                                                                                String contactWay = StringArgumentType.getString(context, "ContactWay");
+                                                                                String extraMessage = StringArgumentType.getString(context, "extraMessage");
+
+                                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", x + " " + y + " " + z, ChChestItems.getItem(item.split(";")))), contactWay, extraMessage, StatusConstants.OPEN)));
+                                                                                return 1;
+                                                                            }
+                                                                    )
+                                                            )
                                                             .executes((context) -> {
                                                                         String item = StringArgumentType.getString(context, "Item");
                                                                         int x = IntegerArgumentType.getInteger(context, "X");
@@ -121,8 +142,8 @@ public class Commands implements MCCommand {
                                                                         int z = IntegerArgumentType.getInteger(context, "Z");
                                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
 
-                                                                sendPacket(new ChChestPacket(0, "", ChChestItems.getItem(item.split(";")), x + " " + y + " " + z, contactWay, ""));
-                                                                        return 1;
+                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", x + " " + y + " " + z, ChChestItems.getItem(item.split(";")))), contactWay, "", StatusConstants.OPEN)));
+                                                                return 1;
                                                                     }
                                                             )
                                                     )
@@ -334,6 +355,15 @@ public class Commands implements MCCommand {
     }
 
     public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
-        sendPacket(new SplashNotifyPacket(0, hubNumber, BBsentials.config.getUsername(), locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste));
+        try {
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.config.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste) {
+                @Override
+                public void statusUpdate(StatusConstants newStatus) {
+                    //ignored
+                }
+            }));
+        } catch (Exception e) {
+            Chat.sendPrivateMessageToSelfError(e.getMessage());
+        }
     }
 }

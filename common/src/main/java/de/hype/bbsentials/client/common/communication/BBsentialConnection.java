@@ -264,7 +264,7 @@ public class BBsentialConnection {
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
         //influencing the delay in any way is disallowed!
         int waitTime;
-        if (packet.splasherUsername.equals(BBsentials.config.getUsername()) && BBsentials.config.autoSplashStatusUpdates) {
+        if (packet.splash.announcer.equals(BBsentials.config.getUsername()) && BBsentials.config.autoSplashStatusUpdates) {
             Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard");
             SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet);
             BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
@@ -272,14 +272,14 @@ public class BBsentialConnection {
         }
         else {
             SplashManager.addSplash(packet);
-            if (packet.lessWaste) {
+            if (packet.splash.lessWaste) {
                 waitTime = Math.min(((EnvironmentCore.mcUtils.getPotTime() * 1000) / 80), 25 * 1000);
             }
             else {
                 waitTime = 0;
             }
             BBsentials.executionService.schedule(() -> {
-                SplashManager.display(packet.splashId);
+                SplashManager.display(packet.splash.splashId);
             }, waitTime, TimeUnit.MILLISECONDS);
         }
     }
@@ -291,18 +291,18 @@ public class BBsentialConnection {
     }
 
     public void onChChestPacket(ChChestPacket packet) {
-        if (isCommandSafe(packet.bbcommand)) {
-            if (showChChest(packet.items)) {
+        if (isCommandSafe(packet.lobby.bbcommand)) {
+            if (showChChest(packet.lobby.chests.get(0).items)) {
                 String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-                tellrawText = tellrawText.replace("@username", packet.announcerUsername);
-                tellrawText = tellrawText.replace("@item", Arrays.stream(packet.items)
+                tellrawText = tellrawText.replace("@username", packet.lobby.contactMan);
+                tellrawText = tellrawText.replace("@item", Arrays.stream(packet.lobby.chests.get(0).items)
                         .map(ChChestItem::getDisplayName)
                         .collect(Collectors.toList())
                         .toString());
-                tellrawText = tellrawText.replace("@coords", packet.locationCoords);
-                tellrawText = tellrawText.replace("@inviteCommand", packet.bbcommand);
-                if (!(packet.extraMessage == null || packet.extraMessage.isEmpty())) {
-                    tellrawText = tellrawText.replace("@extramessage", " : " + packet.extraMessage);
+                tellrawText = tellrawText.replace("@coords", packet.lobby.chests.get(0).getCoords());
+                tellrawText = tellrawText.replace("@inviteCommand", packet.lobby.bbcommand);
+                if (!(packet.lobby.extraMessage == null || packet.lobby.extraMessage.isEmpty())) {
+                    tellrawText = tellrawText.replace("@extramessage", " : " + packet.lobby.extraMessage);
                 }
                 Chat.sendPrivateMessageToSelfText(Message.tellraw(tellrawText));
             }

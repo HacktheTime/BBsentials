@@ -126,6 +126,11 @@ public class MCUtils implements de.hype.bbsentials.client.common.mclibraries.MCU
         return getSplashLeechingPlayersPlayerEntity().stream().map((player -> player.getDisplayName().getString())).toList();
     }
 
+    @Override
+    public List<String> getPlayers() {
+        return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
+    }
+
     public void registerSplashOverlay() {
         HudRenderCallback.EVENT.register(this::renderSplashOverlay);
     }

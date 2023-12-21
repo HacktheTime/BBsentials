@@ -30,7 +30,7 @@ public class ChestLobbyData {
     }
 
     public ChChestPacket getAsPacket() {
-        return new ChChestPacket(lobbyId, contactMan, chests.get(0).items, chests.get(0).getCoords(), bbcommand, extraMessage);
+        return new ChChestPacket(this);
     }
 
     public String getStatus() {

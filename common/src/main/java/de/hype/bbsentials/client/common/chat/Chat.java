@@ -4,7 +4,7 @@ import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.Config;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.shared.packets.function.SplashUpdatePacket;
+import de.hype.bbsentials.shared.constants.StatusConstants;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -320,7 +320,7 @@ public class Chat {
                 }
                 else if (messageUnformatted.startsWith("BUFF! You splashed yourself with")) {
                     if (BBsentials.splashStatusUpdateListener != null) {
-                        BBsentials.splashStatusUpdateListener.setStatus(SplashUpdatePacket.STATUS_SPLASHING);
+                        BBsentials.splashStatusUpdateListener.setStatus(StatusConstants.SPLASHING);
                     }
                 }
                 else if (messageUnformatted.equals("Click here to purchase a new 6 hour pass for 10,000 Coins")) {

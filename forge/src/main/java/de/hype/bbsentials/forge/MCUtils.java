@@ -1,7 +1,7 @@
 package de.hype.bbsentials.forge;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
-import de.hype.bbsentials.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.BBsentials;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
+public class MCUtils implements de.hype.bbsentials.client.common.mclibraries.MCUtils {
     public static boolean isBingo(EntityPlayer player) {
         try {
             return player.getDisplayNameString().contains("Ⓑ");

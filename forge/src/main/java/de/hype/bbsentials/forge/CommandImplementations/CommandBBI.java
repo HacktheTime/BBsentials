@@ -1,15 +1,15 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.client.Config;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-import static de.hype.bbsentials.common.client.BBsentials.connectToBBserver;
-import static de.hype.bbsentials.common.client.BBsentials.getConfig;
+import static de.hype.bbsentials.client.common.client.BBsentials.connectToBBserver;
+import static de.hype.bbsentials.client.common.client.BBsentials.getConfig;
 
 
 

@@ -1,11 +1,11 @@
 package de.hype.bbsentials.forge;
 
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.common.mclibraries.MCCommand;
-import de.hype.bbsentials.common.packets.AbstractPacket;
-import de.hype.bbsentials.common.packets.packets.SplashNotifyPacket;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.mclibraries.MCCommand;
+import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.forge.CommandImplementations.*;
+import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import net.minecraftforge.client.ClientCommandHandler;
 
 public class Commands implements MCCommand {

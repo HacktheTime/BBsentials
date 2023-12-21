@@ -141,12 +141,8 @@ tasks.shadowJar {
 }
 sourceSets {
     main {
-        java {
-            srcDir(project(":common").sourceSets["main"].java.srcDirs)
-        }
-        resources {
-            srcDir(project(":common").sourceSets["main"].resources.srcDirs)
-        }
+        java.srcDirs(project(":common").sourceSets["main"].java.srcDirs)
+        resources.srcDirs(project(":common").sourceSets["main"].resources.srcDirs)
     }
 }
 tasks.assemble.get().dependsOn(tasks.remapJar)

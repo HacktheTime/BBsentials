@@ -1,7 +1,7 @@
 package de.hype.bbsentials.fabric.numpad;
 
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.client.BBsentials;
+import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.client.BBsentials;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;

@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric.numpad;
 
-import de.hype.bbsentials.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.DoubleFieldWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.NoticeScreen;

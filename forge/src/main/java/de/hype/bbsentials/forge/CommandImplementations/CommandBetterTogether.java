@@ -1,13 +1,13 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.constants.enviromentShared.MiningEvents;
-import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.common.packets.packets.MiningEventPacket;
+import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.shared.constants.MiningEvents;
+import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 
-import static de.hype.bbsentials.common.client.BBsentials.connection;
+import static de.hype.bbsentials.client.common.client.BBsentials.connection;
 
 
 public class CommandBetterTogether extends CommandBase {

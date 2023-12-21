@@ -1,11 +1,11 @@
 package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.chat.Message;
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.client.Config;
-import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.chat.Message;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.Config;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -23,7 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.hype.bbsentials.common.client.BBsentials.*;
+import static de.hype.bbsentials.client.common.client.BBsentials.*;
 
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;

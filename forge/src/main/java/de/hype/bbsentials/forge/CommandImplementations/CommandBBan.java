@@ -1,7 +1,7 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
 
-import de.hype.bbsentials.common.packets.packets.PunishUserPacket;
+import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;

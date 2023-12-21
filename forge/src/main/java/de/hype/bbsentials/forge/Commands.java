@@ -1,10 +1,13 @@
 package de.hype.bbsentials.forge;
 
+import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.forge.CommandImplementations.*;
+import de.hype.bbsentials.shared.constants.StatusConstants;
+import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import net.minecraftforge.client.ClientCommandHandler;
 
@@ -39,6 +42,15 @@ public class Commands implements MCCommand {
     }
 
     public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
-        sendPacket(new SplashNotifyPacket(0, hubNumber, BBsentials.config.getUsername(), locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste));
+        try {
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.config.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste) {
+                @Override
+                public void statusUpdate(StatusConstants newStatus) {
+                    //ignored
+                }
+            }));
+        } catch (Exception e) {
+            Chat.sendPrivateMessageToSelfError(e.getMessage());
+        }
     }
 }

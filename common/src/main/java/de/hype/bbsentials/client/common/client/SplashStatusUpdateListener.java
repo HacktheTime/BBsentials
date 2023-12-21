@@ -2,6 +2,7 @@ package de.hype.bbsentials.client.common.client;
 
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import de.hype.bbsentials.shared.packets.function.SplashUpdatePacket;
 
@@ -9,14 +10,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SplashStatusUpdateListener implements Runnable {
-    public String newStatus = SplashUpdatePacket.STATUS_WAITING;
+    public StatusConstants status = StatusConstants.WAITING;
     public boolean splashed = false;
     public boolean full = false;
     AtomicBoolean splashLobby = new AtomicBoolean(false);
     public static boolean showSplashOverlayOverrideDisplay = false;
     BBsentialConnection connection;
     SplashNotifyPacket packet;
-    private String status = SplashUpdatePacket.STATUS_WAITING;
 
     public SplashStatusUpdateListener(BBsentialConnection connection, SplashNotifyPacket packet) {
         this.connection = connection;
@@ -35,12 +35,12 @@ public class SplashStatusUpdateListener implements Runnable {
         splashLobby.set(true);
         while (splashLobby.get()) {
             if (!full && (EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
-                newStatus = SplashUpdatePacket.STATUS_FULL;
+                status = StatusConstants.FULL;
                 full = true;
             }
-            if (!status.equals(newStatus)) {
-                status = newStatus;
-                connection.sendPacket(new SplashUpdatePacket(packet.splashId, status));
+            if (!status.equals(status)) {
+                status = status;
+                connection.sendPacket(new SplashUpdatePacket(packet.splash.splashId, status));
             }
             try {
                 Thread.sleep(250);
@@ -48,23 +48,23 @@ public class SplashStatusUpdateListener implements Runnable {
             }
         }
         if (splashed) {
-            newStatus = SplashUpdatePacket.STATUS_DONE;
+            status = StatusConstants.DONEBAD;
         }
         else {
-            newStatus = SplashUpdatePacket.STATUS_CANCELED;
+            status = StatusConstants.DONEBAD;
         }
-        if (!status.equals(newStatus)) {
-            status = newStatus;
-            connection.sendPacket(new SplashUpdatePacket(packet.splashId, status));
+        if (!status.equals(status)) {
+            status = status;
+            connection.sendPacket(new SplashUpdatePacket(packet.splash.splashId, status));
         }
     }
 
-    public void setStatus(String newStatus) {
-        this.newStatus = newStatus;
-        if (newStatus.equals(SplashUpdatePacket.STATUS_SPLASHING)) {
+    public void setStatus(StatusConstants newStatus) {
+        this.status = newStatus;
+        if (newStatus.equals(StatusConstants.SPLASHING)) {
             splashed = true;
             BBsentials.executionService.schedule(() -> {
-                setStatus(SplashUpdatePacket.STATUS_DONE);
+                setStatus(StatusConstants.DONEBAD);
                 splashLobby.set(false);
             }, 1, TimeUnit.MINUTES);
         }

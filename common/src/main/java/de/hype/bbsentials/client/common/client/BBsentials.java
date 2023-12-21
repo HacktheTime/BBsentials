@@ -81,6 +81,7 @@ public class BBsentials {
     }
 
     public static void onServerLeave() {
+        Chat.sendPrivateMessageToSelfDebug(String.valueOf(EnvironmentCore.utils.getPlayerCount()));
         for (int i = 0; i < onServerLeave.size(); i++) {
             onServerLeave.remove(i).run();
         }

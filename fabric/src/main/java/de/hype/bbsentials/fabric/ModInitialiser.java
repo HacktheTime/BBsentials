@@ -233,7 +233,7 @@ public class ModInitialiser implements ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
             BBsentials.onServerJoin();
         });
-        ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
+        ClientPlayConnectionEvents.DISCONNECT.register((a, b) -> {
             BBsentials.onServerLeave();
         });
     }

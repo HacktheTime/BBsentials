@@ -4,10 +4,10 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.forge.client.MoulConfig;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 @Mod(modid = "bbsentials", useMetadata = true)
 public class ForgeMod {
@@ -39,8 +39,13 @@ public class ForgeMod {
 //        }
     }
     @SubscribeEvent
-    public void onEntityJoinWorld(EntityJoinWorldEvent event) {
+    public void onClientConnected(FMLNetworkEvent.ClientConnectedToServerEvent event) {
         BBsentials.onServerJoin();
+    }
+
+    @SubscribeEvent
+    public void onClientDisconnected(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+        BBsentials.onServerLeave();
     }
 }
 

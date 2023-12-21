@@ -1,9 +1,9 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.client.SplashStatusUpdateListener;
-import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.SplashStatusUpdateListener;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 

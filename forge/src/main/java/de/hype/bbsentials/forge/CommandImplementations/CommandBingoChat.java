@@ -1,13 +1,13 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
 
-import de.hype.bbsentials.common.packets.packets.BingoChatMessagePacket;
+import de.hype.bbsentials.shared.packets.network.BingoChatMessagePacket;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-import static de.hype.bbsentials.common.client.BBsentials.connection;
+import static de.hype.bbsentials.client.common.client.BBsentials.connection;
 
 public class CommandBingoChat extends CommandBase {
 

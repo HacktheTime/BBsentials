@@ -1,8 +1,8 @@
 package de.hype.bbsentials.fabric;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.client.BBsentials;
+import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.client.BBsentials;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-public class MCUtils implements de.hype.bbsentials.common.mclibraries.MCUtils {
+public class MCUtils implements de.hype.bbsentials.client.common.mclibraries.MCUtils {
     public static boolean isBingo(PlayerEntity player) {
         try {
             return player.getDisplayName().getString().contains("Ⓑ");

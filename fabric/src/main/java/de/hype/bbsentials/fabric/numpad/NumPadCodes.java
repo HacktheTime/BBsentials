@@ -1,10 +1,10 @@
 package de.hype.bbsentials.fabric.numpad;
 
 import com.google.common.reflect.TypeToken;
-import de.hype.bbsentials.common.api.Formatting;
-import de.hype.bbsentials.common.chat.Message;
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.api.Formatting;
+import de.hype.bbsentials.client.common.chat.Message;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.fabric.DebugThread;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.hype.bbsentials.common.packets.PacketUtils.gson;
+import static de.hype.bbsentials.environment.packetconfig.PacketUtils.gson;
 
 public class NumPadCodes {
     private static final int NUMPAD_KEY_COUNT = 10;

@@ -1,7 +1,7 @@
 package de.hype.bbsentials.forge;
 
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.forge.client.MoulConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;

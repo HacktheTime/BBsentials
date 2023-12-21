@@ -1,16 +1,16 @@
 package de.hype.bbsentials.fabric;
 
 import com.google.common.collect.Lists;
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.constants.enviromentShared.EnumUtils;
-import de.hype.bbsentials.common.constants.enviromentShared.Islands;
+import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.shared.constants.EnumUtils;
+import de.hype.bbsentials.shared.constants.Islands;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class BBUtils implements de.hype.bbsentials.common.mclibraries.BBUtils {
+public class BBUtils implements de.hype.bbsentials.client.common.mclibraries.BBUtils {
     public Islands getCurrentIsland() {
         try {
             String string = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-b").getDisplayName().getString();

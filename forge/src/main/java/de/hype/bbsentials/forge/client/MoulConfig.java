@@ -7,7 +7,7 @@ import io.github.moulberry.moulconfig.annotations.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 
-import static de.hype.bbsentials.common.client.BBsentials.config;
+import static de.hype.bbsentials.client.common.client.BBsentials.config;
 
 
 public class MoulConfig extends Config {
@@ -17,7 +17,7 @@ public class MoulConfig extends Config {
 
     @Override
     public String getTitle() {
-        return "BBsentials " + de.hype.bbsentials.common.client.Config.apiVersion;
+        return "BBsentials " + de.hype.bbsentials.client.common.client.Config.apiVersion;
     }
 
     @Override

@@ -1,9 +1,9 @@
 package de.hype.bbsentials.fabric;
 
-import de.hype.bbsentials.common.chat.Chat;
-import de.hype.bbsentials.common.chat.Message;
-import de.hype.bbsentials.common.client.BBsentials;
-import de.hype.bbsentials.common.mclibraries.MCChat;
+import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.chat.Message;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.MCChat;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;

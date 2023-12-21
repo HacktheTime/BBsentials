@@ -1,6 +1,6 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.common.chat.Chat;
+import de.hype.bbsentials.client.common.chat.Chat;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 

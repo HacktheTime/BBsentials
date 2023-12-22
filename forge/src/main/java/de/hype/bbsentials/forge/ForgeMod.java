@@ -7,6 +7,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 @Mod(modid = "bbsentials", useMetadata = true)
@@ -39,13 +40,9 @@ public class ForgeMod {
 //        }
     }
     @SubscribeEvent
-    public void onClientConnected(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+    public void onClientConnected(PlayerEvent.PlayerRespawnEvent event) {
         BBsentials.onServerJoin();
     }
 
-    @SubscribeEvent
-    public void onClientDisconnected(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-        BBsentials.onServerLeave();
-    }
 }
 

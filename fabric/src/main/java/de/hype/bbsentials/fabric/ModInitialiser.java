@@ -27,6 +27,7 @@ import static de.hype.bbsentials.client.common.client.BBsentials.*;
 
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
+
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
@@ -180,8 +181,13 @@ public class ModInitialiser implements ClientModInitializer {
                                         // Handle the case when "config" argument is not provided
                                         // ...
                                         return 1;
-                                    })))
-            );
+                                    })
+                            )
+                            .executes((context) -> {
+                                MinecraftClient.getInstance().executeTask(() -> MinecraftClient.getInstance().setScreen(BBsentialsConfigScreemFactory.create(MinecraftClient.getInstance().currentScreen)));
+                                return 1;
+                            })
+                    ));
         }); //bbi
 
         KeyBinding devKeyBind = new KeyBinding("Open Mod Menu Config", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");

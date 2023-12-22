@@ -13,22 +13,16 @@ import java.util.List;
 public class ChestLobbyUpdatePacket extends AbstractPacket {
     public final int lobbyId;
     public final ChestLobbyData lobby;
-    public final List<String> playersStillIn;
-    public final Date closingTime;
     public final String newContactMan;
 
     /**
      * @param lobbyId        id of the lobby
      * @param lobby          one of the following types: {@link StatusConstants#OPEN}, {@link StatusConstants#FULL}, {@link StatusConstants#LEAVINGSOON}, {@link StatusConstants#LEFT}, {@link StatusConstants#CLOSED}
-     * @param playersStillIn Players that were still in when leaving the lobby.
-     * @param closingTime    assumed closingTime.
      */
-    public ChestLobbyUpdatePacket(int lobbyId, ChestLobbyData lobby, List<String> playersStillIn, Date closingTime, String newContactMan) {
+    public ChestLobbyUpdatePacket(int lobbyId, ChestLobbyData lobby, String newContactMan) {
         super(1, 1); //Min and Max supported Version
         this.lobbyId = lobbyId;
         this.lobby = lobby;
-        this.playersStillIn = playersStillIn;
-        this.closingTime = closingTime;
         this.newContactMan = newContactMan;
     }
 }

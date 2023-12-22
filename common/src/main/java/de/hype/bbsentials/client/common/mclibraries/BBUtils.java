@@ -17,5 +17,11 @@ public interface BBUtils {
 
     int getMaximumPlayerCount();
 
+    long getLobbyTime();
+
+    default int getLobbyDay() {
+        return (int) (getLobbyTime() / 24000);
+    }
+
     List<String> getPlayers();
 }

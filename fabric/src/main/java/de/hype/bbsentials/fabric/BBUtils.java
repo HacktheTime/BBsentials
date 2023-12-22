@@ -52,6 +52,9 @@ public class BBUtils implements de.hype.bbsentials.client.common.mclibraries.BBU
         return 24;
     }
 
+    public long getLobbyTime() {
+        return MinecraftClient.getInstance().world.getLevelProperties().getTimeOfDay();
+    }
     public List<String> getPlayers() {
         List<String> list = Lists.newArrayList();
         Iterator var2 = MinecraftClient.getInstance().getNetworkHandler().getPlayerList().iterator();

@@ -45,7 +45,7 @@ public class ChestLobbyData {
         setStatusNoOverride(statusBase);
     }
 
-    private void setStatusNoOverride(Object statusBase) {
+    public void setStatusNoOverride(Object statusBase) {
         if (statusBase instanceof StatusConstants) {
             StatusConstants statusConstants = (StatusConstants) statusBase;
             this.status = statusConstants.getDisplayName();

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class BBsentials {
     public static Config config;
@@ -68,16 +69,13 @@ public class BBsentials {
      * Runs the mod initializer on the client environment.
      */
 
-    public static void onServerJoin() {
-        for (int i = 0; i < onServerJoin.size(); i++) {
-            onServerJoin.remove(i).run();
-        }
-        if (!initialised) {
-            initialised = true;
-            if (Config.isBingoTime() || config.overrideBingoTime()) {
-                connectToBBserver();
+    public synchronized static void onServerJoin() {
+        onServerLeave();
+        executionService.schedule(() -> {
+            for (int i = 0; i < onServerJoin.size(); i++) {
+                onServerJoin.remove(i).run();
             }
-        }
+        }, 5, TimeUnit.SECONDS);
     }
 
     public static void onServerLeave() {
@@ -94,7 +92,11 @@ public class BBsentials {
         );
         debugThread.start();
         debugThread.setName("Debug Thread");
+        if (Config.isBingoTime() || config.overrideBingoTime()) {
+            connectToBBserver();
+        }
         splashStatusUpdateListener = new SplashStatusUpdateListener(null, null);
         EnvironmentCore.mcUtils.registerSplashOverlay();
+
     }
 }

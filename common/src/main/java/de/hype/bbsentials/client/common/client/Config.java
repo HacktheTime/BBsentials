@@ -47,6 +47,7 @@ public class Config implements Serializable {
     public boolean doDesktopNotifications = false;
     public boolean showSplashStatusUpdates = true;
     public boolean useSplashLeecherOverlayHud = true;
+    public boolean chChestHudOverlay = true;
     public boolean showMusicPants = true;
     public boolean doGammaOverride = true;
     public boolean acceptReparty;

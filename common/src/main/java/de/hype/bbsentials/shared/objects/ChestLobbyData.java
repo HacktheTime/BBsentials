@@ -15,14 +15,16 @@ public class ChestLobbyData {
     public List<ChChestData> chests = new ArrayList<>();
     public String bbcommand;
     public String extraMessage;
-    public Color color;
+    public transient Color color;
     public int lobbyId;
+    public String serverId;
     protected String status;
     protected List<String> playersStillIn = new ArrayList<>();
     protected Date closingTime;
 
-    public ChestLobbyData(Collection<ChChestData> chest, String bbcommand, String extraMessage, Object status) {
+    public ChestLobbyData(Collection<ChChestData> chest, String serverId, String bbcommand, String extraMessage, Object status) {
         chests.addAll(chest);
+        this.serverId = serverId;
         this.contactMan = chests.get(0).finder;
         this.bbcommand = bbcommand;
         this.extraMessage = extraMessage;
@@ -79,5 +81,11 @@ public class ChestLobbyData {
 
     public void onLobbyUpdate() {
         // need to be overridden
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ChestLobbyData)) return false;
+        return ((ChestLobbyData) obj).lobbyId == lobbyId;
     }
 }

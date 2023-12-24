@@ -4,7 +4,8 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.SplashManager;
-import de.hype.bbsentials.client.common.client.SplashStatusUpdateListener;
+import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
+import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
@@ -266,14 +267,14 @@ public class BBsentialConnection {
         int waitTime;
         if (packet.splash.announcer.equals(BBsentials.config.getUsername()) && BBsentials.config.autoSplashStatusUpdates) {
             Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard");
-            SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet);
-            BBsentials.splashStatusUpdateListener = splashStatusUpdateListener;
+            SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet.splash);
+            UpdateListenerManager.splashStatusUpdateListener = splashStatusUpdateListener;
             BBsentials.executionService.execute(splashStatusUpdateListener);
         }
         else {
             SplashManager.addSplash(packet);
             if (packet.splash.lessWaste) {
-                waitTime = Math.min(((EnvironmentCore.mcUtils.getPotTime() * 1000) / 80), 25 * 1000);
+                waitTime = Math.min(((EnvironmentCore.utils.getPotTime() * 1000) / 80), 25 * 1000);
             }
             else {
                 waitTime = 0;
@@ -291,6 +292,7 @@ public class BBsentialConnection {
     }
 
     public void onChChestPacket(ChChestPacket packet) {
+        UpdateListenerManager.registerChest(packet.lobby);
         if (isCommandSafe(packet.lobby.bbcommand)) {
             if (showChChest(packet.lobby.chests.get(0).items)) {
                 String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
@@ -299,7 +301,7 @@ public class BBsentialConnection {
                         .map(ChChestItem::getDisplayName)
                         .collect(Collectors.toList())
                         .toString());
-                tellrawText = tellrawText.replace("@coords", packet.lobby.chests.get(0).getCoords());
+                tellrawText = tellrawText.replace("@coords", packet.lobby.chests.get(0).coords.toString());
                 tellrawText = tellrawText.replace("@inviteCommand", packet.lobby.bbcommand);
                 if (!(packet.lobby.extraMessage == null || packet.lobby.extraMessage.isEmpty())) {
                     tellrawText = tellrawText.replace("@extramessage", " : " + packet.lobby.extraMessage);
@@ -308,8 +310,7 @@ public class BBsentialConnection {
             }
         }
         else {
-            Chat.sendPrivateMessageToSelfImportantInfo("§cFiltered out a suspicious packet! Please send a screenshot of this message with ping Hype_the_Time (hackthetime) in Bingo Apothecary, BB, SBZ, offical Hypixel,...");
-            Chat.sendPrivateMessageToSelfImportantInfo(PacketUtils.parsePacketToJson(packet));
+            Chat.sendPrivateMessageToSelfFatal("Potentially dangerous packet detected: " + PacketUtils.parsePacketToJson(packet));
         }
     }
 
@@ -390,13 +391,13 @@ public class BBsentialConnection {
 
     public void onInternalCommandPacket(InternalCommandPacket packet) {
         if (packet.command.equals(InternalCommandPacket.REQUEST_POT_DURATION)) {
-            sendPacket(new InternalCommandPacket(InternalCommandPacket.SET_POT_DURATION, new String[]{String.valueOf(EnvironmentCore.mcUtils.getPotTime())}));
+            sendPacket(new InternalCommandPacket(InternalCommandPacket.SET_POT_DURATION, new String[]{String.valueOf(EnvironmentCore.utils.getPotTime())}));
         }
         else if (packet.command.equals(InternalCommandPacket.SELFDESTRUCT)) {
             selfDestruct();
             Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated. Stopping in 10 seconds.");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-            EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
+            EnvironmentCore.utils.playsound("block.anvil.destroy");
             for (int i = 0; i < 10; i++) {
                 int finalI = i;
                 BBsentials.executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
@@ -407,7 +408,7 @@ public class BBsentialConnection {
             selfDestruct();
             Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated! Becomes effective on next launch");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-            EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
+            EnvironmentCore.utils.playsound("block.anvil.destroy");
         }
         else if (packet.command.equals(InternalCommandPacket.HUB)) {
             BBsentials.config.sender.addImmediateSendTask("/hub");
@@ -425,7 +426,7 @@ public class BBsentialConnection {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
             if (!packet.parameters[0].isEmpty()) Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
             Thread crashThread = new Thread(() -> {
-                EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
+                EnvironmentCore.utils.playsound("block.anvil.destroy");
                 for (int i = 10; i >= 0; i--) {
                     Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + i);
                     try {
@@ -465,7 +466,7 @@ public class BBsentialConnection {
             Chat.sendPrivateMessageToSelfInfo(packet.message);
         }
         if (packet.ping) {
-            EnvironmentCore.mcUtils.playsound("block.anvil.destroy");
+            EnvironmentCore.utils.playsound("block.anvil.destroy");
         }
     }
 
@@ -485,7 +486,7 @@ public class BBsentialConnection {
 
         String serverId = clientRandom + packet.serverIdSuffix;
         if (BBsentials.config.useMojangAuth) {
-            EnvironmentCore.mcUtils.mojangAuth(serverId);
+            EnvironmentCore.utils.mojangAuth(serverId);
             RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.config.getMCUUID(), clientRandom, BBsentials.getConfig().getApiVersion(), AuthenticationConstants.MOJANG);
             sendPacket(connectPacket);
         }

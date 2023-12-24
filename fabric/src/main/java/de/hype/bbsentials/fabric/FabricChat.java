@@ -17,10 +17,10 @@ public class FabricChat implements MCChat {
     public void init() {
         // Register a callback for a custom message type
 //        ClientReceiveMessageEvents.CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
-//            chat.onEvent(new Message(Text.Serializer.toJson(message), message.getString()));
+//            chat.onEvent(new Message(Text.Serialization.toJsonString(message), message.getString()));
 //        });
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, isActionBar) -> {
-            boolean block = (BBsentials.chat.processNotThreaded(new Message(Text.Serializer.toJson(message), message.getString()), isActionBar) == null);
+            boolean block = (BBsentials.chat.processNotThreaded(new Message(Text.Serialization.toJsonString(message), message.getString()), isActionBar) == null);
             return !block;
         });
         ClientReceiveMessageEvents.MODIFY_GAME.register(this::prepareOnEvent);
@@ -28,12 +28,12 @@ public class FabricChat implements MCChat {
     }
 
     public Text prepareOnEvent(Text text, boolean actionbar) {
-        String json = Text.Serializer.toJson(text);
+        String json = Text.Serialization.toJsonString(text);
         Message message = new Message(json, text.getString(), actionbar);
         if (!actionbar) {
             message = chat.onEvent(message, actionbar);
         }
-        Text toReturn = Text.Serializer.fromJson(message.getJson());
+        Text toReturn = Text.Serialization.fromJson(message.getJson());
         if (BBsentials.config.swapActionBarChat && !BBsentials.config.swapOnlyBBsentials) {
             if (!actionbar) {
                 showActionBar(message);
@@ -49,7 +49,7 @@ public class FabricChat implements MCChat {
     public void sendClientSideMessage(Message message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
-            client.player.sendMessage(Text.Serializer.fromJson(message.getJson()));
+            client.player.sendMessage(Text.Serialization.fromJson(message.getJson()));
         }
     }
 
@@ -58,7 +58,7 @@ public class FabricChat implements MCChat {
         if (client.player != null) {
             if (BBsentials.config.overwriteActionBar.isEmpty())
                 message = Message.of(BBsentials.config.overwriteActionBar);
-            client.player.sendMessage(Text.Serializer.fromJson(message.getJson()), true);
+            client.player.sendMessage(Text.Serialization.fromJson(message.getJson()), true);
         }
     }
 

@@ -233,7 +233,7 @@ public class ModInitialiser implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        EnvironmentCore core = new EnvironmentCore(new BBUtils(), new FabricChat(), new MCUtils(), new Commands(), new Options(), new DebugThread());
+        EnvironmentCore core = new EnvironmentCore(new Utils(), new FabricChat(), new Commands(), new Options(), new DebugThread());
         codes = new NumPadCodes();
         BBsentials.init();
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {

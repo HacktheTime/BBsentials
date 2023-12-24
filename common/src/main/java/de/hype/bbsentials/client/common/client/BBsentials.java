@@ -1,7 +1,9 @@
 package de.hype.bbsentials.client.common.client;
 
 import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.client.Commands.Commands;
+import de.hype.bbsentials.client.common.client.commands.Commands;
+import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
+import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
@@ -14,15 +16,14 @@ import java.util.concurrent.TimeUnit;
 public class BBsentials {
     public static Config config;
     public static BBsentialConnection connection;
-    private static boolean initialised = false;
     public static Commands coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
-    public static List<Runnable> onServerJoin = new ArrayList<>();
-    public static List<Runnable> onServerLeave = new ArrayList<>();
-    public static SplashStatusUpdateListener splashStatusUpdateListener;
+    public static List<ServerSwitchTask> onServerJoin = new ArrayList<>();
+    public static List<ServerSwitchTask> onServerLeave = new ArrayList<>();
     public static Thread bbthread;
     public static Chat chat = new Chat();
     public static Thread debugThread;
+    private static boolean initialised = false;
 
     public static Config getConfig() {
         return config;
@@ -73,15 +74,18 @@ public class BBsentials {
         onServerLeave();
         executionService.schedule(() -> {
             for (int i = 0; i < onServerJoin.size(); i++) {
-                onServerJoin.remove(i).run();
+                if (!onServerJoin.get(i).permanent) {
+                    onServerJoin.remove(i).run();
+                }
             }
         }, 5, TimeUnit.SECONDS);
     }
 
     public static void onServerLeave() {
-        Chat.sendPrivateMessageToSelfDebug(String.valueOf(EnvironmentCore.utils.getPlayerCount()));
         for (int i = 0; i < onServerLeave.size(); i++) {
-            onServerLeave.remove(i).run();
+            if (!onServerLeave.get(i).permanent) {
+                onServerLeave.remove(i).run();
+            }
         }
     }
 
@@ -94,9 +98,8 @@ public class BBsentials {
         debugThread.setName("Debug Thread");
         if (Config.isBingoTime() || config.overrideBingoTime()) {
             connectToBBserver();
+            UpdateListenerManager.init(connection);
         }
-        splashStatusUpdateListener = new SplashStatusUpdateListener(null, null);
-        EnvironmentCore.mcUtils.registerSplashOverlay();
 
     }
 }

@@ -3,6 +3,7 @@ package de.hype.bbsentials.client.common.chat;
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.Config;
+import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 
@@ -228,9 +229,9 @@ public class Chat {
             if (message.isFromReportedUser()) {
 
             }
-            else if (!EnvironmentCore.mcUtils.isWindowFocused()) {
+            else if (!EnvironmentCore.utils.isWindowFocused()) {
                 if (BBsentials.config.doDesktopNotifications) {
-                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.mcUtils.isWindowFocused() && BBsentials.config.doDesktopNotifications) {
+                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.config.doDesktopNotifications) {
                         sendNotification("BBsentials Visit-Watcher", messageUnformatted);
                     }
                     else if (message.isMsg()) {
@@ -260,7 +261,7 @@ public class Chat {
                             }
                         }
                     }
-                    if (!EnvironmentCore.mcUtils.isWindowFocused()) {
+                    if (!EnvironmentCore.utils.isWindowFocused()) {
                         sendNotification("BBsentials Party Notifier", "You got invited too a party by: " + username);
                     }
                 }
@@ -319,8 +320,8 @@ public class Chat {
                     sendCommand("/report confirm");
                 }
                 else if (messageUnformatted.startsWith("BUFF! You splashed yourself with")) {
-                    if (BBsentials.splashStatusUpdateListener != null) {
-                        BBsentials.splashStatusUpdateListener.setStatus(StatusConstants.SPLASHING);
+                    if (UpdateListenerManager.splashStatusUpdateListener != null) {
+                        UpdateListenerManager.splashStatusUpdateListener.setStatus(StatusConstants.SPLASHING);
                     }
                 }
                 else if (messageUnformatted.equals("Click here to purchase a new 6 hour pass for 10,000 Coins")) {

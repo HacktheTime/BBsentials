@@ -5,15 +5,17 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.SplashStatusUpdateListener;
+import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
+import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.ChChestItems;
 import de.hype.bbsentials.shared.constants.MiningEvents;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.ChestLobbyData;
+import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
@@ -28,7 +30,6 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.command.CommandSource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -98,19 +99,35 @@ public class Commands implements MCCommand {
             dispatcher.register(ClientCommandManager.literal("chchest")
                     .then(ClientCommandManager.argument("Item", StringArgumentType.string())
                             .suggests((context, builder) -> {
-                                String[] items = new String[]{"PrehistoricEgg", "Pickonimbus2000", "ElectronTransmitter", "FTX3070", "RobotronReflector", "ControlSwitch", "SyntheticHeart", "SuperliteMotor", "BlueGoblinEgg", "YellowGoblinEgg", "FlawlessAmberGemstone", "FlawlessJadeGemstone", "FlawlessSapphireGemstone", "FlawlessRubyGemstone", "FlawlessAmethystGemstone", "JungleHeart", "FlawlessTopazGemstone", "FlawlessJasperGemstone"};
-                                String input = builder.getRemaining().toLowerCase();
-                                int lastSemicolonIndex = input.lastIndexOf(";");
-                                List<String> suggestions = new ArrayList<>();
-                                if (lastSemicolonIndex >= 0) {
-                                    String inputBeforeSemicolon = input.substring(0, lastSemicolonIndex + 1); // Include the semicolon
-
-                                    for (String item : items) {
-                                        suggestions.add(inputBeforeSemicolon + item);
-                                    }
+                                List<String> items = ChChestItems.getAllItems().stream().map(ChChestItem::getDisplayName).toList();
+                                String inputTemporary = builder.getRemaining().replace("\"", "");
+                                int lastIndex = inputTemporary.lastIndexOf(";");
+                                boolean suggestLastQuote;
+                                if (lastIndex == -1) {
+                                    suggestLastQuote = true;
+                                    lastIndex = 0;
                                 }
+                                else {
+                                    lastIndex++;
+                                    suggestLastQuote = false;
+                                }
+                                String input = inputTemporary.substring(0, lastIndex);
+                                String currentItemSuggestionStart = input.substring(lastIndex);
+
+                                List<String> suggestions = items.stream().filter((item) -> {
+                                    return item.toLowerCase().startsWith(currentItemSuggestionStart.toLowerCase());
+                                }).map((newItem) -> {
+                                    if (suggestLastQuote) {
+                                        return "\"" + input + newItem + "\"";
+                                    }
+                                    else {
+                                        return "\"" + input + newItem;
+                                    }
+                                }).toList();
+
                                 return CommandSource.suggestMatching(suggestions, builder);
                             })
+
                             .then(ClientCommandManager.argument("X", IntegerArgumentType.integer())
                                     .then(ClientCommandManager.argument("Y", IntegerArgumentType.integer())
                                             .then(ClientCommandManager.argument("Z", IntegerArgumentType.integer())
@@ -119,9 +136,6 @@ public class Commands implements MCCommand {
                                                                 return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.getConfig().getUsername() + " bb:party me\"", "\"/p join " + BBsentials.config.getUsername() + "\""}, builder);
                                                             }))
                                                             .then(ClientCommandManager.argument("extraMessage", StringArgumentType.greedyString())
-                                                                    .suggests(((context, builder) -> {
-                                                                        return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.getConfig().getUsername() + " bb:party me\"", "\"/p join " + BBsentials.config.getUsername() + "\""}, builder);
-                                                                    }))
                                                                     .executes((context) -> {
                                                                                 String item = StringArgumentType.getString(context, "Item");
                                                                                 int x = IntegerArgumentType.getInteger(context, "X");
@@ -130,7 +144,7 @@ public class Commands implements MCCommand {
                                                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                                 String extraMessage = StringArgumentType.getString(context, "extraMessage");
 
-                                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", x + " " + y + " " + z, ChChestItems.getItem(item.split(";")))), contactWay, extraMessage, StatusConstants.OPEN)));
+                                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
                                                                                 return 1;
                                                                             }
                                                                     )
@@ -142,7 +156,7 @@ public class Commands implements MCCommand {
                                                                         int z = IntegerArgumentType.getInteger(context, "Z");
                                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
 
-                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", x + " " + y + " " + z, ChChestItems.getItem(item.split(";")))), contactWay, "", StatusConstants.OPEN)));
+                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
                                                                 return 1;
                                                                     }
                                                             )
@@ -310,9 +324,9 @@ public class Commands implements MCCommand {
                         ClientCommandManager.literal("getLeecher")
                                 .executes((context) -> {
                                     BBsentials.executionService.execute(() -> {
-                                        SplashStatusUpdateListener.showSplashOverlayOverrideDisplay = true;
-                                        Chat.sendPrivateMessageToSelfInfo("Leeching Players: " + String.join(", ", EnvironmentCore.mcUtils.getSplashLeechingPlayers()));
-                                        BBsentials.executionService.schedule(() -> SplashStatusUpdateListener.showSplashOverlayOverrideDisplay = false,
+                                        SplashStatusUpdateListener.showOverlay = true;
+                                        Chat.sendPrivateMessageToSelfInfo("Leeching Players: " + String.join(", ", EnvironmentCore.utils.getSplashLeechingPlayers()));
+                                        BBsentials.executionService.schedule(() -> SplashStatusUpdateListener.showOverlay = false,
                                                 2, TimeUnit.MINUTES);
                                     });
                                     return 1;

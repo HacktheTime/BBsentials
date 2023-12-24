@@ -20,7 +20,7 @@ public class Config implements Serializable {
     // Gson object for serialization
     private final transient Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     // File object for storing the config
-    private final transient File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
+    private final transient File CONFIG_FILE = new File(EnvironmentCore.utils.getConfigPath(), "BBsential_settings.json");
     //You can change again
     public boolean allowServerPartyInvite = true;
     public boolean devSecurity = true;
@@ -47,7 +47,7 @@ public class Config implements Serializable {
     public boolean doDesktopNotifications = false;
     public boolean showSplashStatusUpdates = true;
     public boolean useSplashLeecherOverlayHud = true;
-    public boolean chChestHudOverlay = true;
+    public boolean useChChestHudOverlay = true;
     public boolean showMusicPants = true;
     public boolean doGammaOverride = true;
     public boolean acceptReparty;
@@ -70,7 +70,7 @@ public class Config implements Serializable {
     // Load the config from file
     public static Config load() {
         Config settings;
-        File CONFIG_FILE = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsential_settings.json");
+        File CONFIG_FILE = new File(EnvironmentCore.utils.getConfigPath(), "BBsential_settings.json");
         Gson GSON = new GsonBuilder().setPrettyPrinting().create();
         if (CONFIG_FILE.exists()) {
             try {
@@ -85,7 +85,7 @@ public class Config implements Serializable {
         }
         else {
             settings = new Config(); // Use default values if the file doesn't exist
-            settings.username = EnvironmentCore.mcUtils.getUsername();
+            settings.username = EnvironmentCore.utils.getUsername();
         }
         if (!settings.hasBBRoles("dev")) {
             //Changing disallowed. doing will result in a permanent ban!
@@ -107,7 +107,7 @@ public class Config implements Serializable {
 
     // Set default attribute values
     private void setDefaults() {
-        username = EnvironmentCore.mcUtils.getUsername();
+        username = EnvironmentCore.utils.getUsername();
         acceptReparty = true;
         if (username.equals("Hype_the_Time")) {
             nickname = "Hype";
@@ -207,6 +207,6 @@ public class Config implements Serializable {
     }
 
     public String getMCUUID() {
-        return EnvironmentCore.mcUtils.getMCUUID().replace("-", "");
+        return EnvironmentCore.utils.getMCUUID().replace("-", "");
     }
 }

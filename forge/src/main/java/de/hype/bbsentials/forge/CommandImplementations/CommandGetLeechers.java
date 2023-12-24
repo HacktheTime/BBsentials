@@ -2,7 +2,7 @@ package de.hype.bbsentials.forge.CommandImplementations;
 
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.SplashStatusUpdateListener;
+import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -23,9 +23,9 @@ public class CommandGetLeechers extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        SplashStatusUpdateListener.showSplashOverlayOverrideDisplay = true;
-        Chat.sendPrivateMessageToSelfDebug("Leechers: " + String.join(", ", EnvironmentCore.mcUtils.getSplashLeechingPlayers()));
-        BBsentials.executionService.schedule(() -> SplashStatusUpdateListener.showSplashOverlayOverrideDisplay = false, 2, TimeUnit.MINUTES);
+        SplashStatusUpdateListener.showOverlay = true;
+        Chat.sendPrivateMessageToSelfDebug("Leechers: " + String.join(", ", EnvironmentCore.utils.getSplashLeechingPlayers()));
+        BBsentials.executionService.schedule(() -> SplashStatusUpdateListener.showOverlay = false, 2, TimeUnit.MINUTES);
     }
 
     @Override

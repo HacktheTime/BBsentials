@@ -8,7 +8,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 @Mod(modid = "bbsentials", useMetadata = true)
 public class ForgeMod {
@@ -19,7 +18,7 @@ public class ForgeMod {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         printLocation();
-        EnvironmentCore core = new EnvironmentCore(new BBUtils(), new ForgeChat(), new MCUtils(), new Commands(), new Options(), new DebugThread());
+        EnvironmentCore core = new EnvironmentCore(new Utils(), new ForgeChat(), new Commands(), new Options(), new DebugThread());
         BBsentials.init();
         MinecraftForge.EVENT_BUS.register(this);
     }

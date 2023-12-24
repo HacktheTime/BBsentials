@@ -40,7 +40,7 @@ public class ToDisplayConfig {
 
     // Serialize the object to JSON and save to file
     public void saveToFile() {
-        File configFile = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_display_Config.json");
+        File configFile = new File(EnvironmentCore.utils.getConfigPath(), "BBsentials_display_Config.json");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try (FileWriter writer = new FileWriter(configFile)) {
@@ -52,7 +52,7 @@ public class ToDisplayConfig {
 
     // Deserialize the object from JSON file
     public static ToDisplayConfig loadFromFile() {
-        File configFile = new File(EnvironmentCore.mcUtils.getConfigPath(), "BBsentials_display_Config.json");
+        File configFile = new File(EnvironmentCore.utils.getConfigPath(), "BBsentials_display_Config.json");
         Gson gson = new Gson();
 
         try (FileReader reader = new FileReader(configFile)) {

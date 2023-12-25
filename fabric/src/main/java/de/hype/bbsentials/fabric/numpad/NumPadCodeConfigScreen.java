@@ -65,6 +65,7 @@ public class NumPadCodeConfigScreen extends Screen {
     private void addCommand(String command, double delay) {
         TextFieldWidget commandField = new TextFieldWidget(textRenderer, width / 3, 20, Text.of(""));
         commandField.setText(command);
+        commandField.setTooltip(Tooltip.of(Text.of("/ for server commands.\n\\ for client side commands")));
         commandFields.add(commandField);
         DoubleFieldWidget delayField = new DoubleFieldWidget(textRenderer, 40, 20, Text.of(""));
         delayField.setTooltip(Tooltip.of(Text.of("Delay in seconds. Supports '.' (Double type)")));

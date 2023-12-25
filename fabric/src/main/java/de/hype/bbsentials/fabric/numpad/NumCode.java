@@ -3,6 +3,7 @@ package de.hype.bbsentials.fabric.numpad;
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +35,6 @@ public class NumCode {
         requiredPermission = "";
     }
 
-    public int pressCount() {
-        int count = commands.size() - (code.length());
-        if (count < 0) count = 0;
-        return count;
-    }
     public NumCode(String code, Formatting format, String requiredRole, Runnable toPerform) {
         this.commands = new ArrayList<>();
         this.code = code;
@@ -48,6 +44,12 @@ public class NumCode {
         codeIsTransient = true;
     }
 
+    public int pressCount() {
+        int count = commands.size() - (code.length());
+        if (count < 0) count = 0;
+        return count;
+    }
+
     public void execute() {
         if (!BBsentials.config.hasBBRoles(requiredPermission)) {
             Chat.sendPrivateMessageToSelfError("You don't have the required permissions to run '" + code + "' ! (Required: '" + requiredPermission + "')");
@@ -55,7 +57,16 @@ public class NumCode {
         }
         if (!commands.isEmpty()) {
             for (int i = 0; i < commands.size(); i++) {
-                BBsentials.config.sender.addHiddenSendTask(commands.get(i), commandDelay.get(i));
+                String command = commands.get(i);
+                if (command.startsWith("\\")) {
+                    if (ClientCommandInternals.executeCommand(command.replaceFirst("\\\\", ""))) {
+                        Chat.sendPrivateMessageToSelfSuccess("Code '" + code + "': Success");
+                    }
+                    else {
+                        Chat.sendPrivateMessageToSelfError("Code '" + code + "': Error Occurd. \nCommand: " + command);
+                    }
+                }
+                else BBsentials.config.sender.addHiddenSendTask(commands.get(i), commandDelay.get(i));
             }
         }
         else {
@@ -70,7 +81,6 @@ public class NumCode {
                 e.printStackTrace();
             }
         }
-        Chat.sendPrivateMessageToSelfInfo("'" + code + "' executed.");
     }
 
     @Override

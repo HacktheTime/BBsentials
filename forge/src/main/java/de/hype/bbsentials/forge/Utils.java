@@ -20,13 +20,13 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.Display;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -198,6 +198,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(new ChatComponentText("§6Status: §0" + status + "§6 | Slots: " + warpInfo + "§6"));
+                Date warpClosingDate = new Date(360000 - (EnvironmentCore.utils.getLobbyTime() * 50));
+                toRender.add(new ChatComponentText("§6Closing in " + warpClosingDate.getHours() + "h ," + warpClosingDate.getMinutes() + "m"));
             }
             else {
                 toRender.add(new ChatComponentText("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
@@ -213,11 +215,6 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-    }
-
-    @Override
-    public void registerOverlays() {
-        FMLCommonHandler.instance().bus().register(this);
     }
 
     public Islands getCurrentIsland() {

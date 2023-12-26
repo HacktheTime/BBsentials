@@ -43,5 +43,4 @@ public interface Utils {
     // Leechers was originally inveneted by Calva but redone by me without access to the code, I made it since Calvas mod was private at that date
     List<String> getSplashLeechingPlayers();
 
-    void registerOverlays();
 }

@@ -191,6 +191,41 @@ public class Commands implements MCCommand {
                             )
             );
         });/*BingoChatLong*/
+//        event.register((dispatcher, registryAccess) -> {
+//            dispatcher.register(ClientCommandManager.literal("p")
+//                    .then(ClientCommandManager.argument("subcommand", StringArgumentType.word())
+//                            .suggests((context, builder) -> {
+//                                // Your custom suggestions logic
+//                                String input = builder.getRemaining().toLowerCase();
+//
+//                                if (input.startsWith("w")) {
+//                                    builder.suggest("warp");
+//                                }
+//
+//                                if (input.startsWith("d")) {
+//                                    builder.suggest("disband");
+//                                }
+//
+//                                return builder.buildFuture();
+//                            })
+//                            .executes(context -> {
+//                                String subcommand = StringArgumentType.getString(context, "subcommand");
+//
+//                                switch (subcommand) {
+//                                    case "warp":
+//                                        context.getSource().sendFeedback(Text.of("Teleporting to warp..."));
+//                                        break;
+//                                    case "disband":
+//                                        context.getSource().sendFeedback(Text.of("Disbanding the group..."));
+//                                        break;
+//                                    default:
+//                                        context.getSource().sendError(Text.of("Unknown subcommand: " + subcommand));
+//                                        break;
+//                                }
+//
+//                                return 1;
+//                            })));
+//        });
     }
 
     public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher, boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {

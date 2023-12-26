@@ -18,10 +18,8 @@ public class UpdateListenerManager {
 
     public static void init(BBsentialConnection connestion) {
         splashStatusUpdateListener = new SplashStatusUpdateListener(connestion, null);
-        EnvironmentCore.utils.registerOverlays();
         lobbies = new ArrayList<>();
         chChestUpdateListener = new ChChestUpdateListener(connestion, null);
-        EnvironmentCore.utils.registerOverlays();
         BBsentials.onServerJoin.add(new ServerSwitchTask(() -> permanentCheck()));
     }
 

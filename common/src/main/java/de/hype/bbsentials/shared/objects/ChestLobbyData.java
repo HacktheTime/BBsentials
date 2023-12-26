@@ -31,6 +31,7 @@ public class ChestLobbyData {
         setStatusNoOverride(status);
     }
 
+
     public ChChestPacket getAsPacket() {
         return new ChChestPacket(this);
     }

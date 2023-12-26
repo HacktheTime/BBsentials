@@ -35,6 +35,6 @@ public class Position {
     public boolean equals(Object obj) {
         if (!(obj instanceof Position)) return false;
         Position pos2 = ((Position) obj);
-        return (pos2.x == x && pos2.y == y && pos2.z == y);
+        return (pos2.x == x && pos2.y == y && pos2.z == z);
     }
 }

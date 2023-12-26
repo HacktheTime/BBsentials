@@ -16,7 +16,6 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     }
 
     public void onNumpadCode() {
-
     }
 
     public void doOnce() {

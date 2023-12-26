@@ -10,7 +10,6 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -27,6 +26,7 @@ import net.minecraft.util.Identifier;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -47,6 +47,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             return false;
         }
     }
+
 
     public boolean isWindowFocused() {
         return MinecraftClient.getInstance().isWindowFocused();
@@ -139,11 +140,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
     }
 
-    public void registerOverlays() {
-        HudRenderCallback.EVENT.register(this::renderOverlays);
-    }
-
-    private void renderOverlays(DrawContext drawContext, float v) {
+    public void renderOverlays(DrawContext drawContext, float v) {
         if (UpdateListenerManager.splashStatusUpdateListener.showOverlay()) {
             // Set the starting position for the overlay
             int x = 10;
@@ -191,13 +188,16 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             List<Text> toRender = new ArrayList<>();
             if (listener.isHoster) {
                 String status = listener.lobby.getStatus();
-                switch (listener.lobby.getStatus()) {
+                switch (status) {
                     case "Open":
                         status = "§aOpen";
+                        break;
                     case "Closed":
                         status = "§4Closed";
+                        break;
                     case "Full":
                         status = "Full";
+                        break;
                 }
                 String warpInfo = "§cFull";
                 int playerThatCanBeWarped = EnvironmentCore.utils.getMaximumPlayerCount() - EnvironmentCore.utils.getPlayerCount();
@@ -205,7 +205,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                     warpInfo = "§a(" + playerThatCanBeWarped + ")";
                 }
 
-                toRender.add(Text.of("§6Status: §0" + status + "§6 | Slots: " + warpInfo + "§6"));
+                toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
+                Date warpClosingDate = new Date(360000 - (EnvironmentCore.utils.getLobbyTime() * 50));
+                toRender.add(Text.of("§6Closing in " + warpClosingDate.getHours() + "h | " + warpClosingDate.getMinutes() + "m"));
             }
             else {
                 toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
@@ -265,6 +267,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public long getLobbyTime() {
-        return MinecraftClient.getInstance().world.getLevelProperties().getTimeOfDay();
+        return MinecraftClient.getInstance().world.getLevelProperties().getTime();
     }
+
 }

@@ -68,7 +68,7 @@ public class ChChestUpdateListener extends UpdateListener {
         } catch (SQLException e) {
             //never thrown lol
         }
-        connection.sendPacket(new ChestLobbyUpdatePacket(lobby.lobbyId, lobby, null));
+        connection.sendPacket(new ChestLobbyUpdatePacket(lobby));
     }
 
     public List<ChChestData> getUnopenedChests() {
@@ -78,5 +78,9 @@ public class ChChestUpdateListener extends UpdateListener {
             if (!chestsOpened.contains(chest.coords)) unopened.add(chest);
         }
         return unopened;
+    }
+
+    public void addOpenedChest(Position pos) {
+        chestsOpened.add(pos);
     }
 }

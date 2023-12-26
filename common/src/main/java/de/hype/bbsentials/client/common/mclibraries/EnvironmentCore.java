@@ -8,12 +8,14 @@ public class EnvironmentCore {
     public static Utils utils;
     public static MCChat chat;
     public static Options mcoptions;
+    public static MCEvents mcevents;
     public static DebugThread debug;
 
-    public EnvironmentCore(Utils utils, MCChat chat, MCCommand commands, Options options, DebugThread debug) {
+    public EnvironmentCore(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug) {
         EnvironmentCore.utils = utils;
         EnvironmentCore.chat = chat;
         EnvironmentCore.commands = commands;
+        EnvironmentCore.mcevents = events;
         EnvironmentCore.mcoptions = options;
         EnvironmentCore.debug=debug;
     }

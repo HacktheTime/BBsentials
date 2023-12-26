@@ -99,6 +99,7 @@ public class BBsentials {
         if (Config.isBingoTime() || config.overrideBingoTime()) {
             connectToBBserver();
             UpdateListenerManager.init(connection);
+            EnvironmentCore.mcevents.registerAll();
         }
 
     }

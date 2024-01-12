@@ -16,11 +16,11 @@ public class UpdateListenerManager {
     public static ChChestUpdateListener chChestUpdateListener;
     public static List<ChestLobbyData> lobbies;
 
-    public static void init(BBsentialConnection connestion) {
-        splashStatusUpdateListener = new SplashStatusUpdateListener(connestion, null);
+    public static void init() {
+        splashStatusUpdateListener = new SplashStatusUpdateListener(null);
         lobbies = new ArrayList<>();
-        chChestUpdateListener = new ChChestUpdateListener(connestion, null);
-        ServerSwitchTask.onServerJoinTask(() -> permanentCheck());
+        chChestUpdateListener = new ChChestUpdateListener(null);
+        ServerSwitchTask.onServerJoinTask(UpdateListenerManager::permanentCheck,true);
     }
 
     public static void permanentCheck() {
@@ -28,7 +28,7 @@ public class UpdateListenerManager {
             String serverId = EnvironmentCore.utils.getServerId();
             int index = lobbies.stream().map((lobby) -> lobby.serverId).collect(Collectors.toList()).indexOf(serverId);
             if (index != -1) {
-                chChestUpdateListener = new ChChestUpdateListener(connection, lobbies.get(index));
+                chChestUpdateListener = new ChChestUpdateListener(lobbies.get(index));
                 chChestUpdateListener.run();
             }
         });

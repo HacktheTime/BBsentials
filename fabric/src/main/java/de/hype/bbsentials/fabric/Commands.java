@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
@@ -30,6 +29,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.command.CommandSource;
+import net.minecraft.text.Text;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Commands implements MCCommand {
     Event<ClientCommandRegistrationCallback> event = ClientCommandRegistrationCallback.EVENT;
+
     private static void simpleCommand(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, String[] parameters) {
         dispatcher.register(
                 ClientCommandManager.literal(commandName)
@@ -144,7 +145,11 @@ public class Commands implements MCCommand {
                                                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                                 String extraMessage = StringArgumentType.getString(context, "extraMessage");
 
-                                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
+                                                                                if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
+                                                                                    context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
+                                                                                    return 1;
+                                                                                }
+                                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
                                                                                 return 1;
                                                                             }
                                                                     )
@@ -155,9 +160,12 @@ public class Commands implements MCCommand {
                                                                         int y = IntegerArgumentType.getInteger(context, "Y");
                                                                         int z = IntegerArgumentType.getInteger(context, "Z");
                                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
-
-                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
-                                                                return 1;
+                                                                if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
+                                                                    context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
+                                                                    return 1;
+                                                                }
+                                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
+                                                                        return 1;
                                                                     }
                                                             )
                                                     )

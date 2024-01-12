@@ -20,7 +20,7 @@ public class ChestLobbyData {
     public String serverId;
     protected String status;
     protected List<String> playersStillIn = new ArrayList<>();
-    protected Date closingTime;
+    protected Long closingTime;
 
     public ChestLobbyData(Collection<ChChestData> chest, String serverId, String bbcommand, String extraMessage, Object status) {
         chests.addAll(chest);
@@ -70,7 +70,7 @@ public class ChestLobbyData {
         contactMan = newContactMan;
     }
 
-    public void setLobbyMetaData(List<String> playersStillIn, Date closingTime) throws SQLException {
+    public void setLobbyMetaData(List<String> playersStillIn, Long closingTime) throws SQLException {
         if (playersStillIn != null) {
             this.playersStillIn = playersStillIn;
         }

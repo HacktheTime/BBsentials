@@ -11,12 +11,13 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
-import de.hype.bbsentials.shared.objects.Waypoints;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import kotlin.Unit;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -30,7 +31,6 @@ import net.minecraft.util.math.BlockPos;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -52,6 +52,24 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
     }
 
+    public static void renderWaypoints(WorldRenderLastEvent event) {
+        BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
+        List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
+        if (!waypoints.isEmpty()) {
+            RenderInWorldContext.renderInWorld(event, (it) -> {
+                for (Waypoints waypoint : waypoints) {
+                    BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
+                    if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
+                    it.color(0f, 1f, 0f, 0.2f);
+                    it.block(pos);
+                    it.color(1f, 0f, 0f, 1f);
+                    it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                }
+                return Unit.INSTANCE;
+            });
+        }
+//        WorldRenderLastEvent.Companion.publish(event);
+    }
 
     public boolean isWindowFocused() {
         return MinecraftClient.getInstance().isWindowFocused();
@@ -222,8 +240,13 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                Date warpClosingDate = new Date(360000 - (EnvironmentCore.utils.getLobbyTime() * 50));
-                toRender.add(Text.of("§6Closing in " + warpClosingDate.getHours() + "h | " + warpClosingDate.getMinutes() + "m"));
+                long closingTimeInMinutes = ((360000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
+                if (closingTimeInMinutes <= 0) {
+                    toRender.add(Text.of("§4Lobby Closed"));
+                }
+                else {
+                    toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
+                }
             }
             else {
                 toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
@@ -260,7 +283,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public String getServerId() {
-        return MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-c").getDisplayName().getString().replace("Server:", "").trim();
+        PlayerListEntry entry = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-c");
+        if (entry==null) return null;
+        return entry.getDisplayName().getString().replace("Server:", "").trim();
     }
 
     public boolean isOnMegaServer() {
@@ -283,24 +308,6 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public long getLobbyTime() {
-        return MinecraftClient.getInstance().world.getLevelProperties().getTime();
-    }
-    public static void renderWaypoints(WorldRenderLastEvent event){
-        BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
-        List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint)->waypoint.visible).toList();
-        if (!waypoints.isEmpty()) {
-            RenderInWorldContext.renderInWorld(event, (it) -> {
-                for (Waypoints waypoint : waypoints) {
-                    BlockPos pos = new BlockPos(waypoint.position.x,waypoint.position.y,waypoint.position.z);
-                    if (playerPos.toCenterPos().distanceTo(pos.toCenterPos())>=waypoint.renderDistance) continue;
-                    it.color(0f, 1f, 0f, 0.2f);
-                    it.block(pos);
-                    it.color(1f, 0f, 0f, 1f);
-                    it.waypoint(pos,Text.Serialization.fromJson(waypoint.jsonToRenderText));
-                }
-                return Unit.INSTANCE;
-            });
-        }
-//        WorldRenderLastEvent.Companion.publish(event);
+        return MinecraftClient.getInstance().world.getLevelProperties().getTimeOfDay();
     }
 }

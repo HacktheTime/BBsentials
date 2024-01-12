@@ -90,19 +90,21 @@ public class BBsentials {
     public synchronized static void onServerJoin() {
         onServerLeave();
         executionService.schedule(() -> {
-            for (int i = 0; i < onServerJoin.size(); i++) {
-                if (!onServerJoin.get(i).permanent) {
-                    onServerJoin.remove(i).run();
+            for (ServerSwitchTask task : onServerJoin.values()) {
+                if (!task.permanent) {
+                    onServerJoin.remove(task.getId());
                 }
+                task.run();
             }
         }, 5, TimeUnit.SECONDS);
     }
 
     public static void onServerLeave() {
-        for (int i = 0; i < onServerLeave.size(); i++) {
-            if (!onServerLeave.get(i).permanent) {
-                onServerLeave.remove(i).run();
+        for (ServerSwitchTask task : onServerLeave.values()) {
+            if (!task.permanent) {
+                onServerLeave.remove(task.getId()).run();
             }
+            task.run();
         }
     }
 
@@ -115,7 +117,7 @@ public class BBsentials {
         debugThread.setName("Debug Thread");
         if (GeneralConfig.isBingoTime() || bbServerConfig.overrideBingoTime) {
             connectToBBserver();
-            UpdateListenerManager.init(connection);
+            UpdateListenerManager.init();
             EnvironmentCore.mcevents.registerAll();
         }
 

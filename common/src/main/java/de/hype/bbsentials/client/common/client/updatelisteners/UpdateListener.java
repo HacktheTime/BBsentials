@@ -1,5 +1,6 @@
 package de.hype.bbsentials.client.common.client.updatelisteners;
 
+import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -7,10 +8,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class UpdateListener implements Runnable {
     public boolean showOverlay = false;
     AtomicBoolean isInLobby = new AtomicBoolean(false);
-    BBsentialConnection connection;
 
-    public UpdateListener(BBsentialConnection connection) {
-        this.connection = connection;
+    public UpdateListener() {
     }
 
     public boolean showOverlay() {
@@ -21,4 +20,8 @@ public abstract class UpdateListener implements Runnable {
     public abstract void run();
 
     public abstract boolean allowOverlayOverall();
+
+    public BBsentialConnection getConnection(){
+        return BBsentials.connection;
+    }
 }

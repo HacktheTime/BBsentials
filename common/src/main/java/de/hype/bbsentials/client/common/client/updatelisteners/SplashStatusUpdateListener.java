@@ -15,8 +15,7 @@ public class SplashStatusUpdateListener extends UpdateListener {
     public boolean full = false;
     SplashData data;
 
-    public SplashStatusUpdateListener(BBsentialConnection connection, SplashData data) {
-        super(connection);
+    public SplashStatusUpdateListener(SplashData data) {
         this.data = data;
     }
 
@@ -48,7 +47,7 @@ public class SplashStatusUpdateListener extends UpdateListener {
     }
 
     public void setStatus(StatusConstants newStatus) {
-        if (!data.status.equals(newStatus)) connection.sendPacket(new SplashUpdatePacket(data.splashId, newStatus));
+        if (!data.status.equals(newStatus)) getConnection().sendPacket(new SplashUpdatePacket(data.splashId, newStatus));
         if (newStatus.equals(StatusConstants.SPLASHING)) {
             splashed = true;
             BBsentials.executionService.schedule(() -> {

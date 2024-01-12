@@ -2,17 +2,18 @@ package de.hype.bbsentials.client.common.client.updatelisteners;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
-import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.ChestLobbyData;
 import de.hype.bbsentials.shared.objects.Position;
-import de.hype.bbsentials.shared.objects.Waypoints;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ChChestUpdateListener extends UpdateListener {
     public ChestLobbyData lobby;
@@ -20,8 +21,7 @@ public class ChChestUpdateListener extends UpdateListener {
     List<Position> chestsOpened = new ArrayList<>();
     Map<Position, Waypoints> waypoints = new HashMap<>();
 
-    public ChChestUpdateListener(BBsentialConnection connection, ChestLobbyData lobby) {
-        super(connection);
+    public ChChestUpdateListener(ChestLobbyData lobby) {
         if (lobby == null) return;
         this.lobby = lobby;
         isHoster = (lobby.contactMan.equalsIgnoreCase(BBsentials.generalConfig.getUsername()));
@@ -33,13 +33,16 @@ public class ChChestUpdateListener extends UpdateListener {
     }
 
     public void setWaypoints() {
+        if (!BBsentials.chChestConfig.addWaypointForChests || lobby == null) return;
         for (ChChestData chest : lobby.chests) {
             Waypoints waypoint = waypoints.get(chest.coords);
-            if (waypoint != null) return;
-            Waypoints newpoint = new Waypoints(chest.coords, "", 1000, true, true, "", "");
-            if (chestsOpened.contains(chest.coords)){
-                newpoint.visible=false;
+            boolean shouldDisplay = !chestsOpened.contains(chest.coords);
+            if (waypoint != null) {
+                waypoint.visible = shouldDisplay;
+                continue;
             }
+            List<String> chestItems = Arrays.stream(chest.items).map(ChChestItem::getDisplayName).collect(Collectors.toList());
+            Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + String.join(", ", chestItems.subList(0, Math.min(chestItems.size(), 3))) + "\"}", 1000, shouldDisplay, true, "", "");
             waypoints.put(newpoint.position, newpoint);
         }
     }
@@ -52,7 +55,7 @@ public class ChChestUpdateListener extends UpdateListener {
         setWaypoints();
         //(15mc days * 20 min day * 60 to seconds * 20 to ticks) -> 360000 | 1s 1000ms 1000/20 for ms for 1 tick.
         try {
-            lobby.setLobbyMetaData(null, new Date(System.currentTimeMillis() + (360000 - EnvironmentCore.utils.getLobbyTime()) / 50));
+            lobby.setLobbyMetaData(null, ((360000 - EnvironmentCore.utils.getLobbyTime()) / 50));
         } catch (SQLException ignored) {
             //never thrown lol
         }
@@ -77,12 +80,13 @@ public class ChChestUpdateListener extends UpdateListener {
     }
 
     public void setStatus(StatusConstants newStatus) {
+        if (lobby.getStatus().equals(newStatus.getDisplayName())) return;
         try {
             lobby.setStatus(newStatus);
         } catch (SQLException e) {
             //never thrown lol
         }
-        connection.sendPacket(new ChestLobbyUpdatePacket(lobby));
+        getConnection().sendPacket(new ChestLobbyUpdatePacket(lobby));
     }
 
     public List<ChChestData> getUnopenedChests() {
@@ -95,7 +99,9 @@ public class ChChestUpdateListener extends UpdateListener {
     }
 
     public void addOpenedChest(Position pos) {
-        chestsOpened.add(pos);
-        setWaypoints();
+        BBsentials.executionService.execute(()->{
+            chestsOpened.add(pos);
+            setWaypoints();
+        });
     }
 }

@@ -260,7 +260,7 @@ public class BBsentialConnection {
         int waitTime;
         if (packet.splash.announcer.equals(BBsentials.generalConfig.getUsername()) && BBsentials.splashConfig.autoSplashStatusUpdates) {
             Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard");
-            SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet.splash);
+            SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(packet.splash);
             UpdateListenerManager.splashStatusUpdateListener = splashStatusUpdateListener;
             BBsentials.executionService.execute(splashStatusUpdateListener);
         }

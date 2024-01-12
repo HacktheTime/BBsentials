@@ -120,6 +120,7 @@ public class NumPadCodes {
         List<NumCode> defaultCodes = new ArrayList();
         defaultCodes.add((new NumCode("042", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new NumPadCodesConfigScreen(this))))));
         defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, "dev", () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
+        defaultCodes.add((new NumCode("04", "/visit portal_hub")));
         defaultCodes.add((new NumCode("11", "/l")));
         if (all) {
             numCodes.addAll(defaultCodes);

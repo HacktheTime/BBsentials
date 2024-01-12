@@ -99,7 +99,7 @@ public class ModInitialiser implements ClientModInitializer {
                                 connectToBBserver(true);
                                 return 1;
                             }))
-                    .then(ClientCommandManager.literal("configManager")
+                    .then(ClientCommandManager.literal("config")
                             .then(ClientCommandManager.argument("category", StringArgumentType.string())
                                     .suggests((context, builder) -> {
                                         // Provide tab-completion options for configManager subfolder
@@ -124,7 +124,7 @@ public class ModInitialiser implements ClientModInitializer {
                                     .then(ClientCommandManager.argument("className", StringArgumentType.string())
                                             .suggests((context, builder) -> {
                                                 // Provide tab-completion options for classes
-                                                List<String> classNames = AToLoadBBsentialsConfigUtils.getAnnotatedClasses().stream().map(Class::getName).toList();
+                                                List<String> classNames = AToLoadBBsentialsConfigUtils.getAnnotatedClasses().stream().map(Class::getSimpleName).toList();
                                                 // Replace with your own logic to retrieve class names
                                                 return CommandSource.suggestMatching(classNames, builder);
                                             })
@@ -163,8 +163,7 @@ public class ModInitialiser implements ClientModInitializer {
                                     .then(ClientCommandManager.argument("className", StringArgumentType.string())
                                             .suggests((context, builder) -> {
                                                 // Provide tab-completion options for classes
-                                                ArrayList<String> classNames = new ArrayList<>();
-                                                classNames.add("ConfigManager");
+                                                List<String> classNames = AToLoadBBsentialsConfigUtils.getAnnotatedClasses().stream().map(Class::getSimpleName).toList();
                                                 // Replace with your own logic to retrieve class names
                                                 return CommandSource.suggestMatching(classNames, builder);
                                             })
@@ -172,7 +171,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                     .suggests((context, builder) -> {
                                                         // Provide tab-completion options for variable names
                                                         List<String> variableNames;
-                                                        variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", "ConfigManager"));
+                                                        variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", StringArgumentType.getString(context, "className")));
                                                         return CommandSource.suggestMatching(variableNames, builder);
                                                     })
                                                     .executes((context) -> {

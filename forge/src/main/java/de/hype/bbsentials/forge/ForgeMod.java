@@ -19,8 +19,8 @@ public class ForgeMod {
     public void init(FMLInitializationEvent event) {
         printLocation();
         EnvironmentCore core = new EnvironmentCore(new Utils(), new MCEvents(), new ForgeChat(), new Commands(), new Options(), new DebugThread());
-        BBsentials.init();
         MinecraftForge.EVENT_BUS.register(this);
+        BBsentials.init();
     }
     public void printLocation() {
 //        try {

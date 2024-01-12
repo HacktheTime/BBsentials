@@ -11,6 +11,7 @@ pluginManagement {
         maven("https://repo.sk1er.club/repository/maven-releases/")
         maven("https://maven.wagyourtail.xyz/releases")
         maven("https://maven.wagyourtail.xyz/snapshots")
+        maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     }
     resolutionStrategy {
         eachPlugin {
@@ -22,7 +23,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.6.0")
+    id("org.gradle.toolchains.foojay-resolver-convention") version ("0.6.0")
 }
 
 

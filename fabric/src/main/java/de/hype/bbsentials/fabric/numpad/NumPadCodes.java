@@ -97,12 +97,12 @@ public class NumPadCodes {
                             actionbarText = Formatting.GOLD + enteredCode + " (" + count + ")";
                         }
                     }
-                    BBsentials.config.overwriteActionBar = actionbarText;
+                    BBsentials.funConfig.overwriteActionBar = actionbarText;
                     overidedActionBar = true;
                     EnvironmentCore.chat.showActionBar(Message.of(actionbarText));
                 }
                 else if (overidedActionBar) {
-                    BBsentials.config.overwriteActionBar = "";
+                    BBsentials.funConfig.overwriteActionBar = "";
                     overidedActionBar = false;
                     EnvironmentCore.chat.showActionBar(Message.of(""));
                 }

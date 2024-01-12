@@ -1,6 +1,16 @@
 [versions]
+modVersion = "1.0"
+kotlinVersion = "1.9.0"
 apache_httpcomponents = "4.5.13"
 lwjglModern = "3.3.3"
+
+minecraft_versionSupported = "1.20.*"
+
+modern_minecraft = "1.20.4"
+modern_yarn = "1.20.4+build.3"
+modern_fabric_loader = "0.15.3"
+modern_fabric_api = "0.92.0+1.20.4"
+
 
 legacy_mcp = "22-1.8.9"
 legacy_minecraft = "1.8.9"
@@ -8,10 +18,6 @@ legacy_forge = "1.8.9-11.15.1.2318-1.8.9"
 legacy_mixin_rt = "0.7.11-SNAPSHOT"
 legacy_mixin_processor = "0.8.5-SNAPSHOT"
 
-modern_minecraft = "1.20.4"
-modern_yarn = "1.20.4+build.3"
-modern_fabric_loader = "0.15.3"
-modern_fabric_api = "0.92.0+1.20.4"
 modmenu = "9.0.0"
 cloth = "13.0.121"
 
@@ -32,7 +38,7 @@ legacy_mixin_processor = { module = "org.spongepowered:mixin", version.ref = "le
 legacy_devauth = { module = "me.djtheredstoner:DevAuth-forge-legacy", version.ref = "devauth" }
 legacy_moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
 
-
+modern_devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
 modern_minecraft = { module = "com.mojang:minecraft", version.ref = "modern_minecraft" }
 modern_fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "modern_fabric_loader" }
 modern_fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "modern_fabric_api" }

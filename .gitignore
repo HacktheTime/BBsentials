@@ -17,12 +17,12 @@ logs
 !.idea/copyright/*
 !.idea/scopes/*
 /run/usercache.json
-/run/config/*
-/run/config/
+/run/configManager/*
+/run/configManager/
 /run/saves/temp
 /run/saves/temp/*
 /run/saves
 /runforge/.mixin.out/*
 /run/servers.dat
 /run/servers.dat_old
-/runforge/config/splash.properties
+/runforge/configManager/splash.properties

@@ -12,8 +12,9 @@ public class PartyPacket extends AbstractPacket {
     /**
      * @param type  Party Command Type {@link PartyConstants}
      * @param users users is just a reference for what behind the type.
+     * @param serverBypass true when server did verification for example when hosting bingo party.
      */
-    public PartyPacket(PartyConstants type, String[] users) {
+    public PartyPacket(PartyConstants type, String[] users, boolean serverBypass ) {
         super(1, 1); //Min and Max supportet Version
         this.type = type;
         this.users = users;

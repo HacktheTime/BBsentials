@@ -4,8 +4,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.Config;
+import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
+import de.hype.bbsentials.client.common.config.AToLoadBBsentialsConfigUtils;
+import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -17,6 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,7 +50,7 @@ public class ModInitialiser implements ClientModInitializer {
                                         //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":true,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the username"}],"text":"$username"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"run_command","click_event_value":"/p invite $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to party player"}],"text":"[Party]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"run_command","click_event_value":"/socialoptions sb $username $message","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to open the SB options"}],"text":"[SB Options]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_aqua","insertion":"","click_event_type":"run_command","click_event_value":"/g member $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Show guild info about the user."}],"text":"[Member info]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$messagecontent","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the message content"}],"text":"[Copy content]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$message","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the exact message"}],"text":"[Copy message]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_purple","insertion":"","click_event_type":"suggest_command","click_event_value":"/msg $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to msg the user"}],"text":"[Msg]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"suggest_command","click_event_value":"/ignore add $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to ignore add the user"}],"text":"[Ignore add]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"\n"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_red","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"G Admin: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_purple","insertion":"","click_event_type":"suggest_command","click_event_value":"/g kick $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"suggest the command to kick the user"}],"text":"[kick]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"suggest_command","click_event_value":"/g mute $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Suggest a mute command for the user."}],"text":"[mute]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_green","insertion":"","click_event_type":"suggest_command","click_event_value":"/g promote $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to promote the user"}],"text":"[promote]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"suggest_command","click_event_value":"/g demote $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to demote the user"}],"text":"[demote]"}],"command":"%s","jtemplate":"tellraw"}
                                     }
                                     else if (parameters[0].equals("party")) {
-                                        if (BBsentials.config.isPartyLeader()) {
+                                        if (partyConfig.isPartyLeader) {
                                             tellrawjson = "[\"\",{\"text\":\"\n\n$username\",\"underlined\":true,\"color\":\"blue\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"$username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"Click to copy the username\",\"color\":\"blue\"}]}},\" \",{\"text\":\"[Party]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p invite $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to party player\"]}},\" \",{\"text\":\"[SB Options]\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/socialoptions sb $username $message\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to open the SB options\"]}},\" \",{\"text\":\"[Copy content]\",\"color\":\"gray\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"$messagecontent\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to copy the message content\"]}},\" \",{\"text\":\"[Copy message]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"$message\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to copy the exact message\"]}},\" \",{\"text\":\"[Msg]\",\"color\":\"dark_purple\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/msg $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to msg the user\"]}},\" \",{\"text\":\"[Ignore add]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/ignore add $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to ignore add the user\"]}},\"\\n\",\"\\n\",{\"text\":\"P Leader: \",\"color\":\"dark_red\"},{\"text\":\"[kick]\",\"color\":\"dark_purple\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p kick $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"suggest the command to kick the user\"]}},\" \",{\"text\":\"[transfer]\",\"color\":\"dark_red\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/p transfer $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Suggest a mute command for the user.\"]}},\" \",{\"text\":\"[promote]\",\"color\":\"dark_green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p promote $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to promote the user\"]}},\" \",{\"text\":\"[demote]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p demote $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to demote the user\"]}}]";
                                             //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":true,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the username"}],"text":"$username"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"run_command","click_event_value":"/p invite $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to party player"}],"text":"[Party]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"run_command","click_event_value":"/socialoptions sb $username $message","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to open the SB options"}],"text":"[SB Options]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$messagecontent","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the message content"}],"text":"[Copy content]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$message","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the exact message"}],"text":"[Copy message]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_purple","insertion":"","click_event_type":"suggest_command","click_event_value":"/msg $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to msg the user"}],"text":"[Msg]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"suggest_command","click_event_value":"/ignore add $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to ignore add the user"}],"text":"[Ignore add]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"\n"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"\n"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_red","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"P Leader: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_purple","insertion":"","click_event_type":"run_command","click_event_value":"/p kick $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"suggest the command to kick the user"}],"text":"[kick]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_red","insertion":"","click_event_type":"suggest_command","click_event_value":"/p transfer $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Suggest a mute command for the user."}],"text":"[transfer]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_green","insertion":"","click_event_type":"run_command","click_event_value":"/p promote $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to promote the user"}],"text":"[promote]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"run_command","click_event_value":"/p demote $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to demote the user"}],"text":"[demote]"}],"command":"%s","jtemplate":"tellraw"}
                                         }
@@ -95,20 +99,20 @@ public class ModInitialiser implements ClientModInitializer {
                                 connectToBBserver(true);
                                 return 1;
                             }))
-                    .then(ClientCommandManager.literal("config")
+                    .then(ClientCommandManager.literal("configManager")
                             .then(ClientCommandManager.argument("category", StringArgumentType.string())
                                     .suggests((context, builder) -> {
-                                        // Provide tab-completion options for config subfolder
+                                        // Provide tab-completion options for configManager subfolder
                                         return CommandSource.suggestMatching(new String[]{"save", "reset", "load"}, builder);
                                     }).executes((context) -> {
                                         String category = StringArgumentType.getString(context, "category");
                                         switch (category) {
                                             case "save":
-                                                getConfig().save();
-                                                Chat.sendPrivateMessageToSelfSuccess("Saved config successfully");
+                                                ConfigManager.saveAll();
+                                                Chat.sendPrivateMessageToSelfSuccess("Saved configManager successfully");
                                                 break;
                                             case "load":
-                                                config = Config.load();
+                                                ConfigManager.loadConfigs();
                                                 break;
                                             case "reset":
                                                 // Reset logic here
@@ -120,16 +124,19 @@ public class ModInitialiser implements ClientModInitializer {
                                     .then(ClientCommandManager.argument("className", StringArgumentType.string())
                                             .suggests((context, builder) -> {
                                                 // Provide tab-completion options for classes
-                                                ArrayList<String> classNames = new ArrayList<>();
-                                                classNames.add("Config");
+                                                List<String> classNames = AToLoadBBsentialsConfigUtils.getAnnotatedClasses().stream().map(Class::getName).toList();
                                                 // Replace with your own logic to retrieve class names
                                                 return CommandSource.suggestMatching(classNames, builder);
                                             })
                                             .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
                                                     .suggests((context, builder) -> {
                                                         // Provide tab-completion options for variable names
-                                                        List<String> variableNames;
-                                                        variableNames = List.of(Chat.getVariableInfo("de.hype.bbsentials.client", "Config"));
+                                                        List<String> variableNames = new ArrayList<>();
+                                                        try {
+                                                            variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", StringArgumentType.getString(context, "className")));
+                                                        } catch (Exception e) {
+                                                            context.getSource().sendError(Text.of("§cCouldnt locate the specified Classes Variables. Is the Class correct?"));
+                                                        }
                                                         return CommandSource.suggestMatching(variableNames, builder);
                                                     })
                                                     .then(ClientCommandManager.argument("variableValue", StringArgumentType.string())
@@ -138,17 +145,17 @@ public class ModInitialiser implements ClientModInitializer {
                                                                 String variableName = StringArgumentType.getString(context, "variableName");
                                                                 String variableValue = StringArgumentType.getString(context, "variableValue");
                                                                 try {
-                                                                    if (!variableName.toLowerCase().contains("dev") || config.hasBBRoles("dev")) {
-                                                                        Chat.setVariableValue(getConfig(), variableName, variableValue);
+                                                                    if (!variableName.toLowerCase().contains("dev") || generalConfig.hasBBRoles("dev")) {
+                                                                        Chat.setVariableValue(StringArgumentType.getString(context, "className"), variableName, variableValue);
                                                                     }
-                                                                    getConfig().save();
+                                                                    ConfigManager.saveAll();
                                                                 } catch (ClassNotFoundException |
                                                                          NoSuchFieldException |
                                                                          IllegalAccessException |
                                                                          InstantiationException |
                                                                          InvocationTargetException |
                                                                          NoSuchMethodException e) {
-                                                                    Chat.sendPrivateMessageToSelfError("Invalid variable or value");
+                                                                    context.getSource().sendError(Text.of("§cInvalid variable or value"));
                                                                 }
                                                                 return 1;
                                                             })))))
@@ -157,7 +164,7 @@ public class ModInitialiser implements ClientModInitializer {
                                             .suggests((context, builder) -> {
                                                 // Provide tab-completion options for classes
                                                 ArrayList<String> classNames = new ArrayList<>();
-                                                classNames.add("Config");
+                                                classNames.add("ConfigManager");
                                                 // Replace with your own logic to retrieve class names
                                                 return CommandSource.suggestMatching(classNames, builder);
                                             })
@@ -165,21 +172,20 @@ public class ModInitialiser implements ClientModInitializer {
                                                     .suggests((context, builder) -> {
                                                         // Provide tab-completion options for variable names
                                                         List<String> variableNames;
-                                                        variableNames = List.of(Chat.getVariableInfo("de.hype.bbsentials.client", "Config"));
+                                                        variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", "ConfigManager"));
                                                         return CommandSource.suggestMatching(variableNames, builder);
                                                     })
                                                     .executes((context) -> {
                                                         // Handle "variableName" and "variableValue" logic here
                                                         String variableName = StringArgumentType.getString(context, "variableName");
                                                         try {
-                                                            Chat.getVariableValue(getConfig(), variableName);
+                                                            Chat.getVariableValue(StringArgumentType.getString(context, "className"), variableName);
                                                         } catch (Exception e) {
                                                             e.printStackTrace();
+                                                            context.getSource().sendError(Text.of("§cInvalid variable or value"));
                                                         }
                                                         return 1;
                                                     }))).executes((context) -> {
-                                        // Handle the case when "config" argument is not provided
-                                        // ...
                                         return 1;
                                     })
                             )
@@ -190,23 +196,28 @@ public class ModInitialiser implements ClientModInitializer {
                     ));
         }); //bbi
 
-        KeyBinding devKeyBind = new KeyBinding("Open Mod Menu Config", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
+        KeyBinding devKeyBind = new KeyBinding("Open Mod Menu ConfigManager", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (devKeyBind.wasPressed()) {
+//              executionService.schedule(() -> MinecraftClient.getInstance().execute(() ->
                 MinecraftClient.getInstance().setScreen(BBsentialsConfigScreemFactory.create(MinecraftClient.getInstance().currentScreen));
+//              ),3, TimeUnit.SECONDS);
             }
         });
 
         KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
+        KeyBindingHelper.registerKeyBinding(promptKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (promptKeyBind.wasPressed()) {
-                if (config.getLastChatPromptAnswer() != null) {
-                    if (config.isDetailedDevModeEnabled()) {
-                        Chat.sendPrivateMessageToSelfDebug(config.getLastChatPromptAnswer());
+                ChatPrompt prompt = temporaryConfig.lastChatPromptAnswer;
+                if (prompt != null) {
+                    if (prompt.isAvailibel()) {
+                        if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
+                            Chat.sendPrivateMessageToSelfDebug(prompt.command);
+                        }
+                        MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(prompt.getCommandAndCancel());
                     }
-                    MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(config.getLastChatPromptAnswer());
                 }
-                config.setLastChatPromptAnswer(null);
             }
         });
         KeyBinding craftKeyBind = new KeyBinding("Craft", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "BBsentials");
@@ -218,6 +229,13 @@ public class ModInitialiser implements ClientModInitializer {
         KeyBindingHelper.registerKeyBinding(petKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (petKeyBind.wasPressed()) MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/pets");
+        });
+        KeyBinding tradesKeyBind = new KeyBinding("Trades Menu", InputUtil.Type.KEYSYM, 0, "BBsentials");
+        KeyBindingHelper.registerKeyBinding(tradesKeyBind);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (tradesKeyBind.wasPressed()) {
+                MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/trades");
+            }
         });
 //        for (int i = 1; i <= 9; i++) {
 //            KeyBinding ecPageKeyBind = new KeyBinding("Ender Chest Page " + i, InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_1 + (i - 1), "BBsentials");
@@ -241,6 +259,11 @@ public class ModInitialiser implements ClientModInitializer {
         });
         ClientPlayConnectionEvents.DISCONNECT.register((a, b) -> {
             BBsentials.onServerLeave();
+        });
+        ServerSwitchTask.onServerJoinTask(() -> {
+            if (visualConfig.doGammaOverride) {
+                new Options().setGamma(10);
+            }
         });
     }
 

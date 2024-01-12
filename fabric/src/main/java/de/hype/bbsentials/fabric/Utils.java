@@ -6,10 +6,13 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.Waypoints;
+import kotlin.Unit;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -22,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,7 +58,19 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public File getConfigPath() {
-        return FabricLoader.getInstance().getConfigDir().toFile();
+        File configDir = FabricLoader.getInstance().getConfigDir().toFile();
+        File bbsentialsDir = new File(configDir, "BBsentials");
+
+        // Create the folder if it doesn't exist
+        if (!bbsentialsDir.exists()) {
+            boolean created = bbsentialsDir.mkdirs();
+            if (!created) {
+                // Handle the case where folder creation fails
+                throw new RuntimeException("Failed to create Config folder");
+            }
+        }
+
+        return bbsentialsDir;
     }
 
     public String getUsername() {
@@ -152,7 +168,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             List<PlayerEntity> musicPants = new ArrayList<>();
             List<Text> toDisplay = new ArrayList<>();
             toDisplay.add(Text.of("§6Total: " + allParticipiants.size() + " | Bingos: " + (allParticipiants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.config.showMusicPants;
+            boolean doPants = BBsentials.hudConfig.showMusicPants;
             for (PlayerEntity participiant : allParticipiants) {
                 if (doPants) {
 
@@ -269,5 +285,22 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public long getLobbyTime() {
         return MinecraftClient.getInstance().world.getLevelProperties().getTime();
     }
-
+    public static void renderWaypoints(WorldRenderLastEvent event){
+        BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
+        List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint)->waypoint.visible).toList();
+        if (!waypoints.isEmpty()) {
+            RenderInWorldContext.renderInWorld(event, (it) -> {
+                for (Waypoints waypoint : waypoints) {
+                    BlockPos pos = new BlockPos(waypoint.position.x,waypoint.position.y,waypoint.position.z);
+                    if (playerPos.toCenterPos().distanceTo(pos.toCenterPos())>=waypoint.renderDistance) continue;
+                    it.color(0f, 1f, 0f, 0.2f);
+                    it.block(pos);
+                    it.color(1f, 0f, 0f, 1f);
+                    it.waypoint(pos,Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                }
+                return Unit.INSTANCE;
+            });
+        }
+//        WorldRenderLastEvent.Companion.publish(event);
+    }
 }

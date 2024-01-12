@@ -6,9 +6,9 @@
   "mixins": [],
   "client": [
     "ClientCommandSourceMixin",
-    "ItemRendererMixin",
-    "PatchHubItemTextures",
+    "CustomItemTextures",
     "ScreenMixin",
+    "WorldRenderLastEventPatch",
     "SimpleOptionMixin"
   ],
   "injectors": {

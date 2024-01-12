@@ -9,7 +9,7 @@ public interface MCChat {
     void sendClientSideMessage(Message message);
 
     default void sendClientSideMessage(Message message, boolean actionbar) {
-        if (BBsentials.config.swapActionBarChat && !BBsentials.config.swapOnlyNormal) {
+        if (BBsentials.funConfig.swapActionBarChat && !BBsentials.funConfig.swapOnlyNormal) {
             actionbar = !actionbar;
         }
         else {

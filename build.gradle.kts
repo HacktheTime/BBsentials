@@ -2,12 +2,8 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
 }
 
-val mod_version: String by project
-val maven_group: String by project
 
 allprojects {
-    version = mod_version
-    group = maven_group
 
     repositories {
         mavenCentral()
@@ -22,7 +18,7 @@ allprojects {
     afterEvaluate {
         tasks.withType(AbstractArchiveTask::class) {
             archiveBaseName.set("BBsentials-${project.name}")
-            archiveVersion.set(mod_version)
+            archiveVersion.set(libs.versions.modVersion)
         }
         tasks.withType(JavaCompile::class) {
             options.encoding = "UTF-8"

@@ -3,6 +3,8 @@ plugins {
     java
     id("com.github.johnrengelman.shadow")
     id("xyz.wagyourtail.unimined") version "1.1.0-SNAPSHOT"
+    kotlin("jvm") version (libs.versions.kotlinVersion)
+
 }
 
 java {
@@ -89,7 +91,8 @@ tasks.withType(Jar::class) {
 tasks.processResources {
     from(project(":common").sourceSets["main"].resources.srcDirs)
 
-    inputs.property("mod_version", project.version)
+    //inputs.property("mod_version", libs.versions.modVersion)
+    inputs.property("mod_version", libs.versions.modVersion)
 
     filesMatching(listOf("mcmod.info", "mixins.bbsentials.json")) {
         expand(inputs.properties)

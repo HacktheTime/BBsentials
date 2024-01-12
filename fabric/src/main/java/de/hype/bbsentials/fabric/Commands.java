@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
+import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
@@ -36,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Commands implements MCCommand {
     Event<ClientCommandRegistrationCallback> event = ClientCommandRegistrationCallback.EVENT;
-
     private static void simpleCommand(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, String[] parameters) {
         dispatcher.register(
                 ClientCommandManager.literal(commandName)
@@ -53,7 +53,7 @@ public class Commands implements MCCommand {
                         .executes((context) -> {
                             try {
                                 sendPacket(new MiningEventPacket(event,
-                                        BBsentials.config.getUsername(), Objects.requireNonNull(EnvironmentCore.utils.getCurrentIsland())));
+                                        BBsentials.generalConfig.getUsername(), Objects.requireNonNull(EnvironmentCore.utils.getCurrentIsland())));
                             } catch (Exception e) {
                                 Chat.sendPrivateMessageToSelfError(e.getMessage());
                             }
@@ -72,8 +72,8 @@ public class Commands implements MCCommand {
                     .then(ClientCommandManager.argument("Player_Name", StringArgumentType.string())
                             .executes((context) -> {
                                 String playerName = StringArgumentType.getString(context, "Player_Name");
-                                BBsentials.getConfig().sender.addSendTask("/creport " + playerName, 0);
-                                BBsentials.getConfig().addReported(playerName);
+                                BBsentials.sender.addSendTask("/creport " + playerName, 0);
+                                BBsentials.temporaryConfig.alreadyReported.add(playerName);
                                 return 1;
                             })));
         });//creport helper → no double report during same launch
@@ -133,7 +133,7 @@ public class Commands implements MCCommand {
                                             .then(ClientCommandManager.argument("Z", IntegerArgumentType.integer())
                                                     .then(ClientCommandManager.argument("ContactWay", StringArgumentType.string())
                                                             .suggests(((context, builder) -> {
-                                                                return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.getConfig().getUsername() + " bb:party me\"", "\"/p join " + BBsentials.config.getUsername() + "\""}, builder);
+                                                                return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.generalConfig.getUsername() + " bb:party me\"", "\"/p join " + BBsentials.generalConfig.getUsername() + "\""}, builder);
                                                             }))
                                                             .then(ClientCommandManager.argument("extraMessage", StringArgumentType.greedyString())
                                                                     .executes((context) -> {
@@ -359,9 +359,9 @@ public class Commands implements MCCommand {
                         ClientCommandManager.literal("getLeecher")
                                 .executes((context) -> {
                                     BBsentials.executionService.execute(() -> {
-                                        SplashStatusUpdateListener.showOverlay = true;
+                                        UpdateListenerManager.splashStatusUpdateListener.showOverlay = true;
                                         Chat.sendPrivateMessageToSelfInfo("Leeching Players: " + String.join(", ", EnvironmentCore.utils.getSplashLeechingPlayers()));
-                                        BBsentials.executionService.schedule(() -> SplashStatusUpdateListener.showOverlay = false,
+                                        BBsentials.executionService.schedule(() -> UpdateListenerManager.splashStatusUpdateListener.showOverlay = false,
                                                 2, TimeUnit.MINUTES);
                                     });
                                     return 1;
@@ -405,7 +405,7 @@ public class Commands implements MCCommand {
 
     public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
         try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.config.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste) {
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste) {
                 @Override
                 public void statusUpdate(StatusConstants newStatus) {
                     //ignored

@@ -2,7 +2,7 @@ package de.hype.bbsentials.environment.packetconfig;
 
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.Config;
+import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.shared.packets.network.InvalidCommandFeedbackPacket;
 
@@ -19,15 +19,15 @@ public class AbstractPacket {
     }
 
     public boolean isValid(BBsentialConnection connection, String[] allowedNullFields) {
-        if (isApiSupported(BBsentials.config)) {
+        if (isApiSupported()) {
             Chat.sendPrivateMessageToSelfFatal("You are using an outdated version of the mod");
         }
         return true;
     }
 
-    public boolean isApiSupported(Config config) {
+    public boolean isApiSupported() {
         //int version = Core.getConfig().getVersion();
-        int version = config.getApiVersion();
+        int version = BBsentials.generalConfig.getApiVersion();
         if (version >= apiVersionMin && version <= apiVersionMax) {
             return true;
         }

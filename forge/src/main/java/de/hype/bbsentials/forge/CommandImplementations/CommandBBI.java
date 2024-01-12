@@ -1,7 +1,7 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.Config;
+import de.hype.bbsentials.client.common.config.ConfigManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -9,7 +9,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.connectToBBserver;
-import static de.hype.bbsentials.client.common.client.BBsentials.getConfig;
 
 
 
@@ -22,13 +21,13 @@ public class CommandBBI extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/bbi <reconnect|config>";
+        return "/bbi <reconnect|configManager>";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length == 0) {
-            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi <reconnect|config|set-key>"));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi <reconnect|configManager|set-key>"));
             return;
         }
 
@@ -38,21 +37,21 @@ public class CommandBBI extends CommandBase {
                 connectToBBserver();
                 break;
 
-            case "config":
+            case "configManager":
                 if (args.length < 2) {
-                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi config <category>"));
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi configManager <category>"));
                     return;
                 }
 
                 String category = args[1];
                 switch (category) {
                     case "save":
-                        getConfig().save();
-                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Saved config successfully"));
+                        ConfigManager.saveAll();
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Saved configManager successfully"));
                         break;
 
                     case "load":
-                        BBsentials.config = Config.load();
+                        ConfigManager.loadConfigs();
                         break;
 
                     default:

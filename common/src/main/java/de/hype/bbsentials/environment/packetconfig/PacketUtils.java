@@ -86,7 +86,7 @@ public class PacketUtils {
         for (Packet<? extends AbstractPacket> packet : manager.getPackets()) {
             if (!packetName.equals(packet.getClazz().getSimpleName())) continue;
             try {
-                if (BBsentials.getConfig().isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug(packetName+":"+rawJson);
+                if (BBsentials.developerConfig.isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug(packetName+":"+rawJson);
                 tryToProcessPacket(packet, rawJson);
                 return true;
             }catch (RuntimeException e){

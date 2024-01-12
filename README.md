@@ -10,6 +10,7 @@ Hype_the_Time/hackthetime (Main Developer)
 Contributors:
 
 hannibal2 (never made a push but was very helpful with questions and did some parts of the code)
+nea89 (helped with gradle and the waypoint render)
 
 IMPORTANT:
 While this mod is supported for both 1.20.2 and 1.8.9 some features may be one version only. My (hackthetime) focus is on 1.20.2. Due too that some things may not be done in 1.8.9 by me personally.
@@ -26,7 +27,7 @@ I worked together with ic22487, and he included a costume Splash Hub texture in 
 If you don't want to use a Full texturepack there are texturepacks with only the hub ui and another with only Splash hub over in the release Section.
 
 Depenendencies:
-1.20.2: mod menu, cloth config, fabric api
+1.20.2: mod menu, cloth configManager, fabric api
 
 1.8.9: nothing
 

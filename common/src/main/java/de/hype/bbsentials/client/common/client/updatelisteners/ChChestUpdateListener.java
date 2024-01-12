@@ -8,34 +8,48 @@ import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.ChestLobbyData;
 import de.hype.bbsentials.shared.objects.Position;
+import de.hype.bbsentials.shared.objects.Waypoints;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ChChestUpdateListener extends UpdateListener {
-    List<Position> chestsOpened = new ArrayList<>();
     public ChestLobbyData lobby;
-
     public boolean isHoster = false;
+    List<Position> chestsOpened = new ArrayList<>();
+    Map<Position, Waypoints> waypoints = new HashMap<>();
 
     public ChChestUpdateListener(BBsentialConnection connection, ChestLobbyData lobby) {
         super(connection);
         if (lobby == null) return;
         this.lobby = lobby;
-        isHoster = (lobby.contactMan.equalsIgnoreCase(BBsentials.config.getUsername()));
+        isHoster = (lobby.contactMan.equalsIgnoreCase(BBsentials.generalConfig.getUsername()));
     }
 
     public void updateLobby(ChestLobbyData data) {
         lobby = data;
+        setWaypoints();
     }
+
+    public void setWaypoints() {
+        for (ChChestData chest : lobby.chests) {
+            Waypoints waypoint = waypoints.get(chest.coords);
+            if (waypoint != null) return;
+            Waypoints newpoint = new Waypoints(chest.coords, "", 1000, true, true, "", "");
+            if (chestsOpened.contains(chest.coords)){
+                newpoint.visible=false;
+            }
+            waypoints.put(newpoint.position, newpoint);
+        }
+    }
+
     @Override
     public void run() {
-        BBsentials.onServerLeave.add(new ServerSwitchTask(() -> isInLobby.set(false)));
+        ServerSwitchTask.onServerLeaveTask(() -> isInLobby.set(false));
         int maxPlayerCount = EnvironmentCore.utils.getMaximumPlayerCount();
         isInLobby.set(true);
+        setWaypoints();
         //(15mc days * 20 min day * 60 to seconds * 20 to ticks) -> 360000 | 1s 1000ms 1000/20 for ms for 1 tick.
         try {
             lobby.setLobbyMetaData(null, new Date(System.currentTimeMillis() + (360000 - EnvironmentCore.utils.getLobbyTime()) / 50));
@@ -59,7 +73,7 @@ public class ChChestUpdateListener extends UpdateListener {
 
     @Override
     public boolean allowOverlayOverall() {
-        return BBsentials.config.useChChestHudOverlay;
+        return BBsentials.hudConfig.useChChestHudOverlay;
     }
 
     public void setStatus(StatusConstants newStatus) {
@@ -82,5 +96,6 @@ public class ChChestUpdateListener extends UpdateListener {
 
     public void addOpenedChest(Position pos) {
         chestsOpened.add(pos);
+        setWaypoints();
     }
 }

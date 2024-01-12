@@ -20,7 +20,7 @@ public class UpdateListenerManager {
         splashStatusUpdateListener = new SplashStatusUpdateListener(connestion, null);
         lobbies = new ArrayList<>();
         chChestUpdateListener = new ChChestUpdateListener(connestion, null);
-        BBsentials.onServerJoin.add(new ServerSwitchTask(() -> permanentCheck()));
+        ServerSwitchTask.onServerJoinTask(() -> permanentCheck());
     }
 
     public static void permanentCheck() {

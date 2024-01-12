@@ -1,7 +1,13 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     java
+    kotlin("jvm") version (libs.versions.kotlinVersion)
     id("com.github.johnrengelman.shadow")
     id("fabric-loom") version "1.4.5"
+}
+repositories {
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 }
 
 
@@ -15,6 +21,7 @@ dependencies {
 
     minecraft(libs.modern.minecraft)
     mappings("net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2")
+    modRuntimeOnly(libs.modern.devauth)
     modImplementation(libs.modern.fabric.loader)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
@@ -23,7 +30,6 @@ dependencies {
         exclude(group = "net.fabricmc.fabric-api")
     }
 }
-
 tasks.processResources {
     from(project(":common").sourceSets["main"].resources.srcDirs)
     inputs.property("version", project.version)
@@ -34,6 +40,7 @@ tasks.processResources {
         expand(inputs.properties)
     }
 }
+tasks.withType<KotlinCompile> {kotlinOptions.jvmTarget = "17"}
 
 java {
     java {

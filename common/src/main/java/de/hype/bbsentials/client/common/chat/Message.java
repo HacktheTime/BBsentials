@@ -3,32 +3,41 @@ package de.hype.bbsentials.client.common.chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 
 public class Message {
+    public boolean actionBar = false;
+    Boolean guild = null;
+    Boolean party = null;
+    Boolean msg = null;
+    Boolean server = null;
     private String text;
     private String unformattedString = null;
     private String playerName = null;
     private String string;
-    public boolean actionBar = false;
+    private String noRanks;
 
-    public Message(String textJson,String string) {
+    public Message(String textJson, String string) {
         this.text = textJson;
-        if (string==null) string = "";
-        this.string=string;
+        if (string == null) string = "";
+        this.string = string;
     }
-    public Message(String textJson,String string,boolean actionbar) {
+
+    public Message(String textJson, String string, boolean actionbar) {
         this.text = textJson;
-        if (string==null) string = "";
-        this.string=string;
+        if (string == null) string = "";
+        this.string = string;
         this.actionBar = actionbar;
     }
+
     public static Message of(String string) {
         String escapedString = string.replace("\\", "\\\\").replace("\"", "\\\"");
         String json = "{\"text\":\"" + escapedString + "\"}";
         return new Message(json, string);
     }
+
     public static Message tellraw(String json) {
-        json = json.replace("@username", BBsentials.config.getUsername());
+        json = json.replace("@username", BBsentials.generalConfig.getUsername());
         return new Message(json, "");
     }
+
     //
     public String getJson() {
         return text;
@@ -49,15 +58,11 @@ public class Message {
         return getUnformattedString().split(":", 2)[1].trim();
     }
 
-    Boolean guild = null;
-
     public boolean isFromGuild() {
         if (guild != null) return guild;
         guild = getUnformattedString().startsWith("Guild >");
         return guild;
     }
-
-    Boolean party = null;
 
     public boolean isFromParty() {
         if (party != null) return party;
@@ -65,15 +70,11 @@ public class Message {
         return party;
     }
 
-    Boolean msg = null;
-
     public boolean isMsg() {
         if (msg != null) return msg;
         msg = getUnformattedString().startsWith("From") || getUnformattedString().startsWith("To");
         return msg;
     }
-
-    Boolean server = null;
 
     public boolean isServerMessage() {
         if (server != null) return server;
@@ -91,20 +92,26 @@ public class Message {
         if (isMsg()) {
             playerName = playerName.replaceFirst("From", "").replace("To", "").trim();
         }
-        if (playerName.contains(">")){
-            playerName=playerName.split(">",2)[1];
+        if (playerName.contains(">")) {
+            playerName = playerName.split(">", 2)[1];
         }
-//        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?[^\\x00-\\x7F]?\\s?\\[[^\\]]*\\])*", "").trim()// replaces every [] and unicode character before a asci character.
-        playerName = playerName.replaceAll("[^\\x00-\\x7F]","").replaceAll("\\[[^\\]]*\\]","").trim();
+//        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?[^\\x00-\\x7F]+\\s*?\\s?\\[[^\\]]*\\])*", "").trim()// replaces every [] and unicode character before a asci character.
+        playerName = playerName.replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim();
         if (playerName.matches("[^a-zA-Z0-9_-]+")) playerName = "";
         return playerName;
+    }
+
+    public String getNoRanks() {
+        if (noRanks != null) return noRanks;
+        return getUnformattedString().replaceAll("[^\\x00-\\x7F]+\\s*","").replaceAll("\\[[^\\]]*\\]","").trim();
     }
 
     public void replaceInJson(String replace, String replaceWith) {
         text = text.replaceFirst(replace, replaceWith);
     }
+
     public boolean isFromReportedUser() {
-        return BBsentials.config.alreadyReported.contains(getPlayerName()) && !getPlayerName().isEmpty();
+        return BBsentials.temporaryConfig.alreadyReported.contains(getPlayerName()) && !getPlayerName().isEmpty();
     }
 
     public boolean contains(String string) {
@@ -113,6 +120,10 @@ public class Message {
 
     public boolean startsWith(String string) {
         return getUnformattedString().startsWith(string);
+    }
+
+    public boolean endsWith(String string) {
+        return getUnformattedString().endsWith(string);
     }
 
     @Override

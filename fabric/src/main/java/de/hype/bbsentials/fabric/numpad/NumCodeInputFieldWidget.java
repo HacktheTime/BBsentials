@@ -49,7 +49,7 @@ public class NumCodeInputFieldWidget extends IntegerFieldWidget {
     }
 
     public boolean forbiddenCode(String input) {
-        if (BBsentials.config.hasBBRoles("dev")) return false;
+        if (BBsentials.generalConfig.hasBBRoles("dev")) return false;
         if (input.startsWith(String.valueOf(0))) {
             return true;
         }

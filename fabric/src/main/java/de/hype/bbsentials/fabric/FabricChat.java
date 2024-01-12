@@ -34,7 +34,7 @@ public class FabricChat implements MCChat {
             message = chat.onEvent(message, actionbar);
         }
         Text toReturn = Text.Serialization.fromJson(message.getJson());
-        if (BBsentials.config.swapActionBarChat && !BBsentials.config.swapOnlyBBsentials) {
+        if (BBsentials.funConfig.swapActionBarChat && !BBsentials.funConfig.swapOnlyBBsentials) {
             if (!actionbar) {
                 showActionBar(message);
             }
@@ -56,8 +56,8 @@ public class FabricChat implements MCChat {
     public void showActionBar(Message message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
-            if (BBsentials.config.overwriteActionBar.isEmpty())
-                message = Message.of(BBsentials.config.overwriteActionBar);
+            if (BBsentials.funConfig.overwriteActionBar.isEmpty())
+                message = Message.of(BBsentials.funConfig.overwriteActionBar);
             client.player.sendMessage(Text.Serialization.fromJson(message.getJson()), true);
         }
     }

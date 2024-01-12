@@ -21,7 +21,7 @@ public class SplashStatusUpdateListener extends UpdateListener {
     }
 
     public void run() {
-        BBsentials.onServerLeave.add(new ServerSwitchTask(() -> isInLobby.set(false)));
+        ServerSwitchTask.onServerLeaveTask(() -> isInLobby.set(false));
         int maxPlayerCount = EnvironmentCore.utils.getMaximumPlayerCount() - 5;
         isInLobby.set(true);
         while (isInLobby.get()) {
@@ -44,7 +44,7 @@ public class SplashStatusUpdateListener extends UpdateListener {
 
     @Override
     public boolean allowOverlayOverall() {
-        return BBsentials.config.useSplashLeecherOverlayHud;
+        return BBsentials.hudConfig.useSplashLeecherOverlayHud;
     }
 
     public void setStatus(StatusConstants newStatus) {

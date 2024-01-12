@@ -1,5 +1,7 @@
 package de.hype.bbsentials.fabric;
 
+import net.minecraft.client.MinecraftClient;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +18,16 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     }
 
     public void onNumpadCode() {
+
     }
 
     public void doOnce() {
         doTest = true;
     }
 
+    public void unlockCursor(){
+        MinecraftClient.getInstance().mouse.unlockCursor();
+    }
     @Override
     public List<String> test() {
         return List.of("");

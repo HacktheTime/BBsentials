@@ -51,7 +51,7 @@ public class NumCode {
     }
 
     public void execute() {
-        if (!BBsentials.config.hasBBRoles(requiredPermission)) {
+        if (!BBsentials.generalConfig.hasBBRoles(requiredPermission)) {
             Chat.sendPrivateMessageToSelfError("You don't have the required permissions to run '" + code + "' ! (Required: '" + requiredPermission + "')");
             return;
         }
@@ -59,6 +59,11 @@ public class NumCode {
             for (int i = 0; i < commands.size(); i++) {
                 String command = commands.get(i);
                 if (command.startsWith("\\")) {
+                    try {
+                        Thread.sleep((long) (commandDelay.get(i)*1000));
+                    } catch (InterruptedException ignored) {
+
+                    }
                     if (ClientCommandInternals.executeCommand(command.replaceFirst("\\\\", ""))) {
                         Chat.sendPrivateMessageToSelfSuccess("Code '" + code + "': Success");
                     }
@@ -66,7 +71,8 @@ public class NumCode {
                         Chat.sendPrivateMessageToSelfError("Code '" + code + "': Error Occurd. \nCommand: " + command);
                     }
                 }
-                else BBsentials.config.sender.addHiddenSendTask(commands.get(i), commandDelay.get(i));
+                else
+                    BBsentials.sender.addHiddenSendTask(commands.get(i), commandDelay.get(i));
             }
         }
         else {

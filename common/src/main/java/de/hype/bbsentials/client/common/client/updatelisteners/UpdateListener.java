@@ -5,7 +5,7 @@ import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class UpdateListener implements Runnable {
-    public static boolean showOverlay = false;
+    public boolean showOverlay = false;
     AtomicBoolean isInLobby = new AtomicBoolean(false);
     BBsentialConnection connection;
 

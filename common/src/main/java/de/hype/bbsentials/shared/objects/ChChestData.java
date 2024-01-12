@@ -12,4 +12,10 @@ public class ChChestData {
         this.coords = coords;
         this.items = items;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ChestLobbyData)) return false;
+        return ((ChChestData) obj).coords.equals(coords);
+    }
 }

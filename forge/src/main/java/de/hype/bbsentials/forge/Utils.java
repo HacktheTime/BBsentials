@@ -49,12 +49,28 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
     }
 
+    public static String getTabListPlayerName(String id) {
+        return Minecraft.getMinecraft().getNetHandler().getPlayerInfo(id).getDisplayName().getUnformattedText();
+    }
+
     public boolean isWindowFocused() {
         return Display.isActive();
     }
 
     public File getConfigPath() {
-        return new File(Minecraft.getMinecraft().mcDataDir, "config");
+        File configDir = Minecraft.getMinecraft().mcDataDir;
+        File bbsentialsDir = new File(configDir, "BBsentials");
+
+        // Create the folder if it doesn't exist
+        if (!bbsentialsDir.exists()) {
+            boolean created = bbsentialsDir.mkdirs();
+            if (!created) {
+                // Handle the case where folder creation fails
+                throw new RuntimeException("Failed to create BBsentials folder");
+            }
+        }
+
+        return bbsentialsDir;
     }
 
     public String getUsername() {
@@ -145,7 +161,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
             List<IChatComponent> toDisplay = new ArrayList<>();
             toDisplay.add(new ChatComponentText("§6Total: " + allParticipants.size() + " | Bingos: " + (allParticipants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.config.showMusicPants;
+            boolean doPants = BBsentials.hudConfig.showMusicPants;
             for (EntityPlayer participant : allParticipants) {
                 if (doPants) {
                     boolean hasPants = false;
@@ -224,15 +240,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
             }
             else {
-                return EnumUtils.getEnumByName(Islands.class, string.replace("Area: ", "").trim());
+                return EnumUtils.getEnumByValue(Islands.class, string.replace("Area: ", "").trim());
             }
         } catch (Exception e) {
         }
         return null;
-    }
-
-    public static String getTabListPlayerName(String id) {
-        return Minecraft.getMinecraft().getNetHandler().getPlayerInfo(id).getDisplayName().getUnformattedText();
     }
 
     public int getPlayerCount() {

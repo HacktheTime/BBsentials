@@ -1,5 +1,7 @@
 package de.hype.bbsentials.forge.client;
 
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper;
+import io.github.moulberry.moulconfig.gui.MoulConfigEditor;
 import io.github.moulberry.moulconfig.gui.MoulGuiOverlayEditor;
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis;
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver;
@@ -17,6 +19,6 @@ public class MoulConfigManager {
     }
 
     public void openConfigGui() {
-        Minecraft.getMinecraft().displayGuiScreen(new MoulGuiOverlayEditor(testConfigMoulConfigProcessor));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiScreenElementWrapper(new MoulConfigEditor<>(testConfigMoulConfigProcessor)));
     }
 }

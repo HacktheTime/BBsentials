@@ -2,9 +2,9 @@ package de.hype.bbsentials.client.common.chat;
 
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.Config;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 
 import javax.sound.sampled.AudioInputStream;
@@ -31,7 +31,7 @@ public class Chat {
     private final Map<String, Instant> partyDisbandedMap = new HashMap<>();
     private String lastPartyDisbandedUsername = null;
 
-    public static String[] getVariableInfo(String packageName, String className) {
+    public static String[] getVariableNames(String packageName, String className) {
         List<String> variableInfoList = new ArrayList<>();
 
         // Combine the class name with the package name
@@ -64,33 +64,46 @@ public class Chat {
         return variableInfoList.toArray(new String[variableInfoList.size()]);
     }
 
-    public static void setVariableValue(Object obj, String variableName, String value) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+    public static void setVariableValue(String className, String variableName, String value) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
         if (value == null) {
-            // Handle null value case
             sendPrivateMessageToSelfError("Invalid value: null");
             return;
         }
 
-        Class<?> objClass = obj.getClass();
-        Field field = objClass.getDeclaredField(variableName);
-        field.setAccessible(true);
+        String fullClassName = "de.hype.bbsentials.client.common.config" + "." + className;
+        Object obj = null;
+            Class<?> clazz = Class.forName(fullClassName);
+            Field field = clazz.getDeclaredField(variableName);
+            field.setAccessible(true);
 
-        // Get the type of the field
-        Class<?> fieldType = field.getType();
+            Class<?> fieldType = field.getType();
+            Object convertedValue = parseValue(value, fieldType);
 
-        // Convert the value to the appropriate type
-        Object convertedValue = parseValue(value, fieldType);
+            if (Modifier.isStatic(field.getModifiers())) {
+                field.set(null, convertedValue);
+            }
+            else {
+                obj = clazz.getDeclaredConstructor().newInstance();
+                field.set(obj, convertedValue);
+            }
 
-        if (Modifier.isStatic(field.getModifiers())) {
-            // If the field is static
-            field.set(null, convertedValue);
+            sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is now: " + field.get(obj));
+    }
+
+    public static void getVariableValue(String className, String variableName) {
+        String fullClassName = "de.hype.bbsentials.client.common.config" + "." + className;
+
+        try {
+            Class<?> clazz = Class.forName(fullClassName);
+            Field field = clazz.getDeclaredField(variableName);
+            field.setAccessible(true);
+
+            Object obj = clazz.getDeclaredConstructor().newInstance();
+            sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is: " + field.get(obj));
+        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | InstantiationException |
+                 InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
         }
-        else {
-            field.set(obj, convertedValue);
-        }
-
-        // Check and output the value of the variable
-        sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is now: " + field.get(obj));
     }
 
     private static Object parseValue(String value, Class<?> targetType) {
@@ -113,13 +126,6 @@ public class Chat {
             // For other types, return the original string value
             return value;
         }
-    }
-
-    public static void getVariableValue(Object object, String variableName) throws NoSuchFieldException, IllegalAccessException {
-        Class<?> objClass = object.getClass();
-        Field field = objClass.getDeclaredField(variableName);
-        field.setAccessible(true);
-        sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is: " + field.get(object));
     }
 
     public static void sendPrivateMessageToSelfError(String message) {
@@ -155,7 +161,7 @@ public class Chat {
     }
 
     public static void sendCommand(String s) {
-        BBsentials.getConfig().sender.addSendTask(s);
+        BBsentials.sender.addSendTask(s);
     }
 
     public static void setChatPromtId(String logMessage) {
@@ -174,18 +180,15 @@ public class Chat {
      * @param timeBeforePerish in seconds before its reset to nothing
      */
     public static void setChatCommand(String command, int timeBeforePerish) {
-        BBsentials.getConfig().setLastChatPromptAnswer(command);
-        if (BBsentials.config.isDevModeEnabled()) {
+        BBsentials.temporaryConfig.lastChatPromptAnswer = new ChatPrompt(command, timeBeforePerish);
+        if (BBsentials.developerConfig.isDevModeEnabled()) {
             Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + command + "\"");
         }
-        BBsentials.executionService.schedule(() -> {
-            BBsentials.getConfig().setLastChatPromptAnswer(null);
-        }, 10, TimeUnit.SECONDS);
     }
 
     public Message onEvent(Message text, boolean actionbar) {
         if (!isSpam(text.getString())) {
-            if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
+            if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                 System.out.println("got a message: " + text.getJson());
             }
             BBsentials.executionService.execute(() -> processThreaded(text));
@@ -199,8 +202,8 @@ public class Chat {
 //        if (message.isFromParty()) {
 //           message.replaceInJson("\"action\":\"run_command\",\"value\":\"/viewprofile", "\"action\":\"run_command\",\"value\":\"/bviewprofile " + messageUnformatted.split(">", 1)[1].trim());
 //        }
-        if (actionbar && !BBsentials.config.overwriteActionBar.isEmpty()) {
-            if (message.getUnformattedString().equals(BBsentials.config.overwriteActionBar.replaceAll("§.", ""))) {
+        if (actionbar && !BBsentials.funConfig.overwriteActionBar.isEmpty()) {
+            if (message.getUnformattedString().equals(BBsentials.funConfig.overwriteActionBar.replaceAll("§.", ""))) {
                 return message;
             }
             return null;
@@ -209,13 +212,13 @@ public class Chat {
             sendPrivateMessageToSelfBase("B: " + message.getUnformattedString(), Formatting.RED);
             return null;
         }
-        if (BBsentials.config.doPartyChatCustomMenu && message.isFromParty()) {
+        if (BBsentials.generalConfig.doPartyChatCustomMenu && message.isFromParty()) {
             message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions party " + message.getPlayerName() + " " + message.getUnformattedString());
         }
-        else if (BBsentials.config.doGuildChatCustomMenu && message.isFromGuild()) {
+        else if (BBsentials.generalConfig.doGuildChatCustomMenu && message.isFromGuild()) {
             message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions guild " + message.getPlayerName() + " " + message.getUnformattedString());
         }
-        else if (BBsentials.config.doAllChatCustomMenu) {
+        else if (BBsentials.generalConfig.doAllChatCustomMenu) {
             message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
         }
 
@@ -230,18 +233,18 @@ public class Chat {
 
             }
             else if (!EnvironmentCore.utils.isWindowFocused()) {
-                if (BBsentials.config.doDesktopNotifications) {
-                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.config.doDesktopNotifications) {
+                if (BBsentials.visualConfig.doDesktopNotifications) {
+                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.visualConfig.doDesktopNotifications) {
                         sendNotification("BBsentials Visit-Watcher", messageUnformatted);
                     }
                     else if (message.isMsg()) {
                         sendNotification("BBsentials Message Notifier", username + " sent you the following message: " + message.getMessageContent());
                     }
-                    if (message.getMessageContent().toLowerCase().contains(BBsentials.getConfig().getUsername().toLowerCase()) || (message.getMessageContent().toLowerCase().contains(BBsentials.getConfig().getNickname().toLowerCase() + " ") && BBsentials.getConfig().getNotifForParty().toLowerCase().equals("nick")) || BBsentials.getConfig().getNotifForParty().toLowerCase().equals("all")) {
+                    if (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.getUsername().toLowerCase()) || (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.nickname.toLowerCase() + " ") && BBsentials.generalConfig.notifForMessagesType.toLowerCase().equals("nick")) || BBsentials.generalConfig.notifForMessagesType.toLowerCase().equals("all")) {
                         sendNotification("BBsentials Party Chat Notification", username + " : " + message.getMessageContent());
                     }
                     else {
-                        if (message.getMessageContent().toLowerCase().contains(BBsentials.getConfig().getUsername().toLowerCase()) || message.getMessageContent().toLowerCase().contains(BBsentials.config.getNickname().toLowerCase() + " ")) {
+                        if (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.getUsername().toLowerCase()) || message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.nickname.toLowerCase() + " ")) {
                             sendNotification("BBsentials Notifier", "You got mentioned in chat! " + message.getMessageContent());
                         }
                     }
@@ -255,7 +258,7 @@ public class Chat {
                 else if (message.contains("invited you to join their party")) {
                     if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
                         Instant lastDisbandedInstant = partyDisbandedMap.get(lastPartyDisbandedUsername);
-                        if (BBsentials.config.acceptReparty) {
+                        if (BBsentials.partyConfig.acceptReparty) {
                             if (lastDisbandedInstant != null && lastDisbandedInstant.isAfter(Instant.now().minusSeconds(20)) && (username.equals(lastPartyDisbandedUsername))) {
                                 sendCommand("/p accept " + username);
                             }
@@ -266,17 +269,17 @@ public class Chat {
                     }
                 }
                 else if (message.startsWith("Party Members (")) {
-                    Config.partyMembers = new ArrayList<>();
+                    BBsentials.partyConfig.partyMembers = new ArrayList<>();
                 }
                 else if (message.startsWith("Party Moderators:")) {
                     String temp = messageUnformatted.replace("Party Moderators:", "").replace(" ●", "").replaceAll("\\s*\\[[^\\]]+\\]", "").trim();
                     if (temp.contains(",")) {
                         for (int i = 0; i < temp.split(",").length; i++) {
-                            Config.partyMembers.add(temp.split(",")[i - 1]);
+                            BBsentials.partyConfig.partyMembers.add(temp.split(",")[i - 1]);
                         }
                     }
                     else {
-                        Config.partyMembers.add(temp);
+                        BBsentials.partyConfig.partyMembers.add(temp);
                     }
                 }
                 else if (message.startsWith("Party Members:")) {
@@ -284,21 +287,26 @@ public class Chat {
                     if (temp.contains(",")) {
                         for (int i = 0; i < temp.split(",").length; i++) {
                             System.out.println("Added to plist: " + (temp.split(",")[i - 1]));
-                            Config.partyMembers.add(temp.split(",")[i - 1]);
+                            BBsentials.partyConfig.partyMembers.add(temp.split(",")[i - 1]);
                         }
                     }
                     else {
-                        Config.partyMembers.add(temp);
+                        BBsentials.partyConfig.partyMembers.add(temp);
                     }
                 }
-                else if ((message.contains("Party Leader:") && !message.contains(BBsentials.getConfig().getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(BBsentials.getConfig().getUsername()) || (!message.startsWith("The party was transferred to " + BBsentials.getConfig().getUsername()) && message.startsWith("The party was transferred to"))) || messageUnformatted.endsWith(BBsentials.getConfig().getUsername() + " is now a Party Moderator") || (message.startsWith("The party was disbanded")) || (message.contains("You have joined ") && message.contains("'s party!")) || (message.contains("Party Leader, ") && message.contains(" , summoned you to their server.")) || (message.contains("warped to your dungeon"))) {
-                    BBsentials.getConfig().setIsLeader(false);
-                    if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isPartyLeader());
+                else if ((message.startsWith("Party Leader:") && !message.contains(BBsentials.generalConfig.getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(BBsentials.generalConfig.getUsername()) ||
+                        (message.startsWith("The party was transferred to ") && !message.getNoRanks().startsWith("The party was transferred to " + BBsentials.generalConfig.getUsername())))
+                        || message.endsWith(BBsentials.generalConfig.getUsername() + " is now a Party Moderator")
+                        || (message.startsWith("The party was disbanded")) || (message.startsWith("You have joined ")
+                        && message.endsWith("'s party!")) || (message.startsWith("Party Leader, ") && message.contains(" , summoned you to their server."))
+                        || (message.contains("warped to your dungeon"))) {
+                    BBsentials.partyConfig.isPartyLeader = false;
+                    if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
+                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.partyConfig.isPartyLeader);
                     }
                 }
-                else if (BBsentials.config.getPlayersInParty().length == 0 && messageUnformatted.endsWith("to the party! They have 60 seconds to accept")) {
-                    BBsentials.config.setIsLeader(true);
+                else if (BBsentials.partyConfig.partyMembers.isEmpty() && messageUnformatted.endsWith("to the party! They have 60 seconds to accept")) {
+                    BBsentials.partyConfig.isPartyLeader = true;
                 }
                 else if (messageUnformatted.startsWith("You'll be partying with:")) {
                     List<String> members = new ArrayList<>();
@@ -308,12 +316,16 @@ public class Chat {
                         }
                         members.add(users);
                     }
-                    Config.partyMembers = members;
+                    BBsentials.partyConfig.partyMembers = members;
                 }
-                else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(BBsentials.getConfig().getUsername() + " ●"))) || (message.contains(BBsentials.getConfig().getUsername() + " warped the party to a SkyBlock dungeon!")) || message.startsWith("The party was transferred to " + BBsentials.getConfig().getUsername()) || message.getUnformattedString().endsWith(" has promoted " + BBsentials.getConfig().getUsername() + " to Party Leader") || (message.contains("warped to your dungeon"))) {
-                    BBsentials.getConfig().setIsLeader(true);
-                    if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
-                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.getConfig().isPartyLeader());
+                else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(BBsentials.generalConfig.getUsername() + " ●")))
+                        || (message.contains(BBsentials.generalConfig.getUsername() + " warped the party to a SkyBlock dungeon!")) ||
+                        (message.getNoRanks().startsWith("The party was transferred to " + BBsentials.generalConfig.getUsername()))
+                        || message.getNoRanks().endsWith(" has promoted " + BBsentials.generalConfig.getUsername() + " to Party Leader") ||
+                        (message.contains("warped to your dungeon"))) {
+                    BBsentials.partyConfig.isPartyLeader = true;
+                    if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
+                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.partyConfig.isPartyLeader);
                     }
                 }
                 else if (message.getUnformattedString().equals("Please type /report confirm to log your report for staff review.")) {
@@ -328,21 +340,35 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",\"You can press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to buy it.\"]"));
                     setChatCommand("/purchasecrystallhollowspass", 30);
                 }
+
+                else if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
+                    setChatPromtId(message.getJson());
+                }
+                else if (message.getUnformattedString().endsWith("Return to the Trapper soon to get a new animal to hunt!")) {
+                    BBsentials.executionService.schedule(() -> {
+                        setChatCommand("/warp trapper", 10);
+                        Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp back to the trapper\",\"color\":\"green\"}]"));
+                    }, 1, TimeUnit.SECONDS);
+                }
+                else if (message.getUnformattedString().endsWith("animal near the Desert Settlement.") || message.getUnformattedString().endsWith("animal near the Oasis.")) {
+                    setChatCommand("/warp desert", 10);
+                    Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp to the \",\"color\":\"green\"},{\"text\":\"Desert Settelment\",\"color\":\"gold\"}]"));
+                }
             }
 
             else if (message.isFromGuild()) {
 
             }
             else if (message.isFromParty()) {
-                if (message.getMessageContent().equals("warp") && BBsentials.config.isPartyLeader()) {
-                    if (BBsentials.config.getPlayersInParty().length == 1) {
+                if (message.getMessageContent().equals("warp") && BBsentials.partyConfig.isPartyLeader) {
+                    if (BBsentials.partyConfig.partyMembers.size() == 1) {
                         Chat.sendCommand("/p warp");
                     }
-                    else if (BBsentials.config.getPlayersInParty().length >= 10) {
+                    else if (BBsentials.partyConfig.partyMembers.size() >= 10) {
                         //ignored because soo many players
                     }
-                    else if (BBsentials.config.getPlayersInParty().length > 1) {
-                        Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a warp. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to warp the entire \",{\"text\":\"Party\",\"color\":\"gold\"},\".\"]"));
+                    else if (BBsentials.partyConfig.partyMembers.size() > 1) {
+                        Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a warp. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to warp the entire \",{\"text\":\"Party\",\"color\":\"gold\"},\".\"]".replace("@username", username)));
                         setChatCommand("/p warp", 10);
                     }
                 }
@@ -350,14 +376,9 @@ public class Chat {
             }
             else if (message.isMsg()) {
                 if (messageUnformatted.endsWith("bb:party me")) {
-                    if (BBsentials.getConfig().allowBBinviteMe()) {
-                        sendCommand("/p " + username);
+                    if (BBsentials.partyConfig.allowBBinviteMe) {
+                        sendCommand("/p invite " + username);
                     }
-                }
-            }
-            else {
-                if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
-                    setChatPromtId(message.getJson());
                 }
             }
         }

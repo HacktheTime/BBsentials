@@ -2,7 +2,7 @@
 <Configuration status="WARN">
     <!-- Filter out Hypixel scoreboard and sound errors -->
     <RegexFilter
-            regex="Unable to play unknown soundEvent:.* |Signature is missing from Property textures|Received packet for unknown team .*|Ignoring player info update for unknown player .*|Requested creation of existing .*"
+            regex="Missing sound for event.*|Ignoring player info update for unknown player.*|Received packet for unknown team .*|Ignoring player info update for unknown player .*|Requested creation of existing .*"
             onMatch="DENY"
                  onMismatch="NEUTRAL"/>
     <!-- Filter out other errors -->

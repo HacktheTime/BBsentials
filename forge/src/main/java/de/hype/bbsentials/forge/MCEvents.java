@@ -14,12 +14,13 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MCEvents {
-    static Utils utils = EnvironmentCore.utils;
+    static Utils utils;
 
     @Override
     public void registerOverlays() {
-        FMLCommonHandler.instance().bus().register(utils);
         FMLCommonHandler.instance().bus().register(this);
+        utils = EnvironmentCore.utils;
+        FMLCommonHandler.instance().bus().register(utils);
     }
 
     @Override
@@ -34,8 +35,9 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
 
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
-        World world = event.world;
         BlockPos pos = event.pos;
+        if (pos == null) return;
+        World world = event.world;
         IBlockState state = world.getBlockState(pos);
         if (state.getBlock() instanceof BlockChest) {
             if (utils.getCurrentIsland().equals(Islands.CRYSTAL_HOLLOWS)) {

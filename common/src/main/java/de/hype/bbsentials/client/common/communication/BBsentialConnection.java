@@ -6,11 +6,13 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
 import de.hype.bbsentials.environment.packetconfig.PacketUtils;
 import de.hype.bbsentials.shared.constants.*;
+import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.PartyPacket;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
@@ -24,7 +26,6 @@ import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.net.SocketException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -38,7 +39,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-;
 
 public class BBsentialConnection {
     public Thread messageReceiverThread;
@@ -47,7 +47,6 @@ public class BBsentialConnection {
     private BufferedReader reader;
     private PrintWriter writer;
     private LinkedBlockingQueue<String> messageQueue;
-    private String itemName = "Hub #1";
     private PacketManager packetManager;
 
     public BBsentialConnection() {
@@ -60,7 +59,7 @@ public class BBsentialConnection {
             return true;
         }
         else {
-            String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and Developer Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
+            String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and DeveloperAbstractConfig Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
             System.out.println(emergencyMessage);
             Chat.sendPrivateMessageToSelfFatal("§4" + emergencyMessage + "\n\n");
         }
@@ -167,7 +166,7 @@ public class BBsentialConnection {
                 try {
                     while (!Thread.interrupted()) {
                         String message = messageQueue.take();
-                        if (BBsentials.config.isDetailedDevModeEnabled())
+                        if (BBsentials.developerConfig.isDetailedDevModeEnabled())
                             Chat.sendPrivateMessageToSelfDebug("BBs: " + message);
                         writer.println(message);
                     }
@@ -196,12 +195,12 @@ public class BBsentialConnection {
 
     public void sendHiddenMessage(String message) {
         if (isConnected()) {
-            if (BBsentials.getConfig().isDetailedDevModeEnabled()) {
+            if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                 Chat.sendPrivateMessageToSelfDebug("BBDev-s: " + message);
             }
             try {
                 if (socket.isConnected() && writer != null) {
-                    if (BBsentials.config.isDetailedDevModeEnabled())
+                    if (BBsentials.developerConfig.isDetailedDevModeEnabled())
                         Chat.sendPrivateMessageToSelfDebug("BBHs: " + message);
                     writer.println(message);
                 }
@@ -225,30 +224,24 @@ public class BBsentialConnection {
         //this does absolutely nothing. dummy for packet in packt manager
     }
 
-    public void splashHighlightItem(String itemName, long displayTimeInMilliseconds) {
-        this.itemName = itemName;
-        BBsentials.config.highlightitem = true;
-        BBsentials.executionService.schedule(() -> {
-            BBsentials.config.highlightitem = false;
-            try {
-                socket.setSoTimeout(0);
-            } catch (SocketException e) {
-                throw new RuntimeException(e);
+    public void splashHighlightItem(SplashData splash, long displayTimeInMilliseconds) {
+        CustomItemTexture toHighlightHub = new CustomItemTexture("customitems/splash_hub") {
+            @Override
+            public boolean isItem(String itemName, String tooltip, String nbt, Object item) {
+                return itemName.endsWith("Hub #" + splash.hubNumber);
             }
+        };
+        BBsentials.executionService.schedule(() -> {
+            toHighlightHub.removeFromPool();
         }, displayTimeInMilliseconds, TimeUnit.MILLISECONDS);
     }
-
-    public String getItemName() {
-        return itemName;
-    }
-    //TODO search
 
 
     public <E extends AbstractPacket> void sendPacket(E packet) {
         String packetName = packet.getClass().getSimpleName();
         String rawjson = PacketUtils.parsePacketToJson(packet);
         if (isConnected() && writer != null) {
-            if (BBsentials.getConfig().isDetailedDevModeEnabled() && !((packet.getClass().equals(RequestConnectPacket.class) && !BBsentials.config.useMojangAuth) && BBsentials.config.devSecurity)) {
+            if (BBsentials.developerConfig.isDetailedDevModeEnabled() && !((packet.getClass().equals(RequestConnectPacket.class) && !BBsentials.bbServerConfig.useMojangAuth) && BBsentials.developerConfig.devSecurity)) {
                 Chat.sendPrivateMessageToSelfDebug("BBDev-sP: " + packetName + ": " + rawjson);
             }
             writer.println(packetName + "." + rawjson);
@@ -265,7 +258,7 @@ public class BBsentialConnection {
     public void onSplashNotifyPacket(SplashNotifyPacket packet) {
         //influencing the delay in any way is disallowed!
         int waitTime;
-        if (packet.splash.announcer.equals(BBsentials.config.getUsername()) && BBsentials.config.autoSplashStatusUpdates) {
+        if (packet.splash.announcer.equals(BBsentials.generalConfig.getUsername()) && BBsentials.splashConfig.autoSplashStatusUpdates) {
             Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard");
             SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(this, packet.splash);
             UpdateListenerManager.splashStatusUpdateListener = splashStatusUpdateListener;
@@ -286,7 +279,7 @@ public class BBsentialConnection {
     }
 
     public void onBingoChatMessagePacket(BingoChatMessagePacket packet) {
-        if (BBsentials.config.showBingoChat) {
+        if (BBsentials.visualConfig.showBingoChat) {
             Chat.sendPrivateMessageToSelfInfo("[" + packet.prefix + "§r] " + packet.username + ": " + packet.message);
         }
     }
@@ -315,49 +308,47 @@ public class BBsentialConnection {
     }
 
     public void onMiningEventPacket(MiningEventPacket packet) {
-        if (!BBsentials.config.toDisplayConfig.getValue("disableAll")) {
-            //its will returns false cause disabled is checked already before.
-            if (BBsentials.config.toDisplayConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                return;
-            if (!(BBsentials.config.toDisplayConfig.allEvents)) {
-                if (packet.event.equals(MiningEvents.RAFFLE)) {
-                    if (!BBsentials.config.toDisplayConfig.raffle) return;
-                }
-                else if (packet.event.equals(MiningEvents.GOBLIN_RAID)) {
-                    if (!BBsentials.config.toDisplayConfig.goblinRaid) return;
-                }
-                else if (packet.event.equals(MiningEvents.MITHRIL_GOURMAND)) {
-                    if (!BBsentials.config.toDisplayConfig.mithrilGourmand) return;
-                }
-                else if (packet.event.equals(MiningEvents.BETTER_TOGETHER)) {
-                    if (BBsentials.config.toDisplayConfig.betterTogether.equals("none")) return;
-                    if (BBsentials.config.toDisplayConfig.betterTogether.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                        return;
-                    if (BBsentials.config.toDisplayConfig.betterTogether.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                        return;
-                }
-                else if (packet.event.equals(MiningEvents.DOUBLE_POWDER)) {
-                    if (BBsentials.config.toDisplayConfig.doublePowder.equals("none")) return;
-                    if (BBsentials.config.toDisplayConfig.doublePowder.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                        return;
-                    if (BBsentials.config.toDisplayConfig.doublePowder.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                        return;
-                }
-                else if (packet.event.equals(MiningEvents.GONE_WITH_THE_WIND)) {
-                    if (BBsentials.config.toDisplayConfig.goneWithTheWind.equals("none")) return;
-                    if (BBsentials.config.toDisplayConfig.goneWithTheWind.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                        return;
-                    if (BBsentials.config.toDisplayConfig.goneWithTheWind.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                        return;
-                }
+        if (BBsentials.miningEventConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+            return;
+        if (!(BBsentials.miningEventConfig.allEvents)) {
+            if (packet.event.equals(MiningEvents.RAFFLE)) {
+                if (!BBsentials.miningEventConfig.raffle) return;
             }
-            Chat.sendPrivateMessageToSelfImportantInfo(packet.username + ": There is a " + packet.event.getDisplayName() + " in the " + packet.island.getDisplayName() + " now/soon.");
+            else if (packet.event.equals(MiningEvents.GOBLIN_RAID)) {
+                if (!BBsentials.miningEventConfig.goblinRaid) return;
+            }
+            else if (packet.event.equals(MiningEvents.MITHRIL_GOURMAND)) {
+                if (!BBsentials.miningEventConfig.mithrilGourmand) return;
+            }
+            else if (packet.event.equals(MiningEvents.BETTER_TOGETHER)) {
+                if (BBsentials.miningEventConfig.betterTogether.equals("none")) return;
+                if (BBsentials.miningEventConfig.betterTogether.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                    return;
+                if (BBsentials.miningEventConfig.betterTogether.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                    return;
+            }
+            else if (packet.event.equals(MiningEvents.DOUBLE_POWDER)) {
+                if (BBsentials.miningEventConfig.doublePowder.equals("none")) return;
+                if (BBsentials.miningEventConfig.doublePowder.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                    return;
+                if (BBsentials.miningEventConfig.doublePowder.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                    return;
+            }
+            else if (packet.event.equals(MiningEvents.GONE_WITH_THE_WIND)) {
+                if (BBsentials.miningEventConfig.goneWithTheWind.equals("none")) return;
+                if (BBsentials.miningEventConfig.goneWithTheWind.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                    return;
+                if (BBsentials.miningEventConfig.goneWithTheWind.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                    return;
+            }
         }
+        Chat.sendPrivateMessageToSelfImportantInfo(packet.username + ": There is a " + packet.event.getDisplayName() + " in the " + packet.island.getDisplayName() + " now/soon.");
     }
+
 
     public void onWelcomePacket(WelcomeClientPacket packet) {
         if (packet.success) {
-            BBsentials.config.bbsentialsRoles = packet.roles;
+            BBsentials.generalConfig.bbsentialsRoles = packet.roles;
             Chat.sendPrivateMessageToSelfSuccess("Login Success");
             if (!packet.motd.isEmpty()) {
                 Chat.sendPrivateMessageToSelfImportantInfo(packet.motd);
@@ -411,16 +402,16 @@ public class BBsentialConnection {
             EnvironmentCore.utils.playsound("block.anvil.destroy");
         }
         else if (packet.command.equals(InternalCommandPacket.HUB)) {
-            BBsentials.config.sender.addImmediateSendTask("/hub");
+            BBsentials.sender.addImmediateSendTask("/hub");
         }
         else if (packet.command.equals(InternalCommandPacket.PRIVATE_ISLAND)) {
-            BBsentials.config.sender.addImmediateSendTask("/is");
+           BBsentials.sender.addImmediateSendTask("/is");
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_HUB)) {
-            BBsentials.config.sender.addHiddenSendTask("/hub", 0);
+           BBsentials.sender.addHiddenSendTask("/hub", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_PRIVATE_ISLAND)) {
-            BBsentials.config.sender.addHiddenSendTask("/is", 0);
+           BBsentials.sender.addHiddenSendTask("/is", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.CRASH)) {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
@@ -449,7 +440,7 @@ public class BBsentialConnection {
     }
 
     public void onPartyPacket(PartyPacket packet) {
-        if (BBsentials.config.allowServerPartyInvite) {
+        if (BBsentials.partyConfig.allowServerPartyInvite) {
             if (packet.type.equals(PartyConstants.DISBAND)) Chat.sendCommand("/p disband");
             else Chat.sendCommand("/p " + packet.type.toString().toLowerCase() + " " + String.join(" ", packet.users));
         }
@@ -485,37 +476,37 @@ public class BBsentialConnection {
         String clientRandom = serverBi.toString(16);
 
         String serverId = clientRandom + packet.serverIdSuffix;
-        if (BBsentials.config.useMojangAuth) {
+        if (BBsentials.bbServerConfig.useMojangAuth) {
             EnvironmentCore.utils.mojangAuth(serverId);
-            RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.config.getMCUUID(), clientRandom, BBsentials.getConfig().getApiVersion(), AuthenticationConstants.MOJANG);
+            RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), clientRandom, BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.MOJANG);
             sendPacket(connectPacket);
         }
         else {
-            sendPacket(new RequestConnectPacket(BBsentials.config.getMCUUID(), BBsentials.getConfig().getApiKey(), BBsentials.getConfig().getApiVersion(), AuthenticationConstants.DATABASE));
+            sendPacket(new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), BBsentials.bbServerConfig.apiKey, BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.DATABASE));
         }
     }
 
     public boolean showChChest(ChChestItem[] items) {
-        if (BBsentials.config.toDisplayConfig.allChChestItem) return true;
+        if (BBsentials.chChestConfig.allChChestItem) return true;
         for (ChChestItem item : items) {
-            if (BBsentials.config.toDisplayConfig.customChChestItem && item.isCustom()) return true;
-            if (BBsentials.config.toDisplayConfig.allRoboPart && item.isRoboPart()) return true;
-            if (BBsentials.config.toDisplayConfig.prehistoricEgg && item.equals(ChChestItems.PrehistoricEgg))
+            if (BBsentials.chChestConfig.customChChestItem && item.isCustom()) return true;
+            if (BBsentials.chChestConfig.allRoboPart && item.isRoboPart()) return true;
+            if (BBsentials.chChestConfig.prehistoricEgg && item.equals(ChChestItems.PrehistoricEgg))
                 return true;
-            if (BBsentials.config.toDisplayConfig.pickonimbus2000 && item.equals(ChChestItems.Pickonimbus2000))
+            if (BBsentials.chChestConfig.pickonimbus2000 && item.equals(ChChestItems.Pickonimbus2000))
                 return true;
-            if (BBsentials.config.toDisplayConfig.controlSwitch && item.equals(ChChestItems.ControlSwitch)) return true;
-            if (BBsentials.config.toDisplayConfig.electronTransmitter && item.equals(ChChestItems.ElectronTransmitter))
+            if (BBsentials.chChestConfig.controlSwitch && item.equals(ChChestItems.ControlSwitch)) return true;
+            if (BBsentials.chChestConfig.electronTransmitter && item.equals(ChChestItems.ElectronTransmitter))
                 return true;
-            if (BBsentials.config.toDisplayConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector))
+            if (BBsentials.chChestConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector))
                 return true;
-            if (BBsentials.config.toDisplayConfig.superliteMotor && item.equals(ChChestItems.SuperliteMotor))
+            if (BBsentials.chChestConfig.superliteMotor && item.equals(ChChestItems.SuperliteMotor))
                 return true;
-            if (BBsentials.config.toDisplayConfig.syntheticHeart && item.equals(ChChestItems.SyntheticHeart))
+            if (BBsentials.chChestConfig.syntheticHeart && item.equals(ChChestItems.SyntheticHeart))
                 return true;
-            if (BBsentials.config.toDisplayConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone))
+            if (BBsentials.chChestConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone))
                 return true;
-            if (BBsentials.config.toDisplayConfig.jungleHeart && item.equals(ChChestItems.JungleHeart)) return true;
+            if (BBsentials.chChestConfig.jungleHeart && item.equals(ChChestItems.JungleHeart)) return true;
         }
         return false;
     }

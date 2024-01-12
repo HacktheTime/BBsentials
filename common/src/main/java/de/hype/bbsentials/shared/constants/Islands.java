@@ -28,7 +28,7 @@ public enum Islands implements BBDisplayNameProvider {
     GOLD_MINE("mining_1", "Gold Mine"),
     HUB("hub", "Hub"),
     KUUDRA("kuudra", "Kuudra"),
-    PRIVATE_ISLAND("dynamic", "Private Islands"),
+    PRIVATE_ISLAND("dynamic", "Private Island"),
     SPIDERS_DEN("combat_1", "Spider's Den"),
     THE_END("combat_3", "The End"),
     THE_FARMING_ISLANDS("farming_1", "The Farming Islands"),

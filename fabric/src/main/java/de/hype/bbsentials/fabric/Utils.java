@@ -6,12 +6,12 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
-import de.hype.bbsentials.client.common.objects.Waypoints;
 import kotlin.Unit;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -19,6 +19,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,10 +29,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -170,6 +176,29 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     @Override
+    public InputStream makeScreenshot() {
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+
+        AtomicReferenceArray<InputStream> screenshotInputStream = new AtomicReferenceArray<>(new InputStream[1]);
+
+        // Execute the screenshot task on the main thread
+        minecraftClient.execute(() -> {
+            try {
+                ByteBuffer buffer = ByteBuffer.wrap(ScreenshotRecorder.takeScreenshot(minecraftClient.getFramebuffer()).getBytes());
+
+                byte[] byteArray = new byte[buffer.capacity()];
+                buffer.get(byteArray);
+
+                screenshotInputStream.set(0, new ByteArrayInputStream(byteArray));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return screenshotInputStream.get(0);
+    }
+
+    @Override
     public List<String> getPlayers() {
         return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
     }
@@ -284,7 +313,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public String getServerId() {
         PlayerListEntry entry = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-c");
-        if (entry==null) return null;
+        if (entry == null) return null;
         return entry.getDisplayName().getString().replace("Server:", "").trim();
     }
 

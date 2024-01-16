@@ -13,6 +13,7 @@ package de.hype.bbsentials.shared.constants;
  */
 public enum PartyConstants {
     INVITE,
+    JOIN,
     TRANSFER,
     ACCEPT,
     DISBAND,

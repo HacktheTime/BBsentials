@@ -55,7 +55,7 @@ public class ChChestUpdateListener extends UpdateListener {
         setWaypoints();
         //(15mc days * 20 min day * 60 to seconds * 20 to ticks) -> 360000 | 1s 1000ms 1000/20 for ms for 1 tick.
         try {
-            lobby.setLobbyMetaData(null, ((360000 - EnvironmentCore.utils.getLobbyTime()) / 50));
+            lobby.setLobbyMetaData(null, ((360000 - EnvironmentCore.utils.getLobbyTime()) * 50));
         } catch (SQLException ignored) {
             //never thrown lol
         }

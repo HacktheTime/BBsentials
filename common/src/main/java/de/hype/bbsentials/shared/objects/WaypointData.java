@@ -8,6 +8,7 @@ public class WaypointData {
     public boolean visible;
     public String textureNameSpace;
     public String texturePath;
+
     public WaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, String textureNameSpace, String texturePath) {
         this.position = pos;
         this.jsonToRenderText = jsonTextToRender;

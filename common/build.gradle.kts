@@ -9,6 +9,7 @@ dependencies {
     implementation(libs.legacyGson)
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     implementation("com.google.guava:guava:33.0.0-jre")
+    implementation(libs.discordJDA)
 
 }
 

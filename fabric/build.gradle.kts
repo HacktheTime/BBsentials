@@ -23,7 +23,6 @@ dependencies {
     mappings("net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2")
     modRuntimeOnly(libs.modern.devauth)
     modImplementation(libs.modern.fabric.loader)
-    implementation(libs.versions.discordJDA)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
 
@@ -65,6 +64,7 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl)
+    relocate("net.dv8tion", "de.hype.bbsentials.deps.dcJDA")
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

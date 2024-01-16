@@ -34,3 +34,7 @@ You need to give credit if you used code of it. (If u used next to no code, don'
 
 Too contributors:
 I may allow donations in the future and will definitely allow donations for the Server costs. I will never make set a requirement too pay though.
+
+Parts of this Project may be under different Licenses.
+
+Discord JDA (net.dv8tion.jda) is under Apache 2.0 License which is available over on their github here: https://github.com/discord-jda/JDA/blob/master/LICENSE The Library is included in the jar and you can try to update it be changing the JDA version in the libs.versions.toml file in the gradle folder.

@@ -21,9 +21,14 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -139,6 +144,41 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public List<String> getSplashLeechingPlayers() {
         return getSplashLeechingPlayersPlayerEntity().stream().map((player -> player.getDisplayName().getFormattedText())).collect(Collectors.toList());
+    }
+
+    public InputStream makeScreenshot() {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        int width = mc.displayWidth;
+        int height = mc.displayHeight;
+
+        // Create ByteBuffer to hold the pixel data
+        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * 4);
+        GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+        // Create BufferedImage from pixel data
+        BufferedImage screenshotImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int index = (y * width + x) * 4;
+                int r = buffer.get(index) & 0xFF;
+                int g = buffer.get(index + 1) & 0xFF;
+                int b = buffer.get(index + 2) & 0xFF;
+                int a = buffer.get(index + 3) & 0xFF;
+                screenshotImage.setRGB(x, y, (a << 24) | (r << 16) | (g << 8) | b);
+            }
+        }
+
+        // Convert BufferedImage to ByteArrayInputStream
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(screenshotImage, "png", outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

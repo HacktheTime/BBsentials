@@ -23,6 +23,7 @@ dependencies {
     mappings("net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2")
     modRuntimeOnly(libs.modern.devauth)
     modImplementation(libs.modern.fabric.loader)
+    implementation(libs.versions.discordJDA)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
 

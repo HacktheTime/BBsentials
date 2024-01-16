@@ -13,6 +13,6 @@ public class ModMenueScreen implements ModMenuApi {
         if (!FabricLoader.getInstance().isModLoaded("cloth-config2")) {
             return parent -> new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(parent), Text.of("BBsentials"), Text.of("BBsentials requires Cloth ConfigManager to be able to show the configManager."));
         }
-        return BBsentialsConfigScreemFactory::create;
+        return BBsentialsConfigScreenFactory::create;
     }
 }

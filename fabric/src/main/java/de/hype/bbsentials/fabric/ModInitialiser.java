@@ -189,7 +189,7 @@ public class ModInitialiser implements ClientModInitializer {
                                     })
                             )
                             .executes((context) -> {
-                                MinecraftClient.getInstance().executeTask(() -> MinecraftClient.getInstance().setScreen(BBsentialsConfigScreemFactory.create(MinecraftClient.getInstance().currentScreen)));
+                                MinecraftClient.getInstance().executeTask(() -> MinecraftClient.getInstance().setScreen(BBsentialsConfigScreenFactory.create(MinecraftClient.getInstance().currentScreen)));
                                 return 1;
                             })
                     ));
@@ -199,7 +199,7 @@ public class ModInitialiser implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (devKeyBind.wasPressed()) {
 //              executionService.schedule(() -> MinecraftClient.getInstance().execute(() ->
-                MinecraftClient.getInstance().setScreen(BBsentialsConfigScreemFactory.create(MinecraftClient.getInstance().currentScreen));
+                MinecraftClient.getInstance().setScreen(BBsentialsConfigScreenFactory.create(MinecraftClient.getInstance().currentScreen));
 //              ),3, TimeUnit.SECONDS);
             }
         });

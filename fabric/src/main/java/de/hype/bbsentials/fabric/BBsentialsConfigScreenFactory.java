@@ -1,7 +1,6 @@
 package de.hype.bbsentials.fabric;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.shared.constants.Islands;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -11,13 +10,12 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 import java.util.List;
 
-public class BBsentialsConfigScreemFactory {
+public class BBsentialsConfigScreenFactory {
     public static Screen create(Screen parent) {
 //        if (BBsentials.configManager == null) {
 //            return new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(parent), Text.of("BBsentials"), Text.of("You need to login to a Server for the ConfigManager to be loaded."));
@@ -29,54 +27,87 @@ public class BBsentialsConfigScreemFactory {
 //        builder.setSavingRunnable(ConfigManager::saveAll);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory server = builder.getOrCreateCategory(Text.of("Server"));
-        if (BBsentials.generalConfig.getUsername().equalsIgnoreCase("Hype_the_Time")) {
-            server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.bbServerConfig.bbServerURL.replaceAll(".", "*"))
-                    .setDefaultValue("static.88-198-149-240.clients.your-server.de")
-                    .setTooltip(Text.of("Place the Server URL of the BBsentials Server here"))
+        if (BBsentials.developerConfig.doDevDashboardConfig && BBsentials.generalConfig.hasBBRoles("dev")) {
+            {
+                ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing Dashboard"));
+                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), BBsentials.developerConfig.devMode)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Dev Mode"))
+                        .setSaveConsumer(newValue -> BBsentials.developerConfig.devMode = newValue)
+                        .build());
+                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Detailed Dev Mode"), BBsentials.developerConfig.detailedDevMode)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Detailed Dev Mode"))
+                        .setSaveConsumer(newValue -> BBsentials.developerConfig.detailedDevMode = newValue)
+                        .build());
+                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Bingo Time Override"), BBsentials.bbServerConfig.overrideBingoTime)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Always connect to the Server whether Bingo is going on or not."))
+                        .setSaveConsumer(newValue -> BBsentials.bbServerConfig.overrideBingoTime = newValue)
+                        .build());
+                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Join Test server"), BBsentials.bbServerConfig.connectToBeta)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("§cWhen enabled join the testserver instead of the main. This Server is used for testing! Youre risking wrong invites etc."))
+                        .setSaveConsumer(newValue -> BBsentials.bbServerConfig.connectToBeta = newValue)
+                        .build());
+                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Security"), BBsentials.developerConfig.devSecurity)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Shows dev debug even when its sensetive information"))
+                        .setSaveConsumer(newValue -> BBsentials.developerConfig.devSecurity = newValue)
+                        .build());
+
+            }
+        }
+        {
+            if (BBsentials.generalConfig.getUsername().equalsIgnoreCase("Hype_the_Time")) {
+                server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.bbServerConfig.bbServerURL.replaceAll(".", "*"))
+                        .setDefaultValue("static.88-198-149-240.clients.your-server.de")
+                        .setTooltip(Text.of("Place the Server URL of the BBsentials Server here"))
+                        .setSaveConsumer((newValue) -> {
+                            if (newValue.replace("*", "").trim().isEmpty()) {
+                                return;
+                            }
+                            else {
+                                BBsentials.bbServerConfig.bbServerURL = newValue;
+                            }
+                        })
+                        .build());
+            }
+            else {
+                server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.bbServerConfig.bbServerURL)
+                        .setDefaultValue("static.88-198-149-240.clients.your-server.de")
+                        .setTooltip(Text.of("Place the Server URL of the BBsentials Server here"))
+                        .setSaveConsumer(newValue -> BBsentials.bbServerConfig.bbServerURL = newValue)
+                        .build());
+            }
+            server.addEntry(entryBuilder.startStrField(Text.of("BBsentials API key"), BBsentials.bbServerConfig.apiKey.replaceAll(".", "*"))
+                    .setDefaultValue("unset")
+                    .setTooltip(Text.of("Put you API Key here (the one generated in the Discord! with /link). §cThe Text is visually censored. Not saved unless you changed it."))
                     .setSaveConsumer((newValue) -> {
                         if (newValue.replace("*", "").trim().isEmpty()) {
                             return;
                         }
                         else {
-                            BBsentials.bbServerConfig.bbServerURL = newValue;
+                            BBsentials.bbServerConfig.apiKey = newValue;
                         }
                     })
                     .build());
-        }
-        else {
-            server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.bbServerConfig.bbServerURL)
-                    .setDefaultValue("localhost")
-                    .setTooltip(Text.of("Place the Server URL of the BBsentials Server here"))
-                    .setSaveConsumer(newValue -> BBsentials.bbServerConfig.bbServerURL = newValue)
+            server.addEntry(entryBuilder.startBooleanToggle(Text.of("Connect to Test Server"), BBsentials.bbServerConfig.connectToBeta)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Makes you connect to the Test Server instead of the Main Server. Keep in mind that all announces may be tests and the main announces are not transferred over to here!")) // Optional: Shown when the user hover over this option
+                    .setSaveConsumer(newValue -> BBsentials.bbServerConfig.connectToBeta = newValue)
                     .build());
-        }
-        server.addEntry(entryBuilder.startStrField(Text.of("BBsentials API key"), BBsentials.bbServerConfig.apiKey.replaceAll(".", "*"))
-                .setDefaultValue("unset")
-                .setTooltip(Text.of("Put you API Key here (the one generated in the Discord! with /link). §cThe Text is visually censored. Not saved unless you changed it."))
-                .setSaveConsumer((newValue) -> {
-                    if (newValue.replace("*", "").trim().isEmpty()) {
-                        return;
-                    }
-                    else {
-                        BBsentials.bbServerConfig.apiKey = newValue;
-                    }
-                })
-                .build());
-        server.addEntry(entryBuilder.startBooleanToggle(Text.of("Connect to Test Server"), BBsentials.bbServerConfig.connectToBeta)
-                .setDefaultValue(false)
-                .setTooltip(Text.of("Makes you connect to the Test Server instead of the Main Server. Keep in mind that all announces may be tests and the main announces are not transferred over to here!")) // Optional: Shown when the user hover over this option
-                .setSaveConsumer(newValue -> BBsentials.bbServerConfig.connectToBeta = newValue)
-                .build());
-        server.addEntry(entryBuilder.startBooleanToggle(Text.of("Mojang Auth"), BBsentials.bbServerConfig.useMojangAuth)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Uses mojang as authenticator instead of api key"))
-                .setSaveConsumer(newValue -> BBsentials.bbServerConfig.useMojangAuth = newValue)
-                .build());
-        server.addEntry(entryBuilder.startBooleanToggle(Text.of("Override Bingo Time"), BBsentials.bbServerConfig.overrideBingoTime)
-                .setDefaultValue(false)
-                .setTooltip(Text.of("Override the Bingo Time and connect always to the Server. (Bingo time is 14 days cause Extreme Bingo)"))
-                .setSaveConsumer(newValue -> BBsentials.bbServerConfig.overrideBingoTime = newValue)
-                .build());
+            server.addEntry(entryBuilder.startBooleanToggle(Text.of("Mojang Auth"), BBsentials.bbServerConfig.useMojangAuth)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Uses mojang as authenticator instead of api key"))
+                    .setSaveConsumer(newValue -> BBsentials.bbServerConfig.useMojangAuth = newValue)
+                    .build());
+            server.addEntry(entryBuilder.startBooleanToggle(Text.of("Override Bingo Time"), BBsentials.bbServerConfig.overrideBingoTime)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Override the Bingo Time and connect always to the Server. (Bingo time is 14 days cause Extreme Bingo)"))
+                    .setSaveConsumer(newValue -> BBsentials.bbServerConfig.overrideBingoTime = newValue)
+                    .build());
+        } // server
         server.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Server Partying"), BBsentials.partyConfig.allowServerPartyInvite)
                 .setDefaultValue(true)
                 .setTooltip(Text.of("Allow the Server to party players for you automatically. (Convenience Feature. Is used for example for services to automatically party the persons which joined it)"))
@@ -319,6 +350,11 @@ public class BBsentialsConfigScreemFactory {
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Shows dev debug even when its sensetive information"))
                     .setSaveConsumer(newValue -> BBsentials.developerConfig.devSecurity = newValue)
+                    .build());
+            dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Dashboard"), BBsentials.developerConfig.doDevDashboardConfig)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("When opening the Config have a combined view for developer most used configs"))
+                    .setSaveConsumer(newValue -> BBsentials.developerConfig.doDevDashboardConfig = newValue)
                     .build());
         }
         if (BBsentials.generalConfig.hasBBRoles("splasher")) {

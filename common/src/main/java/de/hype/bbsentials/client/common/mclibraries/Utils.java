@@ -45,4 +45,6 @@ public interface Utils {
     List<String> getSplashLeechingPlayers();
 
     InputStream makeScreenshot();
+
+    String getStringFromTextJson(String textJson) throws Exception;
 }

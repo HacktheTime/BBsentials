@@ -17,6 +17,5 @@ public class WaypointData {
         this.visible = visible;
         this.texturePath = texturePath;
         this.textureNameSpace = textureNameSpace;
-
     }
 }

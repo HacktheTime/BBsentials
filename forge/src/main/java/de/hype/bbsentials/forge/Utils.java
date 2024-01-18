@@ -182,6 +182,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     @Override
+    public String getStringFromTextJson(String textJson) throws Exception {
+        return IChatComponent.Serializer.jsonToComponent(textJson).getUnformattedText();
+    }
+
+    @Override
     public List<String> getPlayers() {
         return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getFormattedText()).collect(Collectors.toList());
     }

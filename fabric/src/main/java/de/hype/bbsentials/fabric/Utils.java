@@ -13,6 +13,7 @@ import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import kotlin.Unit;
+import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -205,6 +206,27 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @Override
+    public boolean executeClientCommand(String command) {
+        return ClientCommandInternals.executeCommand(command);
+    }
+
+    @Override
+    public boolean isJsonParseableToText(String json) {
+        try {
+            Text.Serialization.fromJson(json);
+            return true;
+        }catch (Exception ignored){
+            return false;
+        }
+    }
+
+    @Override
+    public String stringToTextJson(String string) {
+        if (isJsonParseableToText(string)) return string;
+        return Text.Serialization.toJsonString(Text.of(string));
     }
 
     @Override

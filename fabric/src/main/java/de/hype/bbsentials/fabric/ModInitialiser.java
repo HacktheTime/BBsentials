@@ -15,6 +15,7 @@ import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.shared.objects.Position;
+import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -26,7 +27,6 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.BlockPosArgumentType;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
@@ -83,7 +83,6 @@ public class ModInitialiser implements ClientModInitializer {
                                 return 1;
                             })));
         });//sbsocialoptions
-
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("bbi")
                     .then(ClientCommandManager.literal("reconnect")
@@ -203,11 +202,11 @@ public class ModInitialiser implements ClientModInitializer {
                     .then(ClientCommandManager.literal("waypoint")
                             .then(ClientCommandManager.literal("add")
                                     .then(ClientCommandManager.argument("name", StringArgumentType.string())
-                                            .then(CommandManager.argument("position", BlockPosArgumentType.getBlockPos())
-                                                    .then(CommandManager.argument("deleteonserverswap", BoolArgumentType.bool())
-                                                            .then(CommandManager.argument("visible", BoolArgumentType.bool())
-                                                                    .then(CommandManager.argument("maxrenderdistance", IntegerArgumentType.integer())
-                                                                            .then(CommandManager.argument("customtexture", StringArgumentType.string())
+                                            .then(ClientCommandManager.argument("position", CBlockPosArgumentType.blockPos())
+                                                    .then(ClientCommandManager.argument("deleteonserverswap", BoolArgumentType.bool())
+                                                            .then(ClientCommandManager.argument("visible", BoolArgumentType.bool())
+                                                                    .then(ClientCommandManager.argument("maxrenderdistance", IntegerArgumentType.integer())
+                                                                            .then(ClientCommandManager.argument("customtexture", StringArgumentType.string())
                                                                                     .executes(this::createWaypointFromCommandContext)
                                                                             )
                                                                             .executes(this::createWaypointFromCommandContext)
@@ -221,43 +220,43 @@ public class ModInitialiser implements ClientModInitializer {
                                 int wpId = IntegerArgumentType.getInteger(context, "waypointid");
                                 return (Waypoints.waypoints.remove(wpId) != null) ? 1 : 0;
                             })))
-                            .then(ClientCommandManager.literal("setvisibility")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).then(CommandManager.argument("visible", BoolArgumentType.bool()).executes((context -> {
-                                                int wpId = IntegerArgumentType.getInteger(context, "waypointid");
-                                                boolean visible = BoolArgumentType.getBool(context, "setvisibility");
-                                                Waypoints waypoint = Waypoints.waypoints.get(wpId);
-                                                if (waypoint == null) {
-                                                    context.getSource().sendError(Text.of("No Waypoint on that ID found"));
-                                                    return 0;
-                                                }
-                                                if (waypoint.visible == visible) {
-                                                    Chat.sendPrivateMessageToSelfInfo("Nothing changed. Waypoint visibility was that state already");
-                                                    return 1;
-                                                }
-                                                else {
-                                                    waypoint.visible = visible;
-                                                    Chat.sendPrivateMessageToSelfSuccess("Nothing changed. Waypoint visibility was that state already");
-                                                    return 1;
-                                                }
-                                            })))
-                                            .then(ClientCommandManager.literal("info")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
-                                                int wpId = IntegerArgumentType.getInteger(context, "waypointid");
-                                                try {
-                                                    Chat.sendPrivateMessageToSelfInfo(Waypoints.waypoints.get(wpId).getFullInfoString());
-                                                    return 1;
-                                                } catch (NullPointerException ignored) {
-                                                    return 0;
-                                                }
-                                            })))
-                                            .then(ClientCommandManager.literal("list").executes((context -> {
-                                                        Waypoints.waypoints.forEach(((integer, waypoint) -> {
-                                                            Chat.sendPrivateMessageToSelfInfo(waypoint.getMinimalInfoString());
-                                                        }));
-                                                        return 1;
-                                                    }))
-                                            )
+                            .then(ClientCommandManager.literal("setvisibility")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer())
+                                    .then(ClientCommandManager.argument("visible", BoolArgumentType.bool()).executes((context -> {
+                                        int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                        boolean visible = BoolArgumentType.getBool(context, "setvisibility");
+                                        Waypoints waypoint = Waypoints.waypoints.get(wpId);
+                                        if (waypoint == null) {
+                                            context.getSource().sendError(Text.of("No Waypoint on that ID found"));
+                                            return 0;
+                                        }
+                                        if (waypoint.visible == visible) {
+                                            Chat.sendPrivateMessageToSelfInfo("Nothing changed. Waypoint visibility was that state already");
+                                            return 1;
+                                        }
+                                        else {
+                                            waypoint.visible = visible;
+                                            Chat.sendPrivateMessageToSelfSuccess("Nothing changed. Waypoint visibility was that state already");
+                                            return 1;
+                                        }
+                                    })))
+                                    .then(ClientCommandManager.literal("info")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
+                                        int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                        try {
+                                            Chat.sendPrivateMessageToSelfInfo(Waypoints.waypoints.get(wpId).getFullInfoString());
+                                            return 1;
+                                        } catch (NullPointerException ignored) {
+                                            return 0;
+                                        }
+                                    })))
+                                    .then(ClientCommandManager.literal("list").executes((context -> {
+                                                Waypoints.waypoints.forEach(((integer, waypoint) -> {
+                                                    Chat.sendPrivateMessageToSelfInfo(waypoint.getMinimalInfoString());
+                                                }));
+                                                return 1;
+                                            }))
+                                    )
                             )));
         }); //bbi
-
         KeyBinding devKeyBind = new KeyBinding("Open Mod Menu ConfigManager", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (devKeyBind.wasPressed()) {
@@ -332,12 +331,28 @@ public class ModInitialiser implements ClientModInitializer {
 
     public int createWaypointFromCommandContext(CommandContext context) {
         String jsonName = StringArgumentType.getString(context, "name");
+        jsonName = EnvironmentCore.utils.stringToTextJson(jsonName);
         BlockPos pos = BlockPosArgumentType.getBlockPos(context, "position");
         Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
         Boolean deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
         Boolean visible = BoolArgumentType.getBool(context, "visible");
         Integer maxRenderDist = IntegerArgumentType.getInteger(context, "maxrenderdistance");
+        String customTextureFull = null;
+        String customTextureNameSpace = null;
+        String customTexturePath = null;
+        try {
+            customTextureFull=StringArgumentType.getString(context,"customtexture");
+            if (customTextureFull.contains(":")) {
+                customTextureNameSpace=customTexturePath.split(":")[0];
+                customTexturePath=customTexturePath.split(":")[1];
+            }else {
+                customTexturePath=customTexturePath;
+            }
+        }catch (Exception ignored){
 
+        }
+
+        Waypoints waypoint = new Waypoints(position,jsonName,maxRenderDist,visible,deleteOnServerSwap,customTextureNameSpace,customTexturePath);
         return 1;
     }
 }

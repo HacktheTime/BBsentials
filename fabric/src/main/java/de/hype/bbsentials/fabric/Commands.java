@@ -24,12 +24,14 @@ import de.hype.bbsentials.shared.packets.network.BingoChatMessagePacket;
 import de.hype.bbsentials.shared.packets.network.BroadcastMessagePacket;
 import de.hype.bbsentials.shared.packets.network.InternalCommandPacket;
 import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
+import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 import java.util.Objects;
@@ -128,47 +130,38 @@ public class Commands implements MCCommand {
 
                                 return CommandSource.suggestMatching(suggestions, builder);
                             })
+                            .then(ClientCommandManager.argument("coordinates", CBlockPosArgumentType.blockPos())
+                                    .then(ClientCommandManager.argument("ContactWay", StringArgumentType.string())
+                                            .suggests(((context, builder) -> {
+                                                return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.generalConfig.getUsername() + " bb:party me\"", "\"/p join " + BBsentials.generalConfig.getUsername() + "\""}, builder);
+                                            }))
+                                            .then(ClientCommandManager.argument("extraMessage", StringArgumentType.greedyString())
+                                                    .executes((context) -> {
+                                                                String item = StringArgumentType.getString(context, "Item");
+                                                                BlockPos pos = CBlockPosArgumentType.getCBlockPos(context,"coordinates");
+                                                                String contactWay = StringArgumentType.getString(context, "ContactWay");
+                                                                String extraMessage = StringArgumentType.getString(context, "extraMessage");
 
-                            .then(ClientCommandManager.argument("X", IntegerArgumentType.integer())
-                                    .then(ClientCommandManager.argument("Y", IntegerArgumentType.integer())
-                                            .then(ClientCommandManager.argument("Z", IntegerArgumentType.integer())
-                                                    .then(ClientCommandManager.argument("ContactWay", StringArgumentType.string())
-                                                            .suggests(((context, builder) -> {
-                                                                return CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.generalConfig.getUsername() + " bb:party me\"", "\"/p join " + BBsentials.generalConfig.getUsername() + "\""}, builder);
-                                                            }))
-                                                            .then(ClientCommandManager.argument("extraMessage", StringArgumentType.greedyString())
-                                                                    .executes((context) -> {
-                                                                                String item = StringArgumentType.getString(context, "Item");
-                                                                                int x = IntegerArgumentType.getInteger(context, "X");
-                                                                                int y = IntegerArgumentType.getInteger(context, "Y");
-                                                                                int z = IntegerArgumentType.getInteger(context, "Z");
-                                                                                String contactWay = StringArgumentType.getString(context, "ContactWay");
-                                                                                String extraMessage = StringArgumentType.getString(context, "extraMessage");
-
-                                                                                if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
-                                                                                    context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
-                                                                                    return 1;
-                                                                                }
-                                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
-                                                                                return 1;
-                                                                            }
-                                                                    )
-                                                            )
-                                                            .executes((context) -> {
-                                                                        String item = StringArgumentType.getString(context, "Item");
-                                                                        int x = IntegerArgumentType.getInteger(context, "X");
-                                                                        int y = IntegerArgumentType.getInteger(context, "Y");
-                                                                        int z = IntegerArgumentType.getInteger(context, "Z");
-                                                                        String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                 if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
                                                                     context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
                                                                     return 1;
                                                                 }
-                                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(x, y, z), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
-                                                                        return 1;
-                                                                    }
-                                                            )
+                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("",  new Position(pos.getX(),pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
+                                                                return 1;
+                                                            }
                                                     )
+                                            )
+                                            .executes((context) -> {
+                                                        String item = StringArgumentType.getString(context, "Item");
+                                                BlockPos pos = CBlockPosArgumentType.getCBlockPos(context,"coordinates");
+                                                String contactWay = StringArgumentType.getString(context, "ContactWay");
+                                                        if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
+                                                            context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
+                                                            return 1;
+                                                        }
+                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(),pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
+                                                        return 1;
+                                                    }
                                             )
                                     )
                             )

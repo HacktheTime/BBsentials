@@ -4,36 +4,36 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Sender;
 import de.hype.bbsentials.client.common.client.commands.Commands;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
+import de.hype.bbsentials.client.common.client.socketAddons.AddonManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class BBsentials {
-    public static BBsentialConnection connection;
     public static final Sender sender = new Sender();
+    public static BBsentialConnection connection;
     public static Commands coms;
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
-    public static Map<Integer,ServerSwitchTask> onServerJoin = new HashMap<>();
-    public static Map<Integer,ServerSwitchTask> onServerLeave = new HashMap<>();
+    public static Map<Integer, ServerSwitchTask> onServerJoin = new HashMap<>();
+    public static Map<Integer, ServerSwitchTask> onServerLeave = new HashMap<>();
 
     public static Map<Integer, CustomItemTexture> customItemTextures = new HashMap<>();
     public static Thread bbthread;
     public static Chat chat = new Chat();
     public static Thread debugThread;
-    private static boolean initialised = false;
     public static DeveloperConfig developerConfig = new DeveloperConfig();
     public static DiscordConfig discordConfig = new DiscordConfig();
     public static GeneralConfig generalConfig = new GeneralConfig();
+    public static SocketAddonConfig socketAddonConfig = new SocketAddonConfig();
     public static ChChestConfig chChestConfig = new ChChestConfig();
     public static FunConfig funConfig = new FunConfig();
     public static TemporaryConfig temporaryConfig = new TemporaryConfig();
@@ -45,6 +45,8 @@ public class BBsentials {
     public static GuildConfig guildConfig = new GuildConfig();
     public static BBServerConfig bbServerConfig = new BBServerConfig();
     public static EnvironmentConfig environmentConfig = new EnvironmentConfig();
+    public static AddonManager addonManager;
+    private static boolean initialised = false;
 
     public static void connectToBBserver() {
         connectToBBserver(bbServerConfig.connectToBeta);
@@ -120,6 +122,11 @@ public class BBsentials {
             UpdateListenerManager.init();
             EnvironmentCore.mcevents.registerAll();
         }
-
+        try {
+            addonManager = new AddonManager();
+        } catch (IOException e) {
+            Chat.sendPrivateMessageToSelfError(e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

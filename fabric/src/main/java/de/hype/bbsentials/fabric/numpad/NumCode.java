@@ -3,6 +3,7 @@ package de.hype.bbsentials.fabric.numpad;
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class NumCode {
                     } catch (InterruptedException ignored) {
 
                     }
-                    if (ClientCommandInternals.executeCommand(command.replaceFirst("\\\\", ""))) {
+                    if (EnvironmentCore.utils.executeClientCommand(command.replaceFirst("\\\\", ""))) {
                         Chat.sendPrivateMessageToSelfSuccess("Code '" + code + "': Success");
                     }
                     else {

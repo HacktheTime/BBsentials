@@ -9,6 +9,7 @@ plugins {
 }
 repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://maven.xpple.dev/maven2")
 }
 
 
@@ -18,7 +19,7 @@ val shadowImpl: Configuration by configurations.creating {
 }
 
 dependencies {
-    shadowImpl (project(":common"))
+    shadowImpl(project(":common"))
 
     minecraft(libs.modern.minecraft)
     mappings("net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2")
@@ -26,7 +27,7 @@ dependencies {
     modImplementation(libs.modern.fabric.loader)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
-
+    modImplementation("dev.xpple:clientarguments:1.7")
     modApi(libs.clothConfig) {
         exclude(group = "net.fabricmc.fabric-api")
     }
@@ -41,7 +42,7 @@ tasks.processResources {
         expand(inputs.properties)
     }
 }
-tasks.withType<KotlinCompile> {kotlinOptions.jvmTarget = "17"}
+tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
 
 java {
     java {

@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
+    idea
     kotlin("jvm") version (libs.versions.kotlinVersion)
     id("com.github.johnrengelman.shadow")
     id("fabric-loom") version "1.4.5"

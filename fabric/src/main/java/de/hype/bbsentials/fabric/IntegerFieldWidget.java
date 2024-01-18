@@ -1,10 +1,13 @@
 package de.hype.bbsentials.fabric;
 
+import de.hype.bbsentials.fabric.numpad.TextFieldWidget;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Sets the Maximum length by default to 32767 from Minecraft default of like 30.
+ */
 public class IntegerFieldWidget extends TextFieldWidget {
     public IntegerFieldWidget(TextRenderer textRenderer, int width, int height, Text text) {
         super(textRenderer, width, height, text);

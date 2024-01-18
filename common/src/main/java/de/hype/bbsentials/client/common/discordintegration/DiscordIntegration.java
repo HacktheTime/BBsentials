@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class DiscordIntegration extends ListenerAdapter {
     private final String botToken;
@@ -40,6 +41,7 @@ public class DiscordIntegration extends ListenerAdapter {
         this.botOwnerUserId = botOwnerUserId;
         this.botToken = botToken;
         if (!BBsentials.discordConfig.discordIntegration) return;
+        if (!BBsentials.discordConfig.useBridgeBot) return;
         jda = start();
         BBsentials.executionService.scheduleAtFixedRate(() -> updateStatus(), 0, 10, TimeUnit.MINUTES);
         registerGlobalCommands();
@@ -97,7 +99,7 @@ public class DiscordIntegration extends ListenerAdapter {
     public void onReady(ReadyEvent event) {
         this.botOwner = jda.retrieveUserById(botOwnerUserId).complete();
         dms = botOwner.openPrivateChannel().complete();
-        deleteAllDms(dms);
+        if (BBsentials.discordConfig.deleteHistoryOnServerSwap) deleteAllDms(dms);
         System.out.println("Bot is ready!");
         dms.sendMessage("Bot is now online").setSuppressedNotifications(true).queue();
     }
@@ -122,6 +124,7 @@ public class DiscordIntegration extends ListenerAdapter {
      * @return when returned true message is important and not silent
      */
     public boolean isImportant(de.hype.bbsentials.client.common.chat.Message advancedMessage) {
+        if (BBsentials.discordConfig.alwaysSilent) return false;
         String simpleMessage = advancedMessage.getUnformattedString();
         if (simpleMessage.contains("afk") || simpleMessage.contains("hub")) {
             return true;
@@ -196,6 +199,7 @@ public class DiscordIntegration extends ListenerAdapter {
                 Commands.slash("hub", "warps you to the hub"),
                 Commands.slash("warp-garden", "warps you to the garden"),
                 Commands.slash("screenshot", "makes a screenshot of the screen and sends it to you"),
+                Commands.slash("clear", "clears the messages sent by the bot"),
                 Commands.slash("custom", "allows you to specify a custom command to be executed").addOption(OptionType.STRING, "command", "command to be executed", true)
         ).queue();
     }
@@ -243,6 +247,14 @@ public class DiscordIntegration extends ListenerAdapter {
                     reply(event, "Done");
                 } catch (Exception e) {
                     reply(event, "Invalid command");
+                }
+            }
+            else if (event.getName().equals("clear")) {
+                try {
+                    event.getChannel().asPrivateChannel().purgeMessages(event.getChannel().asPrivateChannel().getHistory().getRetrievedHistory().stream().filter(message -> message.getAuthor().getId().equals(jda.getSelfUser().getId())).collect(Collectors.toList()));
+                    reply(event, "Done");
+                } catch (Exception ignored) {
+                    reply(event, "Error Occur");
                 }
             }
         }

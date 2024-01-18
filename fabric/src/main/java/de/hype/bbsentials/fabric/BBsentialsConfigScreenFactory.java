@@ -1,6 +1,7 @@
 package de.hype.bbsentials.fabric;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.shared.constants.Islands;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -17,14 +18,10 @@ import java.util.List;
 
 public class BBsentialsConfigScreenFactory {
     public static Screen create(Screen parent) {
-//        if (BBsentials.configManager == null) {
-//            return new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(parent), Text.of("BBsentials"), Text.of("You need to login to a Server for the ConfigManager to be loaded."));
-//        }
-//        else {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Text.of("BBsentials ConfigManager"));
-//        builder.setSavingRunnable(ConfigManager::saveAll);
+        builder.setSavingRunnable(ConfigManager::saveAll);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory server = builder.getOrCreateCategory(Text.of("Server"));
         if (BBsentials.developerConfig.doDevDashboardConfig && BBsentials.generalConfig.hasBBRoles("dev")) {
@@ -108,90 +105,100 @@ public class BBsentialsConfigScreenFactory {
                     .setSaveConsumer(newValue -> BBsentials.bbServerConfig.overrideBingoTime = newValue)
                     .build());
         } // server
-        server.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Server Partying"), BBsentials.partyConfig.allowServerPartyInvite)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Allow the Server to party players for you automatically. (Convenience Feature. Is used for example for services to automatically party the persons which joined it)"))
-                .setSaveConsumer(newValue -> BBsentials.partyConfig.allowServerPartyInvite = newValue)
-                .build());
-        //Visual
+        ConfigCategory party = builder.getOrCreateCategory(Text.of("§6Party"));
+        {
+            party.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Server Partying"), BBsentials.partyConfig.allowServerPartyInvite)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Allow the Server to party players for you automatically. (Convenience Feature. Is used for example for services to automatically party the persons which joined it)"))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.allowServerPartyInvite = newValue)
+                    .build());
+        }//Party
         ConfigCategory visual = builder.getOrCreateCategory(Text.of("Visual"));
-        visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Chat"), BBsentials.visualConfig.showBingoChat)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Select if you want the Bingo Chat to be show"))
-                .setSaveConsumer(newValue -> BBsentials.visualConfig.showBingoChat = newValue)
-                .build());
-        visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Splash Status Updates"), BBsentials.splashConfig.showSplashStatusUpdates)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Select if you want to see Splash Staus updates. Keep in mind that this will only send you status updates for the Splashes which you were shown.\nThose hidden due too too high Splash Time will still remain invisible"))
-                .setSaveConsumer(newValue -> BBsentials.splashConfig.showSplashStatusUpdates = newValue)
-                .build());
-        //Notifications
+        {
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Gamma Override"), BBsentials.visualConfig.doGammaOverride)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want BBsentials to enable full bright"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.doGammaOverride = newValue)
+                    .requireRestart()
+                    .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Chat"), BBsentials.visualConfig.showBingoChat)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want the Bingo Chat to be show"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.showBingoChat = newValue)
+                    .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Splash Status Updates"), BBsentials.splashConfig.showSplashStatusUpdates)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want to see Splash Staus updates. Keep in mind that this will only send you status updates for the Splashes which you were shown.\nThose hidden due too too high Splash Time will still remain invisible"))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.showSplashStatusUpdates = newValue)
+                    .build());
+        }
+        //Visual
         ConfigCategory notifications = builder.getOrCreateCategory(Text.of("Notifications"));
-        BooleanListEntry doNotifications = entryBuilder.startBooleanToggle(Text.of("Do Desktop Notifications"), BBsentials.generalConfig.doDesktopNotifications)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
-                .setSaveConsumer(newValue -> BBsentials.generalConfig.doDesktopNotifications = newValue)
-                .build();
-        DropdownBoxEntry<String> notificationOn = entryBuilder.startStringDropdownMenu(Text.of("Notification on"), BBsentials.generalConfig.notifForMessagesType) // Start the StringDropdownMenu entry
-                .setSelections(List.of("all", "nick", "none"))
-                .setTooltip(Text.of("When do you want to receive Desktop Notifications? on all party, messages containing nickname"))
-                .setDefaultValue("all")
-                .setRequirement(Requirement.isTrue(doNotifications))
-                .setSuggestionMode(false)
-                .setSaveConsumer(newValue -> BBsentials.generalConfig.notifForMessagesType = newValue)
-                .build();
-        StringListEntry nickname = entryBuilder.startStrField(Text.of("Nickname"), BBsentials.generalConfig.nickname)
-                .setDefaultValue("")
-                .setTooltip(Text.of("Nickname. you will get send desktop notifications if a message contains one"))
-                .setRequirement(() -> {
-                    return doNotifications.getValue() && notificationOn.getValue().equals("nick");
-                })
-                .setSaveConsumer(newValue -> BBsentials.generalConfig.nickname = newValue)
-                .build();
+        {
+            BooleanListEntry doNotifications = entryBuilder.startBooleanToggle(Text.of("Do Desktop Notifications"), BBsentials.generalConfig.doDesktopNotifications)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
+                    .setSaveConsumer(newValue -> BBsentials.generalConfig.doDesktopNotifications = newValue)
+                    .build();
+            DropdownBoxEntry<String> notificationOn = entryBuilder.startStringDropdownMenu(Text.of("Notification on"), BBsentials.generalConfig.notifForMessagesType) // Start the StringDropdownMenu entry
+                    .setSelections(List.of("all", "nick", "none"))
+                    .setTooltip(Text.of("When do you want to receive Desktop Notifications? on all party, messages containing nickname"))
+                    .setDefaultValue("all")
+                    .setRequirement(Requirement.isTrue(doNotifications))
+                    .setSuggestionMode(false)
+                    .setSaveConsumer(newValue -> BBsentials.generalConfig.notifForMessagesType = newValue)
+                    .build();
+            StringListEntry nickname = entryBuilder.startStrField(Text.of("Nickname"), BBsentials.generalConfig.nickname)
+                    .setDefaultValue("")
+                    .setTooltip(Text.of("Nickname. you will get send desktop notifications if a message contains one"))
+                    .setRequirement(() -> {
+                        return doNotifications.getValue() && notificationOn.getValue().equals("nick");
+                    })
+                    .setSaveConsumer(newValue -> BBsentials.generalConfig.nickname = newValue)
+                    .build();
 
-        notifications.addEntry(doNotifications);
-        notifications.addEntry(notificationOn);
-        notifications.addEntry(nickname);
-        //other
+            notifications.addEntry(doNotifications);
+            notifications.addEntry(notificationOn);
+            notifications.addEntry(nickname);
+        }
+        //Notifications
         ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));
-        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Gamma Override"), BBsentials.visualConfig.doGammaOverride)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Select if you want BBsentials to enable full bright"))
-                .setSaveConsumer(newValue -> BBsentials.visualConfig.doGammaOverride = newValue)
-                .build());
-        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), BBsentials.partyConfig.acceptReparty)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
-                .setSaveConsumer(newValue -> BBsentials.partyConfig.acceptReparty = newValue)
-                .build());
-        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept auto invite"), BBsentials.partyConfig.allowBBinviteMe)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
-                .setSaveConsumer(newValue -> BBsentials.partyConfig.allowBBinviteMe = newValue)
-                .build());
-        SubCategoryBuilder trolls = entryBuilder.startSubCategory(Text.of("Trolls")).setExpanded(false);
-        BooleanListEntry swapActionBarAndChat = (entryBuilder.startBooleanToggle(Text.of("Actionbar-Chat switch"), BBsentials.funConfig.swapActionBarChat)
-                .setDefaultValue(false)
-                .setTooltip(Text.of("Swap that chat messages are shown in actionbar and reverse"))
-                .setSaveConsumer(newValue -> BBsentials.funConfig.swapActionBarChat = newValue)
-                .build());
-        Requirement trollSwapEnabled = swapActionBarAndChat::getValue;
-        BooleanListEntry swapActionBarAndChatOnlyNormal = (entryBuilder.startBooleanToggle(Text.of("Only normal messages"), BBsentials.funConfig.swapOnlyNormal)
-                .setDefaultValue(false)
-                .setRequirement(trollSwapEnabled)
-                .setTooltip(Text.of("Swap only the default messages (→ everything not from BBsentials)"))
-                .setSaveConsumer(newValue -> BBsentials.funConfig.swapOnlyNormal = newValue)
-                .build());
-        BooleanListEntry swapActionBarAndChatOnlyBB = (entryBuilder.startBooleanToggle(Text.of("Only BBsentials messages"), BBsentials.funConfig.swapOnlyBBsentials)
-                .setDefaultValue(false)
-                .setRequirement(trollSwapEnabled)
-                .setTooltip(Text.of("Swap only the messages from BBsentials"))
-                .setSaveConsumer(newValue -> BBsentials.funConfig.swapOnlyBBsentials = newValue)
-                .build());
-        trolls.add(swapActionBarAndChat);
-        trolls.add(swapActionBarAndChatOnlyNormal);
-        trolls.add(swapActionBarAndChatOnlyBB);
-        other.addEntry(trolls.build());
+        {
+            other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), BBsentials.partyConfig.acceptReparty)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.acceptReparty = newValue)
+                    .build());
+            other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept auto invite"), BBsentials.partyConfig.allowBBinviteMe)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.allowBBinviteMe = newValue)
+                    .build());
+            SubCategoryBuilder trolls = entryBuilder.startSubCategory(Text.of("Trolls")).setExpanded(false);
+            BooleanListEntry swapActionBarAndChat = (entryBuilder.startBooleanToggle(Text.of("Actionbar-Chat switch"), BBsentials.funConfig.swapActionBarChat)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Swap that chat messages are shown in actionbar and reverse"))
+                    .setSaveConsumer(newValue -> BBsentials.funConfig.swapActionBarChat = newValue)
+                    .build());
+            Requirement trollSwapEnabled = swapActionBarAndChat::getValue;
+            BooleanListEntry swapActionBarAndChatOnlyNormal = (entryBuilder.startBooleanToggle(Text.of("Only normal messages"), BBsentials.funConfig.swapOnlyNormal)
+                    .setDefaultValue(false)
+                    .setRequirement(trollSwapEnabled)
+                    .setTooltip(Text.of("Swap only the default messages (→ everything not from BBsentials)"))
+                    .setSaveConsumer(newValue -> BBsentials.funConfig.swapOnlyNormal = newValue)
+                    .build());
+            BooleanListEntry swapActionBarAndChatOnlyBB = (entryBuilder.startBooleanToggle(Text.of("Only BBsentials messages"), BBsentials.funConfig.swapOnlyBBsentials)
+                    .setDefaultValue(false)
+                    .setRequirement(trollSwapEnabled)
+                    .setTooltip(Text.of("Swap only the messages from BBsentials"))
+                    .setSaveConsumer(newValue -> BBsentials.funConfig.swapOnlyBBsentials = newValue)
+                    .build());
+            trolls.add(swapActionBarAndChat);
+            trolls.add(swapActionBarAndChatOnlyNormal);
+            trolls.add(swapActionBarAndChatOnlyBB);
+            other.addEntry(trolls.build());
+        }
+        //other
         ConfigCategory chChestItems = builder.getOrCreateCategory(Text.of("Ch Chest Items"));
         {
             BooleanListEntry allItems = entryBuilder.startBooleanToggle(Text.of("All Chest Items"), BBsentials.chChestConfig.allChChestItem)
@@ -334,6 +341,31 @@ public class BBsentialsConfigScreenFactory {
                     .setRequirement(() -> !allEvents.getValue())
                     .build());
         } //Mining Events
+        if (BBsentials.discordConfig.discordIntegration) {
+            ConfigCategory discordIntegration = builder.getOrCreateCategory(Text.of("§bDiscord"));
+            {
+                discordIntegration.addEntry(entryBuilder.startStrField(Text.of("DC Bot Token"), BBsentials.discordConfig.botToken)
+                        .setDefaultValue("")
+                        .setTooltip(Text.of("Whether you want to allow executing any command from remote. Is a security risk in case someone hacks your dc account."))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.botToken = newValue)
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Always silent"), BBsentials.discordConfig.alwaysSilent)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Will always use the @silent tag and never ping you with notification."))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.alwaysSilent = newValue)
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Custom Commands"), BBsentials.discordConfig.allowCustomCommands)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Whether you want to allow executing any command from remote. Is a security risk in case someone hacks your dc account."))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.allowCustomCommands = newValue)
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Use sync bot"), BBsentials.discordConfig.useBridgeBot)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Whether you want messages to be sent over to your discord as well."))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.useBridgeBot = newValue)
+                        .build());
+            }
+        }//Discord
         if (BBsentials.generalConfig.hasBBRoles("dev")) {
             ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing"));
             dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), BBsentials.developerConfig.devMode)
@@ -364,6 +396,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Automatically updates the Status of the Splash by sending packets to the Server"))
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.autoSplashStatusUpdates = newValue)
                     .build();
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Splash Status Updates"), BBsentials.splashConfig.showSplashStatusUpdates)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want to see Splash Staus updates. Keep in mind that this will only send you status updates for the Splashes which you were shown.\nThose hidden due too too high Splash Time will still remain invisible"))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.showSplashStatusUpdates = newValue)
+                    .build());
             splasher.addEntry(updateSplashStatus);
             BooleanListEntry showLeecherHud = entryBuilder.startBooleanToggle(Text.of("Do not show Splash Leecher Overlay"), BBsentials.splashConfig.autoSplashStatusUpdates)
                     .setDefaultValue(true)
@@ -381,6 +418,5 @@ public class BBsentialsConfigScreenFactory {
 
         }
         return builder.build();
-//        }
     }
 }

@@ -5,14 +5,15 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.IntegerFieldWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Sets the Maximum length by default to 32767 from Minecraft default of like 30.
+ */
 public class NumCodeInputFieldWidget extends IntegerFieldWidget {
     public final NumPadCodeConfigScreen codeConfigScreen;
     int index;
-
     public NumCodeInputFieldWidget(TextRenderer textRenderer, int width, int height, Text text, NumPadCodeConfigScreen codeConfigScreen, int index) {
         super(textRenderer, width, height, text);
         this.index = index;

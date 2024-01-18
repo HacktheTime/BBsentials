@@ -47,4 +47,10 @@ public interface Utils {
     InputStream makeScreenshot();
 
     String getStringFromTextJson(String textJson) throws Exception;
+
+    boolean executeClientCommand(String command);
+
+    boolean isJsonParseableToText(String json);
+
+    String stringToTextJson(String string);
 }

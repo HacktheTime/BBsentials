@@ -23,7 +23,6 @@ public class BBsentialsConfigScreenFactory {
                 .setTitle(Text.of("BBsentials ConfigManager"));
         builder.setSavingRunnable(ConfigManager::saveAll);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory server = builder.getOrCreateCategory(Text.of("Server"));
         if (BBsentials.developerConfig.doDevDashboardConfig && BBsentials.generalConfig.hasBBRoles("dev")) {
             {
                 ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing Dashboard"));
@@ -55,6 +54,7 @@ public class BBsentialsConfigScreenFactory {
 
             }
         }
+        ConfigCategory server = builder.getOrCreateCategory(Text.of("Server"));
         {
             if (BBsentials.generalConfig.getUsername().equalsIgnoreCase("Hype_the_Time")) {
                 server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.bbServerConfig.bbServerURL.replaceAll(".", "*"))
@@ -107,6 +107,8 @@ public class BBsentialsConfigScreenFactory {
         } // server
         ConfigCategory party = builder.getOrCreateCategory(Text.of("§6Party"));
         {
+            //TODO do the trusted party meber command and menu
+            //TODO add a waypoint manager gui
             party.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Server Partying"), BBsentials.partyConfig.allowServerPartyInvite)
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Allow the Server to party players for you automatically. (Convenience Feature. Is used for example for services to automatically party the persons which joined it)"))
@@ -366,6 +368,24 @@ public class BBsentialsConfigScreenFactory {
                         .build());
             }
         }//Discord
+        ConfigCategory socketAddons = builder.getOrCreateCategory(Text.of("§cSocket Addons"));
+        {
+            socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Use Socket Addons"), BBsentials.socketAddonConfig.useSocketAddons)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Whether you want to allow Socket Addons."))
+                    .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.useSocketAddons = newValue)
+                    .build());
+            socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow automated sending"), BBsentials.socketAddonConfig.allowAutomatedSending)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("§cSometimes it may be legal but other times it is not. different for how the programm is done you might be doing something illegal and bannable!"))
+                    .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.allowAutomatedSending = newValue)
+                    .build());
+            socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Tellraw"), BBsentials.socketAddonConfig.allowTellraw)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("§cCould be problematic if u run a malicious socket but at that point I believe you have other problems like a RAT. they could simulate a clickable message but they run a coopadd command or sth"))
+                    .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.allowTellraw = newValue)
+                    .build());
+        }//Socket Addons
         if (BBsentials.generalConfig.hasBBRoles("dev")) {
             ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing"));
             dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), BBsentials.developerConfig.devMode)

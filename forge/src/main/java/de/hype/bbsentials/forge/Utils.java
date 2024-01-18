@@ -19,6 +19,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.BufferUtils;
@@ -184,6 +185,27 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     @Override
     public String getStringFromTextJson(String textJson) throws Exception {
         return IChatComponent.Serializer.jsonToComponent(textJson).getUnformattedText();
+    }
+
+    @Override
+    public boolean executeClientCommand(String command) {
+        return false;
+    }
+
+    @Override
+    public boolean isJsonParseableToText(String json) {
+        try {
+            IChatComponent.Serializer.jsonToComponent(json);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    @Override
+    public String stringToTextJson(String string) {
+        if (isJsonParseableToText(string))return string;
+        return IChatComponent.Serializer.componentToJson(new ChatComponentText(string));
     }
 
     @Override

@@ -1,6 +1,9 @@
 package de.hype.bbsentials.fabric;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
@@ -9,7 +12,9 @@ import de.hype.bbsentials.client.common.config.AToLoadBBsentialsConfigUtils;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
+import de.hype.bbsentials.shared.objects.Position;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -20,7 +25,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
@@ -191,8 +199,63 @@ public class ModInitialiser implements ClientModInitializer {
                             .executes((context) -> {
                                 MinecraftClient.getInstance().executeTask(() -> MinecraftClient.getInstance().setScreen(BBsentialsConfigScreenFactory.create(MinecraftClient.getInstance().currentScreen)));
                                 return 1;
-                            })
-                    ));
+                            }))
+                    .then(ClientCommandManager.literal("waypoint")
+                            .then(ClientCommandManager.literal("add")
+                                    .then(ClientCommandManager.argument("name", StringArgumentType.string())
+                                            .then(CommandManager.argument("position", BlockPosArgumentType.getBlockPos())
+                                                    .then(CommandManager.argument("deleteonserverswap", BoolArgumentType.bool())
+                                                            .then(CommandManager.argument("visible", BoolArgumentType.bool())
+                                                                    .then(CommandManager.argument("maxrenderdistance", IntegerArgumentType.integer())
+                                                                            .then(CommandManager.argument("customtexture", StringArgumentType.string())
+                                                                                    .executes(this::createWaypointFromCommandContext)
+                                                                            )
+                                                                            .executes(this::createWaypointFromCommandContext)
+                                                                    )
+                                                            )
+                                                    )
+                                            )
+                                    )
+                            )
+                            .then(ClientCommandManager.literal("remove")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
+                                int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                return (Waypoints.waypoints.remove(wpId) != null) ? 1 : 0;
+                            })))
+                            .then(ClientCommandManager.literal("setvisibility")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).then(CommandManager.argument("visible", BoolArgumentType.bool()).executes((context -> {
+                                                int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                                boolean visible = BoolArgumentType.getBool(context, "setvisibility");
+                                                Waypoints waypoint = Waypoints.waypoints.get(wpId);
+                                                if (waypoint == null) {
+                                                    context.getSource().sendError(Text.of("No Waypoint on that ID found"));
+                                                    return 0;
+                                                }
+                                                if (waypoint.visible == visible) {
+                                                    Chat.sendPrivateMessageToSelfInfo("Nothing changed. Waypoint visibility was that state already");
+                                                    return 1;
+                                                }
+                                                else {
+                                                    waypoint.visible = visible;
+                                                    Chat.sendPrivateMessageToSelfSuccess("Nothing changed. Waypoint visibility was that state already");
+                                                    return 1;
+                                                }
+                                            })))
+                                            .then(ClientCommandManager.literal("info")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
+                                                int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                                try {
+                                                    Chat.sendPrivateMessageToSelfInfo(Waypoints.waypoints.get(wpId).getFullInfoString());
+                                                    return 1;
+                                                } catch (NullPointerException ignored) {
+                                                    return 0;
+                                                }
+                                            })))
+                                            .then(ClientCommandManager.literal("list").executes((context -> {
+                                                        Waypoints.waypoints.forEach(((integer, waypoint) -> {
+                                                            Chat.sendPrivateMessageToSelfInfo(waypoint.getMinimalInfoString());
+                                                        }));
+                                                        return 1;
+                                                    }))
+                                            )
+                            )));
         }); //bbi
 
         KeyBinding devKeyBind = new KeyBinding("Open Mod Menu ConfigManager", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
@@ -222,7 +285,8 @@ public class ModInitialiser implements ClientModInitializer {
         KeyBinding craftKeyBind = new KeyBinding("Craft", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "BBsentials");
         KeyBindingHelper.registerKeyBinding(craftKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (craftKeyBind.wasPressed()) MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/craft");
+            if (craftKeyBind.wasPressed())
+                MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/craft");
         });
         KeyBinding petKeyBind = new KeyBinding("Open Pet Menu", InputUtil.Type.KEYSYM, -1, "BBsentials");
         KeyBindingHelper.registerKeyBinding(petKeyBind);
@@ -266,4 +330,14 @@ public class ModInitialiser implements ClientModInitializer {
         });
     }
 
+    public int createWaypointFromCommandContext(CommandContext context) {
+        String jsonName = StringArgumentType.getString(context, "name");
+        BlockPos pos = BlockPosArgumentType.getBlockPos(context, "position");
+        Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
+        Boolean deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
+        Boolean visible = BoolArgumentType.getBool(context, "visible");
+        Integer maxRenderDist = IntegerArgumentType.getInteger(context, "maxrenderdistance");
+
+        return 1;
+    }
 }

@@ -199,6 +199,15 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     @Override
+    public String getStringFromTextJson(String textJSon) throws Exception {
+        try {
+            return Text.Serialization.fromJson(textJSon).getString();
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public List<String> getPlayers() {
         return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
     }

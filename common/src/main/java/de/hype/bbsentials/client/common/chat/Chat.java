@@ -152,7 +152,11 @@ public class Chat {
         sendPrivateMessageToSelfBase(message, Formatting.AQUA);
     }
 
-    private static void sendPrivateMessageToSelfBase(String message, Formatting formatting) {
+    public static void sendPrivateMessageToSelfBase(String message, Formatting formatting) {
+        sendPrivateMessageToSelfBase(message, formatting.toString());
+    }
+
+    public static void sendPrivateMessageToSelfBase(String message, String formatting) {
         EnvironmentCore.chat.sendClientSideMessage(Message.of(formatting.toString() + message.replace("§r", "§r" + formatting)), false);
     }
 

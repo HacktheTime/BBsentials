@@ -376,7 +376,7 @@ public class BBsentialConnection {
     }
 
     public void onDisplayTellrawMessagePacket(DisplayTellrawMessagePacket packet) {
-        /*Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(packet.rawJson));*/
+        /*Chat.sendPrivateMessageToSelfText(Chat.createClientSideTellraw(packet.message));*/
         Chat.sendPrivateMessageToSelfImportantInfo("You received a tellraw Packet but it got ignored due too there being no safety checks in this version.");
     }
 

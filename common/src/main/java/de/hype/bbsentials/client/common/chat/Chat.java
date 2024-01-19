@@ -386,6 +386,9 @@ public class Chat {
                 }
             }
         }
+        if (BBsentials.socketAddonConfig.useSocketAddons){
+            BBsentials.addonManager.notifyAllAddonsReceievedMessage(message);
+        }
     }
 
     public boolean isSpam(String message) {

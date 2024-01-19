@@ -2,13 +2,11 @@ package de.hype.bbsentials.client.common.config;
 
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
-import java.time.LocalDate;import de.hype.bbsentials.client.common.config.*;
+import java.time.LocalDate;
 
 
-@AToLoadBBsentialsConfig
-public class GeneralConfig implements BBsentialsConfig {
+public class GeneralConfig extends BBsentialsConfig {
 
-    public int configVersion = 1;
     public transient int apiVersion = 1;
     public String[] bbsentialsRoles = {""};
     public boolean useNumCodes = true;
@@ -16,8 +14,13 @@ public class GeneralConfig implements BBsentialsConfig {
     public boolean doAllChatCustomMenu = true;
     public boolean doPartyChatCustomMenu = true;
     public boolean doDesktopNotifications = false;
-    public String nickname="";
+    public String nickname = "";
     public String notifForMessagesType = "NONE";
+
+    public GeneralConfig() {
+        super(1);
+        doInit();
+    }
 
 
     public static boolean isBingoTime() {
@@ -52,17 +55,11 @@ public class GeneralConfig implements BBsentialsConfig {
         return apiVersion;
     }
 
-    @Override
     public void setDefault() {
 
     }
 
-    @Override
-    public void onInit(BBsentialsConfig config) {
-        if (config instanceof GeneralConfig) {
-            if (((GeneralConfig) config).configVersion != apiVersion) {
-                //In case of update with config updater can go here.
-            }
-        }
+    public void onInit() {
+
     }
 }

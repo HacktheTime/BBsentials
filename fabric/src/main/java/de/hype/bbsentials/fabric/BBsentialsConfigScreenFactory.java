@@ -201,6 +201,15 @@ public class BBsentialsConfigScreenFactory {
             other.addEntry(trolls.build());
         }
         //other
+        ConfigCategory guild = builder.getOrCreateCategory(Text.of("§2Guild"));
+        {
+            guild.addEntry(entryBuilder.startBooleanToggle(Text.of("Guild Admin"), BBsentials.guildConfig.guildAdmin)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Whether you have the permission to kick and mute guild members etc"))
+                    .setSaveConsumer(newValue -> BBsentials.guildConfig.guildAdmin = newValue)
+                    .build());
+        }
+        //Guild
         ConfigCategory chChestItems = builder.getOrCreateCategory(Text.of("Ch Chest Items"));
         {
             BooleanListEntry allItems = entryBuilder.startBooleanToggle(Text.of("All Chest Items"), BBsentials.chChestConfig.allChChestItem)
@@ -373,6 +382,7 @@ public class BBsentialsConfigScreenFactory {
             socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Use Socket Addons"), BBsentials.socketAddonConfig.useSocketAddons)
                     .setDefaultValue(false)
                     .setTooltip(Text.of("Whether you want to allow Socket Addons."))
+                    .requireRestart()
                     .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.useSocketAddons = newValue)
                     .build());
             socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow automated sending"), BBsentials.socketAddonConfig.allowAutomatedSending)

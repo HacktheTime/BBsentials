@@ -1,7 +1,7 @@
 package de.hype.bbsentials.client.common.config;
-@AToLoadBBsentialsConfig
 
-public class ChChestConfig implements BBsentialsConfig {
+
+public class ChChestConfig extends BBsentialsConfig {
     public boolean allChChestItem = true;
     public boolean allRoboPart = false;
     public boolean customChChestItem = false;
@@ -18,6 +18,11 @@ public class ChChestConfig implements BBsentialsConfig {
     public boolean jungleHeart = false;
 
     public boolean addWaypointForChests = true;
+
+    public ChChestConfig() {
+        super(1);
+        doInit();
+    }
 
     @Override
     public void setDefault() {

@@ -7,12 +7,17 @@ package de.hype.bbsentials.client.common.config;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 
-@AToLoadBBsentialsConfig
-public class DeveloperConfig implements BBsentialsConfig {
+
+public class DeveloperConfig extends BBsentialsConfig {
     public boolean devMode = false;
     public boolean detailedDevMode = false;
     public boolean doDevDashboardConfig = true;
     public boolean devSecurity = true;
+
+    public DeveloperConfig() {
+        super(1);
+        doInit();
+    }
 
     public boolean isDevModeEnabled() {
         return devMode && hasDevPerm();
@@ -31,8 +36,7 @@ public class DeveloperConfig implements BBsentialsConfig {
 
     }
 
-    @Override
-    public void onInit(BBsentialsConfig config) {
+    public void onInit() {
 
     }
 

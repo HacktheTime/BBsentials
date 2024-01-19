@@ -92,7 +92,7 @@ public class AddonHandler implements Runnable {
 
     public void onDisplayTellrawMessageAddonPacket(DisplayTellrawMessageAddonPacket packet) {
         if (!BBsentials.socketAddonConfig.allowTellraw) return;
-        Chat.sendPrivateMessageToSelfText(Message.of(packet.rawJson));
+        Chat.sendPrivateMessageToSelfText(Message.tellraw(packet.rawJson));
     }
 
     public void onChatPromptAddonPacket(ChatPromptAddonPacket packet) {
@@ -129,7 +129,7 @@ public class AddonHandler implements Runnable {
         String packetName = packet.getClass().getSimpleName();
         String rawjson = AddonPacketUtils.parsePacketToJson(packet);
         if (client.isConnected() && writer != null) {
-            if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
+            if (BBsentials.socketAddonConfig.addonDebug && !(packet.getClass().equals(ReceivedPublicChatMessageAddonPacket.class)&&!BBsentials.socketAddonConfig.addonChatDebug)) {
                 Chat.sendPrivateMessageToSelfDebug("BBDev-AsP: " + packetName + ": " + rawjson);
             }
             writer.println(packetName + "." + rawjson);

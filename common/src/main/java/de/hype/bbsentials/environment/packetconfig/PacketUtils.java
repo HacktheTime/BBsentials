@@ -13,13 +13,13 @@ public class PacketUtils {
     public static final Gson gson = CustomGson.create();
 
     public static String parsePacketToJson(AbstractPacket packet) {
-        return gson.toJson(packet);
+        return gson.toJson(packet).replace("\n","/n");
     }
 
     public static <T extends AbstractPacket> void tryToProcessPacket(Packet<T> packet, String rawJson) {
         Class<T> clazz = packet.getClazz();
         Consumer<T> consumer = packet.getConsumer();
-        T abstractPacket = gson.fromJson(rawJson, clazz);
+        T abstractPacket = gson.fromJson(rawJson.replace("/n","\n"), clazz);
         consumer.accept(abstractPacket);
     }
 
@@ -45,7 +45,7 @@ public class PacketUtils {
         String rawJson = message.substring(packetName.length() + 1);
         if (!packetName.equals(clazz.getSimpleName())) {
             try {
-                T parsedPacket = gson.fromJson(rawJson, clazz);
+                T parsedPacket = gson.fromJson(rawJson.replace("/n","\n"), clazz);
                 return parsedPacket;
             } catch (Throwable t) {
                 showError(t, "Could not process packet '" + packetName + "' from " + EnviromentPacketConfig.notEnviroment);

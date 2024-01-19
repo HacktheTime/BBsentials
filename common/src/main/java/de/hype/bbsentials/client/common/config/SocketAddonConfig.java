@@ -4,6 +4,8 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
 
 public class SocketAddonConfig extends BBsentialsConfig {
+    public boolean addonDebug = false;
+    public boolean addonChatDebug = false;
     public boolean useSocketAddons = false;
     public boolean allowAutomatedSending = false;
     public boolean allowTellraw = false;

@@ -400,6 +400,16 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Allow the mod to set Chat Prompt Actions. Highly recommend allowing tellraw if this is allowed"))
                     .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.allowChatPrompt = newValue)
                     .build());
+            socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Addon Debug"), BBsentials.socketAddonConfig.addonDebug)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Will display you all messages sent and received from the Addons. Does not include all received chat messages by default"))
+                    .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.addonDebug = newValue)
+                    .build());
+            socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Addon Chat Debug"), BBsentials.socketAddonConfig.addonChatDebug)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Will display you all chat messages reieved that are sent to the addons."))
+                    .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.addonChatDebug = newValue)
+                    .build());
         }//Socket Addons
         if (BBsentials.generalConfig.hasBBRoles("dev")) {
             ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing"));

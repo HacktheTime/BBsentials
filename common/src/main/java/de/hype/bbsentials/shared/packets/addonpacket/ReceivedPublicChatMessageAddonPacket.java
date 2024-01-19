@@ -7,9 +7,11 @@ import de.hype.bbsentials.environment.addonpacketconfig.AbstractAddonPacket;
  */
 public class ReceivedPublicChatMessageAddonPacket extends AbstractAddonPacket {
     public final String rawJson;
+    public final String unformattedString;
 
-    public ReceivedPublicChatMessageAddonPacket(String rawJson) {
+    public ReceivedPublicChatMessageAddonPacket(String rawJson, String unformattedString) {
         super(1, 1); //Min and Max supported Version
         this.rawJson = rawJson;
+        this.unformattedString = unformattedString;
     }
 }

@@ -1,9 +1,7 @@
 package de.hype.bbsentials.shared.packets.addonpacket;
 
-import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.environment.addonpacketconfig.AbstractAddonPacket;
 import de.hype.bbsentials.shared.objects.ClientWaypointData;
-import de.hype.bbsentials.shared.objects.WaypointData;
 
 import java.util.List;
 import java.util.Map;

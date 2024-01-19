@@ -5,8 +5,6 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.CustomGson;
 import de.hype.bbsentials.client.common.client.socketAddons.AddonHandler;
-import de.hype.bbsentials.client.common.communication.BBsentialConnection;
-import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 
 import java.util.function.Consumer;
 
@@ -15,13 +13,13 @@ public class AddonPacketUtils {
     public static final Gson gson = CustomGson.create();
 
     public static String parsePacketToJson(AbstractAddonPacket packet) {
-        return gson.toJson(packet);
+        return gson.toJson(packet).replace("\n", "/n");
     }
 
     public static <T extends AbstractAddonPacket> void tryToProcessPacket(AddonPacket<T> addonPacket, String rawJson) {
         Class<T> clazz = addonPacket.getClazz();
         Consumer<T> consumer = addonPacket.getConsumer();
-        T abstractPacket = gson.fromJson(rawJson, clazz);
+        T abstractPacket = gson.fromJson(rawJson.replace("/n", "\n"), clazz);
         consumer.accept(abstractPacket);
     }
 
@@ -30,24 +28,13 @@ public class AddonPacketUtils {
         new Error(errorMessage, t).printStackTrace();
     }
 
-    public static class APIException extends Error {
-
-        public APIException(String errorMessage, Throwable t) {
-            super(errorMessage, t);
-        }
-
-        public APIException(String errorMessage) {
-            super(errorMessage);
-        }
-    }
-
     public static <T extends AbstractAddonPacket> T getAsPacket(String message, Class<T> clazz) {
         if (!message.contains(".")) return null;
         String packetName = message.split("\\.")[0];
         String rawJson = message.substring(packetName.length() + 1);
         if (!packetName.equals(clazz.getSimpleName())) {
             try {
-                T parsedPacket = gson.fromJson(rawJson, clazz);
+                T parsedPacket = gson.fromJson(rawJson.replace("/n", "\n"), clazz);
                 return parsedPacket;
             } catch (Throwable t) {
                 showError(t, "Could not process Addon packet '" + packetName + "' from " + AddonEnvironmentPacketConfig.notEnviroment);
@@ -88,7 +75,7 @@ public class AddonPacketUtils {
         for (AddonPacket<? extends AbstractAddonPacket> addonPacket : manager.getPackets()) {
             if (!packetName.equals(addonPacket.getClazz().getSimpleName())) continue;
             try {
-                if (BBsentials.developerConfig.isDetailedDevModeEnabled())
+                if (BBsentials.socketAddonConfig.addonDebug)
                     Chat.sendPrivateMessageToSelfDebug(packetName + ":" + rawJson);
                 tryToProcessPacket(addonPacket, rawJson);
                 return true;
@@ -102,5 +89,16 @@ public class AddonPacketUtils {
 
         showError(new APIException("Found unknown Addon packet: " + packetName + "'"), errorMessage);
         return false;
+    }
+
+    public static class APIException extends Error {
+
+        public APIException(String errorMessage, Throwable t) {
+            super(errorMessage, t);
+        }
+
+        public APIException(String errorMessage) {
+            super(errorMessage);
+        }
     }
 }

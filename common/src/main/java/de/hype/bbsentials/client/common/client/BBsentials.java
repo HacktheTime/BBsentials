@@ -30,9 +30,11 @@ public class BBsentials {
     public static Thread bbthread;
     public static Chat chat = new Chat();
     public static Thread debugThread;
+    //General Config needs to be first config!
+    public static GeneralConfig generalConfig = new GeneralConfig();
+    //All Other Configs
     public static DeveloperConfig developerConfig = new DeveloperConfig();
     public static DiscordConfig discordConfig = new DiscordConfig();
-    public static GeneralConfig generalConfig = new GeneralConfig();
     public static SocketAddonConfig socketAddonConfig = new SocketAddonConfig();
     public static ChChestConfig chChestConfig = new ChChestConfig();
     public static FunConfig funConfig = new FunConfig();
@@ -111,7 +113,6 @@ public class BBsentials {
     }
 
     public static void init() {
-        ConfigManager.loadConfigs();
         debugThread = new Thread(
                 EnvironmentCore.debug
         );

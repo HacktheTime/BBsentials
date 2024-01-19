@@ -1,6 +1,5 @@
 package de.hype.bbsentials.forge.CommandImplementations;
 
-import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
@@ -45,13 +44,13 @@ public class CommandBBI extends CommandBase {
 
                 String category = args[1];
                 switch (category) {
-                    case "save":
+                    case "saveAll":
                         ConfigManager.saveAll();
                         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Saved configManager successfully"));
                         break;
 
                     case "load":
-                        ConfigManager.loadConfigs();
+                        ConfigManager.reloadAllConfigs();
                         break;
 
                     default:

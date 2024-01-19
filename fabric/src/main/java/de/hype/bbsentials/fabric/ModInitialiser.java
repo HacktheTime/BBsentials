@@ -8,7 +8,6 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
-import de.hype.bbsentials.client.common.config.AToLoadBBsentialsConfigUtils;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
@@ -110,16 +109,16 @@ public class ModInitialiser implements ClientModInitializer {
                             .then(ClientCommandManager.argument("category", StringArgumentType.string())
                                     .suggests((context, builder) -> {
                                         // Provide tab-completion options for configManager subfolder
-                                        return CommandSource.suggestMatching(new String[]{"save", "reset", "load"}, builder);
+                                        return CommandSource.suggestMatching(new String[]{"saveAll", "reset", "load"}, builder);
                                     }).executes((context) -> {
                                         String category = StringArgumentType.getString(context, "category");
                                         switch (category) {
-                                            case "save":
+                                            case "saveAll":
                                                 ConfigManager.saveAll();
-                                                Chat.sendPrivateMessageToSelfSuccess("Saved configManager successfully");
+                                                Chat.sendPrivateMessageToSelfSuccess("Saved configs successfully");
                                                 break;
                                             case "load":
-                                                ConfigManager.loadConfigs();
+                                                ConfigManager.reloadAllConfigs();
                                                 break;
                                             case "reset":
                                                 // Reset logic here
@@ -131,7 +130,7 @@ public class ModInitialiser implements ClientModInitializer {
                                     .then(ClientCommandManager.argument("className", StringArgumentType.string())
                                             .suggests((context, builder) -> {
                                                 // Provide tab-completion options for classes
-                                                List<String> classNames = AToLoadBBsentialsConfigUtils.getAnnotatedClasses().stream().map(Class::getSimpleName).toList();
+                                                List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
                                                 // Replace with your own logic to retrieve class names
                                                 return CommandSource.suggestMatching(classNames, builder);
                                             })
@@ -170,7 +169,7 @@ public class ModInitialiser implements ClientModInitializer {
                                     .then(ClientCommandManager.argument("className", StringArgumentType.string())
                                             .suggests((context, builder) -> {
                                                 // Provide tab-completion options for classes
-                                                List<String> classNames = AToLoadBBsentialsConfigUtils.getAnnotatedClasses().stream().map(Class::getSimpleName).toList();
+                                                List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
                                                 // Replace with your own logic to retrieve class names
                                                 return CommandSource.suggestMatching(classNames, builder);
                                             })
@@ -341,18 +340,19 @@ public class ModInitialiser implements ClientModInitializer {
         String customTextureNameSpace = null;
         String customTexturePath = null;
         try {
-            customTextureFull=StringArgumentType.getString(context,"customtexture");
+            customTextureFull = StringArgumentType.getString(context, "customtexture");
             if (customTextureFull.contains(":")) {
-                customTextureNameSpace=customTexturePath.split(":")[0];
-                customTexturePath=customTexturePath.split(":")[1];
-            }else {
-                customTexturePath=customTexturePath;
+                customTextureNameSpace = customTexturePath.split(":")[0];
+                customTexturePath = customTexturePath.split(":")[1];
             }
-        }catch (Exception ignored){
+            else {
+                customTexturePath = customTexturePath;
+            }
+        } catch (Exception ignored) {
 
         }
 
-        Waypoints waypoint = new Waypoints(position,jsonName,maxRenderDist,visible,deleteOnServerSwap,customTextureNameSpace,customTexturePath);
+        Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, customTextureNameSpace, customTexturePath);
         return 1;
     }
 }

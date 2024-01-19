@@ -1,6 +1,6 @@
 package de.hype.bbsentials.client.common.config;
-@AToLoadBBsentialsConfig
-public class MiningEventConfig implements BBsentialsConfig {
+
+public class MiningEventConfig extends BBsentialsConfig {
     public boolean allEvents = true;
     public boolean blockChEvents = false;
 
@@ -10,6 +10,11 @@ public class MiningEventConfig implements BBsentialsConfig {
     public boolean goblinRaid = false;
     public boolean mithrilGourmand = false;
     public boolean raffle = false;
+
+    public MiningEventConfig() {
+        super(1);
+        doInit();
+    }
 
     @Override
     public void setDefault() {

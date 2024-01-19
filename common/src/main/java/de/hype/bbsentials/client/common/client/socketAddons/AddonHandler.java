@@ -5,12 +5,18 @@ import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
+import de.hype.bbsentials.client.common.objects.Waypoints;
+import de.hype.bbsentials.environment.addonpacketconfig.AbstractAddonPacket;
+import de.hype.bbsentials.environment.addonpacketconfig.AddonPacketUtils;
+import de.hype.bbsentials.shared.objects.ClientWaypointData;
+import de.hype.bbsentials.shared.packets.addonpacket.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.stream.Collectors;
 
 public class AddonHandler implements Runnable {
     public Socket client;
@@ -18,7 +24,7 @@ public class AddonHandler implements Runnable {
     private PrintWriter writer;
 
     public AddonHandler(Socket client) {
-        this.client=client;
+        this.client = client;
         try {
             reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
             writer = new PrintWriter(client.getOutputStream(), true);
@@ -36,71 +42,12 @@ public class AddonHandler implements Runnable {
     }
 
     public void onReceive(String message) {
-        message = message.replace("/n","\n");
-        if (message == null) {
-            close();
-            return;
-        }
-
-//        Chat.sendPrivateMessageToSelfDebug(message);
-        // Check for command prefixes
-        if (message.startsWith("publicchat ")) {
-            if (!BBsentials.socketAddonConfig.allowAutomatedSending) return;
-            handlePublicChat(message.substring("publicchat ".length()));
-        } else if (message.startsWith("clientsidechat ")) {
-            handleClientSideChat(message.substring("clientsidechat ".length()));
-        } else if (message.startsWith("rfunctioncommand ")) {
-            if (!BBsentials.socketAddonConfig.allowChatPrompt) return;
-            rfunctioncommand(message.substring("rfunctioncommand ".length()));
-        } else if (message.startsWith("clientsidetellraw ")) {
-            if (!BBsentials.socketAddonConfig.allowTellraw) return;
-            handleClientSideTellraw(message.substring("clientsidetellraw ".length()));
-        } else if (message.startsWith("playsound ")) {
-            handlePlaySound(message.substring("playsound ".length()));
-        } else if (message.startsWith("clientcommand ")) {
-            if (!BBsentials.socketAddonConfig.allowClientCommands) return;
-            handleClientCommand(message.substring("clientcommand ".length()));
-        } else if (message.startsWith("servercommand ")) {
-            if (!BBsentials.socketAddonConfig.allowAutomatedSending) return;
-            handleServerCommand(message.substring("servercommand ".length()));
-        }
+        AddonPacketUtils.handleIfPacket(this, message);
     }
-
-    private void rfunctioncommand(String message) {
-        BBsentials.temporaryConfig.lastChatPromptAnswer=new ChatPrompt(message,10);
-    }
-
-    private void handlePublicChat(String message) {
-        BBsentials.sender.addSendTask(message);
-    }
-
-    private void handleClientSideChat(String message) {
-        Chat.sendPrivateMessageToSelfInfo(message);
-    }
-
-    private void handleClientSideTellraw(String message) {
-        Chat.sendPrivateMessageToSelfText(Message.tellraw(message));
-    }
-
-    /**
-     * @param message like block.anvil.destroy
-     */
-    private void handlePlaySound(String message) {
-        EnvironmentCore.utils.playsound(message);
-    }
-
-    private void handleClientCommand(String message) {
-        EnvironmentCore.utils.executeClientCommand(message);
-    }
-
-    private void handleServerCommand(String message) {
-       sendMessage("/"+message);
-    }
-
 
     @Override
     public void run() {
-        while (client.isConnected()){
+        while (client.isConnected()) {
             try {
                 onReceive(reader.readLine());
             } catch (Exception ignored) {
@@ -110,13 +57,85 @@ public class AddonHandler implements Runnable {
         BBsentials.addonManager.clients.remove(this);
     }
 
-    public void close(){
+    public void close() {
         try {
             client.close();
         } catch (IOException e) {
 
         }
-        reader=null;
-        writer=null;
+        reader = null;
+        writer = null;
+    }
+
+    public void onClientCommandAddonPacket(ClientCommandAddonPacket packet) {
+        if (!BBsentials.socketAddonConfig.allowClientCommands) return;
+        EnvironmentCore.utils.executeClientCommand(packet.command);
+    }
+
+    public void onPlaySoundAddonPacket(PlaySoundAddonPacket packet) {
+        EnvironmentCore.utils.playsound(packet.path, packet.namespace);
+    }
+
+    public void onPublicChatAddonPacket(PublicChatAddonPacket packet) {
+        if (!BBsentials.socketAddonConfig.allowAutomatedSending) return;
+        BBsentials.sender.addSendTask(packet.message, packet.timing);
+    }
+
+    public void onServerCommandAddonPacket(ServerCommandAddonPacket packet) {
+        if (!BBsentials.socketAddonConfig.allowAutomatedSending) return;
+        BBsentials.sender.addSendTask("/" + packet.command, packet.timing);
+    }
+
+    public void onDisplayClientsideMessageAddonPacket(DisplayClientsideMessageAddonPacket packet) {
+        Chat.sendPrivateMessageToSelfBase(packet.message, packet.formatting);
+    }
+
+    public void onDisplayTellrawMessageAddonPacket(DisplayTellrawMessageAddonPacket packet) {
+        if (!BBsentials.socketAddonConfig.allowTellraw) return;
+        Chat.sendPrivateMessageToSelfText(Message.of(packet.rawJson));
+    }
+
+    public void onChatPromptAddonPacket(ChatPromptAddonPacket packet) {
+        if (!BBsentials.socketAddonConfig.allowChatPrompt) return;
+        BBsentials.temporaryConfig.lastChatPromptAnswer = new ChatPrompt(packet.commandToExecute, packet.timeTillReset);
+    }
+
+    public void onWaypointAddonPacket(WaypointAddonPacket packet) {
+        if (packet.operation.equals(WaypointAddonPacket.Operation.ADD)) {
+            new Waypoints(packet.waypoint);
+        }
+        else if (packet.operation.equals(WaypointAddonPacket.Operation.REMOVE)) {
+            try {
+                Waypoints.waypoints.get(packet.waypointId).removeFromPool();
+            } catch (Exception ignored) {
+
+            }
+        }
+        else if (packet.operation.equals(WaypointAddonPacket.Operation.EDIT)) {
+            try {
+                Waypoints oldWaypoint = Waypoints.waypoints.get(packet.waypointId);
+                oldWaypoint.replaceWithNewWaypoint(packet.waypoint, packet.waypointId);
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    public void onGetWaypointsAddonPacket(GetWaypointsAddonPacket packet) {
+        sendPacket(new GetWaypointsAddonPacket(Waypoints.waypoints.values().stream().map((waypoint -> ((ClientWaypointData) waypoint))).collect(Collectors.toList())));
+    }
+
+    public <E extends AbstractAddonPacket> void sendPacket(E packet) {
+        String packetName = packet.getClass().getSimpleName();
+        String rawjson = AddonPacketUtils.parsePacketToJson(packet);
+        if (client.isConnected() && writer != null) {
+            if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
+                Chat.sendPrivateMessageToSelfDebug("BBDev-AsP: " + packetName + ": " + rawjson);
+            }
+            writer.println(packetName + "." + rawjson);
+        }
+        else {
+            Chat.sendPrivateMessageToSelfError("BB: Couldn't send a " + packetName + "! did you get disconnected?");
+        }
     }
 }

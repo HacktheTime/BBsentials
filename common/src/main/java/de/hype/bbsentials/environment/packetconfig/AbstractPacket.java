@@ -2,7 +2,6 @@ package de.hype.bbsentials.environment.packetconfig;
 
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.shared.packets.network.InvalidCommandFeedbackPacket;
 

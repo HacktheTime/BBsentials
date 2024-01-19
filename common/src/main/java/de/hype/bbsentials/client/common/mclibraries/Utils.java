@@ -35,7 +35,12 @@ public interface Utils {
 
     String getMCUUID();
 
-    void playsound(String eventName);
+    default void playsound(String eventName, String namespace) {
+        playsound(namespace + ":" + eventName);
+    }
+
+    void playsound(String fullName);
+
 
     int getPotTime();
 

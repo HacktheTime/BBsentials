@@ -385,6 +385,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("§cCould be problematic if u run a malicious socket but at that point I believe you have other problems like a RAT. they could simulate a clickable message but they run a coopadd command or sth"))
                     .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.allowTellraw = newValue)
                     .build());
+            socketAddons.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Chat Prompts"), BBsentials.socketAddonConfig.allowChatPrompt)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Allow the mod to set Chat Prompt Actions. Highly recommend allowing tellraw if this is allowed"))
+                    .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.allowChatPrompt = newValue)
+                    .build());
         }//Socket Addons
         if (BBsentials.generalConfig.hasBBRoles("dev")) {
             ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing"));

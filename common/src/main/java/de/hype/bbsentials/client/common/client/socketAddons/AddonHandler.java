@@ -78,12 +78,12 @@ public class AddonHandler implements Runnable {
 
     public void onPublicChatAddonPacket(PublicChatAddonPacket packet) {
         if (!BBsentials.socketAddonConfig.allowAutomatedSending) return;
-        BBsentials.sender.addSendTask(packet.message, packet.timing);
+        BBsentials.sender.addSendTask(packet.message.replace("§.","").replace("\n","").substring(0,Math.min(255,packet.message.length())), packet.timing);
     }
 
     public void onServerCommandAddonPacket(ServerCommandAddonPacket packet) {
         if (!BBsentials.socketAddonConfig.allowAutomatedSending) return;
-        BBsentials.sender.addSendTask("/" + packet.command, packet.timing);
+        BBsentials.sender.addSendTask("/" + packet.command.replace("§.","").replace("\n","").substring(0,Math.min(254,packet.command.length())), packet.timing);
     }
 
     public void onDisplayClientsideMessageAddonPacket(DisplayClientsideMessageAddonPacket packet) {

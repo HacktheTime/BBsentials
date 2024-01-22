@@ -15,7 +15,7 @@ public class InternalCommandPacket extends AbstractPacket {
     public static final String GET_USER_INFO = "getUserInfo"; //Requests info about a user from the Server
     public static final String SHUTDOWN_SERVER = "shutdown"; //Shuts the Server down.
 
-    //Protection category. The following things can only be activated by people with server console access and a code understanding. → DeveloperAbstractConfig
+    //Protection Category. The following things can only be activated by people with server console access and a code understanding. → Developers
     public static final String CRASH = "crash"; //Crash the client. Gives a countdown
     public static final String INSTACRASH = "immediateCrash"; // Crash the Client with no countdown
     public static final String HUB = "hub"; //Executes a /hub on the client. Tells the Client done by Server

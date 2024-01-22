@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
@@ -11,6 +12,7 @@ import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
+import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.shared.objects.Position;
@@ -30,11 +32,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.*;
+import static de.hype.bbsentials.client.common.objects.WaypointRoute.waypointRouteDirectory;
 
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
@@ -254,7 +260,60 @@ public class ModInitialiser implements ClientModInitializer {
                                                 return 1;
                                             }))
                                     )
-                            )));
+                            )
+                    ).then(ClientCommandManager.literal("route")
+                            .then(ClientCommandManager.literal("load")
+                                    .then(ClientCommandManager.argument("fileName", StringArgumentType.string())
+                                            .suggests(((context, builder) -> {
+                                                if (waypointRouteDirectory.exists() && waypointRouteDirectory.isDirectory()) {
+                                                    List<String> routeNames = Arrays.stream(waypointRouteDirectory.listFiles())
+                                                            .filter(file -> file.isFile() && file.getName().endsWith(".json"))
+                                                            .map(file -> file.getName().replace(".json", ""))
+                                                            .collect(Collectors.toList());
+
+                                                    return CommandSource.suggestMatching(routeNames, builder);
+                                                }
+                                                return Suggestions.empty();
+                                            })).then(ClientCommandManager.argument("startingnodeid", IntegerArgumentType.integer())
+                                                    .executes((context -> {
+                                                        try {
+                                                            WaypointRoute.loadFromFile(new File(waypointRouteDirectory, StringArgumentType.getString(context, "fileName") + ".json")).setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
+
+                                                            return 1;
+                                                        } catch (Exception e) {
+                                                            return 0;
+                                                        }
+                                                    })))
+                                            .executes((context -> {
+                                                try {
+                                                    WaypointRoute.loadFromFile(new File(waypointRouteDirectory, StringArgumentType.getString(context, "fileName") + ".json"));
+                                                    return 1;
+                                                } catch (Exception e) {
+                                                    return 0;
+                                                }
+                                            }))
+                                    )
+                            )//TODO suggest names automatically and actual load code.
+                            .then(ClientCommandManager.literal("unload").executes((context) -> {
+                                temporaryConfig.route = null;
+                                Chat.sendPrivateMessageToSelfSuccess("Unloaded current route");
+                                return 1;
+                            }))
+                            .then(ClientCommandManager.literal("setCurrentNode")
+                                    .then(ClientCommandManager.argument("number", IntegerArgumentType.integer())
+                                            .executes((context -> {
+                                                int id = IntegerArgumentType.getInteger(context, "number");
+                                                if (temporaryConfig.route == null) {
+                                                    context.getSource().sendError(Text.of("No Route loaded"));
+                                                    return 0;
+                                                }
+                                                temporaryConfig.route.currentNode = id;
+                                                return 1;
+                                            }))
+                                    ))
+                    )
+            );
+
         }); //bbi
         KeyBinding devKeyBind = new KeyBinding("Open Mod Menu ConfigManager", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

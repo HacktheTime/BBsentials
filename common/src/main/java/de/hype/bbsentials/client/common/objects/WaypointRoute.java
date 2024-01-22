@@ -2,6 +2,7 @@ package de.hype.bbsentials.client.common.objects;
 
 import com.google.gson.*;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.config.TemporaryConfig;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class WaypointRoute {
     WaypointRoute(File file) throws Exception {
         String fileName = file.getName();
         routeName = fileName.substring(0, fileName.lastIndexOf("."));
-        loadFromFile(file);
+        loadConfiguration(file);
     }
 
     public static WaypointRoute loadFromFile(File file) throws Exception {
@@ -34,7 +35,7 @@ public class WaypointRoute {
         else {
             route.loadConfiguration(file);
         }
-
+        BBsentials.temporaryConfig.route = route;
         return route;
     }
 

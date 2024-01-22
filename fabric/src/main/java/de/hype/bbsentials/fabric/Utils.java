@@ -79,15 +79,14 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         try {
             if (BBsentials.temporaryConfig.route != null) {
                 RenderInWorldContext.renderInWorld(event, (it) -> {
-                    BBsentials.temporaryConfig.route.getCurrentNode();
-                    for (RouteNode node : BBsentials.temporaryConfig.route.nodes) {
+                    RouteNode node = BBsentials.temporaryConfig.route.getCurrentNode();
                         BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
                         BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
                         it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
                         it.block(pos);
                         it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
                         it.waypoint(pos, Text.of(node.name));
-                    }
+
                     return Unit.INSTANCE;
                 });
             }

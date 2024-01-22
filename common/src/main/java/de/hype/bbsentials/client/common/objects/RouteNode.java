@@ -5,7 +5,7 @@ import de.hype.bbsentials.shared.objects.Position;
 import java.awt.*;
 
 public class RouteNode {
-    public static final int DEFAULT_TRIGGER_NEXT_RANGE = 5;
+    public static final int DEFAULT_TRIGGER_NEXT_RANGE = 3;
     public Position coords;
     public String name;
     public Color color;

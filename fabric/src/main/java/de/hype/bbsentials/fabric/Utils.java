@@ -6,6 +6,7 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.RouteNode;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
 import de.hype.bbsentials.shared.constants.ChChestItem;
@@ -74,6 +75,23 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
                 return Unit.INSTANCE;
             });
+        }
+        try {
+            if (BBsentials.temporaryConfig.route != null) {
+                RenderInWorldContext.renderInWorld(event, (it) -> {
+                    BBsentials.temporaryConfig.route.getCurrentNode();
+                    for (RouteNode node : BBsentials.temporaryConfig.route.nodes) {
+                        BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
+                        BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
+                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
+                        it.block(pos);
+                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
+                        it.waypoint(pos, Text.of(node.name));
+                    }
+                    return Unit.INSTANCE;
+                });
+            }
+        } catch (Exception ignored) {
         }
 //        WorldRenderLastEvent.Companion.publish(event);
     }
@@ -218,7 +236,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         try {
             Text.Serialization.fromJson(json);
             return true;
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
             return false;
         }
     }

@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 @Mod(modid = "bbsentials", useMetadata = true)
 public class ForgeMod {
     static boolean alreadyInialised = false;
-    static BBsentials sentials = new BBsentials();
+    static BBsentials sentials;
     public static MoulConfig config = new MoulConfig();
 
     @Mod.EventHandler
@@ -20,6 +20,7 @@ public class ForgeMod {
         printLocation();
         EnvironmentCore core = new EnvironmentCore(new Utils(), new MCEvents(), new ForgeChat(), new Commands(), new Options(), new DebugThread());
         MinecraftForge.EVENT_BUS.register(this);
+        sentials = new BBsentials();
         BBsentials.init();
     }
     public void printLocation() {

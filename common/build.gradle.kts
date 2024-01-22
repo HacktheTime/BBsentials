@@ -12,5 +12,5 @@ dependencies {
     implementation(libs.discordJDA)
 
 }
-
+java.withSourcesJar()
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(8))

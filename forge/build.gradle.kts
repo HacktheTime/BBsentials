@@ -8,6 +8,7 @@ plugins {
 }
 
 java {
+    withSourcesJar()
     targetCompatibility = JavaVersion.VERSION_1_8
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
@@ -99,6 +100,7 @@ tasks.processResources {
     }
 
     rename("(.+_at.cfg)", "META-INF/$1")
+    from(project(":common").sourceSets["main"].resources.srcDirs)
 }
 
 
@@ -126,5 +128,4 @@ tasks.shadowJar {
     configurations = listOf(shadowImpl, shadowModImpl)
     relocate("io.github.moulberry.moulconfig", "de.hype.bbsentials.deps.moulconfig")
 }
-
 tasks.assemble.get().dependsOn(remapJar)

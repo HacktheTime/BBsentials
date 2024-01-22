@@ -41,11 +41,13 @@ tasks.processResources {
     filesMatching("fabric.mod.json") {
         expand(inputs.properties)
     }
+    from(project(":common").sourceSets["main"].resources.srcDirs)
 }
 tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
 
 java {
     java {
+        withSourcesJar()
         targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
     }

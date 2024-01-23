@@ -126,6 +126,13 @@ public class Message {
         return getUnformattedString().endsWith(string);
     }
 
+    public void replyToUser(String message) {
+        if (isMsg()) BBsentials.sender.addImmediateSendTask("/r " + message);
+        else if (isFromParty()) BBsentials.sender.addImmediateSendTask("/pc @" + getPlayerName() + " " + message);
+        else if (isServerMessage()) BBsentials.sender.addImmediateSendTask("/ac @" + getPlayerName() + " " + message);
+        else if (isFromGuild()) BBsentials.sender.addImmediateSendTask("/gc @" + getPlayerName() + " " + message);
+    }
+
     @Override
     public String toString() {
         return getUnformattedString();

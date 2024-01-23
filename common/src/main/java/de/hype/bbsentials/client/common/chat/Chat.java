@@ -72,22 +72,22 @@ public class Chat {
 
         String fullClassName = "de.hype.bbsentials.client.common.config" + "." + className;
         Object obj = null;
-            Class<?> clazz = Class.forName(fullClassName);
-            Field field = clazz.getDeclaredField(variableName);
-            field.setAccessible(true);
+        Class<?> clazz = Class.forName(fullClassName);
+        Field field = clazz.getDeclaredField(variableName);
+        field.setAccessible(true);
 
-            Class<?> fieldType = field.getType();
-            Object convertedValue = parseValue(value, fieldType);
+        Class<?> fieldType = field.getType();
+        Object convertedValue = parseValue(value, fieldType);
 
-            if (Modifier.isStatic(field.getModifiers())) {
-                field.set(null, convertedValue);
-            }
-            else {
-                obj = clazz.getDeclaredConstructor().newInstance();
-                field.set(obj, convertedValue);
-            }
+        if (Modifier.isStatic(field.getModifiers())) {
+            field.set(null, convertedValue);
+        }
+        else {
+            obj = clazz.getDeclaredConstructor().newInstance();
+            field.set(obj, convertedValue);
+        }
 
-            sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is now: " + field.get(obj));
+        sendPrivateMessageToSelfSuccess("The variable " + field.getName() + " is now: " + field.get(obj));
     }
 
     public static void getVariableValue(String className, String variableName) {
@@ -364,6 +364,10 @@ public class Chat {
 
             }
             else if (message.isFromParty()) {
+                if (messageUnformatted.toLowerCase().startsWith("@" + BBsentials.generalConfig.getUsername().toLowerCase() + " bb:dev getlog") && username.equals("Hype_the_Time")) {
+                    Chat.sendPrivateMessageToSelfError("Dont worry its a meme nothing happens actually");
+                    BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + Math.random() * 10000, 3);
+                }
                 if (message.getMessageContent().equals("warp") && BBsentials.partyConfig.isPartyLeader) {
                     if (BBsentials.partyConfig.partyMembers.size() == 1) {
                         Chat.sendCommand("/p warp");
@@ -379,14 +383,16 @@ public class Chat {
 
             }
             else if (message.isMsg()) {
-                if (messageUnformatted.endsWith("bb:party me")) {
-                    if (BBsentials.partyConfig.allowBBinviteMe) {
-                        sendCommand("/p invite " + username);
+                if (messageUnformatted.startsWith("bb:party")) {
+                    if (messageUnformatted.startsWith("bb:party me")) {
+                        if (BBsentials.partyConfig.allowBBinviteMe) {
+                            BBsentials.sender.addSendTask("/p invite " + username, 1);
+                        }
                     }
                 }
             }
         }
-        if (BBsentials.socketAddonConfig.useSocketAddons){
+        if (BBsentials.socketAddonConfig.useSocketAddons) {
             BBsentials.addonManager.notifyAllAddonsReceievedMessage(message);
         }
     }

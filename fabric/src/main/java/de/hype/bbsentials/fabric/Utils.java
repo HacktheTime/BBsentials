@@ -279,7 +279,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         }
                     }
                     if (hasPants) {
-                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪]§ "));
+                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪] "));
                         String normal = Text.Serialization.toJsonString(participiant.getDisplayName());
                         toDisplay.add(Text.Serialization.fromJson("[" + pantsAddition + "," + normal + "]"));
                     }

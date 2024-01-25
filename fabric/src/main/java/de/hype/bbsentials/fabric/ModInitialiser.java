@@ -16,8 +16,8 @@ import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
+import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
 import de.hype.bbsentials.shared.objects.Position;
-import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -29,10 +29,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -200,7 +202,10 @@ public class ModInitialiser implements ClientModInitializer {
                                         return 1;
                                     })
                             )
-                    )
+                            .executes((context) -> {
+                                MinecraftClient.getInstance().executeTask(() -> MinecraftClient.getInstance().setScreen(BBsentialsConfigScreenFactory.create(MinecraftClient.getInstance().currentScreen)));
+                                return 1;
+                            }))
                     .then(ClientCommandManager.literal("waypoint")
                             .then(ClientCommandManager.literal("add")
                                     .then(ClientCommandManager.argument("name", StringArgumentType.string())
@@ -258,6 +263,12 @@ public class ModInitialiser implements ClientModInitializer {
                                             }))
                                     )
                             )
+                            .executes((context -> {
+                                MinecraftClient.getInstance().executeTask(() -> {
+                                    MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen());
+                                });
+                                return 1;
+                            }))
                     ).then(ClientCommandManager.literal("route")
                             .then(ClientCommandManager.literal("load")
                                     .then(ClientCommandManager.argument("fileName", StringArgumentType.string())
@@ -274,7 +285,7 @@ public class ModInitialiser implements ClientModInitializer {
                                             })).then(ClientCommandManager.argument("startingnodeid", IntegerArgumentType.integer())
                                                     .executes((context -> {
                                                         try {
-                                                            WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName") + ".json").setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
+                                                            WaypointRoute.loadFromFile(new File(waypointRouteDirectory, StringArgumentType.getString(context, "fileName") + ".json")).setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
 
                                                             return 1;
                                                         } catch (Exception e) {
@@ -283,7 +294,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                     })))
                                             .executes((context -> {
                                                 try {
-                                                    WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName"));
+                                                    WaypointRoute.loadFromFile(new File(waypointRouteDirectory, StringArgumentType.getString(context, "fileName") + ".json"));
                                                     return 1;
                                                 } catch (Exception e) {
                                                     return 0;
@@ -307,8 +318,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                 temporaryConfig.route.currentNode = id;
                                                 return 1;
                                             }))
-                                    )
-                            )
+                                    ))
                     )
             );
 
@@ -388,28 +398,28 @@ public class ModInitialiser implements ClientModInitializer {
     public int createWaypointFromCommandContext(CommandContext context) {
         String jsonName = StringArgumentType.getString(context, "name");
         jsonName = EnvironmentCore.utils.stringToTextJson(jsonName);
-        BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "position");
+        BlockPos pos = BlockPosArgumentType.getBlockPos(context, "position");
         Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
         Boolean deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
         Boolean visible = BoolArgumentType.getBool(context, "visible");
         Integer maxRenderDist = IntegerArgumentType.getInteger(context, "maxrenderdistance");
         String customTextureFull = null;
-        String customTextureNameSpace = "";
-        String customTexturePath = "";
+        String customTextureNameSpace = null;
+        String customTexturePath = null;
         try {
             customTextureFull = StringArgumentType.getString(context, "customtexture");
             if (customTextureFull.contains(":")) {
-                customTextureNameSpace = customTextureFull.split(":")[0];
-                customTexturePath = customTextureFull.split(":")[1];
+                customTextureNameSpace = customTexturePath.split(":")[0];
+                customTexturePath = customTexturePath.split(":")[1];
             }
             else {
-                customTextureFull = customTexturePath;
+                customTexturePath = customTexturePath;
             }
         } catch (Exception ignored) {
 
         }
 
-        Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, new RenderInformation(customTextureNameSpace, customTexturePath));
+        Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, customTextureNameSpace, customTexturePath);
         return 1;
     }
 }

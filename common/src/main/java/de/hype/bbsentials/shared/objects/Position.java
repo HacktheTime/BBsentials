@@ -2,8 +2,8 @@ package de.hype.bbsentials.shared.objects;
 
 public class Position {
     public int x;
-    public int y;
-    public int z;
+    public final int y;
+    public final int z;
 
 
     public Position(int x, int y, int z) {

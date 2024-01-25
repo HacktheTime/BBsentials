@@ -1,14 +1,11 @@
 package de.hype.bbsentials.client.common.client.objects;
 
-import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import static de.hype.bbsentials.client.common.client.APIUtils.getMcUUIDbyUsername;
 
 public class TrustedPartyMember {
     public String mcUuid;
@@ -18,23 +15,18 @@ public class TrustedPartyMember {
     private boolean canInvite = true;
     private boolean canMute = false;
     private boolean partyAdmin = false;
-    private boolean canRequestWarp = false;
-    private boolean canRequestPolls = true;
-
+    private boolean canRequestWarp = true;
     private transient String username = null;
 
     private TrustedPartyMember(String mcuuid) {
-        this.mcUuid = mcuuid.replace("-", "");
+        this.mcUuid = mcuuid;
     }
 
     public TrustedPartyMember(String mcuuid, String username) {
-        this.mcUuid = mcuuid.replace("-", "");
+        this.mcUuid = mcuuid;
         this.username = username;
     }
 
-    public boolean isUsernameInitialised() {
-        return username == null;
-    }
     public static TrustedPartyMember fromUsername(String username) {
         return new TrustedPartyMember(getMcUUIDbyUsername(username), username);
     }
@@ -43,7 +35,34 @@ public class TrustedPartyMember {
         return new TrustedPartyMember(uuid);
     }
 
+    private static String getMcUUIDbyUsername(String username) {
+        try {
+            String url = "https://api.mojang.com/users/profiles/minecraft/" + username;
+            URL mojangAPI = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) mojangAPI.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
 
+            if (responseCode == 200) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                reader.close();
+
+                // Parse the JSON response
+                String uuid = response.toString().split("\"")[3];
+                return uuid;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     private static String getMinecraftUserNameByMCUUID(String uuid) {
         try {
@@ -121,11 +140,6 @@ public class TrustedPartyMember {
         return this;
     }
 
-    public TrustedPartyMember canRequestPolls(boolean value) {
-        canRequestPolls = value;
-        return this;
-    }
-
     public boolean canKick() {
         if (partyAdmin) return true;
         return canKick;
@@ -154,34 +168,5 @@ public class TrustedPartyMember {
     public boolean canRequestWarp() {
         if (partyAdmin) return true;
         return canRequestWarp;
-    }
-
-    public boolean canRequestPolls() {
-        if (partyAdmin) return true;
-        return canRequestPolls;
-    }
-
-    public void save(String originalUsername, String originalUUID) {
-        if (!username.equals(originalUsername)) {
-            try {
-                mcUuid = getMcUUIDbyUsername(username);
-            } catch (Exception e) {
-                Chat.sendPrivateMessageToSelfError("Invalid Username: " + username);
-            }
-        }
-        else if (!mcUuid.equals(originalUUID)) {
-            try {
-                username = getMinecraftUserNameByMCUUID(mcUuid);
-            } catch (Exception e) {
-                Chat.sendPrivateMessageToSelfError("Invalid mcuuid: " + mcUuid);
-            }
-        }
-    }
-
-    /**
-     * DO NOT USE THIS METHOD! This is for special config purposes only
-     */
-    public void setUsernameOverwrite(String username) {
-        this.username = username;
     }
 }

@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric;
+package de.hype.bbsentials.fabric.screens.components;
 
 import de.hype.bbsentials.fabric.numpad.TextFieldWidget;
 import net.minecraft.client.font.TextRenderer;

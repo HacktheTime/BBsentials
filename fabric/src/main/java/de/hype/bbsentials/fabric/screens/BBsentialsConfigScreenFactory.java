@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric;
+package de.hype.bbsentials.fabric.screens;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.config.ConfigManager;

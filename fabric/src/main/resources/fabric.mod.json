@@ -22,7 +22,7 @@
       "de.hype.bbsentials.fabric.ModInitialiser"
     ],
     "modmenu": [
-      "de.hype.bbsentials.fabric.ModMenueScreen"
+      "de.hype.bbsentials.fabric.screens.ModMenueScreen"
     ]
   },
   "depends": {

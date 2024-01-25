@@ -1,6 +1,7 @@
 package de.hype.bbsentials.fabric;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,4 +33,11 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     public List<String> test() {
         return List.of("");
     }
+
+    public void setScreen(Screen screen) {
+        if (screen == null) return;
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.execute(() -> client.setScreen(screen));
+    }
+
 }

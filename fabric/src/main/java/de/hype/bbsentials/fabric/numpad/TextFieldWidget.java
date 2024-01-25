@@ -1,6 +1,5 @@
 package de.hype.bbsentials.fabric.numpad;
 
-import de.hype.bbsentials.fabric.IntegerFieldWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;

@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric;
+package de.hype.bbsentials.fabric.screens;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

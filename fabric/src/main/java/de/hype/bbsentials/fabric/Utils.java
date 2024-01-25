@@ -64,28 +64,32 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
         List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
         if (!waypoints.isEmpty()) {
-            RenderInWorldContext.renderInWorld(event, (it) -> {
-                for (Waypoints waypoint : waypoints) {
-                    BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
-                    if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
-                    it.color(0f, 1f, 0f, 0.2f);
-                    it.block(pos);
-                    it.color(1f, 0f, 0f, 1f);
-                    it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
-                }
-                return Unit.INSTANCE;
-            });
+            try {
+                RenderInWorldContext.renderInWorld(event, (it) -> {
+                    for (Waypoints waypoint : waypoints) {
+                        BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
+                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 0.2f);
+                        it.block(pos);
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 1f);
+                        it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                    }
+                    return Unit.INSTANCE;
+                });
+            } catch (Exception e) {
+
+            }
         }
         try {
             if (BBsentials.temporaryConfig.route != null) {
                 RenderInWorldContext.renderInWorld(event, (it) -> {
                     RouteNode node = BBsentials.temporaryConfig.route.getCurrentNode();
-                        BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
-                        BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
-                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
-                        it.block(pos);
-                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
-                        it.waypoint(pos, Text.of(node.name));
+                    BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
+                    BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
+                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
+                    it.block(pos);
+                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 2f);
+                    it.waypoint(pos, Text.of(node.name));
 
                     return Unit.INSTANCE;
                 });

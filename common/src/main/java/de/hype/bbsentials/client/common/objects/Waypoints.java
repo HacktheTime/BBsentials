@@ -79,4 +79,15 @@ public class Waypoints extends ClientWaypointData {
         if (!customTexture.equals("null:null")) builder.append("Custom Texture: " + customTexture);
         return builder.toString();
     }
+
+    public String getUserSimpleInformation() {
+        String unformatedName;
+        try {
+            unformatedName = EnvironmentCore.utils.getStringFromTextJson(jsonToRenderText);
+        } catch (Exception e) {
+            unformatedName = Formatting.RED + "Invalid Json Name";
+        }
+        return "Name: " + unformatedName + "§r | Coords: " + position.toString();
+    }
+
 }

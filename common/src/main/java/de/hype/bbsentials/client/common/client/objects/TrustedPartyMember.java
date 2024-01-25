@@ -2,6 +2,11 @@ package de.hype.bbsentials.client.common.client.objects;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class TrustedPartyMember {
     public String mcUuid;
     //Permissions
@@ -23,16 +28,68 @@ public class TrustedPartyMember {
     }
 
     public static TrustedPartyMember fromUsername(String username) {
-        return new TrustedPartyMember(getMcUuidByUsername(username), username);
+        return new TrustedPartyMember(getMcUUIDbyUsername(username), username);
     }
 
     public static TrustedPartyMember fromUUID(String uuid) {
         return new TrustedPartyMember(uuid);
     }
 
-    public static String getMcUuidByUsername(String username) {
-        //TODO do the request
+    private static String getMcUUIDbyUsername(String username) {
+        try {
+            String url = "https://api.mojang.com/users/profiles/minecraft/" + username;
+            URL mojangAPI = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) mojangAPI.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == 200) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                reader.close();
+
+                // Parse the JSON response
+                String uuid = response.toString().split("\"")[3];
+                return uuid;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
+    }
+
+    private static String getMinecraftUserNameByMCUUID(String uuid) {
+        try {
+            String url = "https://api.mojang.com/user/profile/" + uuid;
+            URL mojangAPI = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) mojangAPI.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            StringBuilder response = new StringBuilder();
+
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+            // Parse the JSON response
+            String[] json = response.toString().split("name\" : ");
+            String username = json[1].replace("\"", "").replace("}", "").trim();
+            return username;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null; // Return the input value if conversion fails
     }
 
     public TrustedPartyMember register() {
@@ -48,7 +105,7 @@ public class TrustedPartyMember {
 
     public String getUsername() {
         if (username == null) {
-            //TODO request usernme via api and set it
+            username = getMinecraftUserNameByMCUUID(mcUuid);
         }
         return username;
     }

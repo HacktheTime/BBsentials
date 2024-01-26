@@ -4,37 +4,24 @@ import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.api.Requirement;
-import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 public class TrustedPartyMemberConfig {
     public static Screen create(Screen parent, TrustedPartyMember data) {
-        String originalUsername = new String(data.getUsername());
-        String originalUUID = new String(data.mcUuid.replace("-", ""));
-
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
-                .setSavingRunnable(() -> data.save(originalUsername, originalUUID))
                 .setTitle(Text.of("Trusted Party Member"));
         Text text = Text.literal("");
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory main = builder.getOrCreateCategory(Text.literal(data.getUsername()));
 
-        StringListEntry username = entryBuilder.startTextField(Text.of("Username"), text.getString())
-                .setDefaultValue(text.getString())
-                .setSaveConsumer(data::setUsernameOverwrite)
-                .setTooltip(Text.literal("The Username of the person"))
-                .build();
-        main.addEntry(username);
         main.addEntry(entryBuilder.startTextField(Text.of("UUID"), text.getString())
                 .setDefaultValue(text.getString())
                 .setSaveConsumer((value) -> {
-                    data.mcUuid = value.replace("-", "");
+                    data.mcUuid = value;
                 })
                 .setTooltip(Text.literal("The UUID of the person"))
-                .setRequirement(Requirement.isTrue(() -> !username.getValue().equals(originalUsername)))
                 .build());
         main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Party Admin"), data.partyAdmin()).setDefaultValue(false).setSaveConsumer(data::partyAdmin).setTooltip(Text.literal("All Permissions but also promote, transfer, demote,...")).build());
         main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Can Invite"), data.canInvite()).setDefaultValue(false).setSaveConsumer(data::canInvite).setTooltip(Text.literal("Whether you want them to be allowed to invite people")).build());

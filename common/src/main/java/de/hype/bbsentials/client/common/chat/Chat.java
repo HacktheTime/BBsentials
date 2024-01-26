@@ -5,21 +5,17 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.mclibraries.Utils;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.StatusConstants;
-import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -196,7 +192,7 @@ public class Chat {
     }
 
     public Message onEvent(Message text, boolean actionbar) {
-        if (!actionbar && !isSpam(text.getString())) {
+        if (!isSpam(text.getString())) {
             if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                 System.out.println("got a message: " + text.getJson());
             }
@@ -217,7 +213,6 @@ public class Chat {
             }
             return null;
         }
-        if (actionbar) return message;
         if (message.isFromReportedUser()) {
             sendPrivateMessageToSelfBase("B: " + message.getUnformattedString(), Formatting.RED);
             return null;
@@ -229,11 +224,7 @@ public class Chat {
             message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions guild " + message.getPlayerName() + " " + message.getUnformattedString());
         }
         else if (BBsentials.generalConfig.doAllChatCustomMenu) {
-            try {
-                message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
-            }catch (Exception e){
-                Chat.sendPrivateMessageToSelfError("Error with Message: "+message.getUnformattedString());
-            }
+            message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
         }
 
         return message;
@@ -266,11 +257,10 @@ public class Chat {
             }
             else if (message.isServerMessage()) {
                 if (messageUnformatted.contains("disbanded the party")) {
-                    lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
-                    partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());
+                    lastPartyDisbandedUsername = username;
+                    partyDisbandedMap.put(username, Instant.now());
                 }
                 else if (message.contains("invited you to join their party")) {
-                    username = message.getNoRanks().replace("-", "").replace("\n", "").trim().split(" ")[0];
                     if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
                         Instant lastDisbandedInstant = partyDisbandedMap.get(lastPartyDisbandedUsername);
                         if (BBsentials.partyConfig.acceptReparty) {
@@ -355,9 +345,7 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",\"You can press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to buy it.\"]"));
                     setChatCommand("/purchasecrystallhollowspass", 30);
                 }
-                else if (messageUnformatted.equals("You have reached the daily cap of 500,000 Enchanting EXP. Keep in mind EXP from experiments bypasses this cap!")) {
-                    EnvironmentCore.utils.playsound("block.anvil.destroy");
-                }
+
                 else if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
                     setChatPromtId(message.getJson());
                 }
@@ -371,23 +359,15 @@ public class Chat {
                     setChatCommand("/warp desert", 10);
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp to the \",\"color\":\"green\"},{\"text\":\"Desert Settelment\",\"color\":\"gold\"}]"));
                 }
-                else if (messageUnformatted.startsWith("BINGO GOAL COMPLETE! ")) {
-                    BBsentials.connection.sendPacket(new CompletedGoalPacket(messageUnformatted.replace("BINGO GOAL COMPLETE!","").trim(), "", CompletedGoalPacket.CompletionType.GOAL, "", -1));
-                }
-                else if (messageUnformatted.matches("You completed all 20 goals for the \\w+ \\d{4} Bingo Event!")) {
-                    Chat.sendPrivateMessageToSelfImportantInfo("BB: Detected Card Completion. GG!\nThis will be verified shortly. If you want to get special Roles enable your APIs ASAP");
-                    EnvironmentCore.utils.playsound("ui.toast.challenge_complete");
-                    BBsentials.connection.sendPacket(new CompletedGoalPacket("", "", CompletedGoalPacket.CompletionType.CARD, "", -1));
-                }
             }
 
             else if (message.isFromGuild()) {
 
             }
             else if (message.isFromParty()) {
-                if (message.getMessageContent().equalsIgnoreCase("@" + BBsentials.generalConfig.getUsername().toLowerCase() + " bb:dev getlog") && username.equals("Hype_the_Time")) {
+                if (messageUnformatted.toLowerCase().startsWith("@" + BBsentials.generalConfig.getUsername().toLowerCase() + " bb:dev getlog") && username.equals("Hype_the_Time")) {
                     Chat.sendPrivateMessageToSelfError("Dont worry its a meme nothing happens actually");
-                    BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
+                    BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + Math.random() * 10000, 3);
                 }
                 if (message.getMessageContent().equals("warp") && BBsentials.partyConfig.isPartyLeader) {
                     if (BBsentials.partyConfig.partyMembers.size() == 1) {
@@ -412,9 +392,6 @@ public class Chat {
                     }
                     else {
                         TrustedPartyMember person = BBsentials.partyConfig.getTrustedUsername(username);
-                        if (person == null) {
-                            message.replyToUser("Permission Denied");
-                        }
                         String[] splittedParams = messageUnformatted.replace("bb:party", "").trim().split(" ");
                         String actionParamter = "";
                         String targetName = BBsentials.generalConfig.getUsername();
@@ -551,9 +528,7 @@ public class Chat {
                     }
                 }
             }
-
         }
-        BBsentials.discordIntegration.receivedInGameMessage(message);
         if (BBsentials.socketAddonConfig.useSocketAddons) {
             BBsentials.addonManager.notifyAllAddonsReceievedMessage(message);
         }
@@ -562,6 +537,8 @@ public class Chat {
     public boolean isSpam(String message) {
         if (message == null) return true;
         if (message.isEmpty()) return true;
+        if (message.contains("Mana")) return true;
+        if (message.contains("Status")) return true;
         if (message.contains("Achievement Points")) return true;
         return false;
     }
@@ -578,7 +555,18 @@ public class Chat {
 
     public void sendNotification(String title, String text, float volume) {
         BBsentials.executionService.execute(() -> {
-            EnvironmentCore.utils.playCustomSound("/sounds/mixkit-sci-fi-confirmation-914.wav",0);
+            try {
+                InputStream inputStream = getClass().getResourceAsStream("/sounds/mixkit-sci-fi-confirmation-914.wav");
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioInputStream);
+                clip.start();
+                Thread.sleep(clip.getMicrosecondLength() / 1000);
+                clip.close();
+                audioInputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
         List<String> argsList = new ArrayList<>();
         argsList.add("--title");

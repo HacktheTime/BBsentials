@@ -10,6 +10,7 @@ import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.WaypointRoute;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -129,5 +130,6 @@ public class BBsentials {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
             e.printStackTrace();
         }
+        WaypointRoute.waypointRouteDirectory.mkdirs();
     }
 }

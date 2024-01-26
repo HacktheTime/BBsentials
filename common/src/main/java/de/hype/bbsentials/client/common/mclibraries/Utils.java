@@ -1,6 +1,7 @@
 package de.hype.bbsentials.client.common.mclibraries;
 
 import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.objects.Position;
 
 import java.io.File;
 import java.io.InputStream;
@@ -58,4 +59,6 @@ public interface Utils {
     boolean isJsonParseableToText(String json);
 
     String stringToTextJson(String string);
+    Position getPlayersPosition();
+
 }

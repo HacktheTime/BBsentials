@@ -9,7 +9,7 @@ public class RouteNode {
     public Position coords;
     public String name;
     public Color color;
-    int triggerNextRange = -1;
+    public int triggerNextRange = -1;
     transient WaypointRoute route;
 
     public RouteNode(Position coords, Color color, int triggerNextRange, String name, WaypointRoute route) {

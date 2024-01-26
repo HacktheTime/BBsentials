@@ -13,6 +13,7 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
@@ -248,6 +249,12 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public String stringToTextJson(String string) {
         if (isJsonParseableToText(string)) return string;
         return Text.Serialization.toJsonString(Text.of(string));
+    }
+
+    @Override
+    public Position getPlayersPosition() {
+        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+        return new Position(pos.getX(),pos.getY(),pos.getZ());
     }
 
     @Override

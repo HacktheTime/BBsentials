@@ -16,7 +16,6 @@ import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
-import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
 import de.hype.bbsentials.shared.objects.Position;
 import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
 import net.fabricmc.api.ClientModInitializer;
@@ -34,7 +33,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -202,10 +200,7 @@ public class ModInitialiser implements ClientModInitializer {
                                         return 1;
                                     })
                             )
-                            .executes((context) -> {
-                                MinecraftClient.getInstance().executeTask(() -> MinecraftClient.getInstance().setScreen(BBsentialsConfigScreenFactory.create(MinecraftClient.getInstance().currentScreen)));
-                                return 1;
-                            }))
+                    )
                     .then(ClientCommandManager.literal("waypoint")
                             .then(ClientCommandManager.literal("add")
                                     .then(ClientCommandManager.argument("name", StringArgumentType.string())
@@ -263,12 +258,6 @@ public class ModInitialiser implements ClientModInitializer {
                                             }))
                                     )
                             )
-                            .executes((context -> {
-                                MinecraftClient.getInstance().executeTask(() -> {
-                                    MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen());
-                                });
-                                return 1;
-                            }))
                     ).then(ClientCommandManager.literal("route")
                             .then(ClientCommandManager.literal("load")
                                     .then(ClientCommandManager.argument("fileName", StringArgumentType.string())
@@ -285,7 +274,7 @@ public class ModInitialiser implements ClientModInitializer {
                                             })).then(ClientCommandManager.argument("startingnodeid", IntegerArgumentType.integer())
                                                     .executes((context -> {
                                                         try {
-                                                            WaypointRoute.loadFromFile(new File(waypointRouteDirectory, StringArgumentType.getString(context, "fileName") + ".json")).setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
+                                                            WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName") + ".json").setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
 
                                                             return 1;
                                                         } catch (Exception e) {
@@ -294,7 +283,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                     })))
                                             .executes((context -> {
                                                 try {
-                                                    WaypointRoute.loadFromFile(new File(waypointRouteDirectory, StringArgumentType.getString(context, "fileName") + ".json"));
+                                                    WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName"));
                                                     return 1;
                                                 } catch (Exception e) {
                                                     return 0;
@@ -318,7 +307,8 @@ public class ModInitialiser implements ClientModInitializer {
                                                 temporaryConfig.route.currentNode = id;
                                                 return 1;
                                             }))
-                                    ))
+                                    )
+                            )
                     )
             );
 

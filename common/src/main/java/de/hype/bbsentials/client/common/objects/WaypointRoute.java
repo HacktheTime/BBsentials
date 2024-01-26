@@ -2,7 +2,6 @@ package de.hype.bbsentials.client.common.objects;
 
 import com.google.gson.*;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.CustomGson;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
 import java.io.File;
@@ -11,7 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class WaypointRoute {
@@ -19,19 +17,16 @@ public class WaypointRoute {
     public static final File exportRouteDirectory = new File(EnvironmentCore.utils.getConfigPath(), "waypoints/routes/export/");
     public int currentNode;
     public List<RouteNode> nodes = new ArrayList<>();
-    public String name;
+    String routeName;
 
     public WaypointRoute(String name, List<RouteNode> nodes){
-        this.name =name;
-        if (name.isEmpty()){
-            this.name=new Date().toString().replace(" ","_");
-        }
+        this.routeName=name;
         this.nodes=nodes;
         this.currentNode=0;
     }
     private WaypointRoute(File file) {
         String fileName = file.getName();
-        name = fileName.substring(0, fileName.lastIndexOf("."));
+        routeName = fileName.substring(0, fileName.lastIndexOf("."));
         loadConfiguration(file);
     }
 
@@ -56,7 +51,7 @@ public class WaypointRoute {
 
     private static boolean isColewehightsFormat(File file) {
         try (FileReader reader = new FileReader(file)) {
-            Gson gson = CustomGson.create();
+            Gson gson = new Gson();
             JsonArray jsonArray = gson.fromJson(reader, JsonArray.class);
 
             if (jsonArray != null && jsonArray.size() > 0) {
@@ -88,7 +83,7 @@ public class WaypointRoute {
     }
 
     private void loadFromColewehightsFormat(File file) {
-        Gson gson = CustomGson.create();
+        Gson gson = new Gson();
         try (FileReader reader = new FileReader(file)) {
             JsonArray colewehightsArray = gson.fromJson(reader, JsonArray.class);
             for (int i = 0; i < colewehightsArray.size(); i++) {
@@ -101,7 +96,7 @@ public class WaypointRoute {
                 float b = nodeObject.get("b").getAsFloat();
                 String name = nodeObject.getAsJsonObject("options").get("name").getAsString();
 
-                RouteNode node = new RouteNode(x, y, z, r, g, b, name,true, this);
+                RouteNode node = new RouteNode(x, y, z, r, g, b, name, this);
                 nodes.add(node);
             }
         } catch (IOException e) {
@@ -119,7 +114,7 @@ public class WaypointRoute {
                     String fieldName = field.getName();
                     JsonObject jsonObject = loadJsonFile(file);
                     if (jsonObject.has(fieldName)) {
-                        field.set(this, CustomGson.create().fromJson(jsonObject.get(fieldName), field.getType()));
+                        field.set(this, new Gson().fromJson(jsonObject.get(fieldName), field.getType()));
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -145,17 +140,17 @@ public class WaypointRoute {
             if (!java.lang.reflect.Modifier.isTransient(field.getModifiers())) {
                 try {
                     field.setAccessible(true);
-                    jsonObject.add(field.getName(), CustomGson.create().toJsonTree(field.get(this)));
+                    jsonObject.add(field.getName(), new Gson().toJsonTree(field.get(this)));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
         }
         saveToColewheightsFormat();
-        String fileName = name + ".json";
+        String fileName = routeName + ".json";
         File configFile = new File(waypointRouteDirectory, fileName);
         try (FileWriter writer = new FileWriter(configFile)) {
-            Gson gson = CustomGson.create();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonOutput = gson.toJson(jsonObject);
             writer.write(jsonOutput);
         } catch (Exception e) {
@@ -169,7 +164,7 @@ public class WaypointRoute {
 
     public void saveToColewheightsFormat() {
         exportRouteDirectory.mkdirs();
-        Gson gson = CustomGson.create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonArray colewheightsArray = new JsonArray();
 
         for (RouteNode node : nodes) {
@@ -188,7 +183,7 @@ public class WaypointRoute {
             colewheightsArray.add(nodeObject);
         }
 
-        String fileName = name + "_colewheight.json";
+        String fileName = routeName + "_colewheight.json";
         File colewehightsFile = new File(exportRouteDirectory + fileName);
 
         try (FileWriter writer = new FileWriter(colewehightsFile)) {

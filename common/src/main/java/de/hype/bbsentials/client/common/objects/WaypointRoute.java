@@ -2,7 +2,6 @@ package de.hype.bbsentials.client.common.objects;
 
 import com.google.gson.*;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.config.TemporaryConfig;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
 import java.io.File;
@@ -20,13 +19,25 @@ public class WaypointRoute {
     public List<RouteNode> nodes = new ArrayList<>();
     String routeName;
 
-    WaypointRoute(File file) throws Exception {
+    public WaypointRoute(String name, List<RouteNode> nodes){
+        this.routeName=name;
+        this.nodes=nodes;
+        this.currentNode=0;
+    }
+    private WaypointRoute(File file) {
         String fileName = file.getName();
         routeName = fileName.substring(0, fileName.lastIndexOf("."));
         loadConfiguration(file);
     }
 
-    public static WaypointRoute loadFromFile(File file) throws Exception {
+    /**
+     * Does not actually load the route into the mod but acutally gets it as object from the file.
+     * To actually load it use {@link #loadRoute(String)}
+     * @param file file to load from
+     * @return the route
+     * @throws Exception when there is a problem when loading the route
+     */
+    public static WaypointRoute loadFromFile(File file) {
         WaypointRoute route = new WaypointRoute(file);
 
         if (isColewehightsFormat(file)) {
@@ -35,7 +46,6 @@ public class WaypointRoute {
         else {
             route.loadConfiguration(file);
         }
-        BBsentials.temporaryConfig.route = route;
         return route;
     }
 
@@ -60,14 +70,16 @@ public class WaypointRoute {
         BBsentials.temporaryConfig.route = route;
     }
 
-    public static void loadRoute(String nameOrPath) throws Exception {
+    public static WaypointRoute loadRoute(String nameOrPath) throws Exception {
         File file = new File(nameOrPath);
         if (!file.exists()) {
             if (!nameOrPath.endsWith(".json")) nameOrPath += ".json";
             file = new File(file, nameOrPath);
             if (!file.exists()) throw new Exception("Route does not exist");
             BBsentials.temporaryConfig.route = new WaypointRoute(file);
+            return BBsentials.temporaryConfig.route;
         }
+       throw new Exception("Route does not exist");
     }
 
     private void loadFromColewehightsFormat(File file) {

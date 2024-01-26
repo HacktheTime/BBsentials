@@ -10,12 +10,14 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.Position;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
@@ -206,6 +208,12 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public String stringToTextJson(String string) {
         if (isJsonParseableToText(string))return string;
         return IChatComponent.Serializer.componentToJson(new ChatComponentText(string));
+    }
+
+    @Override
+    public Position getPlayersPosition() {
+        BlockPos pos = Minecraft.getMinecraft().thePlayer.getPosition();
+        return new Position(pos.getX(),pos.getY(),pos.getZ());
     }
 
     @Override

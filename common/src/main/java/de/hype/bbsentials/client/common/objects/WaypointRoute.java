@@ -17,16 +17,16 @@ public class WaypointRoute {
     public static final File exportRouteDirectory = new File(EnvironmentCore.utils.getConfigPath(), "waypoints/routes/export/");
     public int currentNode;
     public List<RouteNode> nodes = new ArrayList<>();
-    String routeName;
+    public String name;
 
     public WaypointRoute(String name, List<RouteNode> nodes){
-        this.routeName=name;
+        this.name =name;
         this.nodes=nodes;
         this.currentNode=0;
     }
     private WaypointRoute(File file) {
         String fileName = file.getName();
-        routeName = fileName.substring(0, fileName.lastIndexOf("."));
+        name = fileName.substring(0, fileName.lastIndexOf("."));
         loadConfiguration(file);
     }
 
@@ -147,7 +147,7 @@ public class WaypointRoute {
             }
         }
         saveToColewheightsFormat();
-        String fileName = routeName + ".json";
+        String fileName = name + ".json";
         File configFile = new File(waypointRouteDirectory, fileName);
         try (FileWriter writer = new FileWriter(configFile)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -183,7 +183,7 @@ public class WaypointRoute {
             colewheightsArray.add(nodeObject);
         }
 
-        String fileName = routeName + "_colewheight.json";
+        String fileName = name + "_colewheight.json";
         File colewehightsFile = new File(exportRouteDirectory + fileName);
 
         try (FileWriter writer = new FileWriter(colewehightsFile)) {

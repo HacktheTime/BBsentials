@@ -15,7 +15,9 @@ public class TrustedPartyMember {
     private boolean canInvite = true;
     private boolean canMute = false;
     private boolean partyAdmin = false;
-    private boolean canRequestWarp = true;
+    private boolean canRequestWarp = false;
+    private boolean canRequestPolls = true;
+
     private transient String username = null;
 
     private TrustedPartyMember(String mcuuid) {
@@ -139,6 +141,10 @@ public class TrustedPartyMember {
         partyAdmin = value;
         return this;
     }
+    public TrustedPartyMember canRequestPolls(boolean value) {
+        canRequestPolls= value;
+        return this;
+    }
 
     public boolean canKick() {
         if (partyAdmin) return true;
@@ -168,5 +174,9 @@ public class TrustedPartyMember {
     public boolean canRequestWarp() {
         if (partyAdmin) return true;
         return canRequestWarp;
+    }
+    public boolean canRequestPolls() {
+        if (partyAdmin) return true;
+        return canRequestPolls;
     }
 }

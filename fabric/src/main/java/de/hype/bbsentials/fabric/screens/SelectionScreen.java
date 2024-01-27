@@ -31,8 +31,7 @@ public abstract class SelectionScreen<T> extends Screen {
     public abstract List<T> getObjectList();
 
     private List<T> getObjectsInternal(){
-        if (objects ==null) objects = new ArrayList<>(getObjectList());
-        return objects;
+        return new ArrayList<>(getObjectList());
     }
     @Override
     protected void init() {

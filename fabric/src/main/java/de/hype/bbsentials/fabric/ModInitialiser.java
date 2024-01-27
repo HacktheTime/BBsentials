@@ -17,6 +17,7 @@ import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
 import de.hype.bbsentials.shared.objects.Position;
+import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -388,28 +389,28 @@ public class ModInitialiser implements ClientModInitializer {
     public int createWaypointFromCommandContext(CommandContext context) {
         String jsonName = StringArgumentType.getString(context, "name");
         jsonName = EnvironmentCore.utils.stringToTextJson(jsonName);
-        BlockPos pos = BlockPosArgumentType.getBlockPos(context, "position");
+        BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "position");
         Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
         Boolean deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
         Boolean visible = BoolArgumentType.getBool(context, "visible");
         Integer maxRenderDist = IntegerArgumentType.getInteger(context, "maxrenderdistance");
         String customTextureFull = null;
-        String customTextureNameSpace = null;
-        String customTexturePath = null;
+        String customTextureNameSpace = "";
+        String customTexturePath = "";
         try {
             customTextureFull = StringArgumentType.getString(context, "customtexture");
             if (customTextureFull.contains(":")) {
-                customTextureNameSpace = customTexturePath.split(":")[0];
-                customTexturePath = customTexturePath.split(":")[1];
+                customTextureNameSpace = customTextureFull.split(":")[0];
+                customTexturePath = customTextureFull.split(":")[1];
             }
             else {
-                customTexturePath = customTexturePath;
+                customTextureFull = customTexturePath;
             }
         } catch (Exception ignored) {
 
         }
 
-        Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, customTextureNameSpace, customTexturePath);
+        Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, new RenderInformation(customTextureNameSpace,customTexturePath));
         return 1;
     }
 }

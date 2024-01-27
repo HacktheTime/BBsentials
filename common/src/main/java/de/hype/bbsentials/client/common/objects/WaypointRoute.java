@@ -100,7 +100,7 @@ public class WaypointRoute {
                 float b = nodeObject.get("b").getAsFloat();
                 String name = nodeObject.getAsJsonObject("options").get("name").getAsString();
 
-                RouteNode node = new RouteNode(x, y, z, r, g, b, name, this);
+                RouteNode node = new RouteNode(x, y, z, r, g, b, name,true, this);
                 nodes.add(node);
             }
         } catch (IOException e) {

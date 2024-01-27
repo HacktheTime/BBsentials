@@ -9,21 +9,25 @@ public class RouteNode {
     public Position coords;
     public String name;
     public Color color;
+    public boolean doTracer=true;
     public int triggerNextRange = -1;
     transient WaypointRoute route;
 
-    public RouteNode(Position coords, Color color, int triggerNextRange, String name, WaypointRoute route) {
+    public RouteNode(Position coords, Color color, boolean doTracer, int triggerNextRange, String name, WaypointRoute route) {
         this.coords = coords;
         this.color = color;
+        this.doTracer = doTracer;
         this.triggerNextRange = triggerNextRange;
         this.name = name;
 //        this.nodeId = route.getNextNodeId();
         this.route = route;
     }
 
-    public RouteNode(int x, int y, int z, float r, float g, float b, String name, WaypointRoute route) {
+    public RouteNode(int x, int y, int z, float r, float g, float b, String name, boolean doTracer, WaypointRoute route) {
+        this.doTracer = doTracer;
         coords = new Position(x, y, z);
         this.color = new Color(r, g, b);
+        this.name=name;
 //        this.nodeId = Integer.parseInt(name);
         this.route = route;
     }

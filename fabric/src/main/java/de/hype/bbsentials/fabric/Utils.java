@@ -31,6 +31,8 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -74,6 +76,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         it.block(pos);
                         it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 1f);
                         it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                        if (waypoint.doTracer){
+                            Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
+                            it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)),pos.toCenterPos()}, 3f);
+                        }
                     }
                     return Unit.INSTANCE;
                 });

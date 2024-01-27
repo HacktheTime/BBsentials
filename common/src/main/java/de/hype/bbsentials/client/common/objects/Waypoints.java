@@ -8,6 +8,7 @@ import de.hype.bbsentials.shared.objects.ClientWaypointData;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.WaypointData;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,8 +17,8 @@ public class Waypoints extends ClientWaypointData {
     int removeRunnableId;
 
 
-    public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, String textureNameSpace, String texturePath) {
-        super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, textureNameSpace, texturePath);
+    public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, String textureNameSpace, String texturePath, Color color, boolean doTracer) {
+        super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, textureNameSpace, texturePath, color, doTracer);
         ServerSwitchTask.onServerLeaveTask(() -> {
             if (this.deleteOnServerSwap)
                 this.removeFromPool();
@@ -26,7 +27,16 @@ public class Waypoints extends ClientWaypointData {
     }
 
     public Waypoints(WaypointData data) {
-        super(data.position, data.jsonToRenderText, data.renderDistance, data.visible, data.deleteOnServerSwap, data.textureNameSpace, data.texturePath);
+        super(data.position, data.jsonToRenderText, data.renderDistance, data.visible, data.deleteOnServerSwap, data.textureNameSpace, data.texturePath,data.color,data.doTracer);
+        ServerSwitchTask.onServerLeaveTask(() -> {
+            if (this.deleteOnServerSwap)
+                this.removeFromPool();
+        });
+        waypoints.put(waypointId, this);
+    }
+
+    public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, String textureNameSpace, String texturePath) {
+        super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, textureNameSpace, texturePath);
         ServerSwitchTask.onServerLeaveTask(() -> {
             if (this.deleteOnServerSwap)
                 this.removeFromPool();

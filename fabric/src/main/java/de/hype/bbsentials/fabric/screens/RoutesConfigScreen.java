@@ -33,7 +33,7 @@ public class RoutesConfigScreen extends SelectionScreen<WaypointRoute> {
 
     @Override
     public WaypointRoute getNewDefaultObject() {
-        return new WaypointRoute(null, new ArrayList<>());
+        return new WaypointRoute("", new ArrayList<>());
     }
 
     /**

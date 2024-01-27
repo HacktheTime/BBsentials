@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,12 +25,15 @@ public abstract class SelectionScreen<T> extends Screen {
 
     public SelectionScreen(Screen parent, String displayName) {
         super(Text.of(displayName));
-        this.objects = getObjectList();
         this.parent = parent;
     }
 
     public abstract List<T> getObjectList();
 
+    private List<T> getObjectsInternal(){
+        if (objects ==null) objects = new ArrayList<>(getObjectList());
+        return objects;
+    }
     @Override
     protected void init() {
         if (okButton == null) {
@@ -64,7 +68,7 @@ public abstract class SelectionScreen<T> extends Screen {
     }
 
     public void setPage(int newPage) {
-        int max = objects.size() / ((height - 100) / 30);
+        int max = getObjectsInternal().size() / ((height - 100) / 30);
         if (newPage < 0) newPage = 0;
         if (newPage > max) newPage = max;
         page = newPage;
@@ -72,7 +76,7 @@ public abstract class SelectionScreen<T> extends Screen {
     }
 
     private void addNewRow() {
-        objects.add(getNewDefaultObject());
+        getObjectsInternal().add(getNewDefaultObject());
         updateFields();
     }
 
@@ -80,7 +84,7 @@ public abstract class SelectionScreen<T> extends Screen {
 
     void removeRow(T node) {
         try {
-            objects.remove(node);
+            getObjectsInternal().remove(node);
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
         }
@@ -101,7 +105,7 @@ public abstract class SelectionScreen<T> extends Screen {
 
         clearChildren();
         int count = 0;
-        objects.forEach((object) -> {
+        getObjectsInternal().forEach((object) -> {
             int hight = 60 + count * 30;
 
             ButtonWidget removeButton = ButtonWidget.builder(Text.of("-"), button -> removeRow(object)).build();
@@ -133,7 +137,7 @@ public abstract class SelectionScreen<T> extends Screen {
     public int getMinimumEntry() {
         int toDisplay = 0;
         int index = -1;
-        while ((toDisplay <= entriesPerPage() * page) && index + 1 < objects.size()) {
+        while ((toDisplay <= entriesPerPage() * page) && index + 1 < getObjectsInternal().size()) {
             index++;
             toDisplay++;
 
@@ -142,13 +146,13 @@ public abstract class SelectionScreen<T> extends Screen {
     }
 
     public int entriesPerPage() {
-        return Math.min((height - 100) / 30, objects.size());
+        return Math.min((height - 100) / 30, getObjectsInternal().size());
     }
 
     public int getHighestEntry() {
         int index = getMinimumEntry() - 1;
         int toDisplay = 0;
-        while ((toDisplay <= entriesPerPage()) && index < objects.size() - 1) {
+        while ((toDisplay <= entriesPerPage()) && index < getObjectsInternal().size() - 1) {
             index++;
             toDisplay++;
         }

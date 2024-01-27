@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric.screens;
 
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.objects.Position;
+import de.hype.bbsentials.shared.objects.RenderInformation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +30,7 @@ public class WaypointsConfigScreen extends SelectionScreen<Waypoints> {
         if (pos == null) {
             pos = new BlockPos(0, 100, 0);
         }
-        return new Waypoints(new Position(pos.getX(), pos.getY(), pos.getZ()), "", 10000, true, true, "", "");
+        return new Waypoints(new Position(pos.getX(), pos.getY(), pos.getZ()), "", 10000, true, true,new RenderInformation("",""));
     }
 
     @Override

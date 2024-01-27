@@ -17,6 +17,7 @@ public class RouteConfigScreen extends SelectionScreen<RouteNode> {
         this.route = route;
     }
 
+
     @Override
     public List<RouteNode> getObjectList() {
         return route.nodes;
@@ -45,6 +46,7 @@ public class RouteConfigScreen extends SelectionScreen<RouteNode> {
     }
 
     public void done() {
+        route.save();
         close();
     }
 

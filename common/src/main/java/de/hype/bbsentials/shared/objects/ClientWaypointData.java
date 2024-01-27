@@ -26,7 +26,6 @@ public class ClientWaypointData extends WaypointData {
         super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, EnvironmentPacketConfig.getDefaultWaypointColor(), EnvironmentPacketConfig.getWaypointDefaultWithTracer());
     }
 
-
     public int getWaypointId() {
         return waypointId;
     }

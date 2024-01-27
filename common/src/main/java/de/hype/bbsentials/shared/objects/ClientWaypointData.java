@@ -10,7 +10,6 @@ public class ClientWaypointData extends WaypointData {
     }
 
 
-
     public int getWaypointId() {
         return waypointId;
     }

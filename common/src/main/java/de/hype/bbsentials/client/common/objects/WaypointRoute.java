@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class WaypointRoute {
@@ -21,6 +22,9 @@ public class WaypointRoute {
 
     public WaypointRoute(String name, List<RouteNode> nodes){
         this.name =name;
+        if (name.isEmpty()){
+            this.name=new Date().toString().replace(" ","_");
+        }
         this.nodes=nodes;
         this.currentNode=0;
     }

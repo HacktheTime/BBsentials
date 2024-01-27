@@ -57,9 +57,7 @@ class RenderInWorldContext private constructor(
 
     fun waypoint(position: BlockPos, label: Text) {
         text(
-            position.toCenterPos(),
-            label,
-            Text.literal(
+            position.toCenterPos(), label, Text.literal(
                 "§e${
                     formatDistance(
                         MinecraftClient.getInstance().player?.pos?.distanceTo(
@@ -72,8 +70,7 @@ class RenderInWorldContext private constructor(
     }
 
     fun formatDistance(distance: Double): String {
-        if (distance < 10)
-            return "%.1fm".format(distance)
+        if (distance < 10) return "%.1fm".format(distance)
         return "%dm".format(distance.toInt())
     }
 
@@ -146,12 +143,16 @@ class RenderInWorldContext private constructor(
     }
 
     fun line(vararg points: Vec3d, lineWidth: Float = 10F) {
+        line(points.toList(), lineWidth)
+    }
+
+    fun line(points: List<Vec3d>, lineWidth: Float = 10F) {
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
         RenderSystem.lineWidth(lineWidth / pow(camera.pos.squaredDistanceTo(points.first()), 0.25).toFloat())
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
         buffer.fixedColor(255, 255, 255, 255)
 
-        points.toList().zipWithNext().forEach { (a, b) ->
+        points.zipWithNext().forEach { (a, b) ->
             doLine(matrixStack.peek(), buffer, a.x, a.y, a.z, b.x, b.y, b.z)
         }
         buffer.unfixColor()
@@ -160,17 +161,20 @@ class RenderInWorldContext private constructor(
     }
 
     companion object {
-        private fun doLine(
-            matrix: Entry, buf: BufferBuilder, i: Number, j: Number, k: Number, x: Number, y: Number, z: Number
-        ) {
+        private fun doLine(matrix: Entry, buf: BufferBuilder, i: Number, j: Number, k: Number, x: Number, y: Number, z: Number) {
             val normal =
-                Vector3f(x.toFloat(), y.toFloat(), z.toFloat()).sub(i.toFloat(), j.toFloat(), k.toFloat()).mul(-1F)
+                Vector3f(x.toFloat(), y.toFloat(), z.toFloat()).sub(i.toFloat(), j.toFloat(), k.toFloat()).normalize()
             buf.vertex(matrix.positionMatrix, i.toFloat(), j.toFloat(), k.toFloat())
                 .normal(matrix.normalMatrix, normal.x, normal.y, normal.z).next()
             buf.vertex(matrix.positionMatrix, x.toFloat(), y.toFloat(), z.toFloat())
                 .normal(matrix.normalMatrix, normal.x, normal.y, normal.z).next()
         }
 
+        private fun doTracer(
+            matrix: Entry, buf: BufferBuilder, i: Number, j: Number, k: Number, x: Number, y: Number, z: Number
+        ) {
+            doLine(matrix, buf, i, j, k, x, y, z)
+        }
 
         private fun buildWireFrameCube(matrix: MatrixStack.Entry, buf: BufferBuilder) {
             buf.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)

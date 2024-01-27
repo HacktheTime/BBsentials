@@ -25,7 +25,7 @@ public class RouteConfigScreen extends SelectionScreen<RouteNode> {
 
     @Override
     public RouteNode getNewDefaultObject() {
-        return new RouteNode(EnvironmentCore.utils.getPlayersPosition(), new Color(255, 255, 255), -1, "Unamed", route);
+        return new RouteNode(EnvironmentCore.utils.getPlayersPosition(), new Color(255, 255, 255),true, -1, "Unamed", route);
     }
 
     /**

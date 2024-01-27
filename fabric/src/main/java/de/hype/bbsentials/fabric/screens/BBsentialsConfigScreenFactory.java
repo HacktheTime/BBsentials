@@ -11,6 +11,7 @@ import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
+import me.shedaniel.math.Color;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
@@ -132,6 +133,15 @@ public class BBsentialsConfigScreenFactory {
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Select if you want to see Splash Staus updates. Keep in mind that this will only send you status updates for the Splashes which you were shown.\nThose hidden due too too high Splash Time will still remain invisible"))
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.showSplashStatusUpdates = newValue)
+                    .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Waypoint Tracers Default"), BBsentials.visualConfig.waypointDefaultWithTracer)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want to Waypoints to have tracers by default"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultWithTracer = newValue)
+                    .build());
+            visual.addEntry(entryBuilder.startColorField(Text.of("Waypoint Color Default"), Color.ofRGB(BBsentials.visualConfig.waypointDefaultColor.getRed(),BBsentials.visualConfig.waypointDefaultColor.getGreen(),BBsentials.visualConfig.waypointDefaultColor.getBlue()))
+                    .setTooltip(Text.of("What Color should waypoints have by default"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultColor = new java.awt.Color(newValue))
                     .build());
         }
         //Visual

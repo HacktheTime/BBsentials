@@ -42,7 +42,7 @@ public class ChChestUpdateListener extends UpdateListener {
                 continue;
             }
             List<String> chestItems = Arrays.stream(chest.items).map(ChChestItem::getDisplayName).collect(Collectors.toList());
-            Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + String.join(", ", chestItems.subList(0, Math.min(chestItems.size(), 3))) + "\"}", 1000, shouldDisplay, true, "", "");
+            Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + String.join(", ", chestItems.subList(0, Math.min(chestItems.size(), 3))) + "\"}", 1000, shouldDisplay, true, "", "",BBsentials.chChestConfig.defaultWaypointColor,BBsentials.chChestConfig.doChestWaypointsTracers);
             waypoints.put(newpoint.position, newpoint);
         }
     }

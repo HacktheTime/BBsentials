@@ -52,11 +52,6 @@ public class BBsentialsConfigScreenFactory {
                         .setTooltip(Text.of("Shows dev debug even when its sensetive information"))
                         .setSaveConsumer(newValue -> BBsentials.developerConfig.devSecurity = newValue)
                         .build());
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Item Debug"), BBsentials.developerConfig.hypixelItemInfo)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Shows Hypixels Item Information"))
-                        .setSaveConsumer(newValue -> BBsentials.developerConfig.hypixelItemInfo = newValue)
-                        .build());
 
             }
         }
@@ -113,7 +108,7 @@ public class BBsentialsConfigScreenFactory {
         } // server
         ConfigCategory party = builder.getOrCreateCategory(Text.of("§6Party"));
         {
-            //TODO do the trusted party meMber command and menu
+            //TODO do the trusted party meber command and menu
             //TODO add a waypoint manager gui
             party.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Server Partying"), BBsentials.partyConfig.allowServerPartyInvite)
                     .setDefaultValue(true)
@@ -144,7 +139,7 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Select if you want to Waypoints to have tracers by default"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultWithTracer = newValue)
                     .build());
-            visual.addEntry(entryBuilder.startColorField(Text.of("Waypoint Color Default"), Color.ofRGB(BBsentials.visualConfig.waypointDefaultColor.getRed(), BBsentials.visualConfig.waypointDefaultColor.getGreen(), BBsentials.visualConfig.waypointDefaultColor.getBlue()))
+            visual.addEntry(entryBuilder.startColorField(Text.of("Waypoint Color Default"), Color.ofRGB(BBsentials.visualConfig.waypointDefaultColor.getRed(),BBsentials.visualConfig.waypointDefaultColor.getGreen(),BBsentials.visualConfig.waypointDefaultColor.getBlue()))
                     .setTooltip(Text.of("What Color should waypoints have by default"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultColor = new java.awt.Color(newValue))
                     .build());
@@ -372,7 +367,6 @@ public class BBsentialsConfigScreenFactory {
             {
                 discordIntegration.addEntry(entryBuilder.startStrField(Text.of("DC Bot Token"), BBsentials.discordConfig.botToken)
                         .setDefaultValue("")
-                        .requireRestart()
                         .setTooltip(Text.of("Whether you want to allow executing any command from remote. Is a security risk in case someone hacks your dc account."))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.botToken = newValue)
                         .build());
@@ -390,28 +384,6 @@ public class BBsentialsConfigScreenFactory {
                         .setDefaultValue(true)
                         .setTooltip(Text.of("Whether you want messages to be sent over to your discord as well."))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.useBridgeBot = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startLongField(Text.of("Bot Owner User ID"), Long.parseLong(BBsentials.discordConfig.botOwnerUserId))
-                        .setDefaultValue(-1)
-                        .requireRestart()
-                        .setTooltip(Text.of("The UserId of your discord account"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.botOwnerUserId = String.valueOf(newValue))
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Purge History on Restart"), BBsentials.discordConfig.deleteHistoryOnStart)
-                        .setDefaultValue(true)
-                        .requireRestart()
-                        .setTooltip(Text.of("Whenever the mod launches this will clear your History with the bot"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.deleteHistoryOnStart = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Disable Bot Output Temporarily"), BBsentials.discordConfig.isDisableTemporary())
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("§4Disable the output of the Bot. This is changeable with the bot → made so you can disable the output while away from home!"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.setDisableTemporary(newValue))
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Do Startup Info Message"), BBsentials.discordConfig.doStartupMessage)
-                        .setDefaultValue(true)
-                        .setTooltip(Text.of("Will send you a message whenever the Bot starts"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.doStartupMessage = newValue)
                         .build());
             }
         }//Discord

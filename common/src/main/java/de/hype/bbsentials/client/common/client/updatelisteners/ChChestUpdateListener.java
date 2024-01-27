@@ -9,7 +9,6 @@ import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.ChestLobbyData;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.client.common.objects.Waypoints;
-import de.hype.bbsentials.shared.objects.RenderInformation;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 
 import java.sql.SQLException;
@@ -42,10 +41,8 @@ public class ChChestUpdateListener extends UpdateListener {
                 waypoint.visible = shouldDisplay;
                 continue;
             }
-            List<String> chestItems = Arrays.stream(chest.items).filter(item-> !item.isCustom()).map(ChChestItem::getDisplayName).collect(Collectors.toList());
-            List<RenderInformation> renderInformationList = new ArrayList<>();
-            chestItems.forEach((item)->renderInformationList.add(new RenderInformation("bbsentials","textures/gui/sprites/waypoints/"+item+".png")));
-            Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + String.join(", ", chestItems.subList(0, Math.min(chestItems.size(), 3))) + "\"}", 1000, shouldDisplay, true, renderInformationList,BBsentials.chChestConfig.defaultWaypointColor,BBsentials.chChestConfig.doChestWaypointsTracers);
+            List<String> chestItems = Arrays.stream(chest.items).map(ChChestItem::getDisplayName).collect(Collectors.toList());
+            Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + String.join(", ", chestItems.subList(0, Math.min(chestItems.size(), 3))) + "\"}", 1000, shouldDisplay, true, "", "",BBsentials.chChestConfig.defaultWaypointColor,BBsentials.chChestConfig.doChestWaypointsTracers);
             waypoints.put(newpoint.position, newpoint);
         }
     }

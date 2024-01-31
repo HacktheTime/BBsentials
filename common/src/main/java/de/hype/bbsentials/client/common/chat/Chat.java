@@ -392,6 +392,9 @@ public class Chat {
                     }
                     else {
                         TrustedPartyMember person = BBsentials.partyConfig.getTrustedUsername(username);
+                        if (person == null) {
+                            message.replyToUser("Permission Denied");
+                        }
                         String[] splittedParams = messageUnformatted.replace("bb:party", "").trim().split(" ");
                         String actionParamter = "";
                         String targetName = BBsentials.generalConfig.getUsername();

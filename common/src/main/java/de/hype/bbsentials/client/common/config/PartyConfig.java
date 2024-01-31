@@ -3,10 +3,12 @@ package de.hype.bbsentials.client.common.config;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import static de.hype.bbsentials.client.common.client.APIUtils.getMcUUIDbyUsername;
 
 
 public class PartyConfig extends BBsentialsConfig {
@@ -22,6 +24,11 @@ public class PartyConfig extends BBsentialsConfig {
     public PartyConfig() {
         super(1);
         doInit();
+    }
+
+    @Override
+    public void setDefault() {
+
     }
 
     public TrustedPartyMember getTrustedUsername(String username) {
@@ -54,8 +61,35 @@ public class PartyConfig extends BBsentialsConfig {
         recommendedTrustedMembers.add(TrustedPartyMember.fromUUID("5a4245b07efa45019f162028ba713bb1").partyAdmin(true));//skyrezz bingo Hypixel admin
         recommendedTrustedMembers.add(TrustedPartyMember.fromUUID("858ee9a1ba6f4ef9a512fd0eb63d0663").partyAdmin(true));//Arithemonkey
         recommendedTrustedMembers.add(TrustedPartyMember.fromUUID("c1127c0f10cd489c9d0f27c2df3d76f1").partyAdmin(true));//Godwyn
-        recommendedTrustedMembers.add(TrustedPartyMember.fromUUID("dcf0437f120e45c799f8b6137d556d8b").partyAdmin(true));//ZerosTulip
 
     }
 
+    private static String getMcUUIDbyUsername(String username) {
+        try {
+            String url = "https://api.mojang.com/users/profiles/minecraft/" + username;
+            URL mojangAPI = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) mojangAPI.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == 200) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                reader.close();
+
+                // Parse the JSON response
+                String uuid = response.toString().split("\"")[3];
+                return uuid;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

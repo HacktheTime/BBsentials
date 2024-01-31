@@ -1,5 +1,6 @@
 package de.hype.bbsentials.client.common.client.objects;
 
+import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 
 import java.io.BufferedReader;
@@ -29,6 +30,9 @@ public class TrustedPartyMember {
         this.username = username;
     }
 
+    public boolean isUsernameInitialised() {
+        return username == null;
+    }
     public static TrustedPartyMember fromUsername(String username) {
         return new TrustedPartyMember(getMcUUIDbyUsername(username), username);
     }
@@ -141,8 +145,9 @@ public class TrustedPartyMember {
         partyAdmin = value;
         return this;
     }
+
     public TrustedPartyMember canRequestPolls(boolean value) {
-        canRequestPolls= value;
+        canRequestPolls = value;
         return this;
     }
 
@@ -175,8 +180,27 @@ public class TrustedPartyMember {
         if (partyAdmin) return true;
         return canRequestWarp;
     }
+
     public boolean canRequestPolls() {
         if (partyAdmin) return true;
         return canRequestPolls;
+    }
+
+    public void save(String originalUsername, String originalUUID) {
+        if (!username.equals(originalUsername)) {
+            try {
+                mcUuid = getMcUUIDbyUsername(username);
+            } catch (Exception e) {
+                Chat.sendPrivateMessageToSelfError("Invalid Username: " + username);
+            }
+        }
+        else if (!mcUuid.equals(originalUUID)) {
+            try {
+                username = getMinecraftUserNameByMCUUID(mcUuid);
+            } catch (Exception e) {
+                Chat.sendPrivateMessageToSelfError("Invalid mcuuid: " + mcUuid);
+            }
+        }
+
     }
 }

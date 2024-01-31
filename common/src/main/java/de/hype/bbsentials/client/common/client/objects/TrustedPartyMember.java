@@ -22,11 +22,11 @@ public class TrustedPartyMember {
     private transient String username = null;
 
     private TrustedPartyMember(String mcuuid) {
-        this.mcUuid = mcuuid;
+        this.mcUuid = mcuuid.replace("-", "");
     }
 
     public TrustedPartyMember(String mcuuid, String username) {
-        this.mcUuid = mcuuid;
+        this.mcUuid = mcuuid.replace("-", "");
         this.username = username;
     }
 
@@ -201,6 +201,12 @@ public class TrustedPartyMember {
                 Chat.sendPrivateMessageToSelfError("Invalid mcuuid: " + mcUuid);
             }
         }
+    }
 
+    /**
+     * DO NOT USE THIS METHOD! This is for special config purposes only
+     */
+    public void setUsernameOverwrite(String username) {
+        this.username = username;
     }
 }

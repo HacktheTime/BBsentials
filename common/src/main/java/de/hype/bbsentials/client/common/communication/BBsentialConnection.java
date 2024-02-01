@@ -15,7 +15,10 @@ import de.hype.bbsentials.environment.packetconfig.PacketUtils;
 import de.hype.bbsentials.shared.constants.*;
 import de.hype.bbsentials.shared.objects.ClientWaypointData;
 import de.hype.bbsentials.shared.objects.SplashData;
-import de.hype.bbsentials.shared.packets.function.*;
+import de.hype.bbsentials.shared.packets.function.GetWaypointsPacket;
+import de.hype.bbsentials.shared.packets.function.PartyPacket;
+import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
+import de.hype.bbsentials.shared.packets.function.WaypointPacket;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
@@ -406,13 +409,13 @@ public class BBsentialConnection {
             BBsentials.sender.addImmediateSendTask("/hub");
         }
         else if (packet.command.equals(InternalCommandPacket.PRIVATE_ISLAND)) {
-            BBsentials.sender.addImmediateSendTask("/is");
+           BBsentials.sender.addImmediateSendTask("/is");
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_HUB)) {
-            BBsentials.sender.addHiddenSendTask("/hub", 0);
+           BBsentials.sender.addHiddenSendTask("/hub", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_PRIVATE_ISLAND)) {
-            BBsentials.sender.addHiddenSendTask("/is", 0);
+           BBsentials.sender.addHiddenSendTask("/is", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.CRASH)) {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
@@ -426,13 +429,13 @@ public class BBsentialConnection {
                     } catch (InterruptedException ignored) {
                     }
                 }
-                EnvironmentCore.utils.systemExit(69);
+                System.exit(69);
             });
             crashThread.start();
         }
         else if (packet.command.equals(InternalCommandPacket.INSTACRASH)) {
             System.out.println("BBsentials: InstaCrash triggered");
-            EnvironmentCore.utils.systemExit(69);
+            System.exit(69);
         }
     }
 
@@ -463,13 +466,7 @@ public class BBsentialConnection {
     }
 
     public void onRequestAuthentication(RequestAuthentication packet) {
-        if (socket.getPort() == 5011) {
-            Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online (Beta Development Server)");
-            Chat.sendPrivateMessageToSelfImportantInfo("You may test here but do NOT Spam unless you have very good reasons. Spamming may still be punished");
-        }
-        else {
-            Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
-        }
+        Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -610,19 +607,6 @@ public class BBsentialConnection {
     public void onGetWaypointsPacket(GetWaypointsPacket packet) {
         sendPacket(new GetWaypointsPacket(Waypoints.waypoints.values().stream().map((waypoint -> ((ClientWaypointData) waypoint))).collect(Collectors.toList())));
     }
-
-    public void onCompletedGoalPacket(CompletedGoalPacket packet) {
-        if (!BBsentials.visualConfig.showCardCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.CARD))
-            return;
-        if (!BBsentials.visualConfig.showGoalCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.GOAL))
-            return;
-    }
-
-    public void onPlaySoundPacket(PlaySoundPacket packet) {
-        if (packet.streamFromUrl) EnvironmentCore.utils.streamCustomSound(packet.soundId, packet.durationInSeconds);
-        else EnvironmentCore.utils.playsound(packet.soundId);
-    }
-
     public interface MessageReceivedCallback {
         void onMessageReceived(String message);
     }

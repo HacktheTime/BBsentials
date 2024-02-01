@@ -1,38 +1,26 @@
 package de.hype.bbsentials.shared.packets.function;
 
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
-import de.hype.bbsentials.shared.objects.Position;
-import de.hype.bbsentials.shared.objects.RenderInformation;
 import de.hype.bbsentials.shared.objects.WaypointData;
 
-import java.awt.*;
-import java.util.Collection;
-
+/**
+ * Used to tell the addon what message came in.
+ */
 public class WaypointPacket extends AbstractPacket {
-    public Collection<WaypointPacketData> waypoint;
+    public final WaypointData waypoint;
+    public final int waypointId;
+    public final Operation operation;
 
-    public WaypointPacket(Collection<WaypointPacketData> waypoint) {
-        super(1, 1);
+    public WaypointPacket(WaypointData waypoint, int waypointId, Operation operation) {
+        super(1, 1); //Min and Max supportet Version
         this.waypoint = waypoint;
+        this.waypointId = waypointId;
+        this.operation = operation;
     }
 
-    public enum WaypointAction {
+    public enum Operation {
         ADD,
         REMOVE,
-        UPDATE
-    }
-
-    public class WaypointPacketData extends WaypointData {
-
-        public WaypointAction action;
-
-        public WaypointPacketData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render, Color color, boolean doTracer, WaypointAction action) {
-            super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, color, doTracer);
-            this.action = action;
-        }
-
-        public WaypointData getAsWaypointData() {
-            return this;
-        }
+        EDIT
     }
 }

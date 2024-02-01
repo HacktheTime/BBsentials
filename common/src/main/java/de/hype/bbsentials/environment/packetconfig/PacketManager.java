@@ -3,9 +3,7 @@ package de.hype.bbsentials.environment.packetconfig;
 import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
-import de.hype.bbsentials.shared.packets.function.PartyPacket;
-import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
-import de.hype.bbsentials.shared.packets.function.SplashUpdatePacket;
+import de.hype.bbsentials.shared.packets.function.*;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
@@ -49,6 +47,8 @@ public class PacketManager {
         packets.add(new Packet<>(WelcomeClientPacket.class, connection::onWelcomePacket));
         packets.add(new Packet<>(RequestAuthentication.class, connection::onRequestAuthentication));
         packets.add(new Packet<>(SplashUpdatePacket.class, SplashManager::updateSplash));
+        packets.add(new Packet<>(GetWaypointsPacket.class, connection::onGetWaypointsPacket));
+        packets.add(new Packet<>(WaypointPacket.class, connection::onWaypointPacket));
         packets.add(new Packet<>(ChestLobbyUpdatePacket.class, ((packet) -> UpdateListenerManager.chChestUpdateListener.updateLobby(packet.lobby))));
     }
 

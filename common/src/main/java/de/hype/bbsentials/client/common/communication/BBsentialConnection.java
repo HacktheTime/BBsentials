@@ -8,13 +8,17 @@ import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdat
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
 import de.hype.bbsentials.environment.packetconfig.PacketUtils;
 import de.hype.bbsentials.shared.constants.*;
+import de.hype.bbsentials.shared.objects.ClientWaypointData;
 import de.hype.bbsentials.shared.objects.SplashData;
+import de.hype.bbsentials.shared.packets.function.GetWaypointsPacket;
 import de.hype.bbsentials.shared.packets.function.PartyPacket;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
+import de.hype.bbsentials.shared.packets.function.WaypointPacket;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
@@ -579,6 +583,30 @@ public class BBsentialConnection {
         }
     }
 
+    public void onWaypointPacket(WaypointPacket packet) {
+        if (packet.operation.equals(WaypointPacket.Operation.ADD)) {
+            new Waypoints(packet.waypoint);
+        }
+        else if (packet.operation.equals(WaypointPacket.Operation.REMOVE)) {
+            try {
+                Waypoints.waypoints.get(packet.waypointId).removeFromPool();
+            } catch (Exception ignored) {
+
+            }
+        }
+        else if (packet.operation.equals(WaypointPacket.Operation.EDIT)) {
+            try {
+                Waypoints oldWaypoint = Waypoints.waypoints.get(packet.waypointId);
+                oldWaypoint.replaceWithNewWaypoint(packet.waypoint, packet.waypointId);
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    public void onGetWaypointsPacket(GetWaypointsPacket packet) {
+        sendPacket(new GetWaypointsPacket(Waypoints.waypoints.values().stream().map((waypoint -> ((ClientWaypointData) waypoint))).collect(Collectors.toList())));
+    }
     public interface MessageReceivedCallback {
         void onMessageReceived(String message);
     }

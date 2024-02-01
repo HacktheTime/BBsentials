@@ -11,7 +11,8 @@ import java.util.Date;
 public class AbstractPacket {
     public final int apiVersionMin;
     public final int apiVersionMax;
-    public long replyDate = new Date().getTime();
+    public long packetDate = new Date().getTime();
+    public long replyDate = -1;
 
     protected AbstractPacket(int apiVersionMin, int apiVersionMax) {
         this.apiVersionMax = apiVersionMax;
@@ -67,7 +68,7 @@ public class AbstractPacket {
     }
 
     public <T extends AbstractPacket> T preparePacketToReplyToThis(T packet) {
-        packet.replyDate = replyDate;
+        packet.replyDate = packetDate;
         return packet;
     }
 }

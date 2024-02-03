@@ -35,14 +35,18 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
 
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
-        BlockPos pos = event.pos;
-        if (pos == null) return;
-        World world = event.world;
-        IBlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof BlockChest) {
-            if (utils.getCurrentIsland().equals(Islands.CRYSTAL_HOLLOWS)) {
-                UpdateListenerManager.chChestUpdateListener.addOpenedChest(new Position(pos.getX(), pos.getY(), pos.getZ()));
+        try {
+            BlockPos pos = event.pos;
+            if (pos == null) return;
+            World world = event.world;
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() instanceof BlockChest) {
+                if (utils.getCurrentIsland().equals(Islands.CRYSTAL_HOLLOWS)) {
+                    UpdateListenerManager.chChestUpdateListener.addOpenedChest(new Position(pos.getX(), pos.getY(), pos.getZ()));
+                }
             }
+        } catch (Exception ignored) {
+
         }
     }
 }

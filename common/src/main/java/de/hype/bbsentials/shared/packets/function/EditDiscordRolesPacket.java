@@ -8,7 +8,7 @@ public class EditDiscordRolesPacket extends AbstractPacket {
     public List<RoleActionData> roles;
 
     public EditDiscordRolesPacket(List<RoleActionData> roles) {
-        super(1, 1);
+        super(1,1);
         this.roles = roles;
     }
 

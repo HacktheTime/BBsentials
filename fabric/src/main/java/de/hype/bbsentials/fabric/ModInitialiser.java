@@ -390,7 +390,7 @@ public class ModInitialiser implements ClientModInitializer {
     public int createWaypointFromCommandContext(CommandContext context) {
         String jsonName = StringArgumentType.getString(context, "name");
         jsonName = EnvironmentCore.utils.stringToTextJson(jsonName);
-        BlockPos pos = BlockPosArgumentType.getBlockPos(context, "position");
+        BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "position");
         Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
         Boolean deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
         Boolean visible = BoolArgumentType.getBool(context, "visible");

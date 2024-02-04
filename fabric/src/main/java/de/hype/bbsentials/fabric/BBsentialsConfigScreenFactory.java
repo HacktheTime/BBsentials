@@ -51,6 +51,11 @@ public class BBsentialsConfigScreenFactory {
                         .setTooltip(Text.of("Shows dev debug even when its sensetive information"))
                         .setSaveConsumer(newValue -> BBsentials.developerConfig.devSecurity = newValue)
                         .build());
+                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Item Debug"), BBsentials.developerConfig.hypixelItemInfo)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Shows Hypixels Item Information"))
+                        .setSaveConsumer(newValue -> BBsentials.developerConfig.hypixelItemInfo = newValue)
+                        .build());
 
             }
         }

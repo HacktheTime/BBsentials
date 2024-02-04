@@ -27,6 +27,9 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -39,9 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -97,7 +98,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                     BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
                     it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
                     it.block(pos);
-                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 2f);
+                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
                     it.waypoint(pos, Text.of(node.name));
 
                     return Unit.INSTANCE;
@@ -106,6 +107,67 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         } catch (Exception ignored) {
         }
 //        WorldRenderLastEvent.Companion.publish(event);
+    }
+
+    public static void doBingoRankManipulations(ItemStack stack) {
+//        try {
+//            NbtCompound nbt = stack.getOrCreateNbt();
+//            NbtCompound displayTag = nbt.getCompound("display");
+//
+//            boolean isBingoCommunityGoal = displayTag.asString().contains("Community Goal");
+//            if (displayTag.contains("Lore") && isBingoCommunityGoal) {
+//
+//                NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
+//                for (int i = 0; i < loreList.size(); i++) {
+//                    String lineJson = loreList.getString(i);
+//                    String lineContentString = Text.Serialization.fromLenientJson(lineJson).getString();
+//                    if (lineContentString.matches("  Top \\d+(\\.\\d+)%$") || lineContentString.matches("  Top \\d+%$")) {
+//                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("  §8 Top §a0%"))));
+//                        loreList.add(i + 1, NbtString.of(Text.Serialization.toJsonString(Text.of("  §6§l#1§r §fcontributor"))));
+//                        i += 3;
+//                        continue;
+//                    }
+//
+//                    if (lineContentString.matches("  #(\\d+) contributor")) {
+//                        loreList.remove(i);
+//                    }
+//                }
+//                if (!loreList.get(loreList.size() - 1).asString().contains("This is faked!")) {
+//                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("§4This is faked!"))));
+//                }
+//
+//                displayTag.put("Lore", loreList);
+//                stack.getNbt().put("display", displayTag);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    public static void addDebugInfoToRender(ItemStack stack) {
+        try {
+            if (stack.getNbt().getBoolean("addedDebug")) return;
+            NbtCompound nbt = stack.getOrCreateNbt();
+            NbtCompound displayTag = nbt.getCompound("display");
+            NbtCompound extraAttributes = nbt.getCompound("ExtraAttributes");
+            NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
+            Set<String> keys = extraAttributes.getKeys();
+            for (String key : keys) {
+                if (key.equals("enchantments")) continue;
+                if (key.equals("timestamp")) {
+                    Long stamp = extraAttributes.getLong(key);
+                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + new Date(stamp) + ")"))));
+                    continue;
+                }
+                loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of(key + ": " + extraAttributes.get(key)))));
+            }
+            displayTag.put("Lore", loreList);
+            stack.getNbt().put("display", displayTag);
+            stack.getNbt().putBoolean("addedDebug", true);
+        } catch (NullPointerException ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isWindowFocused() {

@@ -13,6 +13,7 @@ public class DeveloperConfig extends BBsentialsConfig {
     public boolean detailedDevMode = false;
     public boolean doDevDashboardConfig = true;
     public boolean devSecurity = true;
+    public boolean hypixelItemInfo = false;
 
     public DeveloperConfig() {
         super(1);

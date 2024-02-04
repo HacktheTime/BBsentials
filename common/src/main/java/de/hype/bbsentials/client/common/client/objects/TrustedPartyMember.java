@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static de.hype.bbsentials.client.common.client.APIUtils.getMcUUIDbyUsername;
+
 public class TrustedPartyMember {
     public String mcUuid;
     //Permissions
@@ -41,34 +43,7 @@ public class TrustedPartyMember {
         return new TrustedPartyMember(uuid);
     }
 
-    private static String getMcUUIDbyUsername(String username) {
-        try {
-            String url = "https://api.mojang.com/users/profiles/minecraft/" + username;
-            URL mojangAPI = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) mojangAPI.openConnection();
-            connection.setRequestMethod("GET");
-            int responseCode = connection.getResponseCode();
 
-            if (responseCode == 200) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-
-                reader.close();
-
-                // Parse the JSON response
-                String uuid = response.toString().split("\"")[3];
-                return uuid;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private static String getMinecraftUserNameByMCUUID(String uuid) {
         try {

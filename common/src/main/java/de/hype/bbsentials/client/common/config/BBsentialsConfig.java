@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import de.hype.bbsentials.client.common.client.CustomGson;
 import de.hype.bbsentials.client.common.client.ModUpdateHelper;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
@@ -86,7 +87,7 @@ public abstract class BBsentialsConfig {
             if (!java.lang.reflect.Modifier.isTransient(field.getModifiers())) {
                 try {
                     field.setAccessible(true);
-                    jsonObject.add(field.getName(), new Gson().toJsonTree(field.get(this)));
+                    jsonObject.add(field.getName(), CustomGson.create().toJsonTree(field.get(this)));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -97,7 +98,7 @@ public abstract class BBsentialsConfig {
         File configFile = new File(configFolder, fileName);
 
         try (FileWriter writer = new FileWriter(configFile)) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = CustomGson.create();
             String jsonOutput = gson.toJson(jsonObject);
             writer.write(jsonOutput);
         } catch (Exception e) {

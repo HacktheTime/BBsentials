@@ -48,10 +48,10 @@ public class PacketUtils {
                 T parsedPacket = gson.fromJson(rawJson.replace("/n","\n"), clazz);
                 return parsedPacket;
             } catch (Throwable t) {
-                showError(t, "Could not process packet '" + packetName + "' from " + EnviromentPacketConfig.notEnviroment);
+                showError(t, "Could not process packet '" + packetName + "' from " + EnvironmentPacketConfig.notEnviroment);
             }
         }
-        String errorMessage = "Could not process packet '" + packetName + "' from " + EnviromentPacketConfig.notEnviroment;
+        String errorMessage = "Could not process packet '" + packetName + "' from " + EnvironmentPacketConfig.notEnviroment;
 
         showError(new APIException("Found unknown packet: " + packetName + "'"), errorMessage);
         return null;
@@ -92,10 +92,10 @@ public class PacketUtils {
             }catch (RuntimeException e){
                 throw e;
             }catch (Exception t) {
-                showError(t, "Could not process packet '" + packetName + "' from " + EnviromentPacketConfig.notEnviroment);
+                showError(t, "Could not process packet '" + packetName + "' from " + EnvironmentPacketConfig.notEnviroment);
             }
         }
-        String errorMessage = "Could not process packet '" + packetName + "' from " + EnviromentPacketConfig.notEnviroment;
+        String errorMessage = "Could not process packet '" + packetName + "' from " + EnvironmentPacketConfig.notEnviroment;
 
         showError(new APIException("Found unknown packet: " + packetName + "'"), errorMessage);
         return false;

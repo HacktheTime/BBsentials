@@ -10,14 +10,6 @@ public class CustomGson {
         return new GsonBuilder()
 //                .registerTypeHierarchyAdapter(BBDisplayNameProvider.class, new BBDisplayNameProviderSerializer())
                 .registerTypeAdapter(Color.class, new ColorSerializer())
-                .setPrettyPrinting()
-                .create();
-
-    }
-    public static Gson createNotPrettyPrinting() {
-        return new GsonBuilder()
-//                .registerTypeHierarchyAdapter(BBDisplayNameProvider.class, new BBDisplayNameProviderSerializer())
-                .registerTypeAdapter(Color.class, new ColorSerializer())
                 .create();
 
     }

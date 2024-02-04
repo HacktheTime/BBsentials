@@ -17,6 +17,7 @@ public class ClientWaypointData extends WaypointData {
     public ClientWaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render) {
         super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, EnvironmentPacketConfig.getDefaultWaypointColor(), EnvironmentPacketConfig.getWaypointDefaultWithTracer());
     }
+
     public ClientWaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render, Color color, boolean doTracer) {
         super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, color, doTracer);
     }

@@ -19,7 +19,7 @@ public class WaypointData {
         this.jsonToRenderText = jsonTextToRender;
         this.renderDistance = renderDistance;
         this.deleteOnServerSwap = deleteOnServerSwap;
-        this.render= Arrays.asList(render);
+        this.render = Arrays.asList(render);
         this.visible = visible;
         this.doTracer = doTracer;
         this.color = new Color(1f, 1f, 1f);
@@ -34,19 +34,20 @@ public class WaypointData {
         this.renderDistance = renderDistance;
         this.deleteOnServerSwap = deleteOnServerSwap;
         this.visible = visible;
-        this.render=Arrays.asList(render);
+        this.render = Arrays.asList(render);
         this.color = color;
         this.doTracer = doTracer;
         if (jsonTextToRender == null || jsonTextToRender.isEmpty()) {
             this.jsonToRenderText = "{\"text\":\"Unnamed\"}";
         }
     }
+
     public WaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render, boolean doTracer) {
         this.position = pos;
         this.jsonToRenderText = jsonTextToRender;
         this.renderDistance = renderDistance;
         this.deleteOnServerSwap = deleteOnServerSwap;
-        this.render= render;
+        this.render = render;
         this.visible = visible;
         this.doTracer = doTracer;
         this.color = new Color(1f, 1f, 1f);
@@ -61,7 +62,7 @@ public class WaypointData {
         this.renderDistance = renderDistance;
         this.deleteOnServerSwap = deleteOnServerSwap;
         this.visible = visible;
-        this.render=render;
+        this.render = render;
         this.color = color;
         this.doTracer = doTracer;
         if (jsonTextToRender == null || jsonTextToRender.isEmpty()) {

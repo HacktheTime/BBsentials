@@ -345,7 +345,9 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",\"You can press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to buy it.\"]"));
                     setChatCommand("/purchasecrystallhollowspass", 30);
                 }
-
+                else if (messageUnformatted.equals("You have reached the daily cap of 500,000 Enchanting EXP. Keep in mind EXP from experiments bypasses this cap!")) {
+                    EnvironmentCore.utils.playsound("block.anvil.destroy");
+                }
                 else if (message.contains("[OPEN MENU]") || message.contains("[YES]")) {
                     setChatPromtId(message.getJson());
                 }

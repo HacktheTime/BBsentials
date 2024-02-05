@@ -2,6 +2,7 @@ package de.hype.bbsentials.client.common.objects;
 
 import com.google.gson.*;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.CustomGson;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class WaypointRoute {
 
     private static boolean isColewehightsFormat(File file) {
         try (FileReader reader = new FileReader(file)) {
-            Gson gson = new Gson();
+            Gson gson = CustomGson.create();
             JsonArray jsonArray = gson.fromJson(reader, JsonArray.class);
 
             if (jsonArray != null && jsonArray.size() > 0) {
@@ -87,7 +88,7 @@ public class WaypointRoute {
     }
 
     private void loadFromColewehightsFormat(File file) {
-        Gson gson = new Gson();
+        Gson gson = CustomGson.create();
         try (FileReader reader = new FileReader(file)) {
             JsonArray colewehightsArray = gson.fromJson(reader, JsonArray.class);
             for (int i = 0; i < colewehightsArray.size(); i++) {
@@ -118,7 +119,7 @@ public class WaypointRoute {
                     String fieldName = field.getName();
                     JsonObject jsonObject = loadJsonFile(file);
                     if (jsonObject.has(fieldName)) {
-                        field.set(this, new Gson().fromJson(jsonObject.get(fieldName), field.getType()));
+                        field.set(this, CustomGson.create().fromJson(jsonObject.get(fieldName), field.getType()));
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -144,7 +145,7 @@ public class WaypointRoute {
             if (!java.lang.reflect.Modifier.isTransient(field.getModifiers())) {
                 try {
                     field.setAccessible(true);
-                    jsonObject.add(field.getName(), new Gson().toJsonTree(field.get(this)));
+                    jsonObject.add(field.getName(), CustomGson.create().toJsonTree(field.get(this)));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -154,7 +155,7 @@ public class WaypointRoute {
         String fileName = name + ".json";
         File configFile = new File(waypointRouteDirectory, fileName);
         try (FileWriter writer = new FileWriter(configFile)) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = CustomGson.create();
             String jsonOutput = gson.toJson(jsonObject);
             writer.write(jsonOutput);
         } catch (Exception e) {
@@ -168,7 +169,7 @@ public class WaypointRoute {
 
     public void saveToColewheightsFormat() {
         exportRouteDirectory.mkdirs();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = CustomGson.create();
         JsonArray colewheightsArray = new JsonArray();
 
         for (RouteNode node : nodes) {

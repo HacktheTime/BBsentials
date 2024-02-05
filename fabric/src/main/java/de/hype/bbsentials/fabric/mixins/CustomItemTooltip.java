@@ -1,8 +1,8 @@
 package de.hype.bbsentials.fabric.mixins;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.Utils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
@@ -15,6 +15,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
@@ -35,15 +37,18 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
     @Shadow
     protected abstract List<Text> getTooltipFromItem(ItemStack stack);
 
-    @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
-    private ItemStack modfiedItemStack(ItemStack original) {
-        ItemStack itemStack = original.copy();
-        if (itemStack.  getItem() == Items.EMERALD_BLOCK || itemStack.getItem() == Items.IRON_BLOCK || itemStack.getItem() == Items.PAPER) {
-            Utils.doBingoRankManipulations(itemStack);
+    @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
+    private void drawMouseoverTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
+        if (this.handler.getCursorStack().isEmpty() && this.focusedSlot != null && this.focusedSlot.hasStack()) {
+            ItemStack itemStack = this.focusedSlot.getStack().copy();
+            if (itemStack.getItem() == Items.EMERALD_BLOCK || itemStack.getItem() == Items.IRON_BLOCK) {
+                Utils.doBingoRankManipulations(itemStack);
+            }
+            if (BBsentials.developerConfig.hypixelItemInfo) {
+                Utils.addDebugInfoToRender(itemStack);
+            }
+            context.drawTooltip(this.textRenderer, this.getTooltipFromItem(itemStack), itemStack.getTooltipData(), x, y);
         }
-        if (BBsentials.developerConfig.hypixelItemInfo) {
-            Utils.addDebugInfoToRender(itemStack);
-        }
-        return itemStack;
+        ci.cancel();
     }
 }

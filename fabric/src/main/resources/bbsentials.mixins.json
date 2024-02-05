@@ -7,9 +7,10 @@
   "client": [
     "ClientCommandSourceMixin",
     "CustomItemTextures",
+    "CustomItemTooltip",
     "ScreenMixin",
-    "WorldRenderLastEventPatch",
-    "SimpleOptionMixin"
+    "SimpleOptionMixin",
+    "WorldRenderLastEventPatch"
   ],
   "injectors": {
     "defaultRequire": 1

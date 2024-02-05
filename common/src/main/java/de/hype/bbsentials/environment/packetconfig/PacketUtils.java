@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 
 public class PacketUtils {
-    public static final Gson gson = CustomGson.create();
+    public static final Gson gson = CustomGson.createNotPrettyPrinting();
 
     public static String parsePacketToJson(AbstractPacket packet) {
         return gson.toJson(packet).replace("\n","/n");

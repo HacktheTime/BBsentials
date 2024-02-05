@@ -56,7 +56,7 @@ public abstract class BBsentialsConfig {
                     String fieldName = field.getName();
                     JsonObject jsonObject = loadJsonFile();
                     if (jsonObject.has(fieldName)) {
-                        field.set(this, new Gson().fromJson(jsonObject.get(fieldName), field.getType()));
+                        field.set(this, CustomGson.create().fromJson(jsonObject.get(fieldName), field.getType()));
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();

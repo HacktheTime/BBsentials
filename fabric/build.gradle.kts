@@ -27,7 +27,7 @@ dependencies {
     modImplementation(libs.modern.fabric.loader)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
-    modImplementation("dev.xpple:clientarguments:1.7")
+    modImplementation("dev.xpple:clientarguments:1.7")?.let { include(it) }
     modApi(libs.clothConfig) {
         exclude(group = "net.fabricmc.fabric-api")
     }
@@ -69,6 +69,8 @@ tasks.shadowJar {
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl)
     relocate("net.dv8tion", "de.hype.bbsentials.deps.dcJDA")
+    relocate("dev.xpple", "de.hype.bbsentials.deps.clientcommands")
+
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

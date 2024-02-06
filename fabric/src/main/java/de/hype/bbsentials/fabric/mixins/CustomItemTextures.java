@@ -35,14 +35,14 @@ public abstract class CustomItemTextures {
                 drawGuiTexture(new Identifier(itemTexture.nameSpace, itemTexture.renderTextureId), x, y, 16, 16);
             ci.cancel();
         }
-        if (stack.getItem() == Items.POTION) {
-            try {
-                String potionEffect = stack.getNbt().getCompound("ExtraAttributes").getString("potion");
-                if (potionEffect.equals("foraging_xp_boost")) {
-                }
-            } catch (Exception e) {
-
-            }
-        }
+//        if (stack.getItem() == Items.POTION) {
+//            try {
+//                String potionEffect = stack.getNbt().getCompound("ExtraAttributes").getString("potion");
+//                if (potionEffect.equals("foraging_xp_boost")) {
+//                }
+//            } catch (Exception e) {
+//
+//            }
+//        }
     }
 }

@@ -101,8 +101,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 //            NbtCompound nbt = stack.getOrCreateNbt();
 //            NbtCompound displayTag = nbt.getCompound("display");
 //
-//            boolean isBingoCommunityGoal = displayTag.asString().contains("Community Goal");
-//            if (displayTag.contains("Lore") && isBingoCommunityGoal) {
+//            if (displayTag.contains("Lore")) {
 //
 //                NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
 //                for (int i = 0; i < loreList.size(); i++) {
@@ -114,7 +113,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 //                        i += 3;
 //                        continue;
 //                    }
-//
+//                    if (lineContentString.contains("Playtime: ")){
+////                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("§7Playtime: §a0m 10s"))));
+//                        continue;
+//                    }
 //                    if (lineContentString.matches("  #(\\d+) contributor")) {
 //                        loreList.remove(i);
 //                    }

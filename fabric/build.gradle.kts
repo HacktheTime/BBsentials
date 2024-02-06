@@ -15,6 +15,7 @@ repositories {
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
+    isTransitive = false
 }
 
 dependencies {
@@ -26,9 +27,7 @@ dependencies {
     modImplementation(libs.modern.fabric.loader)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
-    modImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     modImplementation("dev.xpple:clientarguments:1.7")?.let { include(it) }
-
     modApi(libs.clothConfig) {
         exclude(group = "net.fabricmc.fabric-api")
     }
@@ -42,22 +41,21 @@ tasks.processResources {
     filesMatching("fabric.mod.json") {
         expand(inputs.properties)
     }
+    from(project(":common").sourceSets["main"].resources.srcDirs)
 }
 tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
 
 java {
     java {
-
-    withSourcesJar()
+        withSourcesJar()
         targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
     }
 }
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    dependsOn(tasks.shadowJar)
-    mustRunAfter(tasks.shadowJar)
     archiveClassifier.set("")
+    from(tasks.shadowJar)
     inputFile.set(tasks.shadowJar.flatMap { it.archiveFile })
 }
 
@@ -70,6 +68,9 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl)
+    relocate("net.dv8tion", "de.hype.bbsentials.deps.dcJDA")
+    relocate("dev.xpple", "de.hype.bbsentials.deps.clientcommands")
+
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

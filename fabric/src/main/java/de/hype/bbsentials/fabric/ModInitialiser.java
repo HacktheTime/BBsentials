@@ -29,7 +29,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
@@ -410,7 +409,7 @@ public class ModInitialiser implements ClientModInitializer {
 
         }
 
-        Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, new RenderInformation(customTextureNameSpace,customTexturePath));
+        Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, new RenderInformation(customTextureNameSpace, customTexturePath));
         return 1;
     }
 }

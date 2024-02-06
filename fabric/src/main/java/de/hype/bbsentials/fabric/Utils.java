@@ -13,6 +13,7 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
@@ -26,19 +27,22 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -64,28 +68,38 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
         List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
         if (!waypoints.isEmpty()) {
-            RenderInWorldContext.renderInWorld(event, (it) -> {
-                for (Waypoints waypoint : waypoints) {
-                    BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
-                    if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
-                    it.color(0f, 1f, 0f, 0.2f);
-                    it.block(pos);
-                    it.color(1f, 0f, 0f, 1f);
-                    it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
-                }
-                return Unit.INSTANCE;
-            });
+            try {
+                RenderInWorldContext.renderInWorld(event, (it) -> {
+                    for (Waypoints waypoint : waypoints) {
+                        BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
+                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 0.2f);
+                        it.block(pos);
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 1f);
+                        it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                        if (waypoint.doTracer) {
+                            Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
+                            it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                        }
+                        it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 32, 32);
+
+                    }
+                    return Unit.INSTANCE;
+                });
+            } catch (Exception e) {
+
+            }
         }
         try {
             if (BBsentials.temporaryConfig.route != null) {
                 RenderInWorldContext.renderInWorld(event, (it) -> {
                     RouteNode node = BBsentials.temporaryConfig.route.getCurrentNode();
-                        BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
-                        BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
-                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
-                        it.block(pos);
-                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
-                        it.waypoint(pos, Text.of(node.name));
+                    BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
+                    BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
+                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
+                    it.block(pos);
+                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
+                    it.waypoint(pos, Text.of(node.name));
 
                     return Unit.INSTANCE;
                 });
@@ -93,6 +107,69 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         } catch (Exception ignored) {
         }
 //        WorldRenderLastEvent.Companion.publish(event);
+    }
+
+    public static void doBingoRankManipulations(ItemStack stack) {
+//        try {
+//            NbtCompound nbt = stack.getOrCreateNbt();
+//            NbtCompound displayTag = nbt.getCompound("display");
+//
+//            if (displayTag.contains("Lore")) {
+//
+//                NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
+//                for (int i = 0; i < loreList.size(); i++) {
+//                    String lineJson = loreList.getString(i);
+//                    String lineContentString = Text.Serialization.fromLenientJson(lineJson).getString();
+//                    if (lineContentString.matches("  Top \\d+(\\.\\d+)%$") || lineContentString.matches("  Top \\d+%$")) {
+//                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("  §8 Top §a0%"))));
+//                        loreList.add(i + 1, NbtString.of(Text.Serialization.toJsonString(Text.of("  §6§l#1§r §fcontributor"))));
+//                        i += 3;
+//                        continue;
+//                    }
+//                    if (lineContentString.contains("Playtime: ")){
+////                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("§7Playtime: §a0m 10s"))));
+//                        continue;
+//                    }
+//                    if (lineContentString.matches("  #(\\d+) contributor")) {
+//                        loreList.remove(i);
+//                    }
+//                }
+//                if (!loreList.get(loreList.size() - 1).asString().contains("This is faked!")) {
+//                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("§4This is faked!"))));
+//                }
+//
+//                displayTag.put("Lore", loreList);
+//                stack.getNbt().put("display", displayTag);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    public static void addDebugInfoToRender(ItemStack stack) {
+        try {
+            if (stack.getNbt().getBoolean("addedDebug")) return;
+            NbtCompound nbt = stack.getOrCreateNbt();
+            NbtCompound displayTag = nbt.getCompound("display");
+            NbtCompound extraAttributes = nbt.getCompound("ExtraAttributes");
+            NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
+            Set<String> keys = extraAttributes.getKeys();
+            for (String key : keys) {
+                if (key.equals("enchantments")) continue;
+                if (key.equals("timestamp")) {
+                    Long stamp = extraAttributes.getLong(key);
+                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + new Date(stamp) + ")"))));
+                    continue;
+                }
+                loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of(key + ": " + extraAttributes.get(key)))));
+            }
+            displayTag.put("Lore", loreList);
+            stack.getNbt().put("display", displayTag);
+            stack.getNbt().putBoolean("addedDebug", true);
+        } catch (NullPointerException ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isWindowFocused() {
@@ -247,6 +324,12 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     @Override
+    public Position getPlayersPosition() {
+        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+        return new Position(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    @Override
     public List<String> getPlayers() {
         return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
     }
@@ -279,7 +362,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         }
                     }
                     if (hasPants) {
-                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪]§ "));
+                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪] "));
                         String normal = Text.Serialization.toJsonString(participiant.getDisplayName());
                         toDisplay.add(Text.Serialization.fromJson("[" + pantsAddition + "," + normal + "]"));
                     }

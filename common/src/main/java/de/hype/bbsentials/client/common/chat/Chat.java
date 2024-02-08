@@ -192,7 +192,7 @@ public class Chat {
     }
 
     public Message onEvent(Message text, boolean actionbar) {
-        if (!isSpam(text.getString())) {
+        if (!actionbar && !isSpam(text.getString())) {
             if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                 System.out.println("got a message: " + text.getJson());
             }
@@ -535,7 +535,7 @@ public class Chat {
             }
 
         }
-        BBsentials.discordIntegration.receivedInGameMessage(message);
+//TODO        BBsentials.discordIntegration.receivedInGameMessage(message);
         if (BBsentials.socketAddonConfig.useSocketAddons) {
             BBsentials.addonManager.notifyAllAddonsReceievedMessage(message);
         }
@@ -544,8 +544,6 @@ public class Chat {
     public boolean isSpam(String message) {
         if (message == null) return true;
         if (message.isEmpty()) return true;
-        if (message.contains("Mana")) return true;
-        if (message.contains("Status")) return true;
         if (message.contains("Achievement Points")) return true;
         return false;
     }

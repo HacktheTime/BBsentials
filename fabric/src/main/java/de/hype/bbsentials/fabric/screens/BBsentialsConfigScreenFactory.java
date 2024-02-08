@@ -144,7 +144,7 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Select if you want to Waypoints to have tracers by default"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultWithTracer = newValue)
                     .build());
-            visual.addEntry(entryBuilder.startColorField(Text.of("Waypoint Color Default"), Color.ofRGB(BBsentials.visualConfig.waypointDefaultColor.getRed(),BBsentials.visualConfig.waypointDefaultColor.getGreen(),BBsentials.visualConfig.waypointDefaultColor.getBlue()))
+            visual.addEntry(entryBuilder.startColorField(Text.of("Waypoint Color Default"), Color.ofRGB(BBsentials.visualConfig.waypointDefaultColor.getRed(), BBsentials.visualConfig.waypointDefaultColor.getGreen(), BBsentials.visualConfig.waypointDefaultColor.getBlue()))
                     .setTooltip(Text.of("What Color should waypoints have by default"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultColor = new java.awt.Color(newValue))
                     .build());
@@ -372,6 +372,7 @@ public class BBsentialsConfigScreenFactory {
             {
                 discordIntegration.addEntry(entryBuilder.startStrField(Text.of("DC Bot Token"), BBsentials.discordConfig.botToken)
                         .setDefaultValue("")
+                        .requireRestart()
                         .setTooltip(Text.of("Whether you want to allow executing any command from remote. Is a security risk in case someone hacks your dc account."))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.botToken = newValue)
                         .build());
@@ -389,6 +390,12 @@ public class BBsentialsConfigScreenFactory {
                         .setDefaultValue(true)
                         .setTooltip(Text.of("Whether you want messages to be sent over to your discord as well."))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.useBridgeBot = newValue)
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startLongField(Text.of("Bot Owner User ID"), Long.parseLong(BBsentials.discordConfig.botOwnerUserId))
+                        .setDefaultValue(-1)
+                        .requireRestart()
+                        .setTooltip(Text.of("The UserId of your discord account"))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.botOwnerUserId = String.valueOf(newValue))
                         .build());
             }
         }//Discord

@@ -3,30 +3,23 @@ package de.hype.bbsentials.client.common.discordintegration;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.utils.FileUpload;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,12 +41,14 @@ public class DiscordIntegration extends ListenerAdapter {
         if (!BBsentials.discordConfig.useBridgeBot) return;
         jda = start();
         BBsentials.executionService.scheduleAtFixedRate(() -> updateStatus(), 0, 10, TimeUnit.MINUTES);
+        registerGlobalCommands();
         // Schedule the message update task
         executorService.scheduleAtFixedRate(this::updateDMs, 0, 30, TimeUnit.SECONDS);
+
     }
 
     public static void reply(GenericCommandInteractionEvent event, String message) {
-        event.getHook().sendMessage(message).queue();
+        event.getHook().editOriginal(message).queue();
     }
 
     public static void sendScreenshotMessage(SlashCommandInteractionEvent event) {
@@ -93,10 +88,7 @@ public class DiscordIntegration extends ListenerAdapter {
         JDABuilder builder = JDABuilder.createDefault(BBsentials.discordConfig.botToken);
         builder.addEventListeners(this);
         try {
-            JDA JDA = builder.build();
-            jda = JDA;
-            return JDA;
-
+            return builder.build();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -108,16 +100,13 @@ public class DiscordIntegration extends ListenerAdapter {
     public void onReady(ReadyEvent event) {
         this.botOwner = jda.retrieveUserById(BBsentials.discordConfig.botOwnerUserId).complete();
         dms = botOwner.openPrivateChannel().complete();
-        if (BBsentials.discordConfig.deleteHistoryOnStart) deleteAllDms(dms);
-        if (BBsentials.discordConfig.doStartupMessage)
-            dms.sendMessage("Bot is now online").setSuppressedNotifications(true).queue();
-        registerGlobalCommands();
+        if (BBsentials.discordConfig.deleteHistoryOnServerSwap) deleteAllDms(dms);
         Chat.sendPrivateMessageToSelfSuccess("BB DC-Bot is up!");
+        dms.sendMessage("Bot is now online").setSuppressedNotifications(true).queue();
     }
 
     public void receivedInGameMessage(de.hype.bbsentials.client.common.chat.Message message) {
-        if (!BBsentials.discordConfig.useBridgeBot || !BBsentials.discordConfig.discordIntegration || BBsentials.discordConfig.isDisableTemporary())
-            return;
+        if (!BBsentials.discordConfig.useBridgeBot || !BBsentials.discordConfig.discordIntegration) return;
         // Always send non-silent messages immediately
         if (!filter(message)) return;
         if (getAfk()) {
@@ -210,8 +199,6 @@ public class DiscordIntegration extends ListenerAdapter {
                 Commands.slash("warp-garden", "warps you to the garden"),
                 Commands.slash("screenshot", "makes a screenshot of the screen and sends it to you"),
                 Commands.slash("clear", "clears the messages sent by the bot"),
-                Commands.slash("status-disable", "Disable the Output"),
-                Commands.slash("status-enable", "Enable the Output"),
                 Commands.slash("custom", "allows you to specify a custom command to be executed").addOption(OptionType.STRING, "command", "command to be executed", true)
         ).queue();
     }
@@ -249,7 +236,7 @@ public class DiscordIntegration extends ListenerAdapter {
                 }
             }
             else if (event.getName().equals("custom")) {
-                if (!BBsentials.discordConfig.allowCustomCommands) {
+                if (BBsentials.discordConfig.allowCustomCommands) {
                     reply(event, "Custom Commands are disabled.");
                     return;
                 }
@@ -269,30 +256,10 @@ public class DiscordIntegration extends ListenerAdapter {
                     reply(event, "Error Occur");
                 }
             }
-            else if (event.getName().equals("status-enable")) {
-                if (!BBsentials.discordConfig.useBridgeBot || !BBsentials.discordConfig.discordIntegration) {
-                    reply(event, new EmbedBuilder().setColor(Color.MAGENTA).setTitle("Status: Disabled").setDescription("The Current Configuration does not allow using the Bridge bot please allow it First. This needs to be done in Person!").build());
-                    return;
-                }
-                BBsentials.discordConfig.setDisableTemporary(false);
-                reply(event, new EmbedBuilder().setColor(Color.RED).setTitle("Status: Enabled").setDescription("Status is now enabled you may see messages now.").build());
-            }
-            else if (event.getName().equals("status-disable")) {
-                if (!BBsentials.discordConfig.useBridgeBot || !BBsentials.discordConfig.discordIntegration) {
-                    reply(event, new EmbedBuilder().setColor(Color.MAGENTA).setTitle("Status: Disabled").setDescription("The Current Configuration does not allow using the Bridge bot please allow it First. This needs to be done in Person!").build());
-                    return;
-                }
-                BBsentials.discordConfig.setDisableTemporary(true);
-                reply(event, new EmbedBuilder().setColor(Color.GREEN).setTitle("Status: Disabled").setDescription("Status you no longer receive messages here").build());
-            }
         }
         else {
             reply(event, "Only the Owner may execute Commands");
         }
-    }
-
-    private void reply(SlashCommandInteractionEvent event, MessageEmbed embed) {
-        event.getHook().sendMessageEmbeds(embed).queue();
     }
 
     public boolean afkCheck() {
@@ -320,20 +287,5 @@ public class DiscordIntegration extends ListenerAdapter {
         if (!oldStatus.equals(newStatus) && !oldStatusMessage.equals(status)) {
             jda.getPresence().setPresence(newStatus, Activity.customStatus(status));
         }
-    }
-
-    @Override
-    public void onGenericMessageReaction(@NotNull GenericMessageReactionEvent event) {
-        if (Objects.equals(event.getUser(), botOwner)) {
-            event.getChannel().retrieveMessageById(event.getMessageId()).queue(message -> message.delete().queue());
-        }
-    }
-
-    public void sendMessage(MessageCreateData data) {
-        dms.sendMessage(data).queue();
-    }
-
-    public void sendEmbed(MessageEmbed embed) {
-        dms.sendMessageEmbeds(embed).queue();
     }
 }

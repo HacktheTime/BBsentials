@@ -28,6 +28,9 @@ dependencies {
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
     modImplementation("dev.xpple:clientarguments:1.7")?.let { include(it) }
+
+//    modImplementation(libs.discordJDA)?.let { include(it) }
+    implementation(libs.discordJDA)?.let { include(it) }
     modApi(libs.clothConfig) {
         exclude(group = "net.fabricmc.fabric-api")
     }
@@ -47,7 +50,8 @@ tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
 
 java {
     java {
-        withSourcesJar()
+
+    withSourcesJar()
         targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
     }
@@ -68,9 +72,6 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl)
-    relocate("net.dv8tion", "de.hype.bbsentials.deps.dcJDA")
-    relocate("dev.xpple", "de.hype.bbsentials.deps.clientcommands")
-
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

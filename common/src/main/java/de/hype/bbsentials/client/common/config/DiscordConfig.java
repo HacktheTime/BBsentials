@@ -1,21 +1,13 @@
 package de.hype.bbsentials.client.common.config;
 
 
-import de.hype.bbsentials.client.common.client.BBsentials;
-
 public class DiscordConfig extends BBsentialsConfig {
     public boolean discordIntegration = false;
     public String botToken = "";
     public boolean useBridgeBot = false;
     public boolean allowCustomCommands = false;
-    public boolean deleteHistoryOnStart = true;
-    /**
-     * disableTemporary can be modified by the Bot via a command so you dont get annoyed by its messages but can enable it from remote if you want so.
-     */
-    private boolean disableTemporary = false;
+    public boolean deleteHistoryOnServerSwap = true;
     public boolean alwaysSilent = false;
-    public boolean doStartupMessage = true;
-
     public String botOwnerUserId = "-1";
 
     public DiscordConfig() {
@@ -26,13 +18,5 @@ public class DiscordConfig extends BBsentialsConfig {
     @Override
     public void setDefault() {
 
-    }
-
-    public boolean isDisableTemporary() {
-        return disableTemporary;
-    }
-
-    public void setDisableTemporary(boolean disableTemporary) {
-        this.disableTemporary = disableTemporary;
     }
 }

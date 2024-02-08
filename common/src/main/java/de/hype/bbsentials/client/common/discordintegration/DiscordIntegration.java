@@ -1,5 +1,6 @@
 package de.hype.bbsentials.client.common.discordintegration;
 
+import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.dv8tion.jda.api.JDA;
@@ -25,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class DiscordIntegration extends ListenerAdapter {
-    private final String botToken;
-    private final String botOwnerUserId;
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private final List<String> silentMessageBuffer = new ArrayList<>();
     int afkTimer = 0;
@@ -37,9 +36,7 @@ public class DiscordIntegration extends ListenerAdapter {
     private long lastCommandTime = 0;
     private boolean afk = false;
 
-    public DiscordIntegration(String botToken, String botOwnerUserId) {
-        this.botOwnerUserId = botOwnerUserId;
-        this.botToken = botToken;
+    public DiscordIntegration() {
         if (!BBsentials.discordConfig.discordIntegration) return;
         if (!BBsentials.discordConfig.useBridgeBot) return;
         jda = start();
@@ -84,7 +81,11 @@ public class DiscordIntegration extends ListenerAdapter {
     }
 
     public JDA start() {
-        JDABuilder builder = JDABuilder.createDefault(botToken);
+        if (BBsentials.discordConfig.botToken.isEmpty()) {
+            Chat.sendPrivateMessageToSelfError("Bot Token is missing");
+            return null;
+        }
+        JDABuilder builder = JDABuilder.createDefault(BBsentials.discordConfig.botToken);
         builder.addEventListeners(this);
         try {
             return builder.build();
@@ -97,15 +98,15 @@ public class DiscordIntegration extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
-        this.botOwner = jda.retrieveUserById(botOwnerUserId).complete();
+        this.botOwner = jda.retrieveUserById(BBsentials.discordConfig.botOwnerUserId).complete();
         dms = botOwner.openPrivateChannel().complete();
         if (BBsentials.discordConfig.deleteHistoryOnServerSwap) deleteAllDms(dms);
-        System.out.println("Bot is ready!");
+        Chat.sendPrivateMessageToSelfSuccess("BB DC-Bot is up!");
         dms.sendMessage("Bot is now online").setSuppressedNotifications(true).queue();
     }
 
     public void receivedInGameMessage(de.hype.bbsentials.client.common.chat.Message message) {
-        if (!BBsentials.discordConfig.discordIntegration) return;
+        if (!BBsentials.discordConfig.useBridgeBot || !BBsentials.discordConfig.discordIntegration) return;
         // Always send non-silent messages immediately
         if (!filter(message)) return;
         if (getAfk()) {
@@ -135,11 +136,9 @@ public class DiscordIntegration extends ListenerAdapter {
     public boolean filter(de.hype.bbsentials.client.common.chat.Message advancedMessage) {
         String simpleMessage = advancedMessage.getUnformattedString();
         if (simpleMessage.isEmpty()) return false;
-        if (simpleMessage.contains("❤")) return false;
+        if (advancedMessage.actionBar) return false;
         if (simpleMessage.contains("stash")) return false;
         if (simpleMessage.contains("to pick them up")) return false;
-
-        simpleMessage = simpleMessage.toLowerCase();
         return true;
     }
 
@@ -279,7 +278,10 @@ public class DiscordIntegration extends ListenerAdapter {
         OnlineStatus oldStatus = jda.getPresence().getStatus();
         String oldStatusMessage = jda.getPresence().getActivity().getName();
         OnlineStatus newStatus = OnlineStatus.IDLE;
-        if (EnvironmentCore.utils.isWindowFocused()) {
+        if (!EnvironmentCore.utils.isWindowFocused()) {
+            newStatus = OnlineStatus.ONLINE;
+        }
+        if (!BBsentials.discordConfig.discordIntegration) {
             newStatus = OnlineStatus.DO_NOT_DISTURB;
         }
         if (!oldStatus.equals(newStatus) && !oldStatusMessage.equals(status)) {

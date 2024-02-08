@@ -59,7 +59,6 @@ java {
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
-    from(tasks.shadowJar)
     inputFile.set(tasks.shadowJar.flatMap { it.archiveFile })
 }
 

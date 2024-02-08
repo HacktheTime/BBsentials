@@ -76,6 +76,7 @@ dependencies {
     //annotationProcessor(libs.legacy.mixin.processor)
 
     implementation(libs.legacy.devauth)
+    shadowModImpl(libs.discordJDA)
 
     "shadowModImpl"(libs.legacy.moulconfig)
 }
@@ -127,5 +128,7 @@ tasks.shadowJar {
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl, shadowModImpl)
     relocate("io.github.moulberry.moulconfig", "de.hype.bbsentials.deps.moulconfig")
+    relocate("net.dv8tion", "de.hype.bbsentials.deps.dcJDA")
+
 }
 tasks.assemble.get().dependsOn(remapJar)

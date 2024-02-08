@@ -11,6 +11,7 @@ import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
+import de.hype.bbsentials.shared.constants.Islands;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ public class BBsentials {
     public static GuildConfig guildConfig = new GuildConfig();
     public static BBServerConfig bbServerConfig = new BBServerConfig();
     public static EnvironmentConfig environmentConfig = new EnvironmentConfig();
+    //TODO    public static DiscordIntegration discordIntegration = new DiscordIntegration();
     public static AddonManager addonManager;
     private static boolean initialised = false;
 
@@ -131,5 +133,11 @@ public class BBsentials {
             e.printStackTrace();
         }
         WaypointRoute.waypointRouteDirectory.mkdirs();
+        ServerSwitchTask.onServerJoinTask(() -> {
+            Islands island = EnvironmentCore.utils.getCurrentIsland();
+            String status = "Lobby Gaming";
+            if (island != null) status = "Playing in the " + island.getDisplayName();
+            //TODO BBsentials.discordIntegration.setNewStatus(status);
+        }, true);
     }
 }

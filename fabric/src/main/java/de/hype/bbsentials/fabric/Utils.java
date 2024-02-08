@@ -120,22 +120,27 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 //                for (int i = 0; i < loreList.size(); i++) {
 //                    String lineJson = loreList.getString(i);
 //                    String lineContentString = Text.Serialization.fromLenientJson(lineJson).getString();
+//                    if (lineContentString.matches("  #(\\d+) contributor")) {
+//                        loreList.remove(i);
+//                    }
 //                    if (lineContentString.matches("  Top \\d+(\\.\\d+)%$") || lineContentString.matches("  Top \\d+%$")) {
 //                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("  §8 Top §a0%"))));
 //                        loreList.add(i + 1, NbtString.of(Text.Serialization.toJsonString(Text.of("  §6§l#1§r §fcontributor"))));
-//                        i += 3;
+//                        i += 1;
 //                        continue;
 //                    }
 //                    if (lineContentString.contains("Playtime: ")){
 ////                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("§7Playtime: §a0m 10s"))));
 //                        continue;
 //                    }
-//                    if (lineContentString.matches("  #(\\d+) contributor")) {
-//                        loreList.remove(i);
+//                    if (lineContentString.contains("Contribution: ")){
+//                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("§7Contribution: §a2,147,483,647 experience"))));
+//                        continue;
 //                    }
+//
 //                }
 //                if (!loreList.get(loreList.size() - 1).asString().contains("This is faked!")) {
-//                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("§4This is faked!"))));
+////                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("§4This is faked!"))));
 //                }
 //
 //                displayTag.put("Lore", loreList);

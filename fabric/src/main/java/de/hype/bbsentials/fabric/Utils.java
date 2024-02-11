@@ -472,6 +472,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return 24;
     }
 
+    @Override
+    public void systemExit(int id) {
+        System.exit(id);
+    }
+
     public long getLobbyTime() {
         return MinecraftClient.getInstance().world.getLevelProperties().getTimeOfDay();
     }

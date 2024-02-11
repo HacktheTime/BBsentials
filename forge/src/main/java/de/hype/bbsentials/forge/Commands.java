@@ -43,12 +43,7 @@ public class Commands implements MCCommand {
 
     public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
         try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste) {
-                @Override
-                public void statusUpdate(StatusConstants newStatus) {
-                    //ignored
-                }
-            }));
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste)));
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
         }

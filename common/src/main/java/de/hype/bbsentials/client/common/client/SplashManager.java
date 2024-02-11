@@ -45,7 +45,7 @@ public class SplashManager {
         else {
             where = "Hub";
         }
-        BBsentials.connection.splashHighlightItem(splash, 20);
+        BBsentials.connection.splashHighlightItem(splash, 20000);
         Chat.sendPrivateMessageToSelfImportantInfo(splash.announcer + " is Splashing in " + where + " #" + splash.hubNumber + " at " + splash.locationInHub + ":" + splash.extraMessage);
     }
 
@@ -55,11 +55,6 @@ public class SplashManager {
         public DisplaySplash(SplashNotifyPacket packet) throws Exception {
             super(packet.splash.announcer, packet.splash.splashId, packet.splash.hubNumber, packet.splash.locationInHub, packet.splash.hubType, packet.splash.extraMessage, packet.splash.lessWaste, packet.splash.status);
             alreadyDisplayed = false;
-        }
-
-        @Override
-        public void statusUpdate(StatusConstants newStatus) {
-            //ignored
         }
     }
 }

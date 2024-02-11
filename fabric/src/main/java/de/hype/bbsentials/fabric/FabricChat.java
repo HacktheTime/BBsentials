@@ -14,6 +14,7 @@ public class FabricChat implements MCChat {
     public FabricChat() {
         init();
     }
+
     public void init() {
         // Register a callback for a custom message type
 //        ClientReceiveMessageEvents.CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
@@ -33,7 +34,13 @@ public class FabricChat implements MCChat {
         if (!actionbar) {
             message = chat.onEvent(message, actionbar);
         }
-        Text toReturn = Text.Serialization.fromJson(message.getJson());
+        Text toReturn = null;
+        try {
+            toReturn = Text.Serialization.fromJson(message.getJson());
+        } catch (Exception e) {
+            Chat.sendPrivateMessageToSelfError(e.getMessage());
+            e.printStackTrace();
+        }
         if (BBsentials.funConfig.swapActionBarChat && !BBsentials.funConfig.swapOnlyBBsentials) {
             if (!actionbar) {
                 showActionBar(message);

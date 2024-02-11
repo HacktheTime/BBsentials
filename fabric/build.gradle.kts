@@ -27,6 +27,8 @@ dependencies {
     modImplementation(libs.modern.fabric.loader)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
+    modImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     modImplementation("dev.xpple:clientarguments:1.7")?.let { include(it) }
 
 //    modImplementation(libs.discordJDA)?.let { include(it) }

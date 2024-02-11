@@ -61,4 +61,6 @@ public interface Utils {
     String stringToTextJson(String string);
     Position getPlayersPosition();
 
+    void systemExit(int id);
+
 }

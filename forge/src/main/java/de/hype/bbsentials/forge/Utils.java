@@ -23,6 +23,7 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -214,6 +215,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public Position getPlayersPosition() {
         BlockPos pos = Minecraft.getMinecraft().thePlayer.getPosition();
         return new Position(pos.getX(),pos.getY(),pos.getZ());
+    }
+
+    @Override
+    public void systemExit(int id) {
+        FMLCommonHandler.instance().exitJava(id,false);
     }
 
     @Override

@@ -38,7 +38,7 @@ public class FabricChat implements MCChat {
         try {
             toReturn = Text.Serialization.fromJson(message.getJson());
         } catch (Exception e) {
-            Chat.sendPrivateMessageToSelfError("Text: " + Text.Serialization.toJsonString(text) + " Error: " + e.getMessage());
+            Chat.sendPrivateMessageToSelfError(e.getMessage());
             e.printStackTrace();
         }
         if (BBsentials.funConfig.swapActionBarChat && !BBsentials.funConfig.swapOnlyBBsentials) {

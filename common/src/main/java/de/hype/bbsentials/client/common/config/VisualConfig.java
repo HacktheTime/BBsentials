@@ -9,6 +9,8 @@ public class VisualConfig extends BBsentialsConfig {
     public boolean doGammaOverride = true;
     public boolean waypointDefaultWithTracer = true;
     public Color waypointDefaultColor = Color.WHITE;
+    public boolean showGoalCompletions = false;
+    public boolean showCardCompletions = true;
 
 
     public VisualConfig() {

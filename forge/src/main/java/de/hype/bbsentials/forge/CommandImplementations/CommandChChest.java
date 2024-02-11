@@ -14,12 +14,12 @@ public class CommandChChest extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "Disabled on 1.8.9 due too missing autocompletion. Please use Discord / 1.20.2";
+        return "Disabled on 1.8.9 due too missing autocompletion. Please use Discord / Modern";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        Chat.sendPrivateMessageToSelfError("Disabled on 1.8.9 due too missing autocompletion. Please use Discord / 1.20.2");
+        Chat.sendPrivateMessageToSelfError("Disabled on 1.8.9 due too missing autocompletion. Please use Discord / Modern");
     }
 
     @Override

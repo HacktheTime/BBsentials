@@ -7,6 +7,7 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.StatusConstants;
+import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -257,10 +258,11 @@ public class Chat {
             }
             else if (message.isServerMessage()) {
                 if (messageUnformatted.contains("disbanded the party")) {
-                    lastPartyDisbandedUsername = username;
-                    partyDisbandedMap.put(username, Instant.now());
+                    lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
+                    partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());
                 }
                 else if (message.contains("invited you to join their party")) {
+                    username = message.getNoRanks().replace("-", "").replace("\n", "").trim().split(" ")[0];
                     if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
                         Instant lastDisbandedInstant = partyDisbandedMap.get(lastPartyDisbandedUsername);
                         if (BBsentials.partyConfig.acceptReparty) {
@@ -361,15 +363,23 @@ public class Chat {
                     setChatCommand("/warp desert", 10);
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp to the \",\"color\":\"green\"},{\"text\":\"Desert Settelment\",\"color\":\"gold\"}]"));
                 }
+                else if (messageUnformatted.startsWith("BINGO GOAL COMPLETE! ")) {
+                    BBsentials.connection.sendPacket(new CompletedGoalPacket(messageUnformatted.replace("BINGO GOAL COMPLETE!","").trim(), "", CompletedGoalPacket.CompletionType.GOAL, "", -1));
+                }
+                else if (messageUnformatted.matches("You completed all 20 goals for the \\w+ \\d{4} Bingo Event!")) {
+                    Chat.sendPrivateMessageToSelfImportantInfo("BB: Detected Card Completion. GG!\nThis will be verified shortly. If you want to get special Roles enable your APIs ASAP");
+                    EnvironmentCore.utils.playsound("ui.toast.challenge_complete");
+                    BBsentials.connection.sendPacket(new CompletedGoalPacket("", "", CompletedGoalPacket.CompletionType.CARD, "", -1));
+                }
             }
 
             else if (message.isFromGuild()) {
 
             }
             else if (message.isFromParty()) {
-                if (messageUnformatted.toLowerCase().startsWith("@" + BBsentials.generalConfig.getUsername().toLowerCase() + " bb:dev getlog") && username.equals("Hype_the_Time")) {
+                if (message.getMessageContent().equalsIgnoreCase("@" + BBsentials.generalConfig.getUsername().toLowerCase() + " bb:dev getlog") && username.equals("Hype_the_Time")) {
                     Chat.sendPrivateMessageToSelfError("Dont worry its a meme nothing happens actually");
-                    BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + Math.random() * 10000, 3);
+                    BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
                 }
                 if (message.getMessageContent().equals("warp") && BBsentials.partyConfig.isPartyLeader) {
                     if (BBsentials.partyConfig.partyMembers.size() == 1) {

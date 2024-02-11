@@ -3,7 +3,7 @@ package de.hype.bbsentials.shared.objects;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 
-public abstract class SplashData {
+public class SplashData {
     public String announcer;
     public StatusConstants status;
     public int splashId;
@@ -38,31 +38,5 @@ public abstract class SplashData {
             throw new Exception("§cInvalid hub type specified. Please only use the Suggestions!");
         }
         this.status = status;
-    }
-
-    public abstract void statusUpdate(StatusConstants newStatus);
-
-    public void setWaiting() {
-        statusUpdate(StatusConstants.WAITING);
-    }
-
-    public void setFull() {
-        statusUpdate(StatusConstants.FULL);
-    }
-
-    public void setSplashing() {
-        statusUpdate(StatusConstants.SPLASHING);
-    }
-
-    public void setDone() {
-        statusUpdate(StatusConstants.DONEBAD);
-    }
-
-    public void setCanceled() {
-        statusUpdate(StatusConstants.CANCELED);
-    }
-
-    public boolean stillAnnounce() {
-        return status.equals(StatusConstants.WAITING);
     }
 }

@@ -409,13 +409,13 @@ public class BBsentialConnection {
             BBsentials.sender.addImmediateSendTask("/hub");
         }
         else if (packet.command.equals(InternalCommandPacket.PRIVATE_ISLAND)) {
-           BBsentials.sender.addImmediateSendTask("/is");
+            BBsentials.sender.addImmediateSendTask("/is");
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_HUB)) {
-           BBsentials.sender.addHiddenSendTask("/hub", 0);
+            BBsentials.sender.addHiddenSendTask("/hub", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_PRIVATE_ISLAND)) {
-           BBsentials.sender.addHiddenSendTask("/is", 0);
+            BBsentials.sender.addHiddenSendTask("/is", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.CRASH)) {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
@@ -429,13 +429,13 @@ public class BBsentialConnection {
                     } catch (InterruptedException ignored) {
                     }
                 }
-                System.exit(69);
+                EnvironmentCore.utils.systemExit(69);
             });
             crashThread.start();
         }
         else if (packet.command.equals(InternalCommandPacket.INSTACRASH)) {
             System.out.println("BBsentials: InstaCrash triggered");
-            System.exit(69);
+            EnvironmentCore.utils.systemExit(69);
         }
     }
 
@@ -607,6 +607,12 @@ public class BBsentialConnection {
     public void onGetWaypointsPacket(GetWaypointsPacket packet) {
         sendPacket(new GetWaypointsPacket(Waypoints.waypoints.values().stream().map((waypoint -> ((ClientWaypointData) waypoint))).collect(Collectors.toList())));
     }
+
+    public void onCompletedGoalPacket(CompletedGoalPacket packet) {
+        if (!BBsentials.visualConfig.showCardCompletions&&packet.completionType.equals(CompletedGoalPacket.CompletionType.CARD)) return;
+        if (!BBsentials.visualConfig.showGoalCompletions&&packet.completionType.equals(CompletedGoalPacket.CompletionType.GOAL)) return;
+    }
+
     public interface MessageReceivedCallback {
         void onMessageReceived(String message);
     }

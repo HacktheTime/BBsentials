@@ -26,9 +26,10 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
         doTest = true;
     }
 
-    public void unlockCursor(){
+    public void unlockCursor() {
         MinecraftClient.getInstance().mouse.unlockCursor();
     }
+
     @Override
     public List<String> test() {
         return List.of("");

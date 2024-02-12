@@ -21,7 +21,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -91,7 +90,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public void playsound(String eventName) {
-        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation(eventName), 1.0F, 1.0F, 0.0F));
+        if (eventName.isEmpty()) Minecraft.getMinecraft().getSoundHandler().stopSounds();
+        else Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation(eventName), 1.0F, 1.0F, 0.0F));
     }
 
     public int getPotTime() {
@@ -200,26 +200,26 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         try {
             IChatComponent.Serializer.jsonToComponent(json);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
     @Override
     public String stringToTextJson(String string) {
-        if (isJsonParseableToText(string))return string;
+        if (isJsonParseableToText(string)) return string;
         return IChatComponent.Serializer.componentToJson(new ChatComponentText(string));
     }
 
     @Override
     public Position getPlayersPosition() {
         BlockPos pos = Minecraft.getMinecraft().thePlayer.getPosition();
-        return new Position(pos.getX(),pos.getY(),pos.getZ());
+        return new Position(pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
     public void systemExit(int id) {
-        FMLCommonHandler.instance().exitJava(id,false);
+        FMLCommonHandler.instance().exitJava(id, false);
     }
 
     @Override

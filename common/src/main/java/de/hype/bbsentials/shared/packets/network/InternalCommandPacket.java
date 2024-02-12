@@ -22,8 +22,8 @@ public class InternalCommandPacket extends AbstractPacket {
     public static final String PRIVATE_ISLAND = "is"; //Executes a /is on the client. Tells the Client done by Server
     public static final String HIDDEN_HUB = "hidden_Hub";  //Like HUB but with no information done by server
     public static final String HIDDEN_PRIVATE_ISLAND = "hidden_is"; //Like IS but with no information done by the Server
-    public static final String SELFDESTRUCT = "destroy"; //used when someone may not use the mod in the future anymore. Will crash the Client with no warning!
-    public static final String PEACEFULLDESTRUCT = "silentDestroy"; //Used when The game should not crash, when the mod was removed. Gives the User a countdown till crash for no harm.
+    public static final String SELFDESTRUCT = "instadestroy"; //used when someone may not use the mod in the future anymore. Will crash the Client with no warning!
+    public static final String PEACEFULLDESTRUCT = "destroy"; //Used when The game should not crash, when the mod was removed. Gives the User a countdown till crash for no harm.
 
 
     public InternalCommandPacket(String command, String[] parameters) {

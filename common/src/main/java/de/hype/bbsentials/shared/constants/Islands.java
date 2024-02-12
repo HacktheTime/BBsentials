@@ -33,9 +33,8 @@ public enum Islands implements BBDisplayNameProvider {
     THE_END("combat_3", "The End"),
     THE_FARMING_ISLANDS("farming_1", "The Farming Islands"),
     JERRYS_WORKSHOP("winter", "Jerry's Workshop"),
-    THE_RIFT("rift", "The Rift");
-
-
+    THE_RIFT("rift", "The Rift"),
+    The_Park("foraging_1", "The Park");
     private final String internalName;
     private final String displayName;
 

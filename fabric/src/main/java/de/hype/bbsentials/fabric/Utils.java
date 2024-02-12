@@ -206,7 +206,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public void playsound(String eventName) {
-        MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
+        if (eventName.isEmpty()) MinecraftClient.getInstance().getSoundManager().stopAll();
+        else
+            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
     }
 
     public int getPotTime() {

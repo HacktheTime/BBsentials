@@ -50,6 +50,7 @@ public class PacketManager {
         packets.add(new Packet<>(GetWaypointsPacket.class, connection::onGetWaypointsPacket));
         packets.add(new Packet<>(WaypointPacket.class, connection::onWaypointPacket));
         packets.add(new Packet<>(CompletedGoalPacket.class, connection::onCompletedGoalPacket));
+        packets.add(new Packet<>(PlaySoundPacket.class, connection::onPlaySoundPacket));
         packets.add(new Packet<>(ChestLobbyUpdatePacket.class, ((packet) -> UpdateListenerManager.chChestUpdateListener.updateLobby(packet.lobby))));
     }
 

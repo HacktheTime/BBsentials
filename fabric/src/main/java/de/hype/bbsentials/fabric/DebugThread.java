@@ -1,5 +1,6 @@
 package de.hype.bbsentials.fabric;
 
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
@@ -19,7 +20,6 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     }
 
     public void onNumpadCode() {
-
     }
 
     public void doOnce() {

@@ -613,8 +613,8 @@ public class BBsentialConnection {
     }
 
     public void onPlaySoundPacket(PlaySoundPacket packet) {
-        if (packet.streamFromUrl) EnvironmentCore.utils.streamCustomSound(packet.id, packet.durationInSeconds);
-        else EnvironmentCore.utils.playsound(packet.id);
+        if (packet.streamFromUrl) EnvironmentCore.utils.streamCustomSound(packet.soundId, packet.durationInSeconds);
+        else EnvironmentCore.utils.playsound(packet.soundId);
     }
 
     public interface MessageReceivedCallback {

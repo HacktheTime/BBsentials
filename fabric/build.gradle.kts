@@ -15,7 +15,6 @@ repositories {
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
-    isTransitive = false
 }
 
 dependencies {
@@ -60,6 +59,9 @@ java {
 }
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+    from(tasks.shadowJar)
+    dependsOn(tasks.shadowJar)
+    mustRunAfter(tasks.shadowJar)
     archiveClassifier.set("")
     inputFile.set(tasks.shadowJar.flatMap { it.archiveFile })
 }

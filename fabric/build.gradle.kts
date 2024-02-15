@@ -26,12 +26,9 @@ dependencies {
     modImplementation(libs.modern.fabric.loader)
     modImplementation(libs.modern.fabric.api)
     modImplementation(libs.modmenu)
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     modImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     modImplementation("dev.xpple:clientarguments:1.7")?.let { include(it) }
 
-//    modImplementation(libs.discordJDA)?.let { include(it) }
-    implementation(libs.discordJDA)?.let { include(it) }
     modApi(libs.clothConfig) {
         exclude(group = "net.fabricmc.fabric-api")
     }
@@ -45,7 +42,6 @@ tasks.processResources {
     filesMatching("fabric.mod.json") {
         expand(inputs.properties)
     }
-    from(project(":common").sourceSets["main"].resources.srcDirs)
 }
 tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
 
@@ -59,7 +55,6 @@ java {
 }
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    from(tasks.shadowJar)
     dependsOn(tasks.shadowJar)
     mustRunAfter(tasks.shadowJar)
     archiveClassifier.set("")

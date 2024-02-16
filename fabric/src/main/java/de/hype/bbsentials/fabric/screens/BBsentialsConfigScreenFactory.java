@@ -113,7 +113,7 @@ public class BBsentialsConfigScreenFactory {
         } // server
         ConfigCategory party = builder.getOrCreateCategory(Text.of("§6Party"));
         {
-            //TODO do the trusted party meber command and menu
+            //TODO do the trusted party meMber command and menu
             //TODO add a waypoint manager gui
             party.addEntry(entryBuilder.startBooleanToggle(Text.of("Allow Server Partying"), BBsentials.partyConfig.allowServerPartyInvite)
                     .setDefaultValue(true)

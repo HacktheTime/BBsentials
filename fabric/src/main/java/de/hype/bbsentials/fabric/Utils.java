@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -262,11 +263,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return getSplashLeechingPlayersPlayerEntity().stream().map((player -> player.getDisplayName().getString())).toList();
     }
 
-    @Override
     public InputStream makeScreenshot() {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
         AtomicReferenceArray<InputStream> screenshotInputStream = new AtomicReferenceArray<>(new InputStream[1]);
+        AtomicBoolean isWaiting = new AtomicBoolean(true);
 
         // Execute the screenshot task on the main thread
         minecraftClient.execute(() -> {
@@ -276,14 +277,30 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 byte[] byteArray = new byte[buffer.capacity()];
                 buffer.get(byteArray);
 
-                screenshotInputStream.set(0, new ByteArrayInputStream(byteArray));
+                synchronized (screenshotInputStream) {
+                    screenshotInputStream.set(0, new ByteArrayInputStream(byteArray));
+                    isWaiting.set(false);
+                    screenshotInputStream.notifyAll();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
+        synchronized (screenshotInputStream) {
+            // Wait for the task to be completed or a timeout if needed
+            while (isWaiting.get()) {
+                try {
+                    screenshotInputStream.wait();
+                } catch (InterruptedException e) {
+                    return null;
+                }
+            }
+        }
+
         return screenshotInputStream.get(0);
     }
+
 
     @Override
     public String getStringFromTextJson(String textJSon) throws Exception {

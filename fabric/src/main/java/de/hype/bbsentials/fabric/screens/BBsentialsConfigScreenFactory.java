@@ -397,6 +397,22 @@ public class BBsentialsConfigScreenFactory {
                         .setTooltip(Text.of("The UserId of your discord account"))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.botOwnerUserId = String.valueOf(newValue))
                         .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Purge History on Restart"), BBsentials.discordConfig.deleteHistoryOnStart)
+                        .setDefaultValue(true)
+                        .requireRestart()
+                        .setTooltip(Text.of("Whenever the mod launches this will clear your History with the bot"))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.deleteHistoryOnStart = newValue)
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Disable Bot Output Temporarily"), BBsentials.discordConfig.isDisableTemporary())
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("§4Disable the output of the Bot. This is changeable with the bot → made so you can disable the output while away from home!"))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.setDisableTemporary(newValue))
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Do Startup Info Message"), BBsentials.discordConfig.doStartupMessage)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Will send you a message whenever the Bot starts"))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.doStartupMessage = newValue)
+                        .build());
             }
         }//Discord
         ConfigCategory socketAddons = builder.getOrCreateCategory(Text.of("§cSocket Addons"));

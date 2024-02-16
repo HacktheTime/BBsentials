@@ -466,7 +466,13 @@ public class BBsentialConnection {
     }
 
     public void onRequestAuthentication(RequestAuthentication packet) {
-        Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
+        if (socket.getPort() == 5011) {
+            Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online (Beta Development Server)");
+            Chat.sendPrivateMessageToSelfImportantInfo("You may test here but do NOT Spam unless you have very good reasons. Spamming may still be punished");
+        }
+        else {
+            Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
+        }
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

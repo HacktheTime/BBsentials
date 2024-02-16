@@ -8,6 +8,7 @@ import de.hype.bbsentials.client.common.client.socketAddons.AddonManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
+import de.hype.bbsentials.client.common.discordintegration.DiscordIntegration;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
@@ -49,7 +50,7 @@ public class BBsentials {
     public static GuildConfig guildConfig = new GuildConfig();
     public static BBServerConfig bbServerConfig = new BBServerConfig();
     public static EnvironmentConfig environmentConfig = new EnvironmentConfig();
-    //TODO    public static DiscordIntegration discordIntegration = new DiscordIntegration();
+    public static DiscordIntegration discordIntegration = new DiscordIntegration();
     public static AddonManager addonManager;
     private static boolean initialised = false;
 
@@ -137,7 +138,7 @@ public class BBsentials {
             Islands island = EnvironmentCore.utils.getCurrentIsland();
             String status = "Lobby Gaming";
             if (island != null) status = "Playing in the " + island.getDisplayName();
-            //TODO BBsentials.discordIntegration.setNewStatus(status);
+            BBsentials.discordIntegration.setNewStatus(status);
         }, true);
     }
 }

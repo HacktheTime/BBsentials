@@ -553,7 +553,7 @@ public class Chat {
             }
 
         }
-//TODO        BBsentials.discordIntegration.receivedInGameMessage(message);
+        BBsentials.discordIntegration.receivedInGameMessage(message);
         if (BBsentials.socketAddonConfig.useSocketAddons) {
             BBsentials.addonManager.notifyAllAddonsReceievedMessage(message);
         }

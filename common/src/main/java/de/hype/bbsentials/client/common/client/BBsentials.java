@@ -124,11 +124,11 @@ public class BBsentials {
         debugThread.setName("Debug Thread");
         if (GeneralConfig.isBingoTime() || bbServerConfig.overrideBingoTime) {
             connectToBBserver();
-            UpdateListenerManager.init();
-            EnvironmentCore.mcevents.registerAll();
         }
         try {
             addonManager = new AddonManager();
+            UpdateListenerManager.init();
+            EnvironmentCore.mcevents.registerAll();
         } catch (IOException e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
             e.printStackTrace();

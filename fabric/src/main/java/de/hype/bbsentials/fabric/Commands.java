@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
@@ -138,7 +139,7 @@ public class Commands implements MCCommand {
                                             .then(ClientCommandManager.argument("extraMessage", StringArgumentType.greedyString())
                                                     .executes((context) -> {
                                                                 String item = StringArgumentType.getString(context, "Item");
-                                                                BlockPos pos = CBlockPosArgumentType.getCBlockPos(context,"coordinates");
+                                                        BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "coordinates");
                                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                 String extraMessage = StringArgumentType.getString(context, "extraMessage");
 
@@ -146,20 +147,30 @@ public class Commands implements MCCommand {
                                                                     context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
                                                                     return 1;
                                                                 }
-                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("",  new Position(pos.getX(),pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
+                                                        if (!BBsentials.partyConfig.allowServerPartyInvite) {
+                                                            Chat.sendPrivateMessageToSelfImportantInfo("Enabled Server Party invites temporarily. Will be disabled on Server swap");
+                                                            BBsentials.partyConfig.allowServerPartyInvite = true;
+                                                            ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowServerPartyInvite = false);
+                                                        }
+                                                        if (!BBsentials.partyConfig.allowBBinviteMe && contactWay.contains("bb:party me")) {
+                                                            Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap");
+                                                            BBsentials.partyConfig.allowBBinviteMe = true;
+                                                            ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
+                                                        }
+                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
                                                                 return 1;
                                                             }
                                                     )
                                             )
                                             .executes((context) -> {
                                                         String item = StringArgumentType.getString(context, "Item");
-                                                BlockPos pos = CBlockPosArgumentType.getCBlockPos(context,"coordinates");
+                                                BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "coordinates");
                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                         if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
                                                             context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
                                                             return 1;
                                                         }
-                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(),pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
+                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
                                                         return 1;
                                                     }
                                             )

@@ -7,7 +7,6 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 public class ChestLobbyData {
@@ -48,6 +47,10 @@ public class ChestLobbyData {
         setStatusNoOverride(statusBase);
     }
 
+    public void setStatus(StatusConstants statusBase) throws SQLException {
+        setStatusNoOverride(statusBase);
+    }
+
     public void setStatusNoOverride(Object statusBase) {
         if (statusBase instanceof StatusConstants) {
             StatusConstants statusConstants = (StatusConstants) statusBase;
@@ -82,6 +85,14 @@ public class ChestLobbyData {
 
     public void onLobbyUpdate() {
         // need to be overridden
+    }
+
+    public List<String> getPlayersStillIn() {
+        return playersStillIn;
+    }
+
+    public Long getClosingTime() {
+        return closingTime;
     }
 
     @Override

@@ -5,6 +5,7 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.Utils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
@@ -19,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.List;
 
 @Mixin(HandledScreen.class)
-public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen {
+public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
     @Shadow
     @Final
     protected T handler;

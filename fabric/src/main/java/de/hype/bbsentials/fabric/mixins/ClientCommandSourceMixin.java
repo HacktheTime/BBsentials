@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.command.CommandSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -18,12 +19,17 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 @Mixin(ClientCommandSource.class)
-public abstract class ClientCommandSourceMixin {
+public abstract class ClientCommandSourceMixin<S> implements CommandSource {
     @Shadow
     private final ClientPlayNetworkHandler networkHandler;
     private final MinecraftClient client;
     @Final
     private List<PlayerListEntry> playerList;
+
+    public ClientCommandSourceMixin(ClientPlayNetworkHandler networkHandler) {
+        this.networkHandler = networkHandler;
+        this.client = MinecraftClient.getInstance();
+    }
 
     /**
      * @return Collection of player names.
@@ -47,10 +53,5 @@ public abstract class ClientCommandSourceMixin {
         }
 
         return list;
-    }
-
-    public ClientCommandSourceMixin(ClientPlayNetworkHandler networkHandler) {
-        this.networkHandler = networkHandler;
-        this.client = MinecraftClient.getInstance();
     }
 }

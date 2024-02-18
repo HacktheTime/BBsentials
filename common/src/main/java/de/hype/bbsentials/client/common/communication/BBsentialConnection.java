@@ -362,11 +362,14 @@ public class BBsentialConnection {
 
     public void onDisconnectPacket(DisconnectPacket packet) {
         Chat.sendPrivateMessageToSelfError(packet.displayMessage);
-        BBsentials.connection.close();
+        try {
+            BBsentials.connection.close();
+        } catch (Exception ignored) {
+        }
         for (int i = 0; i < packet.waitBeforeReconnect.length; i++) {
             int finalI = i;
             BBsentials.executionService.schedule(() -> {
-                if (finalI == 1) {
+                if (finalI == 0) {
                     BBsentials.connectToBBserver();
                 }
                 else {

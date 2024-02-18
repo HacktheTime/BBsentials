@@ -1,7 +1,6 @@
 package de.hype.bbsentials.shared.objects;
 
 import de.hype.bbsentials.shared.constants.StatusConstants;
-import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 
 import java.awt.*;
 import java.sql.SQLException;
@@ -28,11 +27,6 @@ public class ChestLobbyData {
         this.bbcommand = bbcommand;
         this.extraMessage = extraMessage;
         setStatusNoOverride(status);
-    }
-
-
-    public ChChestPacket getAsPacket() {
-        return new ChChestPacket(this);
     }
 
     public String getStatus() {
@@ -99,5 +93,17 @@ public class ChestLobbyData {
     public boolean equals(Object obj) {
         if (!(obj instanceof ChestLobbyData)) return false;
         return ((ChestLobbyData) obj).lobbyId == lobbyId;
+    }
+
+    protected void updateLobby(ChestLobbyData lobby) {
+        bbcommand = lobby.bbcommand;
+        extraMessage = lobby.extraMessage;
+        status = lobby.getStatus();
+        contactMan = lobby.contactMan;
+        chests = lobby.chests;
+        try {
+            setLobbyMetaData(lobby.getPlayersStillIn(), lobby.getClosingTime());
+        } catch (SQLException ignored) {
+        }
     }
 }

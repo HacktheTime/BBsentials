@@ -59,10 +59,10 @@ public class ChChestUpdateListener extends UpdateListener {
         int maxPlayerCount = EnvironmentCore.utils.getMaximumPlayerCount();
         isInLobby.set(true);
         setWaypoints();
-        //(15mc days * 20 min day * 60 to seconds * 20 to ticks) -> 360000 | 1s 1000ms 1000/20 for ms for 1 tick.
+        //(15mc days * 20 min day * 60 to seconds * 20 to ticks) -> 408000 | 1s 1000ms 1000/20 for ms for 1 tick.
         try {
-            lobby.setLobbyMetaData(null, ((360000 - EnvironmentCore.utils.getLobbyTime()) * 50));
-        } catch (SQLException ignored) {
+            lobby.setLobbyMetaData(null, ((408000 - EnvironmentCore.utils.getLobbyTime()) * 50));
+        } catch (Exception ignored) {
             //never thrown lol
         }
         while (isInLobby.get()) {
@@ -106,7 +106,7 @@ public class ChChestUpdateListener extends UpdateListener {
 
     public List<ChChestData> getUnopenedChests() {
         List<ChChestData> unopened = new ArrayList<>();
-
+        if (lobby == null) return new ArrayList<>();
         for (ChChestData chest : lobby.chests) {
             if (!chestsOpened.contains(chest.coords)) unopened.add(chest);
         }
@@ -125,7 +125,9 @@ public class ChChestUpdateListener extends UpdateListener {
             long timeTillCloseMili = ((360_000 - EnvironmentCore.utils.getLobbyTime()) * 50);
             long timeMiliClosingDate = new Date().getTime() + timeTillCloseMili;
             if (timeTillCloseMili <= 0) setStatusNoUpdate(StatusConstants.CLOSED);
-            lobby.setLobbyMetaData(EnvironmentCore.utils.getPlayers(), timeMiliClosingDate);
+            List<String> players = EnvironmentCore.utils.getPlayers();
+            players = players.stream().map(username -> username.replaceAll("\\[\\S+]", "").trim()).filter(userName -> !userName.equals(lobby.contactMan)).collect(Collectors.toList());
+            lobby.setLobbyMetaData(players, timeMiliClosingDate);
         } catch (SQLException e) {
             Chat.sendPrivateMessageToSelfError("Uhm how did this happen: " + e.getMessage());
             e.printStackTrace();

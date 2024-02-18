@@ -1,7 +1,6 @@
 package de.hype.bbsentials.client.common.communication;
 
 import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
@@ -12,11 +11,13 @@ import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
 import de.hype.bbsentials.environment.packetconfig.PacketUtils;
-import de.hype.bbsentials.shared.constants.*;
+import de.hype.bbsentials.shared.constants.AuthenticationConstants;
+import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.constants.MiningEvents;
+import de.hype.bbsentials.shared.constants.PartyConstants;
 import de.hype.bbsentials.shared.objects.ClientWaypointData;
 import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.*;
-import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
 
@@ -34,7 +35,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -285,29 +285,6 @@ public class BBsentialConnection {
         }
     }
 
-    public void onChChestPacket(ChChestPacket packet) {
-        UpdateListenerManager.registerChest(packet.lobby);
-        if (isCommandSafe(packet.lobby.bbcommand)) {
-            if (showChChest(packet.lobby.chests.get(0).items)) {
-                String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-                tellrawText = tellrawText.replace("@username", packet.lobby.contactMan);
-                tellrawText = tellrawText.replace("@item", Arrays.stream(packet.lobby.chests.get(0).items)
-                        .map(ChChestItem::getDisplayName)
-                        .collect(Collectors.toList())
-                        .toString());
-                tellrawText = tellrawText.replace("@coords", packet.lobby.chests.get(0).coords.toString());
-                tellrawText = tellrawText.replace("@inviteCommand", packet.lobby.bbcommand);
-                if (!(packet.lobby.extraMessage == null || packet.lobby.extraMessage.isEmpty())) {
-                    tellrawText = tellrawText.replace("@extramessage", " : " + packet.lobby.extraMessage);
-                }
-                Chat.sendPrivateMessageToSelfText(Message.tellraw(tellrawText));
-            }
-        }
-        else {
-            Chat.sendPrivateMessageToSelfFatal("Potentially dangerous packet detected: " + PacketUtils.parsePacketToJson(packet));
-        }
-    }
-
     public void onMiningEventPacket(MiningEventPacket packet) {
         if (BBsentials.miningEventConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
             return;
@@ -496,30 +473,6 @@ public class BBsentialConnection {
         }
     }
 
-    public boolean showChChest(ChChestItem[] items) {
-        if (BBsentials.chChestConfig.allChChestItem) return true;
-        for (ChChestItem item : items) {
-            if (BBsentials.chChestConfig.customChChestItem && item.isCustom()) return true;
-            if (BBsentials.chChestConfig.allRoboPart && item.isRoboPart()) return true;
-            if (BBsentials.chChestConfig.prehistoricEgg && item.equals(ChChestItems.PrehistoricEgg))
-                return true;
-            if (BBsentials.chChestConfig.pickonimbus2000 && item.equals(ChChestItems.Pickonimbus2000))
-                return true;
-            if (BBsentials.chChestConfig.controlSwitch && item.equals(ChChestItems.ControlSwitch)) return true;
-            if (BBsentials.chChestConfig.electronTransmitter && item.equals(ChChestItems.ElectronTransmitter))
-                return true;
-            if (BBsentials.chChestConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector))
-                return true;
-            if (BBsentials.chChestConfig.superliteMotor && item.equals(ChChestItems.SuperliteMotor))
-                return true;
-            if (BBsentials.chChestConfig.syntheticHeart && item.equals(ChChestItems.SyntheticHeart))
-                return true;
-            if (BBsentials.chChestConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone))
-                return true;
-            if (BBsentials.chChestConfig.jungleHeart && item.equals(ChChestItems.JungleHeart)) return true;
-        }
-        return false;
-    }
 
     public boolean isConnected() {
         try {

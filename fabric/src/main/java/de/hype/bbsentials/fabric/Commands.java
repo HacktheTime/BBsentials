@@ -88,6 +88,13 @@ public class Commands implements MCCommand {
             miningEvent(dispatcher, "2xpowder", MiningEvents.DOUBLE_POWDER);
         });/*2xpowder*/
         event.register((dispatcher, registryAccess) -> {
+            dispatcher.register(ClientCommandManager.literal("getLobbyTime")
+                    .executes((context) -> {
+                        Chat.sendPrivateMessageToSelfSuccess("Day: " + EnvironmentCore.utils.getLobbyDay());
+                        return 1;
+                    }));
+        });/*2xpowder*/
+        event.register((dispatcher, registryAccess) -> {
             miningEvent(dispatcher, "bettertogether", MiningEvents.BETTER_TOGETHER);
         });/*b2g*/
         event.register((dispatcher, registryAccess) -> {
@@ -143,7 +150,7 @@ public class Commands implements MCCommand {
                                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                 String extraMessage = StringArgumentType.getString(context, "extraMessage");
 
-                                                                if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
+                                                        if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
                                                                     context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
                                                                     return 1;
                                                                 }
@@ -166,7 +173,7 @@ public class Commands implements MCCommand {
                                                         String item = StringArgumentType.getString(context, "Item");
                                                 BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "coordinates");
                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
-                                                        if (EnvironmentCore.utils.getLobbyTime() >= 360000) {
+                                                if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
                                                             context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
                                                             return 1;
                                                         }

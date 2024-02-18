@@ -295,7 +295,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(new ChatComponentText("§6Status: §0" + status + "§6 | Slots: " + warpInfo + "§6"));
-                Date warpClosingDate = new Date(360000 - (EnvironmentCore.utils.getLobbyTime() * 50));
+                Date warpClosingDate = new Date(408000 - (EnvironmentCore.utils.getLobbyTime() * 50));
                 toRender.add(new ChatComponentText("§6Closing in " + warpClosingDate.getHours() + "h ," + warpClosingDate.getMinutes() + "m"));
             }
             else {

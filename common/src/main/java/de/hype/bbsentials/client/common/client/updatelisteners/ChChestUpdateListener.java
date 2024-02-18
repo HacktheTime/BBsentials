@@ -3,12 +3,12 @@ package de.hype.bbsentials.client.common.client.updatelisteners;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.ChestLobbyData;
 import de.hype.bbsentials.shared.objects.Position;
-import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 
@@ -66,7 +66,7 @@ public class ChChestUpdateListener extends UpdateListener {
             if ((EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
                 setStatus(StatusConstants.FULL);
             }
-            else if ((EnvironmentCore.utils.getPlayerCount() < maxPlayerCount - 3)) {
+            else if ((EnvironmentCore.utils.getPlayerCount() < maxPlayerCount - 3) && lobby.getStatus().equals(StatusConstants.FULL.getDisplayName())) {
                 setStatus(StatusConstants.OPEN);
             }
             try {

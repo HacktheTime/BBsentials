@@ -106,7 +106,6 @@ public class ChChestUpdateListener extends UpdateListener {
 
     public List<ChChestData> getUnopenedChests() {
         List<ChChestData> unopened = new ArrayList<>();
-        if (lobby == null) return new ArrayList<>();
         for (ChChestData chest : lobby.chests) {
             if (!chestsOpened.contains(chest.coords)) unopened.add(chest);
         }
@@ -115,6 +114,7 @@ public class ChChestUpdateListener extends UpdateListener {
 
     public void addOpenedChest(Position pos) {
         BBsentials.executionService.execute(() -> {
+            if (chestsOpened.contains(pos)) return;
             chestsOpened.add(pos);
             setWaypoints();
         });

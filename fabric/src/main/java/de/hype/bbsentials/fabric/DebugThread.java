@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
@@ -28,6 +29,7 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     }
 
     public void onNumpadCode() {
+        UpdateListenerManager.chChestUpdateListener.setWaypoints();
     }
 
 

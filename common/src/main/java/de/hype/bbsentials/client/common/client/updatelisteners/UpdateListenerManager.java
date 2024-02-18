@@ -35,9 +35,6 @@ public class UpdateListenerManager {
         for (Map.Entry<Integer, ChestLobbyData> entry : lobbies.entrySet()) {
             if (!entry.getValue().serverId.equals(serverId)) continue;
             chChestUpdateListener = new ChChestUpdateListener(entry.getValue());
-            ServerSwitchTask.onServerLeaveTask(() -> {
-                chChestUpdateListener.setStatus(StatusConstants.LEFT);
-            }, false);
             chChestUpdateListener.sendUpdatePacket();
             chChestUpdateListener.run();
         }
@@ -69,7 +66,9 @@ public class UpdateListenerManager {
                 }
                 try {
                     if (EnvironmentCore.utils.getServerId().equalsIgnoreCase(data.serverId)) {
-                        chChestUpdateListener.sendUpdatePacket();
+                        ServerSwitchTask.onServerLeaveTask(() -> {
+                            chChestUpdateListener.setStatus(StatusConstants.LEFT);
+                        }, false);
                     }
                 } catch (Exception ignored) {
                 }

@@ -4,6 +4,7 @@ import de.hype.bbsentials.fabric.Utils;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.SynchronousResourceReloader;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // Credits go to nea89 for this (Firmanent)!
 
 @Mixin(WorldRenderer.class)
-public class WorldRenderLastEventPatch {
+public abstract class WorldRenderLastEventPatch implements SynchronousResourceReloader, AutoCloseable {
     @Shadow
     @Final
     private BufferBuilderStorage bufferBuilders;

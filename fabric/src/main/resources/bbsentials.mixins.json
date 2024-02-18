@@ -3,7 +3,9 @@
   "minVersion": "0.8",
   "package": "de.hype.bbsentials.fabric.mixins",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
+  "mixins": [
+    "CommandSourceMixin"
+  ],
   "client": [
     "ClientCommandSourceMixin",
     "CustomItemTextures",

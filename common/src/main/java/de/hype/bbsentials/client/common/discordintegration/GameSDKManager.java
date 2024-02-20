@@ -4,7 +4,9 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
+import de.jcm.discordgamesdk.DiscordEventAdapter;
 import de.jcm.discordgamesdk.activity.Activity;
+import de.jcm.discordgamesdk.user.DiscordUser;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +31,7 @@ public class GameSDKManager {
 
         // Set parameters for the Core
         try (CreateParams params = new CreateParams()) {
+            params.registerEventHandler(new SDKEventListener());
 //            params.setClientID(698611073133051974L);
             params.setClientID(1209174746605031444L);
             params.setFlags(CreateParams.getDefaultFlags());
@@ -141,7 +144,7 @@ public class GameSDKManager {
             activity.party().size().setCurrentSize(EnvironmentCore.utils.getPlayerCount());
 
             // Make a "cool" image show up
-            activity.assets().setLargeImage("test");
+            activity.assets().setLargeImage("SDKEventListener");
 
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
             activity.party().setID("Party");
@@ -154,5 +157,12 @@ public class GameSDKManager {
 
     public void clearActivity() {
         core.activityManager().clearActivity();
+    }
+}
+
+class SDKEventListener extends DiscordEventAdapter {
+    @Override
+    public void onActivityJoinRequest(DiscordUser user) {
+        super.onActivityJoinRequest(user);
     }
 }

@@ -1,10 +1,7 @@
 package de.hype.bbsentials.fabric;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
@@ -13,7 +10,6 @@ import net.minecraft.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 public class DebugThread implements de.hype.bbsentials.client.common.client.DebugThread {
@@ -29,7 +25,17 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     }
 
     public void onNumpadCode() {
-        UpdateListenerManager.chChestUpdateListener.setWaypoints();
+//        if (BBsentials.discordConfig.sdkMainToggle) {
+//            try {
+//                BBsentials.dcGameSDK = new GameSDKManager();
+//                if (BBsentials.discordConfig.useActivity) {
+////                    BBsentials.dcGameSDK.updateActivity();
+////                    ServerSwitchTask.onServerJoinTask(() -> BBsentials.dcGameSDK.updateActivity(), true);
+//                }
+//            } catch (Exception e) {
+//
+//            }
+//        }
     }
 
 
@@ -37,38 +43,38 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
         return ClientCommandManager.getActiveDispatcher().getRoot().getChildren();
     }
 
-    RootCommandNode<CommandSource> getServerCommands() {
+    RootCommandNode<CommandSource> getSeraverCommands() {
         return MinecraftClient.getInstance().getNetworkHandler().getCommandDispatcher().getRoot();
     }
 
-    public void replaceCommand(String name) {
-        Collection<CommandNode<FabricClientCommandSource>> clientCommandChilds = getClientCommands();
-        Collection<CommandNode<CommandSource>> commandChilds = getServerCommands().getChildren();
-
-        Iterator<CommandNode<CommandSource>> iterator = commandChilds.iterator();
-        while (iterator.hasNext()) {
-            CommandNode<CommandSource> child = iterator.next();
-            if (child.getName().equals(name)) {
-                iterator.remove(); // Safely remove the element
-            }
-        }
-
-        ClientCommandManager.getActiveDispatcher().register(
-                ClientCommandManager.literal(name)
-                        .then(ClientCommandManager.argument("playernames", StringArgumentType.greedyString())
-                                .suggests((context, builder) -> {
-                                    // Provide tab-completion options for classes
-                                    List<String> playerNames = List.of("hi", "hi2", "hi3");
-                                    // Replace with your own logic to retrieve class names
-                                    return CommandSource.suggestMatching(playerNames, builder);
-                                })
-                                .executes((context -> {
-                                    Chat.sendPrivateMessageToSelfImportantInfo("Test Success: " + StringArgumentType.getString(context, "playernames"));
-                                    return 1;
-                                }))
-                        )
-        );
-    }
+//    public void replaceCommand(String name) {
+//        Collection<CommandNode<FabricClientCommandSource>> clientCommandChilds = getClientCommands();
+//        Collection<CommandNode<CommandSource>> commandChilds = getServerCommands().getChildren();
+//
+//        Iterator<CommandNode<CommandSource>> iterator = commandChilds.iterator();
+//        while (iterator.hasNext()) {
+//            CommandNode<CommandSource> child = iterator.next();
+//            if (child.getName().equals(name)) {
+//                iterator.remove(); // Safely remove the element
+//            }
+//        }
+//
+//        ClientCommandManager.getActiveDispatcher().register(
+//                ClientCommandManager.literal(name)
+//                        .then(ClientCommandManager.argument("playernames", StringArgumentType.greedyString())
+//                                .suggests((context, builder) -> {
+//                                    // Provide tab-completion options for classes
+//                                    List<String> playerNames = List.of("hi", "hi2", "hi3");
+//                                    // Replace with your own logic to retrieve class names
+//                                    return CommandSource.suggestMatching(playerNames, builder);
+//                                })
+//                                .executes((context -> {
+//                                    Chat.sendPrivateMessageToSelfImportantInfo("Test Success: " + StringArgumentType.getString(context, "playernames"));
+//                                    return 1;
+//                                }))
+//                        )
+//        );
+//    }
 
     public void doOnce() {
         doTest = true;

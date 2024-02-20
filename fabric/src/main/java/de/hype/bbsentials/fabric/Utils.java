@@ -442,7 +442,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public int getPlayerCount() {
-        return Integer.parseInt(MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!B-a").getDisplayName().getString().trim().replaceAll("[^0-9]", ""));
+        return MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().size();
     }
 
     public String getServerId() {

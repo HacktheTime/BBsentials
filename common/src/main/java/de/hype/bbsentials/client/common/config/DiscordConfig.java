@@ -15,6 +15,8 @@ public class DiscordConfig extends BBsentialsConfig {
     private boolean disableTemporary = false;
     public boolean alwaysSilent = false;
     public boolean doStartupMessage = true;
+    public boolean sdkMainToggle = false;
+    public boolean useActivity = false;
 
     public String botOwnerUserId = "-1";
 

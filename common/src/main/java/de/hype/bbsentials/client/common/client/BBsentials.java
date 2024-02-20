@@ -9,6 +9,7 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.discordintegration.DiscordIntegration;
+import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
@@ -52,6 +53,7 @@ public class BBsentials {
     public static EnvironmentConfig environmentConfig = new EnvironmentConfig();
     public static DiscordIntegration discordIntegration = new DiscordIntegration();
     public static AddonManager addonManager;
+    public static GameSDKManager dcGameSDK;
     private static boolean initialised = false;
 
     public static void connectToBBserver() {
@@ -140,5 +142,16 @@ public class BBsentials {
             if (island != null) status = "Playing in the " + island.getDisplayName();
             BBsentials.discordIntegration.setNewStatus(status);
         }, true);
+        try {
+            if (discordConfig.sdkMainToggle) {
+                dcGameSDK = new GameSDKManager();
+                if (discordConfig.useActivity) {
+                    dcGameSDK.updateActivity();
+                    ServerSwitchTask.onServerJoinTask(() -> dcGameSDK.updateActivity(), true);
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 }

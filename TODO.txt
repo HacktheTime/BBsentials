@@ -5,3 +5,4 @@ chchest command (with auto chest coords, detect if structure spawned?)
 ~~coins/bingo point calculator on items in the bingo shop~~
 conerter of in 36 h into 1 d at 8 am etc
 
+Application id = 1209174746605031444

@@ -413,6 +413,18 @@ public class BBsentialsConfigScreenFactory {
                         .setTooltip(Text.of("Will send you a message whenever the Bot starts"))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.doStartupMessage = newValue)
                         .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Use the Discord Game SDK"), BBsentials.discordConfig.sdkMainToggle)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Main toggle for any usage of the Discord Game SDK."))
+                        .requireRestart()
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.sdkMainToggle = newValue)
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Rich Presence"), BBsentials.discordConfig.useActivity)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Whether or not you want to use Rich Presence in discord"))
+                        .requireRestart()
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.useActivity = newValue)
+                        .build());
             }
         }//Discord
         ConfigCategory socketAddons = builder.getOrCreateCategory(Text.of("§cSocket Addons"));

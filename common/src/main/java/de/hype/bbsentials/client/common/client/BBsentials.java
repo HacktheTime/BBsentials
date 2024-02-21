@@ -142,18 +142,16 @@ public class BBsentials {
             if (island != null) status = "Playing in the " + island.getDisplayName();
             BBsentials.discordIntegration.setNewStatus(status);
         }, true);
-            if (discordConfig.sdkMainToggle) {
-//                ServerSwitchTask.onServerJoinTask(()->{
-                try {
-                    dcGameSDK = new GameSDKManager();
-                    if (discordConfig.useRichPresence) {
-                        dcGameSDK.updateActivity();
-                        ServerSwitchTask.onServerJoinTask(() -> dcGameSDK.updateActivity(), true);
-                    }
-                } catch (Exception e) {
-                    Chat.sendPrivateMessageToSelfError("Could not set Discord Rich Presence");
+        if (discordConfig.sdkMainToggle) {
+            try {
+                dcGameSDK = new GameSDKManager();
+                if (discordConfig.useRichPresence) {
+                    dcGameSDK.updateActivity();
+                    ServerSwitchTask.onServerJoinTask(() -> dcGameSDK.updateActivity(), true);
                 }
-//                });
+            } catch (Exception e) {
+                Chat.sendPrivateMessageToSelfError("Could not set Discord Rich Presence");
             }
+        }
     }
 }

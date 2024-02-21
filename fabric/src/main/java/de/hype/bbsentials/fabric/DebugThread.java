@@ -8,13 +8,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class DebugThread implements de.hype.bbsentials.client.common.client.DebugThread {
-    public static List<Object> store = new ArrayList<>();
+public class DebugThread extends de.hype.bbsentials.client.common.client.DebugThread {
     boolean doTest = false;
+    MinecraftClient minecraft;
 
     @Override
     public void loop() {
@@ -25,17 +24,8 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     }
 
     public void onNumpadCode() {
-//        if (BBsentials.discordConfig.sdkMainToggle) {
-//            try {
-//                BBsentials.dcGameSDK = new GameSDKManager();
-//                if (BBsentials.discordConfig.useRichPresence) {
-////                    BBsentials.dcGameSDK.updateActivity();
-////                    ServerSwitchTask.onServerJoinTask(() -> BBsentials.dcGameSDK.updateActivity(), true);
-//                }
-//            } catch (Exception e) {
-//
-//            }
-//        }
+        init();
+        return;
     }
 
 
@@ -94,5 +84,4 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
         MinecraftClient client = MinecraftClient.getInstance();
         client.execute(() -> client.setScreen(screen));
     }
-
 }

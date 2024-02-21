@@ -10,6 +10,7 @@ import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityJoinRequestReply;
 import de.jcm.discordgamesdk.lobby.Lobby;
+import de.jcm.discordgamesdk.lobby.LobbySearchQuery;
 import de.jcm.discordgamesdk.lobby.LobbyTransaction;
 import de.jcm.discordgamesdk.lobby.LobbyType;
 import de.jcm.discordgamesdk.user.DiscordUser;
@@ -20,6 +21,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -196,7 +199,8 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Make a "cool" image show up
 
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
-            activity.party().setID("bb:rpc:party:" + mcUsername);
+            if (currentLobby == null) blockingCreateDefaultLobby();
+            activity.party().setID(String.valueOf(currentLobby.getId()));
             activity.secrets().setJoinSecret("bb:rpc:join:" + mcUsername);
             activity.secrets().setSpectateSecret("bb:rpc:spec:" + mcUsername);
             // Finally, update the currentLobby activity to our activity
@@ -244,13 +248,12 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     public void acceptUserJoinRequest(DiscordUser user, String mcUsername, boolean shallBypass) {
         core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.YES);
-
         BBsentials.sender.addSendTask("/p " + mcUsername, 1.5);
         if (currentLobby == null) {
             LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
             LobbyTransaction txn = manager.getLobbyCreateTransaction();
             txn.setType(LobbyType.PUBLIC);
-            txn.setCapacity(15);
+            txn.setCapacity(50);
             txn.setLocked(false);
             txn.setMetadata("hoster", mcUsername);
             manager.createLobby(manager.getLobbyCreateTransaction(), ((result, lobby) -> {
@@ -292,7 +295,6 @@ public class GameSDKManager extends DiscordEventAdapter {
                     return;
                 }
                 manager.connectNetwork(lobby);
-                manager.connectNetwork(lobby);
                 Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC join: Success");
                 if (BBsentials.discordConfig.connectVoiceOnJoin) {
                     manager.connectVoice(lobby, result2 -> {
@@ -321,10 +323,68 @@ public class GameSDKManager extends DiscordEventAdapter {
                     return;
                 }
                 manager.connectNetwork(lobby);
-                manager.connectNetwork(lobby);
                 Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC join: Success");
             }));
         }, 10, TimeUnit.SECONDS);
+    }
+
+    public LobbySearchQuery getSearch() {
+        return getLobbyManager().getSearchQuery();
+    }
+
+    public LobbyTransaction updateLobby(Lobby lobby) {
+        return getLobbyManager().getLobbyUpdateTransaction(lobby);
+    }
+
+    @Override
+    public void onLobbyMessage(long lobbyId, long userId, byte[] data) {
+        super.onLobbyMessage(lobbyId, userId, data);
+    }
+
+    public List<DiscordUser> getLobbyMembers() {
+        if (currentLobby == null) return new ArrayList<>();
+        return getLobbyManager().getMemberUsers(currentLobby);
+    }
+
+    public Lobby getCurrentLobby() {
+        return currentLobby;
+    }
+
+    public void createLobby(LobbyTransaction transaction) {
+        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        getLobbyManager().createLobby(transaction, (result, lobby) -> currentLobby = lobby);
+    }
+
+    public void updateCurrentLobby(LobbyTransaction transaction) {
+        getLobbyManager().updateLobby(currentLobby, transaction);
+    }
+
+    public void blockingCreateDefaultLobby() {
+        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        AtomicReference<Lobby> lobby = new AtomicReference<>(null);
+        LobbyTransaction trn = getLobbyManager().getLobbyCreateTransaction();
+        trn.setCapacity(15);
+        if (BBsentials.discordConfig.discordRoomsDefaultPrivate) trn.setType(LobbyType.PRIVATE);
+        else trn.setType(LobbyType.PUBLIC);
+        trn.setLocked(false);
+        trn.setMetadata("hoster", mcUsername);
+        getLobbyManager().createLobby(trn, lobby1 -> lobby.set(lobby1));
+        while (lobby.get() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+
+            }
+        }
+        currentLobby = lobby.get();
+    }
+
+    public void openVoiceSettings() {
+        core.overlayManager().openVoiceSettings();
+    }
+
+    public void inviteToGuild(String inviteCode) {
+        core.overlayManager().openGuildInvite(inviteCode);
     }
 }
 

@@ -4,7 +4,6 @@ import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.shared.packets.function.*;
-import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
@@ -16,11 +15,6 @@ public class PacketManager {
 
     private static PacketManager lastPacketManager = null;
     List<Packet<? extends AbstractPacket>> packets = new ArrayList<>();
-
-    public List<Packet<? extends AbstractPacket>> getPackets() {
-        return packets;
-    }
-
     // Define a map to store packet classes and their associated actions
     BBsentialConnection connection;
 
@@ -31,10 +25,27 @@ public class PacketManager {
         lastPacketManager = this;
     }
 
+    //   method to get a list of all packets
+    public static List<Class<? extends AbstractPacket>> getAllPacketClasses() {
+        if (lastPacketManager == null) {
+            lastPacketManager = new PacketManager(null);
+        }
+        List<Class<? extends AbstractPacket>> allPackets = new ArrayList<>();
+        for (int i = 0; i < lastPacketManager.packets.size(); i++) {
+            allPackets.add(lastPacketManager.packets.get(i).getClazz());
+        }
+        return allPackets;
+    }
+
+    public List<Packet<? extends AbstractPacket>> getPackets() {
+        return packets;
+    }
+
+    // Method to handle a received packet
+
     public void initializePacketActions(BBsentialConnection connection) {
         packets.add(new Packet<>(BingoChatMessagePacket.class, connection::onBingoChatMessagePacket));
         packets.add(new Packet<>(BroadcastMessagePacket.class, connection::onBroadcastMessagePacket));
-        packets.add(new Packet<>(ChChestPacket.class, connection::onChChestPacket));
         packets.add(new Packet<>(DisconnectPacket.class, connection::onDisconnectPacket));
         packets.add(new Packet<>(DisplayTellrawMessagePacket.class, connection::onDisplayTellrawMessagePacket));
         packets.add(new Packet<>(InternalCommandPacket.class, connection::onInternalCommandPacket));
@@ -50,21 +61,11 @@ public class PacketManager {
         packets.add(new Packet<>(GetWaypointsPacket.class, connection::onGetWaypointsPacket));
         packets.add(new Packet<>(WaypointPacket.class, connection::onWaypointPacket));
         packets.add(new Packet<>(CompletedGoalPacket.class, connection::onCompletedGoalPacket));
-        packets.add(new Packet<>(ChestLobbyUpdatePacket.class, ((packet) -> UpdateListenerManager.chChestUpdateListener.updateLobby(packet.lobby))));
-    }
-
-    // Method to handle a received packet
-
-
-    //   method to get a list of all packets
-    public static List<Class<? extends AbstractPacket>> getAllPacketClasses() {
-        if (lastPacketManager == null) {
-            lastPacketManager = new PacketManager(null);
-        }
-        List<Class<? extends AbstractPacket>> allPackets = new ArrayList<>();
-        for (int i = 0; i < lastPacketManager.packets.size(); i++) {
-            allPackets.add(lastPacketManager.packets.get(i).getClazz());
-        }
-        return allPackets;
+        packets.add(new Packet<>(WantedSearchPacket.class, connection::onWantedSearchPacket));
+        packets.add(new Packet<>(SkyblockLobbyDataPacket.class, connection::onSkyblockLobbyDataPacket));
+        packets.add(new Packet<>(RequestActionDiscordLobbyPacket.class, connection::onRequestActionDiscordLobbyPacket));
+        packets.add(new Packet<>(DiscordLobbyPacket.class, connection::onDiscordLobbyPacket));
+        packets.add(new Packet<>(PlaySoundPacket.class, connection::onPlaySoundPacket));
+        packets.add(new Packet<>(ChestLobbyUpdatePacket.class, ((packet) -> UpdateListenerManager.onChLobbyDataReceived(packet.lobby))));
     }
 }

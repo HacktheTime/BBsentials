@@ -5,6 +5,7 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.mclibraries.Utils;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
@@ -12,11 +13,13 @@ import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -214,6 +217,7 @@ public class Chat {
             }
             return null;
         }
+        if (actionbar) return message;
         if (message.isFromReportedUser()) {
             sendPrivateMessageToSelfBase("B: " + message.getUnformattedString(), Formatting.RED);
             return null;
@@ -225,7 +229,11 @@ public class Chat {
             message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions guild " + message.getPlayerName() + " " + message.getUnformattedString());
         }
         else if (BBsentials.generalConfig.doAllChatCustomMenu) {
-            message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
+            try {
+                message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
+            }catch (Exception e){
+                Chat.sendPrivateMessageToSelfError("Error with Message: "+message.getUnformattedString());
+            }
         }
 
         return message;
@@ -570,18 +578,7 @@ public class Chat {
 
     public void sendNotification(String title, String text, float volume) {
         BBsentials.executionService.execute(() -> {
-            try {
-                InputStream inputStream = getClass().getResourceAsStream("/sounds/mixkit-sci-fi-confirmation-914.wav");
-                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
-                Clip clip = AudioSystem.getClip();
-                clip.open(audioInputStream);
-                clip.start();
-                Thread.sleep(clip.getMicrosecondLength() / 1000);
-                clip.close();
-                audioInputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            EnvironmentCore.utils.playCustomSound("/sounds/mixkit-sci-fi-confirmation-914.wav",0);
         });
         List<String> argsList = new ArrayList<>();
         argsList.add("--title");

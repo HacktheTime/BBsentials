@@ -13,6 +13,7 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
@@ -33,6 +34,8 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -66,17 +69,27 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
         List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
         if (!waypoints.isEmpty()) {
-            RenderInWorldContext.renderInWorld(event, (it) -> {
-                for (Waypoints waypoint : waypoints) {
-                    BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
-                    if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
-                    it.color(0f, 1f, 0f, 0.2f);
-                    it.block(pos);
-                    it.color(1f, 0f, 0f, 1f);
-                    it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
-                }
-                return Unit.INSTANCE;
-            });
+            try {
+                RenderInWorldContext.renderInWorld(event, (it) -> {
+                    for (Waypoints waypoint : waypoints) {
+                        BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
+                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 0.2f);
+                        it.block(pos);
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 1f);
+                        it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                        if (waypoint.doTracer) {
+                            Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
+                            it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                        }
+                        it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 32, 32);
+
+                    }
+                    return Unit.INSTANCE;
+                });
+            } catch (Exception e) {
+
+            }
         }
         try {
             if (BBsentials.temporaryConfig.route != null) {
@@ -194,7 +207,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public void playsound(String eventName) {
-        MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
+        if (eventName.isEmpty()) MinecraftClient.getInstance().getSoundManager().stopAll();
+        else
+            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
     }
 
     public int getPotTime() {
@@ -333,8 +348,14 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     @Override
+    public Position getPlayersPosition() {
+        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+        return new Position(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    @Override
     public List<String> getPlayers() {
-        return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
+        return new ArrayList<>(MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().stream().toList());
     }
 
     public void renderOverlays(DrawContext drawContext, float v) {
@@ -365,7 +386,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         }
                     }
                     if (hasPants) {
-                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪]§ "));
+                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪] "));
                         String normal = Text.Serialization.toJsonString(participiant.getDisplayName());
                         toDisplay.add(Text.Serialization.fromJson("[" + pantsAddition + "," + normal + "]"));
                     }
@@ -403,7 +424,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                long closingTimeInMinutes = ((360000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
+                long closingTimeInMinutes = ((408000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
                 if (closingTimeInMinutes <= 0) {
                     toRender.add(Text.of("§4Lobby Closed"));
                 }

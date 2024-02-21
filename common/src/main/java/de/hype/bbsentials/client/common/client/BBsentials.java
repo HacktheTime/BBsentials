@@ -146,7 +146,7 @@ public class BBsentials {
 //                ServerSwitchTask.onServerJoinTask(()->{
                 try {
                     dcGameSDK = new GameSDKManager();
-                    if (discordConfig.useActivity) {
+                    if (discordConfig.useRichPresence) {
                         dcGameSDK.updateActivity();
                         ServerSwitchTask.onServerJoinTask(() -> dcGameSDK.updateActivity(), true);
                     }

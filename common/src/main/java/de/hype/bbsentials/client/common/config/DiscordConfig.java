@@ -1,8 +1,6 @@
 package de.hype.bbsentials.client.common.config;
 
 
-import de.hype.bbsentials.client.common.client.BBsentials;
-
 public class DiscordConfig extends BBsentialsConfig {
     public boolean discordIntegration = false;
     public String botToken = "";
@@ -16,7 +14,13 @@ public class DiscordConfig extends BBsentialsConfig {
     public boolean alwaysSilent = false;
     public boolean doStartupMessage = true;
     public boolean sdkMainToggle = false;
-    public boolean useActivity = false;
+    public boolean useRichPresence = false;
+    public boolean connectVoiceOnJoin = false;
+    public boolean connectVoiceOnJoining = false;
+    public boolean speakerOverlay = true;
+    public boolean useRPCJoin = true;
+    public boolean useRPCSpectate = true;
+
 
     public String botOwnerUserId = "-1";
 

@@ -10,6 +10,7 @@ import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityJoinRequestReply;
 import de.jcm.discordgamesdk.lobby.Lobby;
+import de.jcm.discordgamesdk.lobby.LobbySearchQuery;
 import de.jcm.discordgamesdk.lobby.LobbyTransaction;
 import de.jcm.discordgamesdk.lobby.LobbyType;
 import de.jcm.discordgamesdk.user.DiscordUser;
@@ -325,6 +326,14 @@ public class GameSDKManager extends DiscordEventAdapter {
                 Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC join: Success");
             }));
         }, 10, TimeUnit.SECONDS);
+    }
+
+    public LobbySearchQuery getSearch() {
+        return getLobbyManager().getSearchQuery();
+    }
+
+    public LobbyTransaction updateLobby(Lobby lobby) {
+        return getLobbyManager().getLobbyUpdateTransaction(lobby);
     }
 }
 

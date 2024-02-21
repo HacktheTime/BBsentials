@@ -2,6 +2,9 @@ package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.communication.BBsentialConnection;
+import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
@@ -15,6 +18,9 @@ import java.util.List;
 public class DebugThread implements de.hype.bbsentials.client.common.client.DebugThread {
     public static List<Object> store = new ArrayList<>();
     boolean doTest = false;
+    BBsentialConnection connection;
+    GameSDKManager gameSDKManager;
+    MinecraftClient minecraft;
 
     @Override
     public void loop() {
@@ -25,17 +31,8 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
     }
 
     public void onNumpadCode() {
-//        if (BBsentials.discordConfig.sdkMainToggle) {
-//            try {
-//                BBsentials.dcGameSDK = new GameSDKManager();
-//                if (BBsentials.discordConfig.useRichPresence) {
-////                    BBsentials.dcGameSDK.updateActivity();
-////                    ServerSwitchTask.onServerJoinTask(() -> BBsentials.dcGameSDK.updateActivity(), true);
-//                }
-//            } catch (Exception e) {
-//
-//            }
-//        }
+        init();
+        return;
     }
 
 
@@ -93,6 +90,12 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
         if (screen == null) return;
         MinecraftClient client = MinecraftClient.getInstance();
         client.execute(() -> client.setScreen(screen));
+    }
+
+    public void init() {
+        gameSDKManager = BBsentials.dcGameSDK;
+        minecraft = MinecraftClient.getInstance();
+        connection = BBsentials.connection;
     }
 
 }

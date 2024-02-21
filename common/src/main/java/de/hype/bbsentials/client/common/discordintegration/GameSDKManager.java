@@ -61,6 +61,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             } catch (Exception e) {
 
             }
+            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
             BBsentials.executionService.execute(() -> {
                 while (!stop.get()) {
                     runContinously();
@@ -201,8 +202,8 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
             if (currentLobby == null) blockingCreateDefaultLobby();
             activity.party().setID(String.valueOf(currentLobby.getId()));
-            activity.secrets().setJoinSecret("bb:rpc:join:" + mcUsername);
-            activity.secrets().setSpectateSecret("bb:rpc:spec:" + mcUsername);
+            activity.secrets().setJoinSecret(currentLobby.getSecret());
+            activity.secrets().setSpectateSecret(currentLobby.getSecret());
             // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }
@@ -385,6 +386,27 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     public void inviteToGuild(String inviteCode) {
         core.overlayManager().openGuildInvite(inviteCode);
+    }
+
+    @Override
+    public void onSpeaking(long lobbyId, long userId, boolean speaking) {
+        Chat.sendPrivateMessageToSelfDebug(userId + " started speaking: " + speaking);
+    }
+
+    public void blockingJoinLobby(Long lobbyId, String secret) {
+        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        currentLobby = null;
+        getLobbyManager().connectLobby(lobbyId, secret, (result, lobby) -> currentLobby = lobby);
+        while (currentLobby == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    public void joinVC() {
+        getLobbyManager().connectVoice(currentLobby);
     }
 }
 

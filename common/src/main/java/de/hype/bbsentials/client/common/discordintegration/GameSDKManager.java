@@ -3,6 +3,7 @@ package de.hype.bbsentials.client.common.discordintegration;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.packets.network.RequestUserInfo;
 import de.jcm.discordgamesdk.*;
@@ -22,6 +23,7 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -213,19 +215,37 @@ public class GameSDKManager extends DiscordEventAdapter {
     @Override
     public void onActivityJoinRequest(DiscordUser user) {
         if (!BBsentials.connection.isConnected()) BBsentials.conditionalReconnectToBBserver();
-        String username = "";
-        if (user.getUsername().equals("hackthetime")) username = "Hype_the_Time";
-        else if (user.getUsername().equals("ooffyy")) username = "ooffyy";
-        else if (user.getUsername().equals("mininoob46")) username = "mininoob46";
+        AtomicReference<String> username = new AtomicReference<>("");
+        if (user.getUsername().equals("hackthetime")) username.set("Hype_the_Time");
+        else if (user.getUsername().equals("ooffyy")) username.set("ooffyy");
+        else if (user.getUsername().equals("mininoob46")) username.set("mininoob46");
         else {
             BBsentials.connection.sendPacket(RequestUserInfo.fromDCUserID(user.getUserId(), false));
-            core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.NO);
-            return;
-            //TODO intercept reply packet instead and if not registered no etc
+            BBsentials.connection.packetIntercepts.add(new InterceptPacketInfo<RequestUserInfo>(RequestUserInfo.class, true, true, false, false) {
+                @Override
+                public void run(RequestUserInfo packet) {
+                    if (packet.mcUsername == null) {
+                        core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.NO);
+                        Chat.sendPrivateMessageToSelfError("BB: DC RPC: DC username: " + user.getUsername() + " requested to join but was denied cause they are not registered.");
+                        return;
+                    }
+                    if (packet.isUserPunished()) {
+                        core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.NO);
+                        Chat.sendPrivateMessageToSelfError("BB: DC RPC: DC username: " + user.getUsername() + " requested to join but was denied since their is a punishment ongoing");
+                        return;
+                    }
+                    acceptUserJoinRequest(user, mcUsername, packet.hasRole("mod"));
+                }
+            });
         }
+        acceptUserJoinRequest(user, username.get(), true);
+        //Call when someone wants to join me
+    }
+
+    public void acceptUserJoinRequest(DiscordUser user, String mcUsername, boolean shallBypass) {
         core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.YES);
 
-        BBsentials.sender.addSendTask("/p " + username, 1.5);
+        BBsentials.sender.addSendTask("/p " + mcUsername, 1.5);
         if (currentLobby == null) {
             LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
             LobbyTransaction txn = manager.getLobbyCreateTransaction();
@@ -238,12 +258,17 @@ public class GameSDKManager extends DiscordEventAdapter {
             }));
         }
         else {
+            if (getLobbyManager().getMemberUsers(currentLobby).size() == currentLobby.getCapacity() && shallBypass) {
+                LobbyTransaction trx = getLobbyManager().getLobbyCreateTransaction();
+                trx.setCapacity(currentLobby.getCapacity() + 1);
+                trx.setMetadata("hoster", mcUsername);
+                getLobbyManager().updateLobby(currentLobby, trx);
+            }
             if (BBsentials.discordConfig.connectVoiceOnJoining) {
                 getLobbyManager().connectVoice(currentLobby);
             }
         }
 
-        //Call when someone wants to join me
     }
 
     public LobbyManager getLobbyManager() {

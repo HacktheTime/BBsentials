@@ -42,7 +42,9 @@ public class GameSDKManager extends DiscordEventAdapter {
             File nativeLibrary = downloadNativeLibrary();
             if (nativeLibrary == null)
                 throw new RuntimeException("Could not obtain the Native Library which is required!");
-            Core.init(nativeLibrary);
+            Core.initDownload();
+//            System.load(nativeLibrary.getAbsolutePath());
+//            Core.initDiscordNative(nativeLibrary.getAbsolutePath());
 
             // Set parameters for the Core
 //            CreateParams params;

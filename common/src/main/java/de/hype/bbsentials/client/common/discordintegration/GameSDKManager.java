@@ -1,12 +1,16 @@
 package de.hype.bbsentials.client.common.discordintegration;
 
+import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.shared.constants.Islands;
-import de.jcm.discordgamesdk.Core;
-import de.jcm.discordgamesdk.CreateParams;
-import de.jcm.discordgamesdk.DiscordEventAdapter;
+import de.hype.bbsentials.shared.packets.network.RequestUserInfo;
+import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
+import de.jcm.discordgamesdk.activity.ActivityJoinRequestReply;
+import de.jcm.discordgamesdk.lobby.Lobby;
+import de.jcm.discordgamesdk.lobby.LobbyTransaction;
+import de.jcm.discordgamesdk.lobby.LobbyType;
 import de.jcm.discordgamesdk.user.DiscordUser;
 
 import java.io.File;
@@ -16,13 +20,16 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class GameSDKManager {
+public class GameSDKManager extends DiscordEventAdapter {
+    private final String mcUsername = BBsentials.generalConfig.getUsername();
     private AtomicBoolean stop = new AtomicBoolean(false);
     private Core core;
+    private Lobby currentLobby;
 
     public GameSDKManager() throws Exception {
         // Initialize the Core
@@ -41,7 +48,7 @@ public class GameSDKManager {
 //            params.setClientID(698611073133051974L);
                 params.setFlags(CreateParams.getDefaultFlags());
                 params.setClientID(1209174746605031444L);
-                params.registerEventHandler(new SDKEventListener());
+                params.registerEventHandler(this);
 
                 // Create the Core
                 core = new Core(params);
@@ -152,6 +159,8 @@ public class GameSDKManager {
                 activity.assets().setSmallText("BBsentials. A mod by @hackthetime");
                 activity.assets().setSmallImage("bingo_hub");
                 activity.assets().setLargeImage("i_am_root_backup_laugh");
+                activity.assets().setLargeText("I am Root (→ Linux for I'm the Admin)");
+                activity.secrets().setSpectateSecret("bb:rpc:join:" + mcUsername);
                 activity.timestamps().setStart(Instant.now());
             }
             else {
@@ -185,10 +194,10 @@ public class GameSDKManager {
             // Make a "cool" image show up
 
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
-            activity.party().setID("Party");
-            activity.secrets().setJoinSecret("party me");
-
-            // Finally, update the current activity to our activity
+            activity.party().setID("bb:rpc:party:" + mcUsername);
+            activity.secrets().setJoinSecret("bb:rpc:join:" + mcUsername);
+            activity.secrets().setSpectateSecret("bb:rpc:spec:" + mcUsername);
+            // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }
     }
@@ -196,11 +205,101 @@ public class GameSDKManager {
     public void clearActivity() {
         core.activityManager().clearActivity();
     }
-}
 
-class SDKEventListener extends DiscordEventAdapter {
+    public Core getCore() {
+        return core;
+    }
+
     @Override
     public void onActivityJoinRequest(DiscordUser user) {
-        super.onActivityJoinRequest(user);
+        if (!BBsentials.connection.isConnected()) BBsentials.conditionalReconnectToBBserver();
+        String username = "";
+        if (user.getUsername().equals("hackthetime")) username = "Hype_the_Time";
+        else if (user.getUsername().equals("ooffyy")) username = "ooffyy";
+        else if (user.getUsername().equals("mininoob46")) username = "mininoob46";
+        else {
+            BBsentials.connection.sendPacket(RequestUserInfo.fromDCUserID(user.getUserId(), false));
+            core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.NO);
+            return;
+            //TODO intercept reply packet instead and if not registered no etc
+        }
+        core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.YES);
+
+        BBsentials.sender.addSendTask("/p " + username, 1.5);
+        if (currentLobby == null) {
+            LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
+            LobbyTransaction txn = manager.getLobbyCreateTransaction();
+            txn.setType(LobbyType.PUBLIC);
+            txn.setCapacity(15);
+            txn.setLocked(false);
+            txn.setMetadata("hoster", mcUsername);
+            manager.createLobby(manager.getLobbyCreateTransaction(), ((result, lobby) -> {
+                this.currentLobby = lobby;
+            }));
+        }
+        else {
+            if (BBsentials.discordConfig.connectVoiceOnJoining) {
+                getLobbyManager().connectVoice(currentLobby);
+            }
+        }
+
+        //Call when someone wants to join me
+    }
+
+    public LobbyManager getLobbyManager() {
+        return BBsentials.dcGameSDK.getCore().lobbyManager();
+    }
+
+    public void disconnectFromLobby(Lobby lobby) {
+        getLobbyManager().disconnectNetwork(lobby);
+        getLobbyManager().disconnectLobby(lobby);
+    }
+
+    @Override
+    public void onActivityJoin(String secret) {
+        if (currentLobby != null) disconnectFromLobby(currentLobby);
+        Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC join Request: Working...");
+        BBsentials.executionService.schedule(() -> {
+            LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
+            manager.connectLobbyWithActivitySecret(secret, ((result, lobby) -> {
+                if (!result.equals(Result.OK)) {
+                    Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC join Request failed: " + result);
+                    return;
+                }
+                manager.connectNetwork(lobby);
+                manager.connectNetwork(lobby);
+                Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC join: Success");
+                if (BBsentials.discordConfig.connectVoiceOnJoin) {
+                    manager.connectVoice(lobby, result2 -> {
+                        if (result2.equals(Result.OK))
+                            Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC Voice Connect: Success");
+                        else if (result2.equals(Result.LOBBY_FULL))
+                            Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC Voice Connect: Lobby Full");
+                        else Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC Voice Connect: " + result2);
+                    });
+
+                }
+            }));
+        }, 10, TimeUnit.SECONDS);
+        //Call for when I join a lobby // request too
+    }
+
+    @Override
+    public void onActivitySpectate(String secret) {
+        if (currentLobby != null) disconnectFromLobby(currentLobby);
+        Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC join Request: Working...");
+        BBsentials.executionService.schedule(() -> {
+            LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
+            manager.connectLobbyWithActivitySecret(secret, ((result, lobby) -> {
+                if (!result.equals(Result.OK)) {
+                    Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC join Request failed: " + result);
+                    return;
+                }
+                manager.connectNetwork(lobby);
+                manager.connectNetwork(lobby);
+                Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC join: Success");
+            }));
+        }, 10, TimeUnit.SECONDS);
     }
 }
+

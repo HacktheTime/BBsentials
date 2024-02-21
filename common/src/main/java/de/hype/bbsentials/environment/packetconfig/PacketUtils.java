@@ -5,7 +5,11 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.CustomGson;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
+import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
+import de.jcm.discordgamesdk.Core;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -20,7 +24,7 @@ public class PacketUtils {
         Class<T> clazz = packet.getClazz();
         Consumer<T> consumer = packet.getConsumer();
         T abstractPacket = gson.fromJson(rawJson.replace("/n","\n"), clazz);
-        consumer.accept(abstractPacket);
+        if (handleIntercept(abstractPacket)) consumer.accept(abstractPacket);
     }
 
     private static void showError(Throwable t, String errorMessage) {
@@ -100,4 +104,73 @@ public class PacketUtils {
         showError(new APIException("Found unknown packet: " + packetName + "'"), errorMessage);
         return false;
     }
+
+    public static synchronized <T extends AbstractPacket> boolean handleIntercept(T packet) {
+        Class<T> packetClass;
+        try {
+            packetClass = (Class<T>) packet.getClass();
+        } catch (Exception e) {
+            return true;
+        }
+        List<InterceptPacketInfo> intercepts = BBsentials.connection.packetIntercepts;
+        List<Integer> indexes = new ArrayList<>();
+        boolean cancelIntercept = false;
+        boolean cancelMainExec = false;
+        boolean found = false;
+        for (int i = 0; i < intercepts.size(); i++) {
+            InterceptPacketInfo intercept = intercepts.get(i);
+            if (intercept.matches(packetClass)) {
+                if (packet.replyDate == intercept.getReplyId()) {
+                    if (!intercept.getIgnoreIfIntercepted() || !found) {
+                        found = true;
+                        if (intercept.getCancelPacket()) {
+                            cancelMainExec = true;
+                        }
+                        if (intercept.getBlockIntercepts()) {
+                            cancelIntercept = true;
+                        }
+                        if (intercept.getBlockExecutionForCompletion()) {
+                            intercepts.remove(intercept);
+                            intercept.run(packet);
+                        }
+                        else {
+                            intercepts.remove(intercept);
+                            BBsentials.executionService.execute(() -> intercept.run(packet));
+                        }
+
+                    }
+                    if (cancelIntercept) break;
+                }
+                else {
+                    indexes.add(i);
+                }
+            }
+        }
+        if (!cancelIntercept) {
+            for (Integer index : indexes) {
+                InterceptPacketInfo intercept = intercepts.get(index);
+                if (intercept.matches(packetClass)) {
+                    if (!intercept.getIgnoreIfIntercepted() || !found) {
+                        found = true;
+                        if (intercept.getCancelPacket()) {
+                            cancelMainExec = true;
+                        }
+                        if (intercept.getBlockIntercepts()) {
+                            cancelIntercept = true;
+                        }
+                        if (intercept.getBlockExecutionForCompletion()) {
+                            intercept.run(packet);
+                        }
+                        else {
+                            BBsentials.executionService.execute(() -> intercept.run(packet));
+                        }
+                    }
+                    if (cancelIntercept) break;
+                }
+            }
+        }
+
+        return !cancelMainExec;
+    }
+
 }

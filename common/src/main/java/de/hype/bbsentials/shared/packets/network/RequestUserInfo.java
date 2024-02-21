@@ -44,4 +44,13 @@ public class RequestUserInfo extends AbstractPacket {
     public static RequestUserInfo fromDCUserID(long userId, boolean requestUpToDateData) {
         return new RequestUserInfo(requestUpToDateData, null, null, userId);
     }
+
+    public boolean isUserPunished() {
+        return false;
+        //TODO implement ban data here
+    }
+
+    public boolean hasRole(String role) {
+        return roles.contains(role);
+    }
 }

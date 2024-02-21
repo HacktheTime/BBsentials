@@ -7,6 +7,7 @@ import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdat
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
@@ -35,6 +36,8 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +52,7 @@ public class BBsentialConnection {
     private PrintWriter writer;
     private LinkedBlockingQueue<String> messageQueue;
     private PacketManager packetManager;
+    public List<InterceptPacketInfo> packetIntercepts = new ArrayList();
 
     public BBsentialConnection() {
         packetManager = new PacketManager(this);

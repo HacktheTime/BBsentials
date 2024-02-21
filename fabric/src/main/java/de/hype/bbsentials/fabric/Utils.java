@@ -355,7 +355,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public List<String> getPlayers() {
-        return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
+        return new ArrayList<>(MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().stream().toList());
     }
 
     public void renderOverlays(DrawContext drawContext, float v) {
@@ -424,7 +424,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                long closingTimeInMinutes = ((360000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
+                long closingTimeInMinutes = ((408000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
                 if (closingTimeInMinutes <= 0) {
                     toRender.add(Text.of("§4Lobby Closed"));
                 }
@@ -463,7 +463,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public int getPlayerCount() {
-        return Integer.parseInt(MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!B-a").getDisplayName().getString().trim().replaceAll("[^0-9]", ""));
+        return MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().size();
     }
 
     public String getServerId() {

@@ -14,6 +14,7 @@ allprojects {
         maven("https://maven.notenoughupdates.org/releases/")
         maven("https://maven.terraformersmc.com/releases")
         maven("https://maven.shedaniel.me/")
+        maven("https://jitpack.io")
         jcenter()
     }
 

@@ -2,24 +2,17 @@ package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.communication.BBsentialConnection;
-import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class DebugThread implements de.hype.bbsentials.client.common.client.DebugThread {
-    public static List<Object> store = new ArrayList<>();
+public class DebugThread extends de.hype.bbsentials.client.common.client.DebugThread {
     boolean doTest = false;
-    BBsentialConnection connection;
-    GameSDKManager gameSDKManager;
     MinecraftClient minecraft;
 
     @Override
@@ -91,11 +84,4 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
         MinecraftClient client = MinecraftClient.getInstance();
         client.execute(() -> client.setScreen(screen));
     }
-
-    public void init() {
-        gameSDKManager = BBsentials.dcGameSDK;
-        minecraft = MinecraftClient.getInstance();
-        connection = BBsentials.connection;
-    }
-
 }

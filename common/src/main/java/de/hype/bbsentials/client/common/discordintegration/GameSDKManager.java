@@ -2,6 +2,7 @@ package de.hype.bbsentials.client.common.discordintegration;
 
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.DebugThread;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.shared.constants.Islands;
@@ -21,6 +22,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -251,7 +254,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
             LobbyTransaction txn = manager.getLobbyCreateTransaction();
             txn.setType(LobbyType.PUBLIC);
-            txn.setCapacity(15);
+            txn.setCapacity(50);
             txn.setLocked(false);
             txn.setMetadata("hoster", mcUsername);
             manager.createLobby(manager.getLobbyCreateTransaction(), ((result, lobby) -> {
@@ -334,6 +337,40 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     public LobbyTransaction updateLobby(Lobby lobby) {
         return getLobbyManager().getLobbyUpdateTransaction(lobby);
+    }
+
+    public void test() {
+        LobbyTransaction trn = getLobbyManager().getLobbyCreateTransaction();
+        trn.setCapacity(50);
+        getLobbyManager().createLobby(trn, (result, lobby) -> {
+            getLobbyManager().connectVoice(lobby);
+            DebugThread.store.add(lobby);
+        });
+        getLobbyManager().getMemberUpdateTransaction(currentLobby, 10L);
+    }
+
+    @Override
+    public void onLobbyMessage(long lobbyId, long userId, byte[] data) {
+        super.onLobbyMessage(lobbyId, userId, data);
+    }
+
+    public List<DiscordUser> getLobbyMembers() {
+        if (currentLobby == null) return new ArrayList<>();
+        return getLobbyManager().getMemberUsers(currentLobby);
+    }
+
+    public Lobby getCurrentLobby() {
+        return currentLobby;
+    }
+
+    public void createLobby(LobbyTransaction transaction) {
+        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        getLobbyManager().createLobby(transaction, (result, lobby) -> currentLobby = lobby);
+    }
+
+    public void updateCurrentLobby(LobbyTransaction transaction) {
+        getLobbyManager().updateLobby(currentLobby, transaction);
+
     }
 }
 

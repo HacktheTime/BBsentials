@@ -445,6 +445,11 @@ public class BBsentialsConfigScreenFactory {
                         .setTooltip(Text.of("Will connect you to the vc when someone joins."))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.connectVoiceOnJoining = newValue)
                         .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Room default Private"), BBsentials.discordConfig.discordRoomsDefaultPrivate)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Players wont be able to join without asking in the Lobby to join."))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.discordRoomsDefaultPrivate = newValue)
+                        .build());
             }
         }//Discord
         ConfigCategory socketAddons = builder.getOrCreateCategory(Text.of("§cSocket Addons"));

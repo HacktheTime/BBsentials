@@ -20,6 +20,8 @@ public class DiscordConfig extends BBsentialsConfig {
     public boolean speakerOverlay = true;
     public boolean useRPCJoin = true;
     public boolean useRPCSpectate = true;
+    public boolean discordRoomsDefaultPrivate = false;
+
 
 
     public String botOwnerUserId = "-1";

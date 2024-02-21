@@ -28,7 +28,7 @@ public class DebugThread implements de.hype.bbsentials.client.common.client.Debu
 //        if (BBsentials.discordConfig.sdkMainToggle) {
 //            try {
 //                BBsentials.dcGameSDK = new GameSDKManager();
-//                if (BBsentials.discordConfig.useActivity) {
+//                if (BBsentials.discordConfig.useRichPresence) {
 ////                    BBsentials.dcGameSDK.updateActivity();
 ////                    ServerSwitchTask.onServerJoinTask(() -> BBsentials.dcGameSDK.updateActivity(), true);
 //                }

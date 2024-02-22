@@ -162,25 +162,28 @@ public class GameSDKManager extends DiscordEventAdapter {
             if (BBsentials.developerConfig.devMode) {
                 activity.setDetails("Programming this ↑");
                 activity.setState("Developer Mode: Enabled");
-                activity.assets().setSmallText("BBsentials. A mod by @hackthetime");
-                activity.assets().setSmallImage("bingo_hub");
                 activity.assets().setLargeImage("i_am_root_backup_laugh");
                 activity.assets().setLargeText("I am Root (→ Linux for I'm the Admin)");
-                activity.secrets().setSpectateSecret("bb:rpc:join:" + mcUsername);
                 activity.timestamps().setStart(Instant.now());
+                activity.assets().setSmallText("BBsentials. A mod by @hackthetime");
+                activity.assets().setSmallImage("bingo_hub");
             }
             else {
                 Islands island = EnvironmentCore.utils.getCurrentIsland();
                 if (island != null) {
                     activity.setDetails("Playing Hypixel Skyblock");
                     activity.setState(EnvironmentCore.utils.getServerId() + ": " + EnvironmentCore.utils.getCurrentIsland().getDisplayName());
+                    activity.assets().setSmallText("BBsentials. A mod by @hackthetime");
+                    activity.assets().setSmallImage("bingo_hub");
+                    activity.assets().setLargeImage("bingo_card");
                 }
                 else {
                     activity.setDetails("Playing Minecraft");
                     activity.setState("");
+                    activity.assets().setLargeText("BBsentials. A mod by @hackthetime");
+                    activity.assets().setLargeImage("bingo_hub");
                 }
             }
-
             // Setting a start time causes an "elapsed" field to appear
             activity.timestamps().setStart(Instant.ofEpochSecond(0));
 
@@ -202,8 +205,8 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
             if (currentLobby == null) blockingCreateDefaultLobby();
             activity.party().setID(String.valueOf(currentLobby.getId()));
-            activity.secrets().setJoinSecret(currentLobby.getSecret());
-            activity.secrets().setSpectateSecret(currentLobby.getSecret());
+            activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+            activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
             // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }

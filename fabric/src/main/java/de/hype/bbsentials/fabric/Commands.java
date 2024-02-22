@@ -244,7 +244,7 @@ public class Commands implements MCCommand {
                                 Chat.sendPrivateMessageToSelfError("You are not in a Lobby.");
                                 return 0;
                             }
-                            Chat.sendPrivateMessageToSelfText(Message.tellraw("{\"text\":\"click here to copy the secret into your clipboard.\",\"color\":\"gold\",,\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"@actvitysecret\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"This can be used with /bbi discord join {secret} to connect to the lobby.\"]}}".replace("@actvitysecret", BBsentials.dcGameSDK.getLobbyManager().getLobbyActivitySecret(BBsentials.dcGameSDK.getCurrentLobby()))));
+                            Chat.sendPrivateMessageToSelfText(Message.tellraw("{\"text\":\"click here to copy the secret into your clipboard.\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"@actvitysecret\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"This can be used with /bbi discord join {secret} to connect to the lobby.\"]}}".replace("@actvitysecret", BBsentials.dcGameSDK.getLobbyManager().getLobbyActivitySecret(BBsentials.dcGameSDK.getCurrentLobby()))));
                             return 1;
                         }))
                         .then(literal("createDefault").executes(context -> {
@@ -281,7 +281,6 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))
-                        .then(literal("joinSingleString"))
                 )));/*BingoChatLong*/
 //        event.register((dispatcher, registryAccess) -> {
 //            dispatcher.register(ClientCommandManager.literal("p")

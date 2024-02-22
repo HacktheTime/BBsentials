@@ -188,8 +188,11 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
             if (currentLobby == null) blockingCreateDefaultLobby();
             activity.party().setID(String.valueOf(currentLobby.getId()));
-            activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
-//            activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+            if (BBsentials.discordConfig.useRPCJoin)
+                activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+            if (BBsentials.discordConfig.useRPCSpectate) {
+//                activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+            }
             // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }
@@ -347,7 +350,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public void blockingCreateDefaultLobby() {
-        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        if (currentLobby != null) disconnectLobby();
         AtomicReference<Lobby> lobby = new AtomicReference<>(null);
         LobbyTransaction trn = getLobbyManager().getLobbyCreateTransaction();
         trn.setCapacity(15);
@@ -412,6 +415,23 @@ public class GameSDKManager extends DiscordEventAdapter {
             core = new Core(params);
             updateActivity();
         } catch (Exception e) {
+        }
+    }
+
+    public void disconnectLobby() {
+        disconnectFromLobby(currentLobby);
+        currentLobby = null;
+    }
+
+    public void blockingJoinLobbyWithActivitySecret(String activitySecret) {
+        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        currentLobby = null;
+        getLobbyManager().connectLobbyWithActivitySecret(activitySecret, (result, lobby) -> currentLobby = lobby);
+        while (currentLobby == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
         }
     }
 }

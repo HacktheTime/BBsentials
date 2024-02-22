@@ -42,7 +42,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             File nativeLibrary = downloadNativeLibrary();
             if (nativeLibrary == null)
                 throw new RuntimeException("Could not obtain the Native Library which is required!");
-            Core.init(nativeLibrary);
+            Core.initDownload();
             connectToDiscord();
             BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
             BBsentials.executionService.execute(() -> {

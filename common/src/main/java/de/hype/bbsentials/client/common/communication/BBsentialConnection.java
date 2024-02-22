@@ -615,18 +615,9 @@ public class BBsentialConnection {
             }
             AtomicReference<Lobby> lobby = new AtomicReference<>();
             if (packet.lobbyId != -1) {
-                BBsentials.dcGameSDK.getLobbyManager().connectLobby(packet.lobbyId, packet.lobbySecret, (result, lobby1) -> lobby.set(lobby1));
-                while (lobby == null) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ignored) {
+                BBsentials.dcGameSDK.blockingJoinLobby(packet.lobbyId, packet.lobbySecret);
+            }
 
-                    }
-                }
-            }
-            else {
-                lobby.set(BBsentials.dcGameSDK.getCurrentLobby());
-            }
             if (BBsentials.dcGameSDK == null) return;
             if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOIN) || action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) {
                 BBsentials.dcGameSDK.blockingJoinLobby(packet.lobbyId, packet.lobbySecret);
@@ -634,11 +625,11 @@ public class BBsentialConnection {
             }
 
             if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DISCONNECTVC))
-                BBsentials.dcGameSDK.getLobbyManager().disconnectVoice(lobby.get());
+                BBsentials.dcGameSDK.disconnectLobbyVC();
             if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DISCONNECT))
-                BBsentials.dcGameSDK.getLobbyManager().disconnectLobby(lobby.get());
+                BBsentials.dcGameSDK.disconnectLobby();
             if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DELETE))
-                BBsentials.dcGameSDK.getLobbyManager().deleteLobby(lobby.get());
+                BBsentials.dcGameSDK.deleteLobby();
         } catch (Exception ignored) {
         }
     }

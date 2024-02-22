@@ -269,13 +269,29 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public void disconnectFromLobby(Lobby lobby) {
-        getLobbyManager().disconnectLobby(lobby);
-        currentLobby = null;
+        try {
+            getLobbyManager().disconnectLobby(lobby);
+        } catch (Exception e) {
+
+        }
+        try {
+            getLobbyManager().disconnectVoice(lobby);
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void disconnectFromLobbyVC(Lobby lobby) {
+        try {
+            getLobbyManager().disconnectVoice(lobby);
+        } catch (Exception e) {
+
+        }
     }
 
     @Override
     public void onActivityJoin(String secret) {
-        if (currentLobby != null) disconnectFromLobby(currentLobby);
+        if (currentLobby != null) disconnectLobby();
         Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC join Request: Working...");
         BBsentials.executionService.schedule(() -> {
             LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
@@ -303,7 +319,7 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     @Override
     public void onActivitySpectate(String secret) {
-        if (currentLobby != null) disconnectFromLobby(currentLobby);
+        if (currentLobby != null) disconnectLobby();
         Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC join Request: Working...");
         BBsentials.executionService.schedule(() -> {
             LobbyManager manager = BBsentials.dcGameSDK.getCore().lobbyManager();
@@ -341,7 +357,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public void createLobby(LobbyTransaction transaction) {
-        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        disconnectLobby();
         getLobbyManager().createLobby(transaction, (result, lobby) -> currentLobby = lobby);
     }
 
@@ -433,6 +449,35 @@ public class GameSDKManager extends DiscordEventAdapter {
             } catch (InterruptedException e) {
             }
         }
+    }
+
+    public List<Lobby> blockingSearch(ISearchQuery query) {
+        getLobbyManager().search(query.configureSearch(getLobbyManager().getSearchQuery()));
+        return getLobbyManager().getLobbies();
+    }
+
+    public void deleteLobby() {
+        deleteLobby(currentLobby);
+        currentLobby = null;
+    }
+
+    public void deleteLobby(Lobby lobby) {
+        getLobbyManager().deleteLobby(lobby);
+    }
+
+    public void disconnectLobbyVC() {
+        disconnectFromLobbyVC(currentLobby);
+    }
+
+    @Override
+    public void onMemberConnect(long lobbyId, long userId) {
+        super.onMemberConnect(lobbyId, userId);
+    }
+
+
+    @FunctionalInterface
+    public interface ISearchQuery {
+        LobbySearchQuery configureSearch(LobbySearchQuery query);
     }
 }
 

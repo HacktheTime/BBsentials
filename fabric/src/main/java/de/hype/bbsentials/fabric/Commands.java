@@ -215,16 +215,17 @@ public class Commands implements MCCommand {
                             return 1;
                         }))
                         .then(literal("join")
-                                .then(argument("lobbyid", LongArgumentType.longArg()).then(argument("secret", StringArgumentType.string()).executes(context -> {
-                                    try {
-                                        BBsentials.dcGameSDK.blockingJoinLobby(LongArgumentType.getLong(context, "lobbyid"), StringArgumentType.getString(context, "secret"));
-                                        Chat.sendPrivateMessageToSelfSuccess("Success");
-                                    } catch (Exception e) {
-                                        Chat.sendPrivateMessageToSelfError("Error");
-                                        return 2;
-                                    }
-                                    return 1;
-                                })))
+                                .then(argument("lobbyid", LongArgumentType.longArg())
+                                        .then(argument("secret", StringArgumentType.string()).executes(context -> {
+                                            try {
+                                                BBsentials.dcGameSDK.blockingJoinLobby(LongArgumentType.getLong(context, "lobbyid"), StringArgumentType.getString(context, "secret"));
+                                                Chat.sendPrivateMessageToSelfSuccess("Success");
+                                            } catch (Exception e) {
+                                                Chat.sendPrivateMessageToSelfError("Error");
+                                                return 2;
+                                            }
+                                            return 1;
+                                        })))
                                 .then(argument("activity secret", StringArgumentType.string())
                                         .executes(context -> {
                                             try {
@@ -273,7 +274,7 @@ public class Commands implements MCCommand {
                         }))
                         .then(literal("disconnectVC").executes(context -> {
                             try {
-                                BBsentials.dcGameSDK.getLobbyManager().disconnectVoice(BBsentials.dcGameSDK.getCurrentLobby());
+                                BBsentials.dcGameSDK.disconnectLobbyVC();
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
                             } catch (Exception e) {
                                 Chat.sendPrivateMessageToSelfError("Error");

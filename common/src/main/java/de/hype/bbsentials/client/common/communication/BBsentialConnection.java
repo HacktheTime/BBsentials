@@ -628,12 +628,11 @@ public class BBsentialConnection {
                 lobby.set(BBsentials.dcGameSDK.getCurrentLobby());
             }
             if (BBsentials.dcGameSDK == null) return;
-            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOIN) || action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC))
-                BBsentials.dcGameSDK.getLobbyManager().connectLobby(lobby.get(), (result, lobby1) -> {
-                    if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) {
-                        BBsentials.dcGameSDK.getLobbyManager().connectVoice(lobby1);
-                    }
-                });
+            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOIN) || action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) {
+                BBsentials.dcGameSDK.blockingJoinLobby(packet.lobbyId, packet.lobbySecret);
+                if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) BBsentials.dcGameSDK.joinVC();
+            }
+
             if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DISCONNECTVC))
                 BBsentials.dcGameSDK.getLobbyManager().disconnectVoice(lobby.get());
             if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DISCONNECT))

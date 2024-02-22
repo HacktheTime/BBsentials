@@ -28,7 +28,7 @@ dependencies {
     modImplementation(libs.modmenu)
     modImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     modImplementation("dev.xpple:clientarguments:1.7")?.let { include(it) }
-
+    implementation("com.github.JnCrMx:discord-game-sdk4j:v0.5.5")
     modApi(libs.clothConfig) {
         exclude(group = "net.fabricmc.fabric-api")
     }

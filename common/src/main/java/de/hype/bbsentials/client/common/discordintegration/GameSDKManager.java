@@ -43,24 +43,8 @@ public class GameSDKManager extends DiscordEventAdapter {
             if (nativeLibrary == null)
                 throw new RuntimeException("Could not obtain the Native Library which is required!");
             Core.init(nativeLibrary);
-
-            // Set parameters for the Core
-//            CreateParams params;
-            try {
-//                params = new CreateParams();
-                CreateParams params = new CreateParams();
-
-//            params.setClientID(698611073133051974L);
-                params.setFlags(CreateParams.getDefaultFlags());
-                params.setClientID(1209174746605031444L);
-                params.registerEventHandler(this);
-
-                // Create the Core
-                core = new Core(params);
-                updateActivity();
-            } catch (Exception e) {
-
-            }
+            connectToDiscord();
+            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
             BBsentials.executionService.execute(() -> {
                 while (!stop.get()) {
                     runContinously();
@@ -161,25 +145,28 @@ public class GameSDKManager extends DiscordEventAdapter {
             if (BBsentials.developerConfig.devMode) {
                 activity.setDetails("Programming this ↑");
                 activity.setState("Developer Mode: Enabled");
-                activity.assets().setSmallText("BBsentials. A mod by @hackthetime");
-                activity.assets().setSmallImage("bingo_hub");
                 activity.assets().setLargeImage("i_am_root_backup_laugh");
                 activity.assets().setLargeText("I am Root (→ Linux for I'm the Admin)");
-                activity.secrets().setSpectateSecret("bb:rpc:join:" + mcUsername);
                 activity.timestamps().setStart(Instant.now());
+                activity.assets().setSmallText("BBsentials. A mod by @hackthetime");
+                activity.assets().setSmallImage("bingo_hub");
             }
             else {
                 Islands island = EnvironmentCore.utils.getCurrentIsland();
                 if (island != null) {
                     activity.setDetails("Playing Hypixel Skyblock");
                     activity.setState(EnvironmentCore.utils.getServerId() + ": " + EnvironmentCore.utils.getCurrentIsland().getDisplayName());
+                    activity.assets().setSmallText("BBsentials. A mod by @hackthetime");
+                    activity.assets().setSmallImage("bingo_hub");
+                    activity.assets().setLargeImage("bingo_card");
                 }
                 else {
                     activity.setDetails("Playing Minecraft");
                     activity.setState("");
+                    activity.assets().setLargeText("BBsentials. A mod by @hackthetime");
+                    activity.assets().setLargeImage("bingo_hub");
                 }
             }
-
             // Setting a start time causes an "elapsed" field to appear
             activity.timestamps().setStart(Instant.ofEpochSecond(0));
 
@@ -201,8 +188,8 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
             if (currentLobby == null) blockingCreateDefaultLobby();
             activity.party().setID(String.valueOf(currentLobby.getId()));
-            activity.secrets().setJoinSecret("bb:rpc:join:" + mcUsername);
-            activity.secrets().setSpectateSecret("bb:rpc:spec:" + mcUsername);
+            activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+//            activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
             // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }
@@ -279,8 +266,8 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public void disconnectFromLobby(Lobby lobby) {
-        getLobbyManager().disconnectNetwork(lobby);
         getLobbyManager().disconnectLobby(lobby);
+        currentLobby = null;
     }
 
     @Override
@@ -385,6 +372,47 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     public void inviteToGuild(String inviteCode) {
         core.overlayManager().openGuildInvite(inviteCode);
+    }
+
+    @Override
+    public void onSpeaking(long lobbyId, long userId, boolean speaking) {
+        Chat.sendPrivateMessageToSelfDebug(userId + " started speaking: " + speaking);
+    }
+
+    public void blockingJoinLobby(Long lobbyId, String secret) {
+        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        currentLobby = null;
+        getLobbyManager().connectLobby(lobbyId, secret, (result, lobby) -> currentLobby = lobby);
+        while (currentLobby == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    public void joinVC() {
+        getLobbyManager().connectVoice(currentLobby);
+    }
+
+    public void connectToDiscord() {
+        // Set parameters for the Core
+//            CreateParams params;
+        try {
+            currentLobby = null;
+//                params = new CreateParams();
+            CreateParams params = new CreateParams();
+
+//            params.setClientID(698611073133051974L);
+            params.setFlags(CreateParams.getDefaultFlags());
+            params.setClientID(1209174746605031444L);
+            params.registerEventHandler(this);
+
+            // Create the Core
+            core = new Core(params);
+            updateActivity();
+        } catch (Exception e) {
+        }
     }
 }
 

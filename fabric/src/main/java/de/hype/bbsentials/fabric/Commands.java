@@ -8,7 +8,6 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
@@ -28,7 +27,6 @@ import de.hype.bbsentials.shared.packets.network.BroadcastMessagePacket;
 import de.hype.bbsentials.shared.packets.network.InternalCommandPacket;
 import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
 import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.event.Event;
@@ -40,12 +38,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+
 public class Commands implements MCCommand {
     Event<ClientCommandRegistrationCallback> event = ClientCommandRegistrationCallback.EVENT;
 
     private static void simpleCommand(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, String[] parameters) {
         dispatcher.register(
-                ClientCommandManager.literal(commandName)
+                literal(commandName)
                         .executes((context) -> {
                             sendPacket(new InternalCommandPacket(commandName, parameters));
                             return 1;
@@ -55,7 +56,7 @@ public class Commands implements MCCommand {
 
     private static void miningEvent(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, MiningEvents event) {
         dispatcher.register(
-                ClientCommandManager.literal(commandName)
+                literal(commandName)
                         .executes((context) -> {
                             try {
                                 sendPacket(new MiningEventPacket(event,
@@ -73,8 +74,8 @@ public class Commands implements MCCommand {
     }
 
     public void registerMain() {
-        event.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("creport")
-                .then(ClientCommandManager.argument("Player_Name", StringArgumentType.string())
+        event.register((dispatcher, registryAccess) -> dispatcher.register(literal("creport")
+                .then(argument("Player_Name", StringArgumentType.string())
                         .executes((context) -> {
                             String playerName = StringArgumentType.getString(context, "Player_Name");
                             BBsentials.sender.addSendTask("/creport " + playerName, 0);
@@ -83,7 +84,7 @@ public class Commands implements MCCommand {
                         }))));//creport helper → no double report during same launch
         event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "goblinraid", MiningEvents.GOBLIN_RAID));/*goblinraid*/
         event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "2xpowder", MiningEvents.DOUBLE_POWDER));/*2xpowder*/
-        event.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("getLobbyTime")
+        event.register((dispatcher, registryAccess) -> dispatcher.register(literal("getLobbyTime")
                 .executes((context) -> {
                     Chat.sendPrivateMessageToSelfSuccess("Day: " + EnvironmentCore.utils.getLobbyDay());
                     return 1;
@@ -92,8 +93,8 @@ public class Commands implements MCCommand {
         event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "raffle", MiningEvents.RAFFLE));/*raffle*/
         event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "gonewiththewind", MiningEvents.GONE_WITH_THE_WIND));/*gonewiththewind*/
         event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "mithrilgourmand", MiningEvents.MITHRIL_GOURMAND));/*gonewiththewind*/
-        event.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("chchest")
-                .then(ClientCommandManager.argument("Item", StringArgumentType.string())
+        event.register((dispatcher, registryAccess) -> dispatcher.register(literal("chchest")
+                .then(argument("Item", StringArgumentType.string())
                         .suggests((context, builder) -> {
                             List<String> items = ChChestItems.getAllItems().stream().map(ChChestItem::getDisplayName).toList();
                             String inputTemporary = builder.getRemaining().replace("\"", "");
@@ -121,10 +122,10 @@ public class Commands implements MCCommand {
 
                             return CommandSource.suggestMatching(suggestions, builder);
                         })
-                        .then(ClientCommandManager.argument("coordinates", CBlockPosArgumentType.blockPos())
-                                .then(ClientCommandManager.argument("ContactWay", StringArgumentType.string())
+                        .then(argument("coordinates", CBlockPosArgumentType.blockPos())
+                                .then(argument("ContactWay", StringArgumentType.string())
                                         .suggests(((context, builder) -> CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.generalConfig.getUsername() + " bb:party me\"", "\"/p join " + BBsentials.generalConfig.getUsername() + "\""}, builder)))
-                                        .then(ClientCommandManager.argument("extraMessage", StringArgumentType.greedyString())
+                                        .then(argument("extraMessage", StringArgumentType.greedyString())
                                                 .executes((context) -> {
                                                             String item = StringArgumentType.getString(context, "Item");
                                                             BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "coordinates");
@@ -167,8 +168,8 @@ public class Commands implements MCCommand {
                 )
         ));/*chchest*/
         event.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("bc")
-                        .then(ClientCommandManager.argument("Message to Bingo Chat", StringArgumentType.greedyString())
+                literal("bc")
+                        .then(argument("Message to Bingo Chat", StringArgumentType.greedyString())
                                 .executes((context) -> {
                                     String message = StringArgumentType.getString(context, "Message to Bingo Chat");
                                     sendPacket(new BingoChatMessagePacket("", "", message, 0));
@@ -177,8 +178,8 @@ public class Commands implements MCCommand {
                         )
         ));/*BincoChatShort*/
         event.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("bingochat")
-                        .then(ClientCommandManager.argument("Message to Bingo Chat", StringArgumentType.greedyString())
+                literal("bingochat")
+                        .then(argument("Message to Bingo Chat", StringArgumentType.greedyString())
                                 .executes((context) -> {
                                     String message = StringArgumentType.getString(context, "Message to Bingo Chat");
                                     sendPacket(new BingoChatMessagePacket("", "", message, 0));
@@ -187,22 +188,22 @@ public class Commands implements MCCommand {
                         )
         ));/*BingoChatLong*/
         event.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("bbidiscord")
-                        .then(ClientCommandManager.literal("refreshConnection").executes(context -> {
+                literal("bbi").then(literal("discord")
+                        .then(literal("refreshConnection").executes(context -> {
                             if (BBsentials.dcGameSDK != null) {
-                                Chat.sendPrivateMessageToSelfSuccess("Game SDK is already connected!");
+                                Chat.sendPrivateMessageToSelfInfo("The refresh may take a couple of seconds");
+                                BBsentials.executionService.execute(() -> BBsentials.dcGameSDK.connectToDiscord());
                                 return 1;
                             }
-                            try {
-                                BBsentials.dcGameSDK = new GameSDKManager();
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Error Occur trying to refresh the Discord Connection");
-                                return 2;
+                            else {
+                                Chat.sendPrivateMessageToSelfError("You cant refresh something which does not exist.");
+                                return 0;
                             }
-                            Chat.sendPrivateMessageToSelfSuccess("Game SDK refreshed");
-                            return 1;
+                            // Due too how stuff works you cant initialise the stuff here,
+                            // because it would freeze the screen.
+                            // And if the sdk is downloaded, this is basically a crash
                         }))
-                        .then(ClientCommandManager.literal("openVCSettings").executes(context -> {
+                        .then(literal("openVCSettings").executes(context -> {
                             try {
                                 BBsentials.dcGameSDK.openVoiceSettings();
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
@@ -212,7 +213,7 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))
-                        .then(ClientCommandManager.literal("join").then(ClientCommandManager.argument("lobbyid", LongArgumentType.longArg()).then(ClientCommandManager.argument("secret", StringArgumentType.string()).executes(context -> {
+                        .then(literal("join").then(argument("lobbyid", LongArgumentType.longArg()).then(argument("secret", StringArgumentType.string()).executes(context -> {
                             try {
                                 BBsentials.dcGameSDK.blockingJoinLobby(LongArgumentType.getLong(context, "lobbyid"), StringArgumentType.getString(context, "secret"));
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
@@ -222,7 +223,7 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))))
-                        .then(ClientCommandManager.literal("joinVC").executes(context -> {
+                        .then(literal("joinVC").executes(context -> {
                             try {
                                 BBsentials.dcGameSDK.joinVC();
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
@@ -232,7 +233,7 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))
-                        .then(ClientCommandManager.literal("disconnect").executes(context -> {
+                        .then(literal("disconnect").executes(context -> {
                             try {
                                 BBsentials.dcGameSDK.getLobbyManager().disconnectLobby(BBsentials.dcGameSDK.getCurrentLobby());
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
@@ -242,7 +243,7 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))
-                        .then(ClientCommandManager.literal("disconnectVC").executes(context -> {
+                        .then(literal("disconnectVC").executes(context -> {
                             try {
                                 BBsentials.dcGameSDK.getLobbyManager().disconnectVoice(BBsentials.dcGameSDK.getCurrentLobby());
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
@@ -252,7 +253,7 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))
-        ));/*BingoChatLong*/
+                )));/*BingoChatLong*/
 //        event.register((dispatcher, registryAccess) -> {
 //            dispatcher.register(ClientCommandManager.literal("p")
 //                    .then(ClientCommandManager.argument("subcommand", StringArgumentType.word())
@@ -293,8 +294,8 @@ public class Commands implements MCCommand {
     public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher, boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {
         if (hasMod) {
             event.register((dispatcher, registryAccess) -> dispatcher.register(
-                    ClientCommandManager.literal("bannounce")
-                            .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
+                    literal("bannounce")
+                            .then(argument("message", StringArgumentType.greedyString())
                                     .executes((context) -> {
                                         String message = StringArgumentType.getString(context, "message");
                                         sendPacket(new BroadcastMessagePacket("", "", message));
@@ -302,10 +303,10 @@ public class Commands implements MCCommand {
                                     })
                             )
             ));/*bAnnounce*/
-            event.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("bmute")
-                    .then(ClientCommandManager.argument("userId/mcusername", StringArgumentType.string())
-                            .then(ClientCommandManager.argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                    .then(ClientCommandManager.argument("reason", StringArgumentType.greedyString())
+            event.register((dispatcher, registryAccess) -> dispatcher.register(literal("bmute")
+                    .then(argument("userId/mcusername", StringArgumentType.string())
+                            .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+                                    .then(argument("reason", StringArgumentType.greedyString())
                                             .executes((context) -> {
                                                 String identification = StringArgumentType.getString(context, "userId/mcusername");
                                                 String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
@@ -325,10 +326,10 @@ public class Commands implements MCCommand {
                             )
                     )
             ));/*bmute*/
-            event.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("bban")
-                    .then(ClientCommandManager.argument("userId/mcusername", StringArgumentType.string())
-                            .then(ClientCommandManager.argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                    .then(ClientCommandManager.argument("reason", StringArgumentType.greedyString())
+            event.register((dispatcher, registryAccess) -> dispatcher.register(literal("bban")
+                    .then(argument("userId/mcusername", StringArgumentType.string())
+                            .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+                                    .then(argument("reason", StringArgumentType.greedyString())
                                             .executes((context) -> {
                                                 String identification = StringArgumentType.getString(context, "userId/mcusername");
                                                 String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
@@ -348,8 +349,8 @@ public class Commands implements MCCommand {
                             )
                     )
             ));/*ban*/
-            event.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("bgetinfo")
-                    .then(ClientCommandManager.argument("userId/mcusername", StringArgumentType.string())
+            event.register((dispatcher, registryAccess) -> dispatcher.register(literal("bgetinfo")
+                    .then(argument("userId/mcusername", StringArgumentType.string())
                             .executes((context) -> {
                                 String identification = StringArgumentType.getString(context, "userId/mcusername");
                                 sendPacket(new InternalCommandPacket(InternalCommandPacket.GET_USER_INFO, new String[]{identification}));
@@ -360,13 +361,13 @@ public class Commands implements MCCommand {
         }
         if (hasSplasher) {
             event.register((dispatcher, registryAccess) -> dispatcher.register(
-                    ClientCommandManager.literal("splashAnnounce")
-                            .then(ClientCommandManager.argument("Hub", IntegerArgumentType.integer(1, 28))
-                                    .then(ClientCommandManager.argument("location", StringArgumentType.string())
+                    literal("splashAnnounce")
+                            .then(argument("Hub", IntegerArgumentType.integer(1, 28))
+                                    .then(argument("location", StringArgumentType.string())
                                             .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{"kat", "bea", "guild-house"}, builder))
-                                            .then(ClientCommandManager.argument("lasswaste", StringArgumentType.string())
+                                            .then(argument("lasswaste", StringArgumentType.string())
                                                     .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{"true", "false"}, builder))
-                                                    .then(ClientCommandManager.argument("extramessage", StringArgumentType.greedyString())
+                                                    .then(argument("extramessage", StringArgumentType.greedyString())
                                                             .executes((context) -> {
                                                                 int hub = IntegerArgumentType.getInteger(context, "Hub");
                                                                 String extramessage = StringArgumentType.getString(context, "extramessage");
@@ -394,14 +395,14 @@ public class Commands implements MCCommand {
                             )
             ));/*SplashAnnounce*/
             event.register((dispatcher, registryAccess) -> dispatcher.register(
-                    ClientCommandManager.literal("requestpottimes")
+                    literal("requestpottimes")
                             .executes((context) -> {
                                 sendPacket(new InternalCommandPacket(InternalCommandPacket.REQUEST_POT_DURATION, new String[0]));
                                 return 1;
                             })
             ));/*requestpottimes*/
             event.register((dispatcher, registryAccess) -> dispatcher.register(
-                    ClientCommandManager.literal("getLeecher")
+                    literal("getLeecher")
                             .executes((context) -> {
                                 BBsentials.executionService.execute(() -> {
                                     UpdateListenerManager.splashStatusUpdateListener.showOverlay = true;
@@ -415,8 +416,8 @@ public class Commands implements MCCommand {
         }
         if (hasAdmin) {
             event.register((dispatcher, registryAccess) -> dispatcher.register(
-                    ClientCommandManager.literal("bshutdown")
-                            .then(ClientCommandManager.argument("Reason", StringArgumentType.greedyString())
+                    literal("bshutdown")
+                            .then(argument("Reason", StringArgumentType.greedyString())
                                     .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{"Emergency Shutdown", "System Shutdown", "Other"}, builder))
                                     .executes((context) -> {
                                         String reason = StringArgumentType.getString(context, "Reason");
@@ -426,8 +427,8 @@ public class Commands implements MCCommand {
                             )
             ));/*BBShutdown*/
             event.register((dispatcher, registryAccess) -> dispatcher.register(
-                    ClientCommandManager.literal("bsetmotd")
-                            .then(ClientCommandManager.argument("Message", StringArgumentType.greedyString())
+                    literal("bsetmotd")
+                            .then(argument("Message", StringArgumentType.greedyString())
                                     .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{""}, builder))
                                     .executes((context) -> {
                                         String message = StringArgumentType.getString(context, "Message").trim();

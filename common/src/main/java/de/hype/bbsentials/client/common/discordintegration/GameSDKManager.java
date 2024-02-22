@@ -43,24 +43,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             if (nativeLibrary == null)
                 throw new RuntimeException("Could not obtain the Native Library which is required!");
             Core.init(nativeLibrary);
-
-            // Set parameters for the Core
-//            CreateParams params;
-            try {
-//                params = new CreateParams();
-                CreateParams params = new CreateParams();
-
-//            params.setClientID(698611073133051974L);
-                params.setFlags(CreateParams.getDefaultFlags());
-                params.setClientID(1209174746605031444L);
-                params.registerEventHandler(this);
-
-                // Create the Core
-                core = new Core(params);
-                updateActivity();
-            } catch (Exception e) {
-
-            }
+            connectToDiscord();
             BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
             BBsentials.executionService.execute(() -> {
                 while (!stop.get()) {
@@ -206,7 +189,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             if (currentLobby == null) blockingCreateDefaultLobby();
             activity.party().setID(String.valueOf(currentLobby.getId()));
             activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
-            activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+//            activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
             // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }
@@ -283,8 +266,8 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public void disconnectFromLobby(Lobby lobby) {
-        getLobbyManager().disconnectNetwork(lobby);
         getLobbyManager().disconnectLobby(lobby);
+        currentLobby = null;
     }
 
     @Override
@@ -410,6 +393,26 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     public void joinVC() {
         getLobbyManager().connectVoice(currentLobby);
+    }
+
+    public void connectToDiscord() {
+        // Set parameters for the Core
+//            CreateParams params;
+        try {
+            currentLobby = null;
+//                params = new CreateParams();
+            CreateParams params = new CreateParams();
+
+//            params.setClientID(698611073133051974L);
+            params.setFlags(CreateParams.getDefaultFlags());
+            params.setClientID(1209174746605031444L);
+            params.registerEventHandler(this);
+
+            // Create the Core
+            core = new Core(params);
+            updateActivity();
+        } catch (Exception e) {
+        }
     }
 }
 

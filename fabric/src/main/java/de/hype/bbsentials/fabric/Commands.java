@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
@@ -213,16 +214,43 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))
-                        .then(literal("join").then(argument("lobbyid", LongArgumentType.longArg()).then(argument("secret", StringArgumentType.string()).executes(context -> {
-                            try {
-                                BBsentials.dcGameSDK.blockingJoinLobby(LongArgumentType.getLong(context, "lobbyid"), StringArgumentType.getString(context, "secret"));
-                                Chat.sendPrivateMessageToSelfSuccess("Success");
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Error");
-                                return 2;
+                        .then(literal("join")
+                                .then(argument("lobbyid", LongArgumentType.longArg()).then(argument("secret", StringArgumentType.string()).executes(context -> {
+                                    try {
+                                        BBsentials.dcGameSDK.blockingJoinLobby(LongArgumentType.getLong(context, "lobbyid"), StringArgumentType.getString(context, "secret"));
+                                        Chat.sendPrivateMessageToSelfSuccess("Success");
+                                    } catch (Exception e) {
+                                        Chat.sendPrivateMessageToSelfError("Error");
+                                        return 2;
+                                    }
+                                    return 1;
+                                })))
+                                .then(argument("activity secret", StringArgumentType.string())
+                                        .executes(context -> {
+                                            try {
+                                                BBsentials.dcGameSDK.blockingJoinLobbyWithActivitySecret(StringArgumentType.getString(context, "lobbyid"));
+                                                Chat.sendPrivateMessageToSelfSuccess("Success");
+                                            } catch (Exception e) {
+                                                Chat.sendPrivateMessageToSelfError("Error");
+                                                return 2;
+                                            }
+                                            return 1;
+                                        })
+                                )
+
+                        )
+                        .then(literal("getActivitySecret").executes(context -> {
+                            if (BBsentials.dcGameSDK.getCurrentLobby() == null) {
+                                Chat.sendPrivateMessageToSelfError("You are not in a Lobby.");
+                                return 0;
                             }
+                            Chat.sendPrivateMessageToSelfText(Message.tellraw("{\"text\":\"click here to copy the secret into your clipboard.\",\"color\":\"gold\",,\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"@actvitysecret\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"This can be used with /bbi discord join {secret} to connect to the lobby.\"]}}".replace("@actvitysecret", BBsentials.dcGameSDK.getLobbyManager().getLobbyActivitySecret(BBsentials.dcGameSDK.getCurrentLobby()))));
                             return 1;
-                        }))))
+                        }))
+                        .then(literal("createDefault").executes(context -> {
+                            BBsentials.dcGameSDK.blockingCreateDefaultLobby();
+                            return 1;
+                        }))
                         .then(literal("joinVC").executes(context -> {
                             try {
                                 BBsentials.dcGameSDK.joinVC();
@@ -235,7 +263,7 @@ public class Commands implements MCCommand {
                         }))
                         .then(literal("disconnect").executes(context -> {
                             try {
-                                BBsentials.dcGameSDK.getLobbyManager().disconnectLobby(BBsentials.dcGameSDK.getCurrentLobby());
+                                BBsentials.dcGameSDK.disconnectLobby();
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
                             } catch (Exception e) {
                                 Chat.sendPrivateMessageToSelfError("Error");
@@ -253,6 +281,7 @@ public class Commands implements MCCommand {
                             }
                             return 1;
                         }))
+                        .then(literal("joinSingleString"))
                 )));/*BingoChatLong*/
 //        event.register((dispatcher, registryAccess) -> {
 //            dispatcher.register(ClientCommandManager.literal("p")

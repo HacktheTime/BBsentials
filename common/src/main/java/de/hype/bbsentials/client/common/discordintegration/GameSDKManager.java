@@ -49,7 +49,6 @@ public class GameSDKManager extends DiscordEventAdapter {
                 while (!stop.get()) {
                     runContinously();
                 }
-                System.out.println("Exited stop");
             });
             connectToDiscord();
             BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
@@ -133,9 +132,9 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public void runContinously() {
-        core.runCallbacks();
         try {
             // Sleep a bit to save CPU
+            core.runCallbacks();
             Thread.sleep(16);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -384,6 +383,7 @@ public class GameSDKManager extends DiscordEventAdapter {
         while (lobby.get() == null) {
             try {
                 Thread.sleep(100);
+                core.runCallbacks();
             } catch (InterruptedException ignored) {
 
             }
@@ -412,6 +412,7 @@ public class GameSDKManager extends DiscordEventAdapter {
         while (currentLobby == null) {
             try {
                 Thread.sleep(100);
+                core.runCallbacks();
             } catch (InterruptedException e) {
             }
         }
@@ -472,6 +473,7 @@ public class GameSDKManager extends DiscordEventAdapter {
         while (currentLobby == null) {
             try {
                 Thread.sleep(100);
+                core.runCallbacks();
             } catch (InterruptedException e) {
             }
         }

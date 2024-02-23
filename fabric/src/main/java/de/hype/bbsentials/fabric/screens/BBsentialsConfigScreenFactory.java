@@ -516,24 +516,17 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Automatically updates the Status of the Splash by sending packets to the Server"))
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.autoSplashStatusUpdates = newValue)
                     .build();
-            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Splash Status Updates"), BBsentials.splashConfig.showSplashStatusUpdates)
-                    .setDefaultValue(true)
-                    .setTooltip(Text.of("Select if you want to see Splash Staus updates. Keep in mind that this will only send you status updates for the Splashes which you were shown.\nThose hidden due too too high Splash Time will still remain invisible"))
-                    .setSaveConsumer(newValue -> BBsentials.splashConfig.showSplashStatusUpdates = newValue)
-                    .build());
             splasher.addEntry(updateSplashStatus);
-            BooleanListEntry showLeecherHud = entryBuilder.startBooleanToggle(Text.of("Do not show Splash Leecher Overlay"), BBsentials.splashConfig.autoSplashStatusUpdates)
+            BooleanListEntry showLeecherHud = entryBuilder.startBooleanToggle(Text.of("Use Splash Leecher Overlay"), BBsentials.splashConfig.useSplasherOverlay)
                     .setDefaultValue(true)
-                    .setTooltip(Text.of("Optional disabler for the Splash Leecher Overlay. Is normally automatically enabled when you announce a splash.\nAutomatically gets disabled when its marked done."))
-                    .setSaveConsumer(newValue -> BBsentials.splashConfig.autoSplashStatusUpdates = newValue)
-                    .setRequirement(updateSplashStatus::getValue)
+                    .setTooltip(Text.of("Is normally automatically enabled when you announce a splash.\nAutomatically gets disabled when its marked done."))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.useSplasherOverlay = newValue)
                     .build();
             splasher.addEntry(showLeecherHud);
-            entryBuilder.startBooleanToggle(Text.of("Show Music Pants Users"), BBsentials.splashConfig.autoSplashStatusUpdates)
+            entryBuilder.startBooleanToggle(Text.of("Show Music Pants Users"), BBsentials.splashConfig.showMusicPantsUsers)
                     .setDefaultValue(true)
-                    .setTooltip(Text.of("Displays a small red note in front of the username if they wear music pants. Displays everybody with it not just non Bingos"))
-                    .setRequirement(showLeecherHud::getValue)
-                    .setSaveConsumer(newValue -> BBsentials.splashConfig.autoSplashStatusUpdates = newValue)
+                    .setTooltip(Text.of("Displays a small red note symbol in front of the username if they wear music pants. Displays everybody with it not just non Bingos"))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.showMusicPantsUsers = newValue)
                     .build();
 
         }

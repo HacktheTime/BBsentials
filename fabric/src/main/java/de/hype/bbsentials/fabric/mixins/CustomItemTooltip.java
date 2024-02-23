@@ -1,9 +1,11 @@
 package de.hype.bbsentials.fabric.mixins;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.Utils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -78,8 +81,19 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
                 }
                 BBsentials.splashConfig.smallestHubName = lowestYetHubName;
                 Chat.sendPrivateMessageToSelfInfo("The lowest amount of players seems to be in " + lowestYetHubName);
-            }, 10, TimeUnit.MILLISECONDS);
+            }, 30, TimeUnit.MILLISECONDS);
         }
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (BBsentials.splashConfig.smallestHubName == null) return;
+        context.drawText(textRenderer, getSmallestHubText(), 10, 50, 16777215, false);
+    }
+
+    @Unique
+    private Text getSmallestHubText() {
+        return Text.of(Formatting.DARK_PURPLE + "Least Player Hub: Hub #" + BBsentials.splashConfig.smallestHubName.replaceAll("\\D", ""));
     }
 
     @Inject(method = "close", at = @At("HEAD"))

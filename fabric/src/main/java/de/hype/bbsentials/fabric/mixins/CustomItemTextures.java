@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric.mixins;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.LivingEntity;
@@ -27,15 +28,22 @@ public abstract class CustomItemTextures {
     @Shadow
     public abstract void drawTooltip(TextRenderer textRenderer, Text text, int x, int y);
 
+    @Shadow
+    public abstract int drawText(TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow);
+
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), cancellable = true)
     private void onRenderItem(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
         for (CustomItemTexture itemTexture : BBsentials.customItemTextures.values()) {
             String nbtString = "";
             NbtCompound nbt = stack.getNbt();
+            String stackItemName = stack.getName().getString();
             if (nbt != null) nbtString = nbt.toString();
-            if (itemTexture.isItem(stack.getName().getString(), "", nbtString, stack)) {
+            if (itemTexture.isItem(stackItemName, nbtString, stack)) {
                 drawGuiTexture(new Identifier(itemTexture.nameSpace, itemTexture.renderTextureId), x, y, 16, 16);
                 ci.cancel();
+            }
+            if (stackItemName.equals(BBsentials.splashConfig.smallestHubName != null && BBsentials.splashConfig.showSmallestHub)) {
+                drawText(MinecraftClient.getInstance().textRenderer, Text.of("§aThe smallest Hub is currently " + BBsentials.splashConfig.smallestHubName), 10, 100, 16777215, false);
             }
         }
 //        if (stack.getItem() == Items.POTION) {

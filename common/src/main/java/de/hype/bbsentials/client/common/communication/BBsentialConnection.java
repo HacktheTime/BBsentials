@@ -244,7 +244,7 @@ public class BBsentialConnection {
     public void splashHighlightItem(SplashData splash, long displayTimeInMilliseconds) {
         CustomItemTexture toHighlightHub = new CustomItemTexture("customitems/splash_hub") {
             @Override
-            public boolean isItem(String itemName, String tooltip, String nbt, Object item) {
+            public boolean isItem(String itemName, String nbt, Object item) {
                 return itemName.endsWith("Hub #" + splash.hubNumber);
             }
         };

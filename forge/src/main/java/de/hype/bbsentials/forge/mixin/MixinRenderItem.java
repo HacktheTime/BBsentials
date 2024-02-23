@@ -3,8 +3,6 @@ package de.hype.bbsentials.forge.mixin;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
-import de.hype.bbsentials.forge.Temphook;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
@@ -40,7 +38,7 @@ public abstract class MixinRenderItem {
     private void overrideItemTextureForHubs(ItemStack stack, int x, int y, CallbackInfo ci) {
         try {
             for (CustomItemTexture itemTexture : BBsentials.customItemTextures.values()) {
-                if (itemTexture.isItem(stack.getDisplayName(), "", stack.getTagCompound().toString(), stack)) {
+                if (itemTexture.isItem(stack.getDisplayName(), stack.getTagCompound().toString(), stack)) {
                     textureManager.bindTexture(new ResourceLocation(itemTexture.nameSpace, "textures/gui/sprites/" + itemTexture.renderTextureId + ".png"));
                     Gui.drawModalRectWithCustomSizedTexture(
                             x, y, 0, 0, 16, 16, 16, 16

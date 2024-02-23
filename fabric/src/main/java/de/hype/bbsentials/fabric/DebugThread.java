@@ -2,18 +2,27 @@ package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import de.hype.bbsentials.client.common.client.BBsentials;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DebugThread extends de.hype.bbsentials.client.common.client.DebugThread {
+    public static volatile AtomicInteger timerSinceLastTick = new AtomicInteger(0);
     boolean doTest = false;
     MinecraftClient minecraft;
+
+    public void unlockCursor() {
+        MinecraftClient.getInstance().mouse.unlockCursor();
+    }
 
     @Override
     public void loop() {
@@ -28,13 +37,8 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
         return;
     }
 
-
     Collection<CommandNode<FabricClientCommandSource>> getClientCommands() {
         return ClientCommandManager.getActiveDispatcher().getRoot().getChildren();
-    }
-
-    RootCommandNode<CommandSource> getSeraverCommands() {
-        return MinecraftClient.getInstance().getNetworkHandler().getCommandDispatcher().getRoot();
     }
 
 //    public void replaceCommand(String name) {
@@ -66,12 +70,12 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
 //        );
 //    }
 
-    public void doOnce() {
-        doTest = true;
+    RootCommandNode<CommandSource> getServerCommands() {
+        return MinecraftClient.getInstance().getNetworkHandler().getCommandDispatcher().getRoot();
     }
 
-    public void unlockCursor() {
-        MinecraftClient.getInstance().mouse.unlockCursor();
+    public void doOnce() {
+        doTest = true;
     }
 
     @Override
@@ -83,5 +87,21 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
         if (screen == null) return;
         MinecraftClient client = MinecraftClient.getInstance();
         client.execute(() -> client.setScreen(screen));
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        ClientTickEvents.START_CLIENT_TICK.register(i -> timerSinceLastTick.set(0));
+        ClientTickEvents.END_CLIENT_TICK.register(i -> timerSinceLastTick.set(0));
+        BBsentials.executionService.scheduleAtFixedRate(() -> {
+            timerSinceLastTick.getAndAdd(1);
+            if (timerSinceLastTick.get() > 20 && MinecraftClient.getInstance().currentScreen == null) {
+                timerSinceLastTick.set(0);
+//                    Chat.sendPrivateMessageToSelfInfo("Cursor unlocked");
+                unlockCursor();
+            }
+
+        }, 100, 100, TimeUnit.MILLISECONDS);
     }
 }

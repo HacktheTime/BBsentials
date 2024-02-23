@@ -38,10 +38,9 @@ public abstract class CustomItemTexture {
 
     /**
      * @param itemName
-     * @param tooltip  Tooltip is at the moment still empty. Not supported yet
      * @param nbt
      * @param item
      * @return
      */
-    public abstract boolean isItem(String itemName, String tooltip, String nbt, Object item);
+    public abstract boolean isItem(String itemName, String nbt, Object item);
 }

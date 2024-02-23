@@ -420,11 +420,14 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     private void initMembers() {
+        members.clear();
         BBsentials.executionService.execute(() -> {
             for (DiscordUser lobbyMember : getLobbyMembers()) {
                 try {
                     if (members.get(lobbyMember.getUserId()) == null) {
-                        members.put(lobbyMember.getUserId(), new DiscordLobbyUser(lobbyMember, getCurrentLobby()));
+                        DiscordLobbyUser user = new DiscordLobbyUser(lobbyMember, getCurrentLobby());
+                        if (user == null) throw new RuntimeException("Uhm here");
+                        members.put(lobbyMember.getUserId(), user);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -511,6 +514,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public List<DiscordLobbyUser> getAdvancedLobbyMembers() {
+        if (members == null || members.isEmpty()) return new ArrayList<>();
         return new ArrayList<>(members.values());
     }
 

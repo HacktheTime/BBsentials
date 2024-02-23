@@ -242,7 +242,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
             List<IChatComponent> toDisplay = new ArrayList<>();
             toDisplay.add(new ChatComponentText("§6Total: " + allParticipants.size() + " | Bingos: " + (allParticipants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.hudConfig.showMusicPants;
+            boolean doPants = BBsentials.splashConfig.showMusicPantsUsers;
             for (EntityPlayer participant : allParticipants) {
                 if (doPants) {
                     boolean hasPants = false;

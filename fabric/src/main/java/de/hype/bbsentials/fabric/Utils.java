@@ -5,6 +5,8 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bbsentials.client.common.discordintegration.DiscordLobbyUser;
+import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.RouteNode;
 import de.hype.bbsentials.client.common.objects.Waypoints;
@@ -370,7 +372,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             List<PlayerEntity> musicPants = new ArrayList<>();
             List<Text> toDisplay = new ArrayList<>();
             toDisplay.add(Text.of("§6Total: " + allParticipiants.size() + " | Bingos: " + (allParticipiants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.hudConfig.showMusicPants;
+            boolean doPants = BBsentials.splashConfig.showMusicPantsUsers;
             for (PlayerEntity participiant : allParticipiants) {
                 if (doPants) {
 
@@ -440,6 +442,26 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                     toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
                     Arrays.stream(chest.items).map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
+            }
+            for (Text text : toRender) {
+                drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
+                y += 10; // Adjust the vertical position for the next string
+            }
+        }
+        if (BBsentials.discordConfig.overlay) {
+            int x = 10;
+            int y = 15;
+            GameSDKManager sdkManager = BBsentials.dcGameSDK;
+            List<Text> toRender = new ArrayList<>();
+            if (BBsentials.discordConfig.overlayShowSelfInfo) {
+                boolean muted = sdkManager.getCore().voiceManager().isSelfMute();
+                boolean deaf = sdkManager.getCore().voiceManager().isSelfDeaf();
+                if (muted && deaf) toRender.add(Text.of("§cMuted and Deafen"));
+                else if (deaf) toRender.add(Text.of("§cDeafen"));
+                else if (muted) toRender.add(Text.of("§cMuted"));
+            }
+            for (DiscordLobbyUser advancedLobbyMember : sdkManager.getAdvancedLobbyMembers()) {
+                toRender.add(Text.Serialization.fromJson(advancedLobbyMember.getAsDisplayName(sdkManager.getCore()).getJson()));
             }
             for (Text text : toRender) {
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);

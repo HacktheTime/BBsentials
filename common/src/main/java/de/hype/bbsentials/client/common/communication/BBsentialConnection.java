@@ -533,9 +533,9 @@ public class BBsentialConnection {
             if (BBsentials.bbthread != null) {
                 BBsentials.bbthread.interrupt();
             }
-            writer.close();
-            reader.close();
-            socket.close();
+            if (writer != null) writer.close();
+            if (reader != null) reader.close();
+            if (socket != null) socket.close();
             messageQueue.clear();
             if (BBsentials.bbthread != null) {
                 BBsentials.bbthread.join();
@@ -612,6 +612,10 @@ public class BBsentialConnection {
     public void onRequestActionDiscordLobbyPacket(RequestActionDiscordLobbyPacket packet) {
         try {
             RequestActionDiscordLobbyPacket.ActionType action = packet.action;
+            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.REQUESTINFO)) {
+                sendPacket(packet.preparePacketToReplyToThis(BBsentials.dcGameSDK.getLobbyAsPacket()));
+                return;
+            }
             if (BBsentials.dcGameSDK == null && packet.initIfNull) {
                 try {
                     BBsentials.dcGameSDK = new GameSDKManager();

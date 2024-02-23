@@ -5,6 +5,7 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.packets.network.DiscordLobbyPacket;
 import de.hype.bbsentials.shared.packets.network.RequestUserInfo;
 import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
@@ -21,12 +22,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -36,6 +36,8 @@ public class GameSDKManager extends DiscordEventAdapter {
     private Core core;
     private Lobby currentLobby;
 
+    private Map<Long, DiscordLobbyUser> members = new HashMap<>();
+
     public GameSDKManager() throws Exception {
         // Initialize the Core
         if (core == null) {
@@ -43,13 +45,14 @@ public class GameSDKManager extends DiscordEventAdapter {
             if (nativeLibrary == null)
                 throw new RuntimeException("Could not obtain the Native Library which is required!");
             Core.init(nativeLibrary);
-            connectToDiscord();
-            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
             BBsentials.executionService.execute(() -> {
                 while (!stop.get()) {
                     runContinously();
                 }
+                System.out.println("Exited stop");
             });
+            connectToDiscord();
+            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
         }
 
     }
@@ -265,7 +268,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public LobbyManager getLobbyManager() {
-        return BBsentials.dcGameSDK.getCore().lobbyManager();
+        return getCore().lobbyManager();
     }
 
     public void disconnectFromLobby(Lobby lobby) {
@@ -313,6 +316,7 @@ public class GameSDKManager extends DiscordEventAdapter {
 
                 }
             }));
+            initMembers();
         }, 10, TimeUnit.SECONDS);
         //Call for when I join a lobby // request too
     }
@@ -331,6 +335,7 @@ public class GameSDKManager extends DiscordEventAdapter {
                 manager.connectNetwork(lobby);
                 Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC join: Success");
             }));
+            initMembers();
         }, 10, TimeUnit.SECONDS);
     }
 
@@ -359,6 +364,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     public void createLobby(LobbyTransaction transaction) {
         disconnectLobby();
         getLobbyManager().createLobby(transaction, (result, lobby) -> currentLobby = lobby);
+        initMembers();
     }
 
     public void updateCurrentLobby(LobbyTransaction transaction) {
@@ -374,7 +380,7 @@ public class GameSDKManager extends DiscordEventAdapter {
         else trn.setType(LobbyType.PUBLIC);
         trn.setLocked(false);
         trn.setMetadata("hoster", mcUsername);
-        getLobbyManager().createLobby(trn, lobby1 -> lobby.set(lobby1));
+        getLobbyManager().createLobby(trn, lobby::set);
         while (lobby.get() == null) {
             try {
                 Thread.sleep(100);
@@ -383,6 +389,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             }
         }
         currentLobby = lobby.get();
+        initMembers();
     }
 
     public void openVoiceSettings() {
@@ -395,7 +402,7 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     @Override
     public void onSpeaking(long lobbyId, long userId, boolean speaking) {
-        Chat.sendPrivateMessageToSelfDebug(userId + " started speaking: " + speaking);
+        members.get(userId).setIsTalking(speaking);
     }
 
     public void blockingJoinLobby(Long lobbyId, String secret) {
@@ -408,6 +415,21 @@ public class GameSDKManager extends DiscordEventAdapter {
             } catch (InterruptedException e) {
             }
         }
+        initMembers();
+    }
+
+    private void initMembers() {
+        BBsentials.executionService.execute(() -> {
+            for (DiscordUser lobbyMember : getLobbyMembers()) {
+                try {
+                    if (members.get(lobbyMember.getUserId()) == null) {
+                        members.put(lobbyMember.getUserId(), new DiscordLobbyUser(lobbyMember, getCurrentLobby()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public void joinVC() {
@@ -430,17 +452,21 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Create the Core
             core = new Core(params);
             updateActivity();
+            initMembers();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public void disconnectLobby() {
         disconnectFromLobby(currentLobby);
         currentLobby = null;
+        members.clear();
     }
 
     public void blockingJoinLobbyWithActivitySecret(String activitySecret) {
         if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
+        members.clear();
         currentLobby = null;
         getLobbyManager().connectLobbyWithActivitySecret(activitySecret, (result, lobby) -> currentLobby = lobby);
         while (currentLobby == null) {
@@ -449,6 +475,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             } catch (InterruptedException e) {
             }
         }
+        initMembers();
     }
 
     public List<Lobby> blockingSearch(ISearchQuery query) {
@@ -459,6 +486,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     public void deleteLobby() {
         deleteLobby(currentLobby);
         currentLobby = null;
+        members.clear();
     }
 
     public void deleteLobby(Lobby lobby) {
@@ -471,7 +499,22 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     @Override
     public void onMemberConnect(long lobbyId, long userId) {
-        super.onMemberConnect(lobbyId, userId);
+        initMembers();
+    }
+
+    public DiscordLobbyPacket getLobbyAsPacket() {
+        DiscordLobbyPacket.Type type = DiscordLobbyPacket.Type.PUBLIC;
+        if (currentLobby.getType().equals(LobbyType.PRIVATE)) type = DiscordLobbyPacket.Type.PRIVATE;
+        return new DiscordLobbyPacket(getLobbyMembers().stream().map(DiscordUser::getUserId).collect(Collectors.toList()), type, currentLobby.getId(), currentLobby.getSecret(), currentLobby.getOwnerId(), currentLobby.getCapacity(), currentLobby.isLocked(), getLobbyManager().getLobbyMetadata(currentLobby));
+    }
+
+    public List<DiscordLobbyUser> getAdvancedLobbyMembers() {
+        return new ArrayList<>(members.values());
+    }
+
+    @Override
+    public void onMemberDisconnect(long lobbyId, long userId) {
+        initMembers();
     }
 
 

@@ -2,7 +2,6 @@ package de.hype.bbsentials.client.common.client.updatelisteners;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
-import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.SplashData;
@@ -43,7 +42,7 @@ public class SplashStatusUpdateListener extends UpdateListener {
 
     @Override
     public boolean allowOverlayOverall() {
-        return BBsentials.hudConfig.useSplashLeecherOverlayHud;
+        return BBsentials.splashConfig.useSplasherOverlay;
     }
 
     public void setStatus(StatusConstants newStatus) {

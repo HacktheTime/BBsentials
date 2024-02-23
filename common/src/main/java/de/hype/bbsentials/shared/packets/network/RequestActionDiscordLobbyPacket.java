@@ -22,6 +22,7 @@ public class RequestActionDiscordLobbyPacket extends AbstractPacket {
         JOINVC,
         DISCONNECT,
         DISCONNECTVC,
-        DELETE
+        DELETE,
+        REQUESTINFO
     }
 }

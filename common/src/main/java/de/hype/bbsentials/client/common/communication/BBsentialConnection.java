@@ -165,6 +165,11 @@ public class BBsentialConnection {
                         }
                         else {
                             Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected.");
+                            try {
+                                Thread.sleep(10000);
+                            } catch (Exception e) {
+
+                            }
                         }
                     }
                 } catch (IOException e) {

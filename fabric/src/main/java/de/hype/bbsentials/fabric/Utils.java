@@ -461,6 +461,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 else if (muted) toRender.add(Text.of("§cMuted"));
             }
             for (DiscordLobbyUser advancedLobbyMember : sdkManager.getAdvancedLobbyMembers()) {
+                if (advancedLobbyMember == null) continue;
                 toRender.add(Text.Serialization.fromJson(advancedLobbyMember.getAsDisplayName(sdkManager.getCore()).getJson()));
             }
             for (Text text : toRender) {

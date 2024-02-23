@@ -27,16 +27,27 @@ public abstract class CustomItemTextures {
     @Shadow
     public abstract void drawTooltip(TextRenderer textRenderer, Text text, int x, int y);
 
+    @Shadow
+    public abstract int drawText(TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow);
+
+    @Shadow
+    public abstract void drawGuiTexture(Identifier texture, int x, int y, int z, int width, int height);
+
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), cancellable = true)
     private void onRenderItem(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
         for (CustomItemTexture itemTexture : BBsentials.customItemTextures.values()) {
             String nbtString = "";
             NbtCompound nbt = stack.getNbt();
+            String stackItemName = stack.getName().getString();
             if (nbt != null) nbtString = nbt.toString();
-            if (itemTexture.isItem(stack.getName().getString(), "", nbtString, stack)) {
+            if (itemTexture.isItem(stackItemName, nbtString, stack)) {
                 drawGuiTexture(new Identifier(itemTexture.nameSpace, itemTexture.renderTextureId), x, y, 16, 16);
                 ci.cancel();
             }
+        }
+        if ((BBsentials.splashConfig.smallestHubName != null) && stack.getName().getString().equals(BBsentials.splashConfig.smallestHubName)) {
+            drawGuiTexture(new Identifier("bbsentials:customitems/low_player_hub"), x, y, 16, 16);
+            ci.cancel();
         }
 //        if (stack.getItem() == Items.POTION) {
 //            try {

@@ -229,7 +229,7 @@ public class Commands implements MCCommand {
                                 .then(argument("activity secret", StringArgumentType.string())
                                         .executes(context -> {
                                             try {
-                                                BBsentials.dcGameSDK.blockingJoinLobbyWithActivitySecret(StringArgumentType.getString(context, "lobbyid"));
+                                                BBsentials.dcGameSDK.blockingJoinLobbyWithActivitySecret(StringArgumentType.getString(context, "activity secret"));
                                                 Chat.sendPrivateMessageToSelfSuccess("Success");
                                             } catch (Exception e) {
                                                 Chat.sendPrivateMessageToSelfError("Error");

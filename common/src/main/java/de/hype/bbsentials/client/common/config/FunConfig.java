@@ -6,6 +6,8 @@ public class FunConfig extends BBsentialsConfig {
     public boolean swapOnlyNormal = true;
     public boolean swapOnlyBBsentials = false;
     public transient String overwriteActionBar = "";
+    public Boolean hub29Troll = false;
+    public Boolean hub17To29Troll = false;
 
     public FunConfig() {
         super(1);

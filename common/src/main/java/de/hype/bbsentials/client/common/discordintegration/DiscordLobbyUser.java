@@ -50,4 +50,8 @@ public class DiscordLobbyUser {
         if (isTalking) return Message.of(Formatting.GREEN + dcUsername);
         else return Message.of(Formatting.GRAY + dcUsername);
     }
+
+    public boolean isTalking() {
+        return isTalking;
+    }
 }

@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,6 +37,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     private Core core;
     private Lobby currentLobby;
 
+    private ScheduledFuture callbackRunner;
     private Map<Long, DiscordLobbyUser> members = new HashMap<>();
 
     public GameSDKManager() throws Exception {
@@ -45,13 +47,14 @@ public class GameSDKManager extends DiscordEventAdapter {
             if (nativeLibrary == null)
                 throw new RuntimeException("Could not obtain the Native Library which is required!");
             Core.init(nativeLibrary);
-            BBsentials.executionService.execute(() -> {
-                while (!stop.get()) {
+            callbackRunner = BBsentials.executionService.scheduleAtFixedRate(() -> {
+                try {
                     runContinously();
+                } catch (Exception ignored) {
                 }
-            });
+            }, 0, 14, TimeUnit.MILLISECONDS);
             connectToDiscord();
-            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
+            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 20, TimeUnit.SECONDS);
         }
 
     }
@@ -133,8 +136,12 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     public void runContinously() {
         try {
-            // Sleep a bit to save CPU
             core.runCallbacks();
+        } catch (Exception e) {
+
+        }
+        try {
+            // Sleep a bit to save CPU
             Thread.sleep(16);
         } catch (InterruptedException e) {
             e.printStackTrace();

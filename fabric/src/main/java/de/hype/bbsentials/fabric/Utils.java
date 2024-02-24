@@ -5,7 +5,6 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.discordintegration.DiscordLobbyUser;
 import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.RouteNode;
@@ -448,7 +447,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        if (BBsentials.discordConfig.overlay) {
+        if (BBsentials.discordConfig.overlay && BBsentials.dcGameSDK.getAdvancedLobbyMembers().size() > 1) {
             int x = 10;
             int y = 15;
             GameSDKManager sdkManager = BBsentials.dcGameSDK;
@@ -460,9 +459,15 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 else if (deaf) toRender.add(Text.of("§cDeafen"));
                 else if (muted) toRender.add(Text.of("§cMuted"));
             }
-            for (DiscordLobbyUser advancedLobbyMember : sdkManager.getAdvancedLobbyMembers()) {
-                if (advancedLobbyMember == null) continue;
-                toRender.add(Text.Serialization.fromJson(advancedLobbyMember.getAsDisplayName(sdkManager.getCore()).getJson()));
+            if (BBsentials.dcGameSDK.getAdvancedLobbyMembers().size() >= 10 || BBsentials.discordConfig.showOnlySpeakingInOverlay) {
+                sdkManager.getAdvancedLobbyMembers().stream().filter((user -> user != null && user.isTalking())).forEach(user -> {
+                    toRender.add(Text.Serialization.fromJson(user.getAsDisplayName(sdkManager.getCore()).getJson()));
+                });
+            }
+            else {
+                sdkManager.getAdvancedLobbyMembers().stream().filter((Objects::nonNull)).forEach(user -> {
+                    toRender.add(Text.Serialization.fromJson(user.getAsDisplayName(sdkManager.getCore()).getJson()));
+                });
             }
             for (Text text : toRender) {
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);

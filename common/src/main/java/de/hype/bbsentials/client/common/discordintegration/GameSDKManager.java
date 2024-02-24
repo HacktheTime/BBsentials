@@ -54,7 +54,7 @@ public class GameSDKManager extends DiscordEventAdapter {
                 }
             }, 0, 14, TimeUnit.MILLISECONDS);
             connectToDiscord();
-            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 1, TimeUnit.MINUTES);
+            BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 20, TimeUnit.SECONDS);
         }
 
     }

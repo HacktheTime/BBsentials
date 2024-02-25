@@ -8,6 +8,7 @@ public class DiscordConfig extends BBsentialsConfig {
     public boolean allowCustomCommands = false;
     public boolean deleteHistoryOnStart = true;
     public boolean overlayShowSelfInfo = true;
+    public boolean showOnlySpeakingInOverlay = false;
     /**
      * disableTemporary can be modified by the Bot via a command so you dont get annoyed by its messages but can enable it from remote if you want so.
      */

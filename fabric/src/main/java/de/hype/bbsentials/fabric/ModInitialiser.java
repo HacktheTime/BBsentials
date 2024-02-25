@@ -382,6 +382,9 @@ public class ModInitialiser implements ClientModInitializer {
             if (visualConfig.doGammaOverride) {
                 new Options().setGamma(10);
             }
+            if (EnvironmentCore.utils.getUsername().equals("p0iS")) {
+                funConfig.hub17To29Troll = true;
+            }
         });
     }
 

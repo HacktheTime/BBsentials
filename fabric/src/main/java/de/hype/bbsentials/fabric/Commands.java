@@ -238,8 +238,31 @@ public class Commands implements MCCommand {
                                             return 1;
                                         })
                                 )
-
                         )
+                        .then(literal("mute").executes(context -> {
+                            try {
+                                boolean mute = !BBsentials.dcGameSDK.getCore().voiceManager().isSelfMute();
+                                BBsentials.dcGameSDK.getCore().voiceManager().setSelfMute(mute);
+                                if (mute) Chat.sendPrivateMessageToSelfSuccess("You are now muted");
+                                else Chat.sendPrivateMessageToSelfSuccess("You are now UNmuted");
+                                return 1;
+                            } catch (Exception e) {
+                                Chat.sendPrivateMessageToSelfError("Could not mute etc. Are you connected?");
+                                return 0;
+                            }
+                        }))
+                        .then(literal("deafen").executes(context -> {
+                            try {
+                                boolean mute = !BBsentials.dcGameSDK.getCore().voiceManager().isSelfMute();
+                                BBsentials.dcGameSDK.getCore().voiceManager().setSelfMute(mute);
+                                if (mute) Chat.sendPrivateMessageToSelfSuccess("You are now deafened");
+                                else Chat.sendPrivateMessageToSelfSuccess("You are not longer deafened");
+                                return 1;
+                            } catch (Exception e) {
+                                Chat.sendPrivateMessageToSelfError("Could not mute etc. Are you connected?");
+                                return 0;
+                            }
+                        }))
                         .then(literal("getActivitySecret").executes(context -> {
                             if (BBsentials.dcGameSDK.getCurrentLobby() == null) {
                                 Chat.sendPrivateMessageToSelfError("You are not in a Lobby.");

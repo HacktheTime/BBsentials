@@ -148,6 +148,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("What Color should waypoints have by default"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultColor = new java.awt.Color(newValue))
                     .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Position as Item Count"), BBsentials.visualConfig.waypointDefaultWithTracer)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Will show your leaderboard postion for the community goals as item count"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultWithTracer = newValue)
+                    .build());
         }
         //Visual
         ConfigCategory notifications = builder.getOrCreateCategory(Text.of("Notifications"));
@@ -181,6 +186,16 @@ public class BBsentialsConfigScreenFactory {
         //Notifications
         ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));
         {
+            BooleanListEntry hub29Troll = (entryBuilder.startBooleanToggle(Text.of("Hub 29s"), BBsentials.funConfig.hub29Troll)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Will replace hubs in hub selector with hub 29.\n Example: Skyblock Hub #17 → Skyblock Hub #29 (17)"))
+                    .setSaveConsumer(newValue -> BBsentials.funConfig.hub29Troll = newValue)
+                    .build());
+            BooleanListEntry hub17To29Troll = (entryBuilder.startBooleanToggle(Text.of("Hub 17→29"), BBsentials.funConfig.hub17To29Troll)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Will replace hub 17 with hub 29 in hub selector."))
+                    .setSaveConsumer(newValue -> BBsentials.funConfig.hub17To29Troll = newValue)
+                    .build());
             other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), BBsentials.partyConfig.acceptReparty)
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
@@ -210,6 +225,8 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Swap only the messages from BBsentials"))
                     .setSaveConsumer(newValue -> BBsentials.funConfig.swapOnlyBBsentials = newValue)
                     .build());
+            trolls.add(hub29Troll);
+            trolls.add(hub17To29Troll);
             trolls.add(swapActionBarAndChat);
             trolls.add(swapActionBarAndChatOnlyNormal);
             trolls.add(swapActionBarAndChatOnlyBB);
@@ -445,6 +462,16 @@ public class BBsentialsConfigScreenFactory {
                         .setTooltip(Text.of("Will connect you to the vc when someone joins."))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.connectVoiceOnJoining = newValue)
                         .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Speakers only"), BBsentials.discordConfig.showOnlySpeakingInOverlay)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Only talking players will be shown in the overlay. If more than 10 players are in a lobby this is always the case"))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.showOnlySpeakingInOverlay = newValue)
+                        .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Self Info"), BBsentials.discordConfig.overlayShowSelfInfo)
+                        .setDefaultValue(false)
+                        .setTooltip(Text.of("Will add a row at the top of the hud where you are informed when you are muted or deafened."))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.overlayShowSelfInfo = newValue)
+                        .build());
                 discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Room default Private"), BBsentials.discordConfig.discordRoomsDefaultPrivate)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Players wont be able to join without asking in the Lobby to join."))
@@ -523,11 +550,16 @@ public class BBsentialsConfigScreenFactory {
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.useSplasherOverlay = newValue)
                     .build();
             splasher.addEntry(showLeecherHud);
-            entryBuilder.startBooleanToggle(Text.of("Show Music Pants Users"), BBsentials.splashConfig.showMusicPantsUsers)
+            splasher.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Music Pants Users"), BBsentials.splashConfig.showMusicPantsUsers)
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Displays a small red note symbol in front of the username if they wear music pants. Displays everybody with it not just non Bingos"))
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.showMusicPantsUsers = newValue)
-                    .build();
+                    .build());
+            splasher.addEntry(entryBuilder.startBooleanToggle(Text.of("Highlight Smallest Hub"), BBsentials.splashConfig.showSmallestHub)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Will highlight the smallest hub with a magenta texture."))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.showSmallestHub = newValue)
+                    .build());
 
         }
         return builder.build();

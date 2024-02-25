@@ -6,7 +6,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -35,19 +38,46 @@ public abstract class CustomItemTextures {
 
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), cancellable = true)
     private void onRenderItem(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
+        String stackItemName = stack.getName().getString();
+        if (BBsentials.funConfig.hub17To29Troll) {
+            if (stack.getName().getString().equals("SkyBlock Hub #17")) {
+                stack.setCustomName(Text.translatable("§aSkyBlock Hub #29"));
+                stack.setCount(29);
+            }
+        }
+        if (BBsentials.funConfig.hub29Troll) {
+            if (stack.getName().getString().startsWith("SkyBlock Hub #")) {
+                if (!stack.getName().getString().endsWith("29")) {
+                    stack.setCustomName(Text.translatable("§aSkyBlock Hub #29 (" + stackItemName.replaceAll("\\D", "") + ")"));
+                    stack.setCount(29);
+                }
+            }
+        }
+        if ((stack.getItem() == Items.EMERALD_BLOCK || stack.getItem() == Items.IRON_BLOCK) && BBsentials.visualConfig.showContributorPositionInCount) {
+            NbtList list = stack.getNbt().getCompound("display").getList("Lore", NbtElement.STRING_TYPE);
+            if (list.size() >= 23) {
+                String string = Text.Serialization.fromJson(list.get(23).asString()).getString();
+                if (string.contains("contributor")) {
+                    int position = Integer.parseInt(string.replaceAll("\\D", ""));
+                    stack.setCount(position);
+                }
+            }
+        }
         for (CustomItemTexture itemTexture : BBsentials.customItemTextures.values()) {
             String nbtString = "";
             NbtCompound nbt = stack.getNbt();
-            String stackItemName = stack.getName().getString();
+
             if (nbt != null) nbtString = nbt.toString();
             if (itemTexture.isItem(stackItemName, nbtString, stack)) {
                 drawGuiTexture(new Identifier(itemTexture.nameSpace, itemTexture.renderTextureId), x, y, 16, 16);
                 ci.cancel();
+                return;
             }
         }
-        if ((BBsentials.splashConfig.smallestHubName != null) && stack.getName().getString().equals(BBsentials.splashConfig.smallestHubName)) {
+        if (BBsentials.splashConfig.showSmallestHub && (BBsentials.splashConfig.smallestHubName != null) && stack.getName().getString().equals(BBsentials.splashConfig.smallestHubName)) {
             drawGuiTexture(new Identifier("bbsentials:customitems/low_player_hub"), x, y, 16, 16);
             ci.cancel();
+            return;
         }
 //        if (stack.getItem() == Items.POTION) {
 //            try {

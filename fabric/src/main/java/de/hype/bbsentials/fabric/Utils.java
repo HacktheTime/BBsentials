@@ -447,7 +447,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        if (BBsentials.discordConfig.overlay && BBsentials.dcGameSDK.getAdvancedLobbyMembers().size() > 1) {
+        if (BBsentials.discordConfig.overlay && BBsentials.dcGameSDK != null && BBsentials.dcGameSDK.getAdvancedLobbyMembers().size() > 1) {
             int x = 10;
             int y = 15;
             GameSDKManager sdkManager = BBsentials.dcGameSDK;

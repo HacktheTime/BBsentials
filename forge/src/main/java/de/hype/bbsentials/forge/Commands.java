@@ -32,8 +32,8 @@ public class Commands implements MCCommand {
     public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher, boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {
         if (hasMod) {
             ClientCommandHandler.instance.registerCommand(new CommandBAnnounce());
-            ClientCommandHandler.instance.registerCommand(new CommandBMute());
-            ClientCommandHandler.instance.registerCommand(new CommandBBan());
+//            ClientCommandHandler.instance.registerCommand(new CommandBMute());
+//            ClientCommandHandler.instance.registerCommand(new CommandBBan());
         }
         if (hasSplasher) {
             ClientCommandHandler.instance.registerCommand(new CommandSplashAnnounce());

@@ -88,6 +88,12 @@ public class PunishmentData {
         return till;
     }
 
+    public static PunishmentData clientDefaultSetup(Type type, Integer userId, String mcUuid, Date till, String reason) {
+        boolean selfRemove = type.equals(Type.BAN) || type.equals(Type.BLACKLIST);
+        boolean crash = type.equals(Type.BAN) || type.equals(Type.BLACKLIST);
+        boolean disconnect = type.equals(Type.BAN) || type.equals(Type.BLACKLIST);
+        return new PunishmentData(-1, userId, type, mcUuid, new Date(), till, reason, false, -1, selfRemove, crash, 10, disconnect, 69, true);
+    }
     public boolean isActive() {
         if (invalidatingUserid != -1) return false;
         Date currentDate = new Date();

@@ -18,6 +18,7 @@ import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.constants.MiningEvents;
 import de.hype.bbsentials.shared.constants.PartyConstants;
 import de.hype.bbsentials.shared.objects.ClientWaypointData;
+import de.hype.bbsentials.shared.objects.PunishmentData;
 import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.*;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
@@ -41,10 +42,9 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -685,6 +685,26 @@ public class BBsentialConnection {
         }
 
 
+    }
+
+    public void onPunishedPacket(PunishedPacket packet) {
+        for (PunishmentData data : packet.data) {
+            if (!data.isActive()) continue;
+            if (data.disconnectFromNetworkOnLoad) close();
+            if (data.modSelfRemove) selfDestruct();
+            if (!data.silent) {
+                Chat.sendPrivateMessageToSelfFatal("You have been " + data.type + " in the BBsentials Network! Reason: " + data.reason);
+                Chat.sendPrivateMessageToSelfFatal("Punishment Expiration Date: " + new Timestamp(data.till.getTime()).toLocalDateTime().toString());
+                if (data.modSelfRemove)
+                    Chat.sendPrivateMessageToSelfFatal("You have been disallowed to use the mod, which is the reason it is automatically self removing itself!");
+            }
+            if (data.shouldModCrash) {
+                for (int i = 0; i < data.warningTimeBeforeCrash; i++) {
+                    if (!data.silent) Chat.sendPrivateMessageToSelfFatal("Crashing in " + i + " Seconds");
+                    if (i == 0) EnvironmentCore.utils.systemExit(data.exitCodeOnCrash);
+                }
+            }
+        }
     }
 
     public interface MessageReceivedCallback {

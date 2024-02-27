@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PunishedPacket extends AbstractPacket {
-    List<PunishmentData> data;
+    public List<PunishmentData> data;
 
     public PunishedPacket(List<PunishmentData> punishments) {
         super(1, 1);

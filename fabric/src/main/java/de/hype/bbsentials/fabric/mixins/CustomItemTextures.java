@@ -55,11 +55,13 @@ public abstract class CustomItemTextures {
         }
         if ((stack.getItem() == Items.EMERALD_BLOCK || stack.getItem() == Items.IRON_BLOCK) && BBsentials.visualConfig.showContributorPositionInCount) {
             NbtList list = stack.getNbt().getCompound("display").getList("Lore", NbtElement.STRING_TYPE);
-            if (list.size() >= 23) {
-                String string = Text.Serialization.fromJson(list.get(23).asString()).getString();
-                if (string.contains("contributor")) {
-                    int position = Integer.parseInt(string.replaceAll("\\D", ""));
-                    stack.setCount(position);
+            if (list.size() >= 20) {
+                for (int i = 20; i < list.size(); i++) {
+                    String string = Text.Serialization.fromJson(list.get(i).asString()).getString();
+                    if (string.contains("contributor")) {
+                        int position = Integer.parseInt(string.replaceAll("\\D", ""));
+                        stack.setCount(position);
+                    }
                 }
             }
         }

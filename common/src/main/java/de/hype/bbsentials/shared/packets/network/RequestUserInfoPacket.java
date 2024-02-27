@@ -6,7 +6,7 @@ import de.hype.bbsentials.shared.objects.PunishmentData;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RequestUserInfo extends AbstractPacket {
+public class RequestUserInfoPacket extends AbstractPacket {
     public final boolean requestUpToDateData;
     public final Integer bbUserId;
     public final String mcUsername;
@@ -18,7 +18,7 @@ public class RequestUserInfo extends AbstractPacket {
     public List<String> roles;
     public List<PunishmentData> punishments;
 
-    public RequestUserInfo(boolean requestUpToDateData, Integer bbUserId, String mcUsername, Long dcUserId, Integer cardCount, Integer bingoPoints, String displayPrefix) {
+    public RequestUserInfoPacket(boolean requestUpToDateData, Integer bbUserId, String mcUsername, Long dcUserId, Integer cardCount, Integer bingoPoints, String displayPrefix) {
         super(1, 1);
         this.requestUpToDateData = requestUpToDateData;
         this.bbUserId = bbUserId;
@@ -29,7 +29,7 @@ public class RequestUserInfo extends AbstractPacket {
         this.displayPrefix = displayPrefix;
     }
 
-    public RequestUserInfo(boolean requestUpToDateData, Integer bbUserId, String mcUsername, Long dcUserId) {
+    public RequestUserInfoPacket(boolean requestUpToDateData, Integer bbUserId, String mcUsername, Long dcUserId) {
         super(1, 1);
 
         this.requestUpToDateData = requestUpToDateData;
@@ -41,8 +41,8 @@ public class RequestUserInfo extends AbstractPacket {
         this.displayPrefix = null;
     }
 
-    public static RequestUserInfo fromDCUserID(long userId, boolean requestUpToDateData) {
-        return new RequestUserInfo(requestUpToDateData, null, null, userId);
+    public static RequestUserInfoPacket fromDCUserID(long userId, boolean requestUpToDateData) {
+        return new RequestUserInfoPacket(requestUpToDateData, null, null, userId);
     }
 
     public List<PunishmentData> getActivePunishments() {

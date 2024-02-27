@@ -6,7 +6,7 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.packets.network.DiscordLobbyPacket;
-import de.hype.bbsentials.shared.packets.network.RequestUserInfo;
+import de.hype.bbsentials.shared.packets.network.RequestUserInfoPacket;
 import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityJoinRequestReply;
@@ -223,16 +223,16 @@ public class GameSDKManager extends DiscordEventAdapter {
         else if (user.getUsername().equals("ooffyy")) username.set("ooffyy");
         else if (user.getUsername().equals("mininoob46")) username.set("mininoob46");
         else {
-            BBsentials.connection.sendPacket(RequestUserInfo.fromDCUserID(user.getUserId(), false));
-            BBsentials.connection.packetIntercepts.add(new InterceptPacketInfo<RequestUserInfo>(RequestUserInfo.class, true, true, false, false) {
+            BBsentials.connection.sendPacket(RequestUserInfoPacket.fromDCUserID(user.getUserId(), false));
+            BBsentials.connection.packetIntercepts.add(new InterceptPacketInfo<RequestUserInfoPacket>(RequestUserInfoPacket.class, true, true, false, false) {
                 @Override
-                public void run(RequestUserInfo packet) {
+                public void run(RequestUserInfoPacket packet) {
                     if (packet.mcUsername == null) {
                         core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.NO);
                         Chat.sendPrivateMessageToSelfError("BB: DC RPC: DC username: " + user.getUsername() + " requested to join but was denied cause they are not registered.");
                         return;
                     }
-                    if (packet.isUserPunished()) {
+                    if (!packet.getActivePunishments().isEmpty()) {
                         core.activityManager().sendRequestReply(user.getUserId(), ActivityJoinRequestReply.NO);
                         Chat.sendPrivateMessageToSelfError("BB: DC RPC: DC username: " + user.getUsername() + " requested to join but was denied since their is a punishment ongoing");
                         return;

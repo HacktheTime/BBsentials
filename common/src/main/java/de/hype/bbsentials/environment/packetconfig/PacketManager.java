@@ -3,6 +3,7 @@ package de.hype.bbsentials.environment.packetconfig;
 import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
+import de.hype.bbsentials.shared.objects.PunishmentData;
 import de.hype.bbsentials.shared.packets.function.*;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
@@ -63,6 +64,7 @@ public class PacketManager {
         packets.add(new Packet<>(CompletedGoalPacket.class, connection::onCompletedGoalPacket));
         packets.add(new Packet<>(WantedSearchPacket.class, connection::onWantedSearchPacket));
         packets.add(new Packet<>(SkyblockLobbyDataPacket.class, connection::onSkyblockLobbyDataPacket));
+        packets.add(new Packet<>(PunishedPacket.class, connection::onPunishedPacket));
         packets.add(new Packet<>(RequestActionDiscordLobbyPacket.class, connection::onRequestActionDiscordLobbyPacket));
         packets.add(new Packet<>(DiscordLobbyPacket.class, connection::onDiscordLobbyPacket));
         packets.add(new Packet<>(PlaySoundPacket.class, connection::onPlaySoundPacket));

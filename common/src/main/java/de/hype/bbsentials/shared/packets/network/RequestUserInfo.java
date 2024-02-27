@@ -1,8 +1,10 @@
 package de.hype.bbsentials.shared.packets.network;
 
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
+import de.hype.bbsentials.shared.objects.PunishmentData;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestUserInfo extends AbstractPacket {
     public final boolean requestUpToDateData;
@@ -14,12 +16,10 @@ public class RequestUserInfo extends AbstractPacket {
     public final String displayPrefix;
 
     public List<String> roles;
+    public List<PunishmentData> punishments;
 
-    //TODO completed cards by type?
-    //TODO    public List<PunishmentData> punishments;
     public RequestUserInfo(boolean requestUpToDateData, Integer bbUserId, String mcUsername, Long dcUserId, Integer cardCount, Integer bingoPoints, String displayPrefix) {
         super(1, 1);
-
         this.requestUpToDateData = requestUpToDateData;
         this.bbUserId = bbUserId;
         this.mcUsername = mcUsername;
@@ -45,9 +45,8 @@ public class RequestUserInfo extends AbstractPacket {
         return new RequestUserInfo(requestUpToDateData, null, null, userId);
     }
 
-    public boolean isUserPunished() {
-        return false;
-        //TODO implement ban data here
+    public List<PunishmentData> getActivePunishments() {
+        return punishments.stream().filter(PunishmentData::isActive).collect(Collectors.toList());
     }
 
     public boolean hasRole(String role) {

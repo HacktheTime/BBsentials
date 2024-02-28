@@ -46,7 +46,7 @@ public class GameSDKManager extends DiscordEventAdapter {
             File nativeLibrary = downloadNativeLibrary();
             if (nativeLibrary == null)
                 throw new RuntimeException("Could not obtain the Native Library which is required!");
-            Core.init(nativeLibrary);
+            Core.initDownload();
             callbackRunner = BBsentials.executionService.scheduleAtFixedRate(() -> {
                 try {
                     runContinously();
@@ -237,7 +237,7 @@ public class GameSDKManager extends DiscordEventAdapter {
                         Chat.sendPrivateMessageToSelfError("BB: DC RPC: DC username: " + user.getUsername() + " requested to join but was denied since their is a punishment ongoing");
                         return;
                     }
-                    acceptUserJoinRequest(user, mcUsername, packet.hasRole("mod"));
+                        acceptUserJoinRequest(user, mcUsername, packet.hasRole("mod"));
                 }
             });
         }

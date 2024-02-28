@@ -9,6 +9,7 @@ import de.jcm.discordgamesdk.lobby.Lobby;
 import de.jcm.discordgamesdk.user.DiscordUser;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class DiscordLobbyUser {
     public final Long id;
@@ -48,7 +49,9 @@ public class DiscordLobbyUser {
             else return Message.of(Formatting.RED + dcUsername);
         }
         if (isTalking) return Message.of(Formatting.GREEN + dcUsername);
-        else return Message.of(Formatting.GRAY + dcUsername);
+        else
+            if (Objects.equals(dcUsername, "mininoob46")) return Message.of(Formatting.DARK_AQUA + "Mininoob46 (The Best)");
+            else return Message.of(Formatting.GRAY + dcUsername);
     }
 
     public boolean isTalking() {

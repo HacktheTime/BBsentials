@@ -27,8 +27,8 @@ public class RouteNodeConfigScreen {
         main.addEntry(entryBuilder.startColorField(Text.literal("Render Color"), Color.ofRGB(data.color.getRed(), data.color.getGreen(), data.color.getBlue()))
                 .setSaveConsumer((value) -> data.color = new java.awt.Color(value)).build());
         main.addEntry(entryBuilder.startIntField(Text.literal("X:"), data.coords.x).setDefaultValue(data.coords.x).setSaveConsumer((newx) -> data.coords.x = newx).build());
-        main.addEntry(entryBuilder.startIntField(Text.literal("Y:"), data.coords.y).setDefaultValue(data.coords.y).setSaveConsumer((newy) -> data.coords.x = newy).build());
-        main.addEntry(entryBuilder.startIntField(Text.literal("Z:"), data.coords.z).setDefaultValue(data.coords.z).setSaveConsumer((newz) -> data.coords.x = newz).build());
+        main.addEntry(entryBuilder.startIntField(Text.literal("Y:"), data.coords.y).setDefaultValue(data.coords.y).setSaveConsumer((newy) -> data.coords.y = newy).build());
+        main.addEntry(entryBuilder.startIntField(Text.literal("Z:"), data.coords.z).setDefaultValue(data.coords.z).setSaveConsumer((newz) -> data.coords.z = newz).build());
         main.addEntry(entryBuilder.startIntField(Text.literal("Trigger Next Distance:"), data.triggerNextRange).setDefaultValue(-1).setSaveConsumer((newvalue) -> data.triggerNextRange = newvalue).setTooltip(Text.literal("Distance to the point that will trigger to hide this waypoint and show the next one.")).build());
         try {
             return builder.build();

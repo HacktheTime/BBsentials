@@ -536,3 +536,4 @@ public class GameSDKManager extends DiscordEventAdapter {
         LobbySearchQuery configureSearch(LobbySearchQuery query);
     }
 }
+

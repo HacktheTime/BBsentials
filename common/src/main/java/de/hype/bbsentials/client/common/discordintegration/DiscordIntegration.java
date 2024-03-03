@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -212,6 +213,10 @@ public class DiscordIntegration extends ListenerAdapter {
                 Commands.slash("clear", "clears the messages sent by the bot"),
                 Commands.slash("status-disable", "Disable the Output"),
                 Commands.slash("status-enable", "Enable the Output"),
+                Commands.slash("shutdown", "Shuts down your pc"),
+                Commands.slash("suspend", "Puts your pc into sleep"),
+                Commands.slash("hibernate", "Puts your pc into hibernation (shutdown but restart with all application data)"),
+
                 Commands.slash("custom", "allows you to specify a custom command to be executed").addOption(OptionType.STRING, "command", "command to be executed", true)
         ).queue();
     }
@@ -284,6 +289,30 @@ public class DiscordIntegration extends ListenerAdapter {
                 }
                 BBsentials.discordConfig.setDisableTemporary(true);
                 reply(event, new EmbedBuilder().setColor(Color.GREEN).setTitle("Status: Disabled").setDescription("Status you no longer receive messages here").build());
+            }
+            else if (event.getName().equals("shutdown")) {
+                try {
+                    EnvironmentCore.utils.shutdownPC();
+                    reply(event, "Shutting down in 20 Seconds");
+                } catch (IOException e) {
+                    reply(event, "Error Occcur: " + e.getMessage());
+                }
+            }
+            else if (event.getName().equals("suspend")) {
+                try {
+                    EnvironmentCore.utils.suspendPC();
+                    reply(event, "Going into sleep in 20 Seconds");
+                } catch (IOException e) {
+                    reply(event, "Error Occcur: " + e.getMessage());
+                }
+            }
+            else if (event.getName().equals("hibernate")) {
+                try {
+                    EnvironmentCore.utils.hibernatePC();
+                    reply(event, "Going into hibernation in 20 Seconds");
+                } catch (IOException e) {
+                    reply(event, "Error Occcur: " + e.getMessage());
+                }
             }
         }
         else {

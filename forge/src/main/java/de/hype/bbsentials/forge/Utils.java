@@ -223,6 +223,16 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     @Override
+    public boolean isInGame() {
+        return Minecraft.getMinecraft().thePlayer != null;
+    }
+
+    @Override
+    public void showErrorScreen(String s) {
+
+    }
+
+    @Override
     public List<String> getPlayers() {
         return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getFormattedText()).collect(Collectors.toList());
     }

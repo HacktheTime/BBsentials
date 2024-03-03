@@ -20,6 +20,7 @@ import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -522,6 +523,16 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     @Override
     public void systemExit(int id) {
         System.exit(id);
+    }
+
+    @Override
+    public boolean isInGame() {
+        return MinecraftClient.getInstance().player != null;
+    }
+
+    @Override
+    public void showErrorScreen(String message) {
+        MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen), Text.of("§cBBsentials"), Text.of(message), Text.of("OK"), true));
     }
 
     public long getLobbyTime() {

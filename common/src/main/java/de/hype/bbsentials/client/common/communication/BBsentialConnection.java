@@ -13,10 +13,7 @@ import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
 import de.hype.bbsentials.environment.packetconfig.PacketUtils;
-import de.hype.bbsentials.shared.constants.AuthenticationConstants;
-import de.hype.bbsentials.shared.constants.Islands;
-import de.hype.bbsentials.shared.constants.MiningEvents;
-import de.hype.bbsentials.shared.constants.PartyConstants;
+import de.hype.bbsentials.shared.constants.*;
 import de.hype.bbsentials.shared.objects.ClientWaypointData;
 import de.hype.bbsentials.shared.objects.PunishmentData;
 import de.hype.bbsentials.shared.objects.SplashData;
@@ -43,8 +40,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -354,21 +353,28 @@ public class BBsentialConnection {
     }
 
     public void onDisconnectPacket(DisconnectPacket packet) {
-        Chat.sendPrivateMessageToSelfError(packet.displayMessage);
-        try {
-            BBsentials.connection.close();
-        } catch (Exception ignored) {
+        if (EnvironmentCore.utils.isInGame()) {
+            Chat.sendPrivateMessageToSelfError(packet.displayMessage);
+            try {
+                BBsentials.connection.close();
+            } catch (Exception ignored) {
+            }
+            for (int i = 0; i < packet.waitBeforeReconnect.length; i++) {
+                int finalI = i;
+                BBsentials.executionService.schedule(() -> {
+                    if (finalI == 0) {
+                        BBsentials.connectToBBserver();
+                    }
+                    else {
+                        BBsentials.conditionalReconnectToBBserver();
+                    }
+                }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)), TimeUnit.SECONDS);
+            }
         }
-        for (int i = 0; i < packet.waitBeforeReconnect.length; i++) {
-            int finalI = i;
-            BBsentials.executionService.schedule(() -> {
-                if (finalI == 0) {
-                    BBsentials.connectToBBserver();
-                }
-                else {
-                    BBsentials.conditionalReconnectToBBserver();
-                }
-            }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)), TimeUnit.SECONDS);
+        else {
+            if (packet.internalReason.equals(InternalReasonConstants.NOT_REGISTERED))
+                EnvironmentCore.utils.showErrorScreen("Could not connect to the network. Reason: \n" + packet.displayMessage);
+            else EnvironmentCore.utils.showErrorScreen(packet.displayMessage);
         }
     }
 

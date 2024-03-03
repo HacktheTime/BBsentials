@@ -5,21 +5,14 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.mclibraries.Utils;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineEvent;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -231,8 +224,8 @@ public class Chat {
         else if (BBsentials.generalConfig.doAllChatCustomMenu) {
             try {
                 message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
-            }catch (Exception e){
-                Chat.sendPrivateMessageToSelfError("Error with Message: "+message.getUnformattedString());
+            } catch (Exception e) {
+                Chat.sendPrivateMessageToSelfError("Error with Message: " + message.getUnformattedString());
             }
         }
 
@@ -372,7 +365,7 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp to the \",\"color\":\"green\"},{\"text\":\"Desert Settelment\",\"color\":\"gold\"}]"));
                 }
                 else if (messageUnformatted.startsWith("BINGO GOAL COMPLETE! ")) {
-                    BBsentials.connection.sendPacket(new CompletedGoalPacket(messageUnformatted.replace("BINGO GOAL COMPLETE!","").trim(), "", CompletedGoalPacket.CompletionType.GOAL, "", -1));
+                    BBsentials.connection.sendPacket(new CompletedGoalPacket(messageUnformatted.replace("BINGO GOAL COMPLETE!", "").trim(), "", CompletedGoalPacket.CompletionType.GOAL, "", -1));
                 }
                 else if (messageUnformatted.matches("You completed all 20 goals for the \\w+ \\d{4} Bingo Event!")) {
                     Chat.sendPrivateMessageToSelfImportantInfo("BB: Detected Card Completion. GG!\nThis will be verified shortly. If you want to get special Roles enable your APIs ASAP");
@@ -578,7 +571,7 @@ public class Chat {
 
     public void sendNotification(String title, String text, float volume) {
         BBsentials.executionService.execute(() -> {
-            EnvironmentCore.utils.playCustomSound("/sounds/mixkit-sci-fi-confirmation-914.wav",0);
+            EnvironmentCore.utils.playCustomSound("/sounds/mixkit-sci-fi-confirmation-914.wav", 0);
         });
         List<String> argsList = new ArrayList<>();
         argsList.add("--title");

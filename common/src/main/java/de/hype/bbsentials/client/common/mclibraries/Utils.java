@@ -145,4 +145,7 @@ public interface Utils {
     }
 
 
+    boolean isInGame();
+
+    void showErrorScreen(String s);
 }

@@ -39,6 +39,7 @@ public abstract class CustomItemTextures {
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), cancellable = true)
     private void onRenderItem(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
         String stackItemName = stack.getName().getString();
+        stack = stack.copy();
         if (BBsentials.funConfig.hub17To29Troll) {
             if (stack.getName().getString().equals("SkyBlock Hub #17")) {
                 stack.setCustomName(Text.translatable("§aSkyBlock Hub #29"));
@@ -67,7 +68,7 @@ public abstract class CustomItemTextures {
                     }
                 }
                 if (!found) {
-                    stack.setCount(-1);
+                    stack.setCount(404);
                 }
             }
         }

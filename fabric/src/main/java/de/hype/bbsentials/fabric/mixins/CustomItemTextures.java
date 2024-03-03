@@ -67,7 +67,7 @@ public abstract class CustomItemTextures {
                     }
                 }
                 if (!found) {
-                    stack.setCount(0);
+                    stack.setCount(-1);
                 }
             }
         }

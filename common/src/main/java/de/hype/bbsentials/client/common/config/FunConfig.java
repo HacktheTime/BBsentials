@@ -8,6 +8,7 @@ public class FunConfig extends BBsentialsConfig {
     public transient String overwriteActionBar = "";
     public Boolean hub29Troll = false;
     public Boolean hub17To29Troll = false;
+    public boolean show404IfNotPositioned = false;
 
     public FunConfig() {
         super(1);

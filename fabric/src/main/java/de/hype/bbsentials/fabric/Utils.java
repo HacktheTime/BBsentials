@@ -480,10 +480,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public Islands getCurrentIsland() {
         try {
             String string = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-b").getDisplayName().getString();
-            if (!string.startsWith("Area: ")) {
+            if (!string.startsWith("Area: ") && !string.startsWith("Dungeon: ")) {
                 Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
             }
             else {
+                if (string.startsWith("Dungeon: ")) return Islands.DUNGEON;
                 return EnumUtils.getEnumByValue(Islands.class, string.replace("Area: ", "").trim());
             }
         } catch (Exception e) {

@@ -25,6 +25,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -270,6 +271,68 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return players.stream().filter(predicate).toList();
     }
 
+    public List<String> toDisplayStringLeecherOverlay() {
+        List<String> stringList = new ArrayList();
+        boolean doPants = BBsentials.splashConfig.showMusicPantsUsers;
+        for (PlayerEntity player : getAllPlayers()) {
+            String prefix = "";
+            boolean display = false;
+            if (!isBingo(player)) {
+                display = true;
+            }
+            if (!isInRadius(MinecraftClient.getInstance().player, player, 5)) continue;
+            if (doPants) {
+                for (ItemStack armorItem : player.getArmorItems()) {
+                    try {
+                        if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
+                            prefix = "§4[♪]§r ";
+                            display = true;
+                        }
+                    } catch (Exception ignored) {
+                        continue;
+                    }
+                }
+            }
+
+            Integer leechPotions = 0;
+            for (Map.Entry<StatusEffect, StatusEffectInstance> entry : player.getActiveStatusEffects().entrySet()) {
+                StatusEffect effect = entry.getKey();
+                Integer amplifier = entry.getValue().getAmplifier();
+                if (effect == StatusEffects.STRENGTH && amplifier >= 7) {
+                    if (entry.getValue().getDuration() >= 60000) {
+                        leechPotions++;
+                    }
+                }
+                else if (effect == StatusEffects.JUMP_BOOST && amplifier >= 5) {
+                    if (entry.getValue().getDuration() >= 60000) {
+                        leechPotions++;
+                    }
+                }
+            }
+            if (leechPotions >= 2) {
+                prefix += "§4[⏳] §r";
+                display = true;
+            }
+            //32min left
+            //Potion: Night VisionAmplifier: 0 Duration: 2147473747
+            //Potion: StrengthAmplifier: 7 Duration: 39353
+            //Potion: Jump BoostAmplifier: 5 Duration: 39520
+            //Potion: HasteAmplifier: 3 Duration: 39379
+            //Potion: AbsorptionAmplifier: 0 Duration: 39368
+
+            if (display) {
+                if (prefix.isEmpty()) stringList.add(Text.Serialization.toJsonString(player.getDisplayName()));
+                else {
+                    String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪] §r"));
+                    String normal = Text.Serialization.toJsonString(player.getDisplayName());
+                    stringList.add("[" + pantsAddition + "," + normal + "]");
+                }
+            }
+        }
+        return stringList;
+    }
+
+
     private List<PlayerEntity> getSplashLeechingPlayersPlayerEntity() {
         List<PlayerEntity> players = getAllPlayers();
         players.remove(MinecraftClient.getInstance().player);
@@ -367,34 +430,12 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             int y = 10;
 
             // Render each string in the list
-            List<PlayerEntity> splashLeechers = getSplashLeechingPlayersPlayerEntity();
+            List<String> splashLeechers = toDisplayStringLeecherOverlay();
             List<PlayerEntity> allParticipiants = filterOut(getAllPlayers(), (player) -> isInRadius(MinecraftClient.getInstance().player, player, 5));
-            List<PlayerEntity> musicPants = new ArrayList<>();
             List<Text> toDisplay = new ArrayList<>();
             toDisplay.add(Text.of("§6Total: " + allParticipiants.size() + " | Bingos: " + (allParticipiants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.splashConfig.showMusicPantsUsers;
-            for (PlayerEntity participiant : allParticipiants) {
-                if (doPants) {
 
-                    boolean hasPants = false;
-                    for (ItemStack armorItem : participiant.getArmorItems()) {
-                        try {
-                            if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
-                                musicPants.add(participiant);
-                                hasPants = true;
-                            }
-                        } catch (Exception ignored) {
-                            continue;
-                        }
-                    }
-                    if (hasPants) {
-                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪] "));
-                        String normal = Text.Serialization.toJsonString(participiant.getDisplayName());
-                        toDisplay.add(Text.Serialization.fromJson("[" + pantsAddition + "," + normal + "]"));
-                    }
-                }
-            }
-            toDisplay.addAll(splashLeechers.stream().map(PlayerEntity::getDisplayName).toList());
+            toDisplay.addAll(splashLeechers.stream().map(Text.Serialization::fromJson).toList());
             for (Text text : toDisplay) {
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
                 y += 10; // Adjust the vertical position for the next string

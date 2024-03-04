@@ -24,19 +24,25 @@ import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.toast.Toast;
+import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 
@@ -332,6 +338,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return stringList;
     }
 
+    public void displayToast(BBToast toast) {
+        MinecraftClient.getInstance().getToastManager().add(toast);
+    }
 
     private List<PlayerEntity> getSplashLeechingPlayersPlayerEntity() {
         List<PlayerEntity> players = getAllPlayers();
@@ -579,5 +588,101 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public long getLobbyTime() {
         return MinecraftClient.getInstance().world.getLevelProperties().getTimeOfDay();
+    }
+
+    public static class BBToast implements Toast {
+        public static final int DEFAULT_DURATION_MS = 5000;
+        private static final Identifier TEXTURE = new Identifier("toast/advancement");
+        //        private static final Identifier TEXTURE = new Identifier("toast/system");
+        String title;
+        String description;
+        Integer displayTime = DEFAULT_DURATION_MS;
+        Identifier sound = SoundEvents.UI_TOAST_CHALLENGE_COMPLETE.getId();
+        Identifier icon;
+        Integer width;
+        Integer height;
+        private boolean soundPlayed;
+
+        Integer imageSize = 16;
+        Integer integerToWrap = getWidth() - imageSize * 3;
+
+        public BBToast(String title, String description, Identifier sound, Identifier icon) {
+            this.title = title;
+            this.description = description;
+            if (sound != null) this.sound = sound;
+            if (icon != null) this.icon = icon;
+        }
+
+        public void setHeight() {
+            height = MinecraftClient.getInstance().textRenderer.wrapLines(Text.of(description), integerToWrap).size() * (MinecraftClient.getInstance().textRenderer.fontHeight + 2) + 40;
+        }
+
+        @Override
+        public int getWidth() {
+            return Toast.super.getWidth() * 2;
+        }
+
+        @Override
+        public int getHeight() {
+            if (height == null) setHeight();
+            return height;
+        }
+
+        public Toast.Visibility draw(DrawContext context, ToastManager manager, long startTime) {
+            int boxWidth = getWidth();
+            int boxHeight = getHeight();
+            int imageSize = 16;
+            context.drawGuiTexture(TEXTURE, 0, 0, boxWidth, boxHeight);
+
+            List<OrderedText> list = manager.getClient().textRenderer.wrapLines(Text.of(description), integerToWrap);
+            int textColor = 0xFFFFFF;
+
+            if (list.size() == 1) {
+                int titleY = (boxHeight - 18) / 2; // Center vertically
+                context.drawText(manager.getClient().textRenderer, Text.of(title), imageSize * 2, titleY, textColor | -16777216, false);
+                context.drawText(manager.getClient().textRenderer, list.get(0), imageSize * 2, titleY + 11, -1, false);
+            }
+            else {
+                int titleColor = 0xFFFFFF;
+                int fadeInColor = 67108864;
+                int fadeOutColor = 67108864;
+
+                if (startTime < 1500L) {
+                    int k = MathHelper.floor(MathHelper.clamp((float) (1500L - startTime) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | fadeInColor;
+                    int titleY = (boxHeight - 18) / 2; // Center vertically
+                    context.drawText(manager.getClient().textRenderer, Text.of(title), imageSize * 2, titleY, textColor | k, false);
+                }
+                else {
+                    int k = MathHelper.floor(MathHelper.clamp((float) (startTime - 1500L) / 300.0F, 0.0F, 1.0F) * 252.0F) << 24 | fadeOutColor;
+                    int centerY = (boxHeight - list.size() * 9) / 2;
+
+                    for (OrderedText orderedText : list) {
+                        context.drawText(manager.getClient().textRenderer, orderedText, imageSize * 2, centerY, 16777215 | k, false);
+                        centerY += 9;
+                    }
+                }
+            }
+
+            if (!this.soundPlayed && startTime > 0L) {
+                this.soundPlayed = true;
+                manager.getClient().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(sound), 1.0F, 1.0F));
+            }
+
+            context.drawItemWithoutEntity(Items.DIAMOND.getDefaultStack(), 1, 8, 8);
+            return (double) startTime >= displayTime * manager.getNotificationDisplayTimeMultiplier() ? Visibility.HIDE : Visibility.SHOW;
+        }
+
+        public enum ToastType {
+            ADVANCEMENT(new Identifier("toast/advancement")),
+            SYSTEM(new Identifier("toast/system")),
+            TUTORIAL(new Identifier("toast/tutorial")),
+            RECIPE(new Identifier("toast/recipe")),
+            ;
+            private final Identifier id;
+
+            ToastType(Identifier id) {
+                this.id = id;
+            }
+        }
     }
 }

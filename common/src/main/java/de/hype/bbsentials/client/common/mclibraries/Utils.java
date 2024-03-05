@@ -174,7 +174,7 @@ public interface Utils {
     default void suspendPC() throws IOException {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            processBuilder = new ProcessBuilder("shutdown", "/h", "/t", String.valueOf(20), "/c", "The System is going into sleep in 20 Seconds. Make sure to save everything.");
+            processBuilder = new ProcessBuilder("shutdown", "/h");
         }
         else {
             processBuilder = new ProcessBuilder("systemctl", "suspend");

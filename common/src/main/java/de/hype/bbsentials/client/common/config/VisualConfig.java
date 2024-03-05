@@ -11,6 +11,7 @@ public class VisualConfig extends BBsentialsConfig {
     public Color waypointDefaultColor = Color.WHITE;
     public boolean showGoalCompletions = false;
     public boolean showCardCompletions = true;
+    public boolean broadcastGoalAndCardCompletion = true;
     public boolean showContributorPositionInCount = true;
 
 

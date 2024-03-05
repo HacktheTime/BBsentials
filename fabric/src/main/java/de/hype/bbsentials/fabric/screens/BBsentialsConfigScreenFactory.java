@@ -153,6 +153,21 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Will show your leaderboard postion for the community goals as item count"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultWithTracer = newValue)
                     .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Card completions"), BBsentials.visualConfig.showCardCompletions)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Whether you want to see when someone obtains a card (only account for people completing the card with the mod)"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.showCardCompletions = newValue)
+                    .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Goal Completions"), BBsentials.visualConfig.showGoalCompletions)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Whether you want to see when someone completes a goal. (only accounts for people using the mod).\nKeep in mind that difficulty may be filtered by the Server and the completion my be faked by the player. Cards get validated by the Server!"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.showGoalCompletions = newValue)
+                    .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Publish Goal Completions"), BBsentials.visualConfig.broadcastGoalAndCardCompletion)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Whether you want that your goal completions are shared with everyone. Cards will always be shared!"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.broadcastGoalAndCardCompletion = newValue)
+                    .build());
         }
         //Visual
         ConfigCategory notifications = builder.getOrCreateCategory(Text.of("Notifications"));

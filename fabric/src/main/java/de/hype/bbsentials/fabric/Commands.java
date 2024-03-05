@@ -252,8 +252,8 @@ public class Commands implements MCCommand {
                         }))
                         .then(literal("deafen").executes(context -> {
                             try {
-                                boolean mute = !BBsentials.dcGameSDK.getCore().voiceManager().isSelfMute();
-                                BBsentials.dcGameSDK.getCore().voiceManager().setSelfMute(mute);
+                                boolean mute = !BBsentials.dcGameSDK.getCore().voiceManager().isSelfDeaf();
+                                BBsentials.dcGameSDK.getCore().voiceManager().setSelfDeaf(mute);
                                 if (mute) Chat.sendPrivateMessageToSelfSuccess("You are now deafened");
                                 else Chat.sendPrivateMessageToSelfSuccess("You are not longer deafened");
                                 return 1;

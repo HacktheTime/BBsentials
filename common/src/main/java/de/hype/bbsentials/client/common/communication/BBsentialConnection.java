@@ -591,6 +591,7 @@ public class BBsentialConnection {
 
     public void onCompletedGoalPacket(CompletedGoalPacket packet) {
         if (!BBsentials.visualConfig.showCardCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.CARD))
+
             return;
         if (!BBsentials.visualConfig.showGoalCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.GOAL))
             return;

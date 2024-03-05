@@ -365,12 +365,12 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp to the \",\"color\":\"green\"},{\"text\":\"Desert Settelment\",\"color\":\"gold\"}]"));
                 }
                 else if (messageUnformatted.startsWith("BINGO GOAL COMPLETE! ")) {
-                    BBsentials.connection.sendPacket(new CompletedGoalPacket(messageUnformatted.replace("BINGO GOAL COMPLETE!", "").trim(), "", CompletedGoalPacket.CompletionType.GOAL, "", -1));
+                    BBsentials.connection.sendPacket(new CompletedGoalPacket("", messageUnformatted.replace("BINGO GOAL COMPLETE!", "").trim(), "", "", CompletedGoalPacket.CompletionType.GOAL, -1, BBsentials.visualConfig.broadcastGoalAndCardCompletion));
                 }
                 else if (messageUnformatted.matches("You completed all 20 goals for the \\w+ \\d{4} Bingo Event!")) {
                     Chat.sendPrivateMessageToSelfImportantInfo("BB: Detected Card Completion. GG!\nThis will be verified shortly. If you want to get special Roles enable your APIs ASAP");
                     EnvironmentCore.utils.playsound("ui.toast.challenge_complete");
-                    BBsentials.connection.sendPacket(new CompletedGoalPacket("", "", CompletedGoalPacket.CompletionType.CARD, "", -1));
+                    BBsentials.connection.sendPacket(new CompletedGoalPacket("", "", "", "", CompletedGoalPacket.CompletionType.CARD, -1, BBsentials.visualConfig.broadcastGoalAndCardCompletion));
                 }
             }
 

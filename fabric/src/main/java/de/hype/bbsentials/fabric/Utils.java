@@ -583,7 +583,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public void showErrorScreen(String message) {
-        MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen), Text.of("§cBBsentials"), Text.of(message), Text.of("OK"), true));
+        MinecraftClient.getInstance().execute((() -> MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen), Text.of("§cBBsentials"), Text.of(message), Text.of("OK"), true))));
     }
 
     public long getLobbyTime() {
@@ -601,10 +601,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         Identifier icon;
         Integer width;
         Integer height;
-        private boolean soundPlayed;
-
         Integer imageSize = 16;
         Integer integerToWrap = getWidth() - imageSize * 3;
+        private boolean soundPlayed;
 
         public BBToast(String title, String description, Identifier sound, Identifier icon) {
             this.title = title;

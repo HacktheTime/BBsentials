@@ -107,7 +107,11 @@ public class DiscordIntegration extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
-        this.botOwner = jda.retrieveUserById(BBsentials.discordConfig.botOwnerUserId).complete();
+        try {
+            this.botOwner = jda.retrieveUserById(BBsentials.discordConfig.botOwnerUserId).complete();
+        } catch (Exception e) {
+            EnvironmentCore.utils.showErrorScreen("It seems like you are not in a Server with the dcbot o your user id is wrong. For the Discord integration to work you need to be in a server with it. I recommend making a small server just for you and your bot.");
+        }
         dms = botOwner.openPrivateChannel().complete();
         if (BBsentials.discordConfig.deleteHistoryOnStart) deleteAllDms(dms);
         if (BBsentials.discordConfig.doStartupMessage)

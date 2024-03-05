@@ -151,7 +151,7 @@ public interface Utils {
 
     default void shutdownPC() throws IOException {
         ProcessBuilder processBuilder;
-        if (System.getProperty("os.name").contains("win")) {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
             processBuilder = new ProcessBuilder("shutdown", "/s", "/t", String.valueOf(20), "/c", "The System is shutting down forcefully in 20 Seconds. Make sure to save everything.");
         }
         else {
@@ -162,7 +162,7 @@ public interface Utils {
 
     default void hibernatePC() throws IOException {
         ProcessBuilder processBuilder;
-        if (System.getProperty("os.name").contains("win")) {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
             processBuilder = new ProcessBuilder("shutdown", "/s", "/hybrid", "/t", String.valueOf(20), "/c", "The System is going into hibernation in 20 Seconds. Make sure to save everything.");
         }
         else {
@@ -173,7 +173,7 @@ public interface Utils {
 
     default void suspendPC() throws IOException {
         ProcessBuilder processBuilder;
-        if (System.getProperty("os.name").contains("win")) {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
             processBuilder = new ProcessBuilder("shutdown", "/h", "/t", String.valueOf(20), "/c", "The System is going into sleep in 20 Seconds. Make sure to save everything.");
         }
         else {

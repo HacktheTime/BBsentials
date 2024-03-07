@@ -14,6 +14,7 @@ public class DiscordLobbyUser {
     public final Long id;
     public final String dcUsername;
     public Lobby lobby;
+    String mcusername;
     DiscordUser user;
     boolean isTalking;
 
@@ -43,15 +44,27 @@ public class DiscordLobbyUser {
     }
 
     public Message getAsDisplayName(Core core) {
-        if (isLocalMuted(core.voiceManager())) {
-            if (isTalking) return Message.of(Formatting.DARK_PURPLE + dcUsername);
-            else return Message.of(Formatting.RED + dcUsername);
+        String displayName;
+        if (mcusername != null) {
+            displayName = mcusername;
         }
-        if (isTalking) return Message.of(Formatting.GREEN + dcUsername);
-        else return Message.of(Formatting.GRAY + dcUsername);
+        else {
+            displayName = "(" + dcUsername + ")";
+        }
+        if (isLocalMuted(core.voiceManager())) {
+            if (isTalking) return Message.of(Formatting.DARK_PURPLE + displayName);
+            else return Message.of(Formatting.RED + displayName);
+        }
+        if (isTalking) return Message.of(Formatting.GREEN + displayName);
+        else return Message.of(Formatting.GRAY + displayName);
     }
 
     public boolean isTalking() {
         return isTalking;
+    }
+
+    public void updateMetaData(LobbyManager mgn) {
+        mcusername = getMetaData(mgn, "hoster");
+        if (mcusername.isEmpty()) mcusername = null;
     }
 }

@@ -329,9 +329,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             if (display) {
                 if (prefix.isEmpty()) stringList.add(Text.Serialization.toJsonString(player.getDisplayName()));
                 else {
-                    String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪] §r"));
+                    String prefixAddition = Text.Serialization.toJsonString(Text.of(prefix));
                     String normal = Text.Serialization.toJsonString(player.getDisplayName());
-                    stringList.add("[" + pantsAddition + "," + normal + "]");
+                    stringList.add("[" + prefixAddition + "," + normal + "]");
                 }
             }
         }

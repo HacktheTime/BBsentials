@@ -10,10 +10,7 @@ import de.hype.bbsentials.shared.packets.network.RequestUserInfoPacket;
 import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityJoinRequestReply;
-import de.jcm.discordgamesdk.lobby.Lobby;
-import de.jcm.discordgamesdk.lobby.LobbySearchQuery;
-import de.jcm.discordgamesdk.lobby.LobbyTransaction;
-import de.jcm.discordgamesdk.lobby.LobbyType;
+import de.jcm.discordgamesdk.lobby.*;
 import de.jcm.discordgamesdk.user.DiscordUser;
 
 import java.io.File;
@@ -128,6 +125,30 @@ public class GameSDKManager extends DiscordEventAdapter {
         zin.close();
         // We couldn't find the library inside the ZIP
         return null;
+    }
+
+    public void joinLobby(Long lobbyId, String secret, boolean connectToVc, boolean blocking) {
+        LobbyManager mgn = getLobbyManager();
+        leaveLobby(mgn, currentLobby);
+        getLobbyManager().connectLobby(lobbyId, secret, (result, lobby) -> currentLobby = lobby);
+        while (currentLobby == null && blocking) {
+            try {
+                Thread.sleep(100);
+                core.runCallbacks();
+            } catch (InterruptedException e) {
+            }
+        }
+        initMembers();
+    }
+
+    public void leaveLobby(LobbyManager mgn, Lobby lobby) {
+        if (currentLobby != null) {
+            mgn.disconnectNetwork(lobby);
+            mgn.disconnectVoice(lobby);
+            mgn.disconnectLobby(lobby);
+        }
+        currentLobby = null;
+
     }
 
     public void stop() {
@@ -321,10 +342,18 @@ public class GameSDKManager extends DiscordEventAdapter {
                     });
 
                 }
+                setOwnMetaData(lobby);
             }));
             initMembers();
         }, 10, TimeUnit.SECONDS);
         //Call for when I join a lobby // request too
+    }
+
+    private void setOwnMetaData(Lobby lobby) {
+        LobbyMemberTransaction trans = core.lobbyManager().getMemberUpdateTransaction(lobby, core.userManager().getCurrentUser().getUserId());
+        trans.setMetadata("mcusername", BBsentials.generalConfig.getUsername());
+        //TODO card count, point count?
+        core.lobbyManager().updateMember(lobby, core.userManager().getCurrentUser().getUserId(), trans);
     }
 
     @Override
@@ -411,31 +440,19 @@ public class GameSDKManager extends DiscordEventAdapter {
     public void onSpeaking(long lobbyId, long userId, boolean speaking) {
         members.get(userId).setIsTalking(speaking);
     }
-
-    public void blockingJoinLobby(Long lobbyId, String secret) {
-        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
-        currentLobby = null;
-        getLobbyManager().connectLobby(lobbyId, secret, (result, lobby) -> currentLobby = lobby);
-        while (currentLobby == null) {
-            try {
-                Thread.sleep(100);
-                core.runCallbacks();
-            } catch (InterruptedException e) {
-            }
-        }
-        initMembers();
-    }
-
     private void initMembers() {
         members.clear();
+        LobbyManager mgn = getLobbyManager();
         BBsentials.executionService.execute(() -> {
             for (DiscordUser lobbyMember : getLobbyMembers()) {
                 try {
                     if (members.get(lobbyMember.getUserId()) == null) {
                         DiscordLobbyUser user = new DiscordLobbyUser(lobbyMember, getCurrentLobby());
                         if (user == null) throw new RuntimeException("Uhm here");
+                        user.updateMetaData(mgn);
                         members.put(lobbyMember.getUserId(), user);
                     }
+                    //else already inserted.
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -476,10 +493,9 @@ public class GameSDKManager extends DiscordEventAdapter {
     }
 
     public void blockingJoinLobbyWithActivitySecret(String activitySecret) {
-        if (currentLobby != null) getLobbyManager().disconnectLobby(currentLobby);
-        members.clear();
-        currentLobby = null;
-        getLobbyManager().connectLobbyWithActivitySecret(activitySecret, (result, lobby) -> currentLobby = lobby);
+        LobbyManager mgn = getLobbyManager();
+        leaveLobby(mgn, currentLobby);
+        mgn.connectLobbyWithActivitySecret(activitySecret, (result, lobby) -> currentLobby = lobby);
         while (currentLobby == null) {
             try {
                 Thread.sleep(100);
@@ -530,6 +546,11 @@ public class GameSDKManager extends DiscordEventAdapter {
         initMembers();
     }
 
+
+    @Override
+    public void onMemberUpdate(long lobbyId, long userId) {
+        members.get(userId).updateMetaData(getLobbyManager());
+    }
 
     @FunctionalInterface
     public interface ISearchQuery {

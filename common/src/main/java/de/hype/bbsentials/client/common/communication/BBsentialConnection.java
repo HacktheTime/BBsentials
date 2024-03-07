@@ -631,12 +631,12 @@ public class BBsentialConnection {
             }
             AtomicReference<Lobby> lobby = new AtomicReference<>();
             if (packet.lobbyId != -1) {
-                BBsentials.dcGameSDK.blockingJoinLobby(packet.lobbyId, packet.lobbySecret);
+                BBsentials.dcGameSDK.joinLobby(packet.lobbyId, packet.lobbySecret, false, true);
             }
 
             if (BBsentials.dcGameSDK == null) return;
             if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOIN) || action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) {
-                BBsentials.dcGameSDK.blockingJoinLobby(packet.lobbyId, packet.lobbySecret);
+                BBsentials.dcGameSDK.joinLobby(packet.lobbyId, packet.lobbySecret, false, true);
                 if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) BBsentials.dcGameSDK.joinVC();
             }
 

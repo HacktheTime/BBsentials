@@ -583,7 +583,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public void showErrorScreen(String message) {
-        MinecraftClient.getInstance().execute((() -> MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen), Text.of("§cBBsentials"), Text.of(message), Text.of("OK"), true))));
+        MinecraftClient.getInstance().execute((() -> MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen), Text.of("§cBBsentials"), Text.of(message)))));
     }
 
     public long getLobbyTime() {

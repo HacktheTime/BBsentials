@@ -72,4 +72,8 @@ tasks.shadowJar {
     configurations = listOf(shadowImpl)
 }
 
+loom {
+    log4jConfigs.from(project.rootProject.file("log4j2.xml"))
+}
+
 tasks.assemble.get().dependsOn(tasks.remapJar)

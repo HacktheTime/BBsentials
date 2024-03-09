@@ -7,4 +7,6 @@
                  onMismatch="NEUTRAL"/>
     <!-- Filter out other errors -->
     <RegexFilter regex="Error executing task.*" onMatch="DENY" onMismatch="NEUTRAL"/>
+    <RegexFilter regex="Created: .*" onMatch="DENY" onMismatch="NEUTRAL"/>
+
 </Configuration>

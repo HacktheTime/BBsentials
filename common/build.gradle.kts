@@ -9,6 +9,7 @@ plugins {
 dependencies {
     implementation(libs.apache.httpclient)
     implementation(libs.legacyGson)
+    implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     implementation("com.google.guava:guava:33.0.0-jre")
     implementation("javazoom:jlayer:1.0.1")

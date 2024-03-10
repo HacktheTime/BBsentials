@@ -31,6 +31,7 @@ public class FabricChat implements MCChat {
     public Text prepareOnEvent(Text text, boolean actionbar) {
         String json = Text.Serialization.toJsonString(text);
         Message message = new Message(json, text.getString(), actionbar);
+
         if (!actionbar) {
             message = chat.onEvent(message, actionbar);
         }
@@ -41,6 +42,7 @@ public class FabricChat implements MCChat {
             Chat.sendPrivateMessageToSelfError("Text: " + Text.Serialization.toJsonString(text) + " Error: " + e.getMessage());
             e.printStackTrace();
         }
+
         if (BBsentials.funConfig.swapActionBarChat && !BBsentials.funConfig.swapOnlyBBsentials) {
             if (!actionbar) {
                 showActionBar(message);

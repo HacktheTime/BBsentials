@@ -1,5 +1,4 @@
 package de.hype.bbsentials.client.common.chat;
-
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
@@ -8,6 +7,7 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -216,14 +216,14 @@ public class Chat {
             return null;
         }
         if (BBsentials.generalConfig.doPartyChatCustomMenu && message.isFromParty()) {
-            message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions party " + message.getPlayerName() + " " + message.getUnformattedString());
+            message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", StringEscapeUtils.escapeJava("/socialoptions party " + message.getPlayerName() + " " + message.getUnformattedString()));
         }
         else if (BBsentials.generalConfig.doGuildChatCustomMenu && message.isFromGuild()) {
-            message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", "/socialoptions guild " + message.getPlayerName() + " " + message.getUnformattedString());
+            message.replaceInJson("/viewprofile \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}", StringEscapeUtils.escapeJava("/socialoptions guild " + message.getPlayerName() + " " + message.getUnformattedString()));
         }
         else if (BBsentials.generalConfig.doAllChatCustomMenu) {
             try {
-                message.replaceInJson("/socialoptions " + message.getPlayerName(), "/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString());
+                message.replaceInJson("/socialoptions " + message.getPlayerName(), StringEscapeUtils.escapeJava("/socialoptions sb " + message.getPlayerName() + " " + message.getUnformattedString()));
             } catch (Exception e) {
                 Chat.sendPrivateMessageToSelfError("Error with Message: " + message.getUnformattedString());
             }

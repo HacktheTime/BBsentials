@@ -1,6 +1,8 @@
 package de.hype.bbsentials.client.common.chat;
 
+import com.google.gson.JsonObject;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Message {
     public boolean actionBar = false;
@@ -12,6 +14,7 @@ public class Message {
     private String unformattedString = null;
     private String playerName = null;
     private String string;
+    private String unformattedStringJsonEscape = null;
     private String noRanks;
 
     public Message(String textJson, String string) {
@@ -28,9 +31,9 @@ public class Message {
     }
 
     public static Message of(String string) {
-        String escapedString = string.replace("\\", "\\\\").replace("\"", "\\\"");
-        String json = "{\"text\":\"" + escapedString + "\"}";
-        return new Message(json, string);
+        JsonObject obj = new JsonObject();
+        obj.addProperty("text", string);
+        return new Message(obj.toString(), string);
     }
 
     public static Message tellraw(String json) {
@@ -103,11 +106,11 @@ public class Message {
 
     public String getNoRanks() {
         if (noRanks != null) return noRanks;
-        return getUnformattedString().replaceAll("[^\\x00-\\x7F]+\\s*","").replaceAll("\\[[^\\]]*\\]","").trim();
+        return getUnformattedString().replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim();
     }
 
     public void replaceInJson(String replace, String replaceWith) {
-        text = text.replaceFirst(replace, replaceWith);
+        text = text.replaceFirst(replace, StringEscapeUtils.escapeJson(replaceWith));
     }
 
     public boolean isFromReportedUser() {

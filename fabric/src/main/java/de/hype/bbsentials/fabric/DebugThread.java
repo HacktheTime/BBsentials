@@ -41,6 +41,10 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
         return ClientCommandManager.getActiveDispatcher().getRoot().getChildren();
     }
 
+
+    public <T> void triggerRenderBreakpoint(List<T> data) {
+    }
+
 //    public void replaceCommand(String name) {
 //        Collection<CommandNode<FabricClientCommandSource>> clientCommandChilds = getClientCommands();
 //        Collection<CommandNode<CommandSource>> commandChilds = getServerCommands().getChildren();

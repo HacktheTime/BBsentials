@@ -5,7 +5,6 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.shared.constants.Islands;
-import de.hype.bbsentials.shared.packets.network.DiscordLobbyPacket;
 import de.hype.bbsentials.shared.packets.network.RequestUserInfoPacket;
 import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
@@ -14,10 +13,13 @@ import de.jcm.discordgamesdk.lobby.*;
 import de.jcm.discordgamesdk.user.DiscordUser;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
@@ -95,36 +97,26 @@ public class GameSDKManager extends DiscordEventAdapter {
         URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/" + version + "/discord_game_sdk.zip");
         HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
         connection.setRequestProperty("User-Agent", "discord-game-sdk4j (https://github.com/JnCrMx/discord-game-sdk4j)");
-        ZipInputStream zin = new ZipInputStream(connection.getInputStream());
+        // Create a FileOutputStream to store the downloaded ZIP file
+        File zipFile = new File(EnvironmentCore.utils.getConfigPath(), "discord_game_sdk.zip");
+        FileOutputStream fos = new FileOutputStream(zipFile);
 
-        // Search for the right file inside the ZIP
-        ZipEntry entry;
-        while ((entry = zin.getNextEntry()) != null) {
-            if (entry.getName().equals(zipPath)) {
-                // Create a new temporary directory
-                // We need to do this, because we may not change the filename on Windows
-//                File tempDir = new File(System.getProperty("java.io.tmpdir"), "java-" + name + System.nanoTime());
-                if (!(tempDir.mkdir() || tempDir.exists()))
-                    throw new IOException("Cannot create temporary directory");
-
-                // Create a temporary file inside our directory (with a "normal" name)
-                File temp = new File(tempDir, name + "_" + version + suffix);
-
-                // Copy the file in the ZIP to our temporary file
-                Files.copy(zin, temp.toPath());
-
-                // We are done, so close the input stream
-                zin.close();
-
-                // Return our temporary file
-                return temp;
+        // Copy the content from the connection input stream to the FileOutputStream
+        try (InputStream is = connection.getInputStream()) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesRead);
             }
-            // next entry
-            zin.closeEntry();
+        } finally {
+            fos.close();
         }
-        zin.close();
-        // We couldn't find the library inside the ZIP
-        return null;
+
+        // Close the ZipInputStream
+        connection.disconnect();
+
+        // Return the path to the stored ZIP file
+        return zipFile;
     }
 
     public void joinLobby(Long lobbyId, String secret, boolean connectToVc, boolean blocking) {
@@ -216,13 +208,13 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Make a "cool" image show up
 
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
-            if (currentLobby == null) blockingCreateDefaultLobby();
-            activity.party().setID(String.valueOf(currentLobby.getId()));
-            if (BBsentials.discordConfig.useRPCJoin)
-                activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
-            if (BBsentials.discordConfig.useRPCSpectate) {
-//                activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
-            }
+//            if (currentLobby == null) blockingCreateDefaultLobby();
+//            activity.party().setID(String.valueOf(currentLobby.getId()));
+//            if (BBsentials.discordConfig.useRPCJoin)
+//                activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+//            if (BBsentials.discordConfig.useRPCSpectate) {
+////                activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+//            }
             // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }
@@ -468,7 +460,7 @@ public class GameSDKManager extends DiscordEventAdapter {
         // Set parameters for the Core
 //            CreateParams params;
         try {
-            currentLobby = null;
+            disconnectLobby();
 //                params = new CreateParams();
             CreateParams params = new CreateParams();
 
@@ -528,12 +520,6 @@ public class GameSDKManager extends DiscordEventAdapter {
     @Override
     public void onMemberConnect(long lobbyId, long userId) {
         initMembers();
-    }
-
-    public DiscordLobbyPacket getLobbyAsPacket() {
-        DiscordLobbyPacket.Type type = DiscordLobbyPacket.Type.PUBLIC;
-        if (currentLobby.getType().equals(LobbyType.PRIVATE)) type = DiscordLobbyPacket.Type.PRIVATE;
-        return new DiscordLobbyPacket(getLobbyMembers().stream().map(DiscordUser::getUserId).collect(Collectors.toList()), type, currentLobby.getId(), currentLobby.getSecret(), currentLobby.getOwnerId(), currentLobby.getCapacity(), currentLobby.isLocked(), getLobbyManager().getLobbyMetadata(currentLobby));
     }
 
     public List<DiscordLobbyUser> getAdvancedLobbyMembers() {

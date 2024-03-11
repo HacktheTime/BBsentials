@@ -498,33 +498,6 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        if (BBsentials.discordConfig.overlay && BBsentials.dcGameSDK != null && BBsentials.dcGameSDK.getAdvancedLobbyMembers().size() > 1) {
-            int x = 10;
-            int y = 15;
-            GameSDKManager sdkManager = BBsentials.dcGameSDK;
-            List<Text> toRender = new ArrayList<>();
-            if (BBsentials.discordConfig.overlayShowSelfInfo) {
-                boolean muted = sdkManager.getCore().voiceManager().isSelfMute();
-                boolean deaf = sdkManager.getCore().voiceManager().isSelfDeaf();
-                if (muted && deaf) toRender.add(Text.of("§cMuted and Deafen"));
-                else if (deaf) toRender.add(Text.of("§cDeafen"));
-                else if (muted) toRender.add(Text.of("§cMuted"));
-            }
-            if (BBsentials.dcGameSDK.getAdvancedLobbyMembers().size() >= 10 || BBsentials.discordConfig.showOnlySpeakingInOverlay) {
-                sdkManager.getAdvancedLobbyMembers().stream().filter((user -> user != null && user.isTalking())).forEach(user -> {
-                    toRender.add(Text.Serialization.fromJson(user.getAsDisplayName(sdkManager.getCore()).getJson()));
-                });
-            }
-            else {
-                sdkManager.getAdvancedLobbyMembers().stream().filter((Objects::nonNull)).forEach(user -> {
-                    toRender.add(Text.Serialization.fromJson(user.getAsDisplayName(sdkManager.getCore()).getJson()));
-                });
-            }
-            for (Text text : toRender) {
-                drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
-                y += 10; // Adjust the vertical position for the next string
-            }
-        }
     }
 
     public Islands getCurrentIsland() {

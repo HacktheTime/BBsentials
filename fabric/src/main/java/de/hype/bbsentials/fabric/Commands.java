@@ -2,10 +2,8 @@ package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.APIUtils;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
@@ -189,21 +187,22 @@ public class Commands implements MCCommand {
         ));/*BingoChatLong*/
         event.register((dispatcher, registryAccess) -> dispatcher.register(
                 literal("bbi").then(literal("discord")
-                        .then(literal("refreshConnection").executes(context -> {
-                            if (BBsentials.dcGameSDK != null) {
-                                Chat.sendPrivateMessageToSelfInfo("The refresh may take a couple of seconds");
-                                BBsentials.executionService.execute(() -> BBsentials.dcGameSDK.connectToDiscord());
-                                return 1;
-                            }
-                            else {
-                                Chat.sendPrivateMessageToSelfError("You cant refresh something which does not exist.");
-                                return 0;
-                            }
-                            // Due too how stuff works you cant initialise the stuff here,
-                            // because it would freeze the screen.
-                            // And if the sdk is downloaded, this is basically a crash
-                        }))
-                        .then(literal("openVCSettings").executes(context -> {
+                                .then(literal("refreshConnection").executes(context -> {
+                                    if (BBsentials.dcGameSDK != null) {
+                                        Chat.sendPrivateMessageToSelfInfo("The refresh may take a couple of seconds");
+                                        BBsentials.executionService.execute(() -> BBsentials.dcGameSDK.connectToDiscord());
+                                        return 1;
+                                    }
+                                    else {
+                                        Chat.sendPrivateMessageToSelfError("You cant refresh something which does not exist.");
+                                        return 0;
+                                    }
+                                    // Due too how stuff works you cant initialise the stuff here,
+                                    // because it would freeze the screen.
+                                    // And if the sdk is downloaded, this is basically a crash
+                                }))
+                        //Lobbies and VCs have been deprecated by Discord. → Removed
+                        /*.then(literal("openVCSettings").executes(context -> {
                             try {
                                 BBsentials.dcGameSDK.openVoiceSettings();
                                 Chat.sendPrivateMessageToSelfSuccess("Success");
@@ -303,7 +302,7 @@ public class Commands implements MCCommand {
                                 return 2;
                             }
                             return 1;
-                        }))
+                        }))*/
                 )));/*BingoChatLong*/
 //        event.register((dispatcher, registryAccess) -> {
 //            dispatcher.register(ClientCommandManager.literal("p")
@@ -342,7 +341,8 @@ public class Commands implements MCCommand {
 //        });
     }
 
-    public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher, boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {
+    public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher,
+                                     boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {
         if (hasMod) {
             event.register((dispatcher, registryAccess) -> dispatcher.register(
                     literal("bannounce")

@@ -65,8 +65,6 @@ public class PacketManager {
         packets.add(new Packet<>(WantedSearchPacket.class, connection::onWantedSearchPacket));
         packets.add(new Packet<>(SkyblockLobbyDataPacket.class, connection::onSkyblockLobbyDataPacket));
         packets.add(new Packet<>(PunishedPacket.class, connection::onPunishedPacket));
-        packets.add(new Packet<>(RequestActionDiscordLobbyPacket.class, connection::onRequestActionDiscordLobbyPacket));
-        packets.add(new Packet<>(DiscordLobbyPacket.class, connection::onDiscordLobbyPacket));
         packets.add(new Packet<>(PlaySoundPacket.class, connection::onPlaySoundPacket));
         packets.add(new Packet<>(ChestLobbyUpdatePacket.class, ((packet) -> UpdateListenerManager.onChLobbyDataReceived(packet.lobby))));
     }

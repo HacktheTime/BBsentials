@@ -142,7 +142,7 @@ public class BBsentials {
             if (island != null) status = "Playing in the " + island.getDisplayName();
             BBsentials.discordIntegration.setNewStatus(status);
         }, true);
-        if (discordConfig.sdkMainToggle) {
+        if (discordConfig.useRichPresence) {
             try {
                 dcGameSDK = new GameSDKManager();
                 if (discordConfig.useRichPresence) {

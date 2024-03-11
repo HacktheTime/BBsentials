@@ -604,96 +604,14 @@ public class BBsentialConnection {
 
     public void onWantedSearchPacket(WantedSearchPacket packet) {
         if (packet.serverId != null) if (packet.serverId.equals(EnvironmentCore.utils.getServerId()))
-            sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.dcUserId, packet.serverId)));
-        if (packet.dcUserId != null && BBsentials.dcGameSDK != null)
-            if (BBsentials.dcGameSDK.getLobbyMembers().stream().map(DiscordUser::getUserId).collect(Collectors.toList()).contains(packet.dcUserId))
-                sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.dcUserId, packet.serverId)));
+            sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.serverId)));
         if (packet.username != null) if (EnvironmentCore.utils.getPlayers().contains(packet.username))
-            sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.dcUserId, packet.serverId)));
+            sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.serverId)));
     }
 
     public void onSkyblockLobbyDataPacket(SkyblockLobbyDataPacket packet) {
         packet.preparePacketToReplyToThis(new SkyblockLobbyDataPacket(EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.getLobbyTime(), EnvironmentCore.utils.getServerId(), EnvironmentCore.utils.getCurrentIsland()));
     }
-
-    public void onRequestActionDiscordLobbyPacket(RequestActionDiscordLobbyPacket packet) {
-        try {
-            RequestActionDiscordLobbyPacket.ActionType action = packet.action;
-            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.REQUESTINFO)) {
-                sendPacket(packet.preparePacketToReplyToThis(BBsentials.dcGameSDK.getLobbyAsPacket()));
-                return;
-            }
-            if (BBsentials.dcGameSDK == null && packet.initIfNull) {
-                try {
-                    BBsentials.dcGameSDK = new GameSDKManager();
-                } catch (Exception ignored) {
-                }
-            }
-            AtomicReference<Lobby> lobby = new AtomicReference<>();
-            if (packet.lobbyId != -1) {
-                BBsentials.dcGameSDK.joinLobby(packet.lobbyId, packet.lobbySecret, false, true);
-            }
-
-            if (BBsentials.dcGameSDK == null) return;
-            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOIN) || action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) {
-                BBsentials.dcGameSDK.joinLobby(packet.lobbyId, packet.lobbySecret, false, true);
-                if (action.equals(RequestActionDiscordLobbyPacket.ActionType.JOINVC)) BBsentials.dcGameSDK.joinVC();
-            }
-
-            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DISCONNECTVC))
-                BBsentials.dcGameSDK.disconnectLobbyVC();
-            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DISCONNECT))
-                BBsentials.dcGameSDK.disconnectLobby();
-            if (action.equals(RequestActionDiscordLobbyPacket.ActionType.DELETE))
-                BBsentials.dcGameSDK.deleteLobby();
-        } catch (Exception ignored) {
-        }
-    }
-
-    public void onDiscordLobbyPacket(DiscordLobbyPacket packet) {
-        LobbyTransaction transaction;
-        Integer capacity = packet.maxSize;
-        Boolean locked = packet.locked;
-        DiscordLobbyPacket.Type type = packet.type;
-        if (packet.lobbyId == -1) {
-            transaction = BBsentials.dcGameSDK.getLobbyManager().getLobbyCreateTransaction();
-            if (capacity == null) capacity = 15;
-            if (locked == null) locked = false;
-            if (type == null) type = DiscordLobbyPacket.Type.PUBLIC;
-            for (Map.Entry<String, String> entry : packet.metaData.entrySet()) {
-                transaction.setMetadata(entry.getKey(), entry.getValue());
-            }
-        }
-        else if (packet.lobbyId.equals(BBsentials.dcGameSDK.getCurrentLobby().getId())) {
-            transaction = BBsentials.dcGameSDK.getLobbyManager().getLobbyUpdateTransaction(BBsentials.dcGameSDK.getCurrentLobby());
-            for (Map.Entry<String, String> entry : packet.metaData.entrySet()) {
-                transaction.setMetadata(entry.getKey(), entry.getValue());
-            }
-        }
-        else {
-            return;
-        }
-        if (capacity != null) transaction.setCapacity(capacity);
-        if (locked != null) transaction.setLocked(locked);
-        if (type != null) {
-            if (type.equals(DiscordLobbyPacket.Type.PRIVATE)) {
-                transaction.setType(LobbyType.PRIVATE);
-            }
-            else {
-                transaction.setType(LobbyType.PUBLIC);
-            }
-        }
-        transaction.setMetadata("hoster", BBsentials.generalConfig.getUsername());
-        if (packet.lobbyId == -1) {
-            BBsentials.dcGameSDK.createLobby(transaction);
-        }
-        else {
-            BBsentials.dcGameSDK.updateCurrentLobby(transaction);
-        }
-
-
-    }
-
     public void onPunishedPacket(PunishedPacket packet) {
         for (PunishmentData data : packet.data) {
             if (!data.isActive()) continue;

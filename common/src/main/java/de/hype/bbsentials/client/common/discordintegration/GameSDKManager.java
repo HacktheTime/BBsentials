@@ -13,17 +13,20 @@ import de.jcm.discordgamesdk.lobby.*;
 import de.jcm.discordgamesdk.user.DiscordUser;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class GameSDKManager extends DiscordEventAdapter {
     private final String mcUsername = BBsentials.generalConfig.getUsername();
@@ -37,10 +40,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     public GameSDKManager() throws Exception {
         // Initialize the Core
         if (core == null) {
-            File nativeLibrary = downloadNativeLibrary();
-            if (nativeLibrary == null)
-                throw new RuntimeException("Could not obtain the Native Library which is required!");
-            Core.init(nativeLibrary);
+            initCore();
             callbackRunner = BBsentials.executionService.scheduleAtFixedRate(() -> {
                 try {
                     runContinously();
@@ -53,24 +53,33 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     }
 
-    public static File downloadNativeLibrary() throws IOException {
+    public static void initCore() throws IOException {
         // Find out which name Discord's library has (.dll for Windows, .so for Linux)
-        String name = "discord_game_sdk";
+        File sdkDir = new File(EnvironmentCore.utils.getConfigPath() + "/discord_game_sdk");
+        sdkDir.mkdirs();
+        String dcNativeName = "discord_game_sdk";
         String suffix;
-
+        String jniName = "discord_game_sdk_jni";
         String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
         String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
         String version = "2.5.6";
-        File tempDir = new File(EnvironmentCore.utils.getConfigPath(), name);
+        boolean needsDCNativeLibLoadFirst = false;
 
         if (osName.contains("windows")) {
             suffix = ".dll";
+            osName = "windows";
+            jniName = jniName + suffix;
+            needsDCNativeLibLoadFirst = true;
         }
         else if (osName.contains("linux")) {
             suffix = ".so";
+            osName = "linux";
+            jniName = "lib" + jniName + suffix;
         }
         else if (osName.contains("mac os")) {
             suffix = ".dylib";
+            osName = "macos";
+            jniName = "lib" + jniName + suffix;
         }
         else {
             throw new RuntimeException("cannot determine OS type: " + osName);
@@ -84,36 +93,64 @@ public class GameSDKManager extends DiscordEventAdapter {
             arch = "x86_64";
 
         // Path of Discord's library inside the ZIP
-        String zipPath = "lib/" + arch + "/" + name + suffix;
-        File pathToLibrary = new File(new File(EnvironmentCore.utils.getConfigPath(), "discord_game_sdk"), "discord_game_sdk_" + version + suffix);
-        if (pathToLibrary.exists()) return pathToLibrary;
-        System.out.println("Downloading SDK");
-        // Open the URL as a ZipInputStream
-        URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/" + version + "/discord_game_sdk.zip");
-        HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
-        connection.setRequestProperty("User-Agent", "discord-game-sdk4j (https://github.com/JnCrMx/discord-game-sdk4j)");
-        // Create a FileOutputStream to store the downloaded ZIP file
-        File zipFile = new File(EnvironmentCore.utils.getConfigPath(), "discord_game_sdk.zip");
-        FileOutputStream fos = new FileOutputStream(zipFile);
+        String zipPath = "lib/" + arch + "/" + dcNativeName + suffix;
+        File dcNativeLibraryStoragePath = new File(sdkDir, "discord_game_sdk_" + version + suffix);
+        if (!dcNativeLibraryStoragePath.exists()) {
+            System.out.println("Downloading Discord SDK");
+            // Open the URL as a ZipInputStream
+            URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/" + version + "/discord_game_sdk.zip");
+            HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
+            connection.setRequestProperty("User-Agent", "discord-game-sdk4j (https://github.com/JnCrMx/discord-game-sdk4j)");
+            ZipInputStream zin = new ZipInputStream(connection.getInputStream());
 
-        // Copy the content from the connection input stream to the FileOutputStream
-        try (InputStream is = connection.getInputStream()) {
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, bytesRead);
+            // Search for the right file inside the ZIP
+            ZipEntry entry;
+            boolean found = false;
+            while ((entry = zin.getNextEntry()) != null) {
+                if (entry.getName().equals(zipPath)) {
+                    // Create a new temporary directory
+                    // We need to do this, because we may not change the filename on Windows
+                    if (!(sdkDir.mkdir() || sdkDir.exists()))
+                        throw new IOException("Cannot create temporary directory");
+
+                    // Create a temporary file inside our directory (with a "normal" name)
+
+                    // Copy the file in the ZIP to our temporary file
+                    Files.copy(zin, dcNativeLibraryStoragePath.toPath());
+                    // Return our temporary file
+                    found = true;
+                    break;
+                }
+                // next entry
+                zin.closeEntry();
             }
-        } finally {
-            fos.close();
+            zin.close();
+            if (!found) throw new RuntimeException("Could not find Discord Native Library!");
         }
 
-        // Close the ZipInputStream
-        connection.disconnect();
 
-        // Return the path to the stored ZIP file
-        return zipFile;
+        if (arch.equals("x86_64"))
+            arch = "amd64";
+
+        if (needsDCNativeLibLoadFirst) System.load(dcNativeLibraryStoragePath.getAbsolutePath());
+
+
+        String path = "/native/" + osName + "/" + arch + "/" + jniName;
+        InputStream in = Core.class.getResourceAsStream(path);
+        if (in == null)
+            throw new RuntimeException(new FileNotFoundException("cannot find Discord native library at " + path));
+
+        File jniStoragePath = new File(sdkDir, jniName);
+
+        try {
+            Files.copy(in, jniStoragePath.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.load(jniStoragePath.getAbsolutePath());
+        Core.initDiscordNative(dcNativeLibraryStoragePath.getAbsolutePath());
     }
-
     public void joinLobby(Long lobbyId, String secret, boolean connectToVc, boolean blocking) {
         LobbyManager mgn = getLobbyManager();
         leaveLobby(mgn, currentLobby);

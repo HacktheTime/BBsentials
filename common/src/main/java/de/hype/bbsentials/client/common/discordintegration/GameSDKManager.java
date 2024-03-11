@@ -5,7 +5,6 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.shared.constants.Islands;
-import de.hype.bbsentials.shared.packets.network.DiscordLobbyPacket;
 import de.hype.bbsentials.shared.packets.network.RequestUserInfoPacket;
 import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
@@ -216,13 +215,13 @@ public class GameSDKManager extends DiscordEventAdapter {
             // Make a "cool" image show up
 
             // Setting a join secret and a party ID causes an "Ask to Join" button to appear
-            if (currentLobby == null) blockingCreateDefaultLobby();
-            activity.party().setID(String.valueOf(currentLobby.getId()));
-            if (BBsentials.discordConfig.useRPCJoin)
-                activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
-            if (BBsentials.discordConfig.useRPCSpectate) {
-//                activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
-            }
+//            if (currentLobby == null) blockingCreateDefaultLobby();
+//            activity.party().setID(String.valueOf(currentLobby.getId()));
+//            if (BBsentials.discordConfig.useRPCJoin)
+//                activity.secrets().setJoinSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+//            if (BBsentials.discordConfig.useRPCSpectate) {
+////                activity.secrets().setSpectateSecret(getLobbyManager().getLobbyActivitySecret(currentLobby));
+//            }
             // Finally, update the currentLobby activity to our activity
             core.activityManager().updateActivity(activity);
         }
@@ -468,7 +467,7 @@ public class GameSDKManager extends DiscordEventAdapter {
         // Set parameters for the Core
 //            CreateParams params;
         try {
-            currentLobby = null;
+            disconnectLobby();
 //                params = new CreateParams();
             CreateParams params = new CreateParams();
 
@@ -528,12 +527,6 @@ public class GameSDKManager extends DiscordEventAdapter {
     @Override
     public void onMemberConnect(long lobbyId, long userId) {
         initMembers();
-    }
-
-    public DiscordLobbyPacket getLobbyAsPacket() {
-        DiscordLobbyPacket.Type type = DiscordLobbyPacket.Type.PUBLIC;
-        if (currentLobby.getType().equals(LobbyType.PRIVATE)) type = DiscordLobbyPacket.Type.PRIVATE;
-        return new DiscordLobbyPacket(getLobbyMembers().stream().map(DiscordUser::getUserId).collect(Collectors.toList()), type, currentLobby.getId(), currentLobby.getSecret(), currentLobby.getOwnerId(), currentLobby.getCapacity(), currentLobby.isLocked(), getLobbyManager().getLobbyMetadata(currentLobby));
     }
 
     public List<DiscordLobbyUser> getAdvancedLobbyMembers() {

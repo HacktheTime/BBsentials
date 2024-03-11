@@ -18,17 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class GameSDKManager extends DiscordEventAdapter {
     private final String mcUsername = BBsentials.generalConfig.getUsername();
@@ -279,9 +274,7 @@ public class GameSDKManager extends DiscordEventAdapter {
                 trx.setMetadata("hoster", mcUsername);
                 getLobbyManager().updateLobby(currentLobby, trx);
             }
-            if (BBsentials.discordConfig.connectVoiceOnJoining) {
-                getLobbyManager().connectVoice(currentLobby);
-            }
+            getLobbyManager().connectVoice(currentLobby);
         }
 
     }
@@ -324,16 +317,14 @@ public class GameSDKManager extends DiscordEventAdapter {
                 }
                 manager.connectNetwork(lobby);
                 Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC join: Success");
-                if (BBsentials.discordConfig.connectVoiceOnJoin) {
-                    manager.connectVoice(lobby, result2 -> {
-                        if (result2.equals(Result.OK))
-                            Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC Voice Connect: Success");
-                        else if (result2.equals(Result.LOBBY_FULL))
-                            Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC Voice Connect: Lobby Full");
-                        else Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC Voice Connect: " + result2);
-                    });
+                manager.connectVoice(lobby, result2 -> {
+                    if (result2.equals(Result.OK))
+                        Chat.sendPrivateMessageToSelfSuccess("BB: DISCORD RPC Voice Connect: Success");
+                    else if (result2.equals(Result.LOBBY_FULL))
+                        Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC Voice Connect: Lobby Full");
+                    else Chat.sendPrivateMessageToSelfError("BB: DISCORD RPC Voice Connect: " + result2);
+                });
 
-                }
                 setOwnMetaData(lobby);
             }));
             initMembers();
@@ -403,8 +394,6 @@ public class GameSDKManager extends DiscordEventAdapter {
         AtomicReference<Lobby> lobby = new AtomicReference<>(null);
         LobbyTransaction trn = getLobbyManager().getLobbyCreateTransaction();
         trn.setCapacity(15);
-        if (BBsentials.discordConfig.discordRoomsDefaultPrivate) trn.setType(LobbyType.PRIVATE);
-        else trn.setType(LobbyType.PUBLIC);
         trn.setLocked(false);
         trn.setMetadata("hoster", mcUsername);
         getLobbyManager().createLobby(trn, lobby::set);
@@ -432,6 +421,7 @@ public class GameSDKManager extends DiscordEventAdapter {
     public void onSpeaking(long lobbyId, long userId, boolean speaking) {
         members.get(userId).setIsTalking(speaking);
     }
+
     private void initMembers() {
         members.clear();
         LobbyManager mgn = getLobbyManager();

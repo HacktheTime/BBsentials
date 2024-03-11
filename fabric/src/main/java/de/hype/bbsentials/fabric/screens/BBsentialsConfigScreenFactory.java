@@ -457,41 +457,6 @@ public class BBsentialsConfigScreenFactory {
                         .requireRestart()
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.useRichPresence = newValue)
                         .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Use RPC join"), BBsentials.discordConfig.useRPCJoin)
-                        .setDefaultValue(true)
-                        .setTooltip(Text.of("Will make it so they join a room with you when clicking join as well as Receive a Party Invite. \n§cRequires them to be registered in the BBsentials Network!"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.useRPCJoin = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Use RPC spectate"), BBsentials.discordConfig.useRPCSpectate)
-                        .setDefaultValue(true)
-                        .setTooltip(Text.of("Will make it so when requesting to spectate that you will send them a Party invite automatically.\n§cRequires them to be registered in the BBsentials Network!"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.useRPCSpectate = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Connect to Voice on Join"), BBsentials.discordConfig.connectVoiceOnJoin)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Will join you the room vc automatically when you join a room."))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.connectVoiceOnJoin = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Connect to Voice on Joining"), BBsentials.discordConfig.connectVoiceOnJoining)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Will connect you to the vc when someone joins."))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.connectVoiceOnJoining = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Speakers only"), BBsentials.discordConfig.showOnlySpeakingInOverlay)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Only talking players will be shown in the overlay. If more than 10 players are in a lobby this is always the case"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.showOnlySpeakingInOverlay = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Self Info"), BBsentials.discordConfig.overlayShowSelfInfo)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Will add a row at the top of the hud where you are informed when you are muted or deafened."))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.overlayShowSelfInfo = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Room default Private"), BBsentials.discordConfig.discordRoomsDefaultPrivate)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Players wont be able to join without asking in the Lobby to join."))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.discordRoomsDefaultPrivate = newValue)
-                        .build());
             }
         }//Discord
         ConfigCategory socketAddons = builder.getOrCreateCategory(Text.of("§cSocket Addons"));

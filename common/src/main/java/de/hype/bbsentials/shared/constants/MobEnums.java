@@ -97,4 +97,8 @@ public enum MobEnums {
         this.mobGroup = mobGroup;
         this.island = island;
     }
+
+    public MobGroupEnums getMobGroup() {
+        return mobGroup;
+    }
 }

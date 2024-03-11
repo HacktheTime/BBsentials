@@ -1,5 +1,8 @@
 package de.hype.bbsentials.shared.constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum MobGroupEnums {
     Zombie("Zombie"),
     Wolf("Wolf"),
@@ -48,9 +51,5 @@ public enum MobGroupEnums {
         }
         this.mobs = new ArrayList<>(mobs);
         return mobs;
-    }
-
-    public MobEnums[] getMobs() {
-        return mobEnums;
     }
 }

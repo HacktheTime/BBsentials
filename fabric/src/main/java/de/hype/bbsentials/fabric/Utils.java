@@ -5,7 +5,6 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.RouteNode;
 import de.hype.bbsentials.client.common.objects.Waypoints;
@@ -502,7 +501,15 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public Islands getCurrentIsland() {
         try {
-            String string = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-b").getDisplayName().getString();
+            String string;
+            if (isSecondRowInfoRow()) {
+                //Its in Second Row
+                string = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-b").getDisplayName().getString();
+            }
+            else {
+                //Its 3 row. default from before
+                string = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!C-b").getDisplayName().getString();
+            }
             if (!string.startsWith("Area: ") && !string.startsWith("Dungeon: ")) {
                 Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
             }
@@ -515,12 +522,23 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return null;
     }
 
+    private boolean isSecondRowInfoRow() {
+        return MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-a").getDisplayName().getString().startsWith("Info");
+    }
+
     public int getPlayerCount() {
         return MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().size();
     }
 
     public String getServerId() {
-        PlayerListEntry entry = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-c");
+
+        PlayerListEntry entry;
+        if (isSecondRowInfoRow()) {
+            entry = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-c");
+        }
+        else {
+            entry = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!C-c");
+        }
         if (entry == null) return null;
         return entry.getDisplayName().getString().replace("Server:", "").trim();
     }

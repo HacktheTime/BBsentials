@@ -397,8 +397,9 @@ public class Chat {
 
             }
             else if (message.isMsg()) {
-                if (messageUnformatted.startsWith("bb:party")) {
-                    if (messageUnformatted.startsWith("bb:party me")) {
+                String messageContent = message.getMessageContent();
+                if (messageContent.startsWith("bb:party")) {
+                    if (messageContent.startsWith("bb:party me")) {
                         if (BBsentials.partyConfig.allowBBinviteMe) {
                             BBsentials.sender.addSendTask("/p invite " + username, 1);
                         }
@@ -408,7 +409,7 @@ public class Chat {
                         if (person == null) {
                             message.replyToUser("Permission Denied");
                         }
-                        String[] splittedParams = messageUnformatted.replace("bb:party", "").trim().split(" ");
+                        String[] splittedParams = messageContent.replace("bb:party", "").trim().split(" ");
                         String actionParamter = "";
                         String targetName = BBsentials.generalConfig.getUsername();
                         try {
@@ -526,7 +527,7 @@ public class Chat {
                         else if (actionParamter.equalsIgnoreCase("poll")) {
                             if (person.canRequestWarp()) {
                                 BBsentials.sender.addSendTask("/pc posting poll in name of " + username, 1);
-                                BBsentials.sender.addSendTask("/p poll " + messageUnformatted.replace("bb:party poll", "").trim(), 1);
+                                BBsentials.sender.addSendTask("/p poll " + messageContent.replace("bb:party poll", "").trim(), 1);
                             }
                             else {
                                 message.replyToUser("Insufficient Privileges");

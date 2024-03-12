@@ -106,7 +106,7 @@ public class Message {
 
     public String getNoRanks() {
         if (noRanks != null) return noRanks;
-        return getUnformattedString().replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim();
+        return getUnformattedString().replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim().replaceAll("\\s+", " ");
     }
 
     public void replaceInJson(String replace, String replaceWith) {

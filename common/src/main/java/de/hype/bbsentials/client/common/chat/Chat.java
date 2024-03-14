@@ -372,6 +372,9 @@ public class Chat {
                     EnvironmentCore.utils.playsound("ui.toast.challenge_complete");
                     BBsentials.connection.sendPacket(new CompletedGoalPacket("", "", "", "", CompletedGoalPacket.CompletionType.CARD, -1, BBsentials.visualConfig.broadcastGoalAndCardCompletion));
                 }
+                else if (messageUnformatted.startsWith("Profile ID: ")) {
+                    BBsentials.generalConfig.profileIds.add(messageUnformatted.replace("Profile ID: ", "").trim());
+                }
             }
 
             else if (message.isFromGuild()) {

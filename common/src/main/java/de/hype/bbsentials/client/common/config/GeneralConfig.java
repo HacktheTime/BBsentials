@@ -10,12 +10,12 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.generalConfig;
 
@@ -32,6 +32,7 @@ public class GeneralConfig extends BBsentialsConfig {
     public String nickname = "";
     public String notifForMessagesType = "NONE";
     public JsonObject recentBingoData = null;
+    public Set<String> profileIds = new HashSet<>();
 
     public GeneralConfig() {
         super(1);

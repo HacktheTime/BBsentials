@@ -104,7 +104,7 @@ public class BBsentials {
                 if (!task.permanent) {
                     onServerJoin.remove(task.getId());
                 }
-                task.run();
+                executionService.execute(task::run);
             }
         }, 5, TimeUnit.SECONDS);
     }
@@ -114,7 +114,7 @@ public class BBsentials {
             if (!task.permanent) {
                 onServerLeave.remove(task.getId()).run();
             }
-            task.run();
+            executionService.execute(task::run);
         }
     }
 

@@ -222,10 +222,10 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Will replace hub 17 with hub 29 in hub selector."))
                     .setSaveConsumer(newValue -> BBsentials.funConfig.hub17To29Troll = newValue)
                     .build());
-            BooleanListEntry lowPlaytimeHelper = (entryBuilder.startBooleanToggle(Text.of("Hub 17→29"), BBsentials.funConfig.lowPlayTimeHelpers)
+            BooleanListEntry lowPlaytimeHelper = (entryBuilder.startBooleanToggle(Text.of("§4Low Playtime Helper"), BBsentials.funConfig.lowPlayTimeHelpers)
                     .setDefaultValue(false)
                     .requireRestart()
-                    .setTooltip(Text.of("Will show you some extra Overlays and plays sounds after around 45 Seconds after joining a Lobby. Unless your name is Godwyn generally not recommended!"))
+                    .setTooltip(Text.of("§4Will show you some extra Overlays and plays sounds after around 45 Seconds after joining a Lobby. Unless your name is Godwyn generally not recommended!"))
                     .setSaveConsumer(newValue -> BBsentials.funConfig.lowPlayTimeHelpers = newValue)
                     .build());
             SubCategoryBuilder trolls = entryBuilder.startSubCategory(Text.of("Trolls")).setExpanded(false);

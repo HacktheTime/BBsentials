@@ -153,5 +153,25 @@ public class BBsentials {
                 Chat.sendPrivateMessageToSelfError("Could not set Discord Rich Presence");
             }
         }
+        if (funConfig.lowPlayTimeHelpers) {
+            ServerSwitchTask.onServerJoinTask(() -> {
+                String serverId = EnvironmentCore.utils.getServerId();
+                executionService.schedule(() -> {
+                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
+                        EnvironmentCore.utils.playsound("entity.horse.death");
+                        Chat.sendPrivateMessageToSelfError("45 Seconds over");
+                    }
+                }, 40, TimeUnit.SECONDS);
+            }, true);
+            ServerSwitchTask.onServerJoinTask(() -> {
+                String serverId = EnvironmentCore.utils.getServerId();
+                executionService.schedule(() -> {
+                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
+                        EnvironmentCore.utils.playsound("entity.horse.death");
+                        Chat.sendPrivateMessageToSelfError("50 Seconds over");
+                    }
+                }, 45, TimeUnit.SECONDS);
+            }, true);
+        }
     }
 }

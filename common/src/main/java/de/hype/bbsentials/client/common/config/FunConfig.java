@@ -9,6 +9,7 @@ public class FunConfig extends BBsentialsConfig {
     public Boolean hub29Troll = false;
     public Boolean hub17To29Troll = false;
     public boolean show404IfNotPositioned = false;
+    public boolean lowPlayTimeHelpers = false;
 
     public FunConfig() {
         super(1);

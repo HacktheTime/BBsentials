@@ -181,4 +181,6 @@ public interface Utils {
         }
         processBuilder.start();
     }
+
+    boolean isSelfBingo();
 }

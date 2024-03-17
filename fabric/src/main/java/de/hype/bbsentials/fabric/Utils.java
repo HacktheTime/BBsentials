@@ -324,7 +324,6 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             //Potion: Jump BoostAmplifier: 5 Duration: 39520
             //Potion: HasteAmplifier: 3 Duration: 39379
             //Potion: AbsorptionAmplifier: 0 Duration: 39368
-
             if (display) {
                 if (prefix.isEmpty()) stringList.add(Text.Serialization.toJsonString(player.getDisplayName()));
                 else {
@@ -335,6 +334,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             }
         }
         return stringList;
+    }
+
+    public boolean isSelfBingo() {
+        assert MinecraftClient.getInstance().player != null;
+        return Objects.requireNonNull(MinecraftClient.getInstance().player.getDisplayName()).getString().contains("Ⓑ");
     }
 
     public void displayToast(BBToast toast) {

@@ -523,7 +523,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     private boolean isSecondRowInfoRow() {
-        return MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-a").getDisplayName().getString().startsWith("Info");
+        return MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-a").getDisplayName().getString().trim().startsWith("Info");
     }
 
     public int getPlayerCount() {

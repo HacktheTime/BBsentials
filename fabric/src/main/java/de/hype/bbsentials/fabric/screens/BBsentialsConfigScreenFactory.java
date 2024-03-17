@@ -200,6 +200,17 @@ public class BBsentialsConfigScreenFactory {
         }
         //Notifications
         ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));
+        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), BBsentials.partyConfig.acceptReparty)
+                .setDefaultValue(true)
+                .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
+                .setSaveConsumer(newValue -> BBsentials.partyConfig.acceptReparty = newValue)
+                .build());
+        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept auto invite"), BBsentials.partyConfig.allowBBinviteMe)
+                .setDefaultValue(true)
+                .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
+                .setSaveConsumer(newValue -> BBsentials.partyConfig.allowBBinviteMe = newValue)
+                .build());
+
         {
             BooleanListEntry hub29Troll = (entryBuilder.startBooleanToggle(Text.of("Hub 29s"), BBsentials.funConfig.hub29Troll)
                     .setDefaultValue(false)
@@ -211,15 +222,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Will replace hub 17 with hub 29 in hub selector."))
                     .setSaveConsumer(newValue -> BBsentials.funConfig.hub17To29Troll = newValue)
                     .build());
-            other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), BBsentials.partyConfig.acceptReparty)
-                    .setDefaultValue(true)
-                    .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
-                    .setSaveConsumer(newValue -> BBsentials.partyConfig.acceptReparty = newValue)
-                    .build());
-            other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept auto invite"), BBsentials.partyConfig.allowBBinviteMe)
-                    .setDefaultValue(true)
-                    .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
-                    .setSaveConsumer(newValue -> BBsentials.partyConfig.allowBBinviteMe = newValue)
+            BooleanListEntry lowPlaytimeHelper = (entryBuilder.startBooleanToggle(Text.of("§4Low Playtime Helper"), BBsentials.funConfig.lowPlayTimeHelpers)
+                    .setDefaultValue(false)
+                    .requireRestart()
+                    .setTooltip(Text.of("§4Will show you some extra Overlays and plays sounds after around 45 Seconds after joining a Lobby. Unless your name is Godwyn generally not recommended!"))
+                    .setSaveConsumer(newValue -> BBsentials.funConfig.lowPlayTimeHelpers = newValue)
                     .build());
             SubCategoryBuilder trolls = entryBuilder.startSubCategory(Text.of("Trolls")).setExpanded(false);
             BooleanListEntry swapActionBarAndChat = (entryBuilder.startBooleanToggle(Text.of("Actionbar-Chat switch"), BBsentials.funConfig.swapActionBarChat)
@@ -240,6 +247,7 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Swap only the messages from BBsentials"))
                     .setSaveConsumer(newValue -> BBsentials.funConfig.swapOnlyBBsentials = newValue)
                     .build());
+            trolls.add(lowPlaytimeHelper);
             trolls.add(hub29Troll);
             trolls.add(hub17To29Troll);
             trolls.add(swapActionBarAndChat);

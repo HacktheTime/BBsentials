@@ -104,7 +104,7 @@ public class BBsentials {
                 if (!task.permanent) {
                     onServerJoin.remove(task.getId());
                 }
-                task.run();
+                executionService.execute(task::run);
             }
         }, 5, TimeUnit.SECONDS);
     }
@@ -114,7 +114,7 @@ public class BBsentials {
             if (!task.permanent) {
                 onServerLeave.remove(task.getId()).run();
             }
-            task.run();
+            executionService.execute(task::run);
         }
     }
 
@@ -152,6 +152,26 @@ public class BBsentials {
             } catch (Exception e) {
                 Chat.sendPrivateMessageToSelfError("Could not set Discord Rich Presence");
             }
+        }
+        if (funConfig.lowPlayTimeHelpers) {
+            ServerSwitchTask.onServerJoinTask(() -> {
+                String serverId = EnvironmentCore.utils.getServerId();
+                executionService.schedule(() -> {
+                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
+                        EnvironmentCore.utils.playsound("entity.horse.death");
+                        Chat.sendPrivateMessageToSelfError("45 Seconds over");
+                    }
+                }, 40, TimeUnit.SECONDS);
+            }, true);
+            ServerSwitchTask.onServerJoinTask(() -> {
+                String serverId = EnvironmentCore.utils.getServerId();
+                executionService.schedule(() -> {
+                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
+                        EnvironmentCore.utils.playsound("entity.horse.death");
+                        Chat.sendPrivateMessageToSelfError("50 Seconds over");
+                    }
+                }, 45, TimeUnit.SECONDS);
+            }, true);
         }
     }
 }

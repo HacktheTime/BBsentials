@@ -13,17 +13,17 @@ public enum MobEnums {
     Pig("farming_pig_1", "Pig", 1, MobGroupEnums.Pig, Islands.THE_FARMING_ISLANDS),
     Rabbit("farming_rabbit_1", "Rabbit", 1, MobGroupEnums.Rabbit, Islands.THE_FARMING_ISLANDS),
     Sheep("farming_sheep_1", "Sheep", 1, MobGroupEnums.Sheep, Islands.THE_FARMING_ISLANDS),
-    Arachne_300("arachne_300", "Arachne", 300, MobGroupEnums.Arachne, Islands.SPIDERS_DEN),
-    Arachne_500("arachne_500", "Arachne", 500, MobGroupEnums.Arachne, Islands.SPIDERS_DEN),
-    Arachne_Brood_100("arachne_brood_100", "Arachne's Brood", 100, MobGroupEnums.Arachne, Islands.SPIDERS_DEN),
-    Arachne_Brood_200("arachne_brood_200", "Arachne's Brood", 200, MobGroupEnums.Arachne, Islands.SPIDERS_DEN),
-    Arachne_Keeper_100("arachne_keeper_100","Arachne's Keeper", 100, MobGroupEnums.Arachne, Islands.SPIDERS_DEN),
+    Arachne_300("arachne_300", "Arachne", 300, MobGroupEnums.Arachne_Boss, Islands.SPIDERS_DEN),
+    Arachne_500("arachne_500", "Arachne", 500, MobGroupEnums.Arachne_Boss, Islands.SPIDERS_DEN),
+    Arachne_Brood_100("arachne_brood_100", "Arachne's Brood", 100, MobGroupEnums.Arachne_Boss, Islands.SPIDERS_DEN),
+    Arachne_Brood_200("arachne_brood_200", "Arachne's Brood", 200, MobGroupEnums.Arachne_Boss, Islands.SPIDERS_DEN),
+    Arachne_Keeper_100("arachne_keeper_100","Arachne's Keeper", 100, MobGroupEnums.Arachne_Boss, Islands.SPIDERS_DEN),
     Broodmother("brood_mother_spider_12", "Broodmother", 12, MobGroupEnums.Broodmother, Islands.SPIDERS_DEN),
-    Dasher_Spider_4("dasher_spider_4", "Dasher Spider", 4, MobGroupEnums.Dasher_Spider, Islands.SPIDERS_DEN),
-    Dasher_Spider_6("dasher_spider_6", "Dasher Spider", 6, MobGroupEnums.Dasher_Spider, Islands.SPIDERS_DEN),
-    Dasher_Spider_42("dasher_spider_42", "Dasher Spider", 42, MobGroupEnums.Dasher_Spider, Islands.SPIDERS_DEN),
-    Dasher_Spider_45("dasher_spider_45", "Dasher Spider", 45, MobGroupEnums.Dasher_Spider, Islands.SPIDERS_DEN),
-    Dasher_Spider_50("dasher_spider_50", "Dasher Spider", 50, MobGroupEnums.Dasher_Spider, Islands.SPIDERS_DEN),
+    Dasher_Spider_4("dasher_spider_4", "Dasher Spider", 4, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Dasher_Spider_6("dasher_spider_6", "Dasher Spider", 6, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Dasher_Spider_42("dasher_spider_42", "Dasher Spider", 42, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Dasher_Spider_45("dasher_spider_45", "Dasher Spider", 45, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Dasher_Spider_50("dasher_spider_50", "Dasher Spider", 50, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
     Gravel_Skeleton("respawning_skeleton_2", "Gravel Skeleton", 2, MobGroupEnums.Skeleton, Islands.SPIDERS_DEN),
     Rain_Slime_8("random_slime_8", "Rain Slime", 8, MobGroupEnums.Rain_Slime, Islands.SPIDERS_DEN),
     Rain_Slime_20("random_slime_8", "Rain Slime", 20, MobGroupEnums.Rain_Slime, Islands.SPIDERS_DEN),
@@ -33,26 +33,26 @@ public enum MobEnums {
     Splitter_Spider_Silverfish_42("splitter_spider_silverfish_42", "Silverfish", 42, MobGroupEnums.Silverfish, Islands.SPIDERS_DEN),
     Splitter_Spider_Silverfish_45("splitter_spider_silverfish_45", "Silverfish", 45, MobGroupEnums.Silverfish, Islands.SPIDERS_DEN),
     Splitter_Spider_Silverfish_50("splitter_spider_silverfish_50", "Silverfish", 50, MobGroupEnums.Silverfish, Islands.SPIDERS_DEN),
-    Spider_Jockey_3("spider_jockey_3", "Spider Jockey", 3, MobGroupEnums.Spider_Jockey, Islands.SPIDERS_DEN),
-    Spider_Jockey_5("spider_jockey_5", "Spider Jockey", 5, MobGroupEnums.Spider_Jockey, Islands.SPIDERS_DEN),
-    Spider_Jockey_42("spider_jockey_42", "Spider Jockey", 42, MobGroupEnums.Spider_Jockey, Islands.SPIDERS_DEN),
-    Splitter_Spider_2("splitter_spider_2", "Splitter Spider", 2, MobGroupEnums.Splitter_Spider, Islands.SPIDERS_DEN),
-    Splitter_Spider_4("splitter_spider_4", "Splitter Spider", 4, MobGroupEnums.Splitter_Spider, Islands.SPIDERS_DEN),
-    Splitter_Spider_6("splitter_spider_6", "Splitter Spider", 6, MobGroupEnums.Splitter_Spider, Islands.SPIDERS_DEN),
-    Splitter_Spider_42("splitter_spider_42", "Splitter Spider", 42, MobGroupEnums.Splitter_Spider, Islands.SPIDERS_DEN),
-    Splitter_Spider_45("splitter_spider_45", "Splitter Spider", 45, MobGroupEnums.Splitter_Spider, Islands.SPIDERS_DEN),
-    Splitter_Spider_50("splitter_spider_50", "Splitter Spider", 50, MobGroupEnums.Splitter_Spider, Islands.SPIDERS_DEN),
-    Voracious_Spider_10("voracious_spider_10", "Voracious Spider", 10, MobGroupEnums.Voracious_Spider, Islands.SPIDERS_DEN),
-    Voracious_Spider_42("voracious_spider_42", "Voracious Spider", 42, MobGroupEnums.Voracious_Spider, Islands.SPIDERS_DEN),
-    Voracious_Spider_45("voracious_spider_45", "Voracious Spider", 45, MobGroupEnums.Voracious_Spider, Islands.SPIDERS_DEN),
-    Voracious_Spider_50("voracious_spider_50", "Voracious Spider", 50, MobGroupEnums.Voracious_Spider, Islands.SPIDERS_DEN),
-    Weaver_Spider_3("weaver_spider_3", "Weaver Spider", 3, MobGroupEnums.Weaver_Spider, Islands.SPIDERS_DEN),
-    Weaver_Spider_4("weaver_spider_4", "Weaver Spider", 4, MobGroupEnums.Weaver_Spider, Islands.SPIDERS_DEN),
-    Weaver_Spider_5("weaver_spider_5", "Weaver Spider", 5, MobGroupEnums.Weaver_Spider, Islands.SPIDERS_DEN),
-    Weaver_Spider_6("weaver_spider_6", "Weaver Spider", 6, MobGroupEnums.Weaver_Spider, Islands.SPIDERS_DEN),
-    Weaver_Spider_42("weaver_spider_42", "Weaver Spider", 42, MobGroupEnums.Weaver_Spider, Islands.SPIDERS_DEN),
-    Weaver_Spider_45("weaver_spider_45", "Weaver Spider", 45, MobGroupEnums.Weaver_Spider, Islands.SPIDERS_DEN),
-    Weaver_Spider_50("weaver_spider_50", "Weaver Spider", 50, MobGroupEnums.Weaver_Spider, Islands.SPIDERS_DEN),
+    Spider_Jockey_3("spider_jockey_3", "Spider Jockey", 3, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Spider_Jockey_5("spider_jockey_5", "Spider Jockey", 5, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Spider_Jockey_42("spider_jockey_42", "Spider Jockey", 42, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Splitter_Spider_2("splitter_spider_2", "Splitter Spider", 2, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Splitter_Spider_4("splitter_spider_4", "Splitter Spider", 4, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Splitter_Spider_6("splitter_spider_6", "Splitter Spider", 6, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Splitter_Spider_42("splitter_spider_42", "Splitter Spider", 42, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Splitter_Spider_45("splitter_spider_45", "Splitter Spider", 45, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Splitter_Spider_50("splitter_spider_50", "Splitter Spider", 50, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Voracious_Spider_10("voracious_spider_10", "Voracious Spider", 10, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Voracious_Spider_42("voracious_spider_42", "Voracious Spider", 42, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Voracious_Spider_45("voracious_spider_45", "Voracious Spider", 45, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Voracious_Spider_50("voracious_spider_50", "Voracious Spider", 50, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Weaver_Spider_3("weaver_spider_3", "Weaver Spider", 3, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Weaver_Spider_4("weaver_spider_4", "Weaver Spider", 4, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Weaver_Spider_5("weaver_spider_5", "Weaver Spider", 5, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Weaver_Spider_6("weaver_spider_6", "Weaver Spider", 6, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Weaver_Spider_42("weaver_spider_42", "Weaver Spider", 42, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Weaver_Spider_45("weaver_spider_45", "Weaver Spider", 45, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
+    Weaver_Spider_50("weaver_spider_50", "Weaver Spider", 50, MobGroupEnums.Spider, Islands.SPIDERS_DEN),
     Protector_Dragon("protector_dragon_100", "Ender Dragons", 100, MobGroupEnums.Ender_Dragons, Islands.THE_END),
     Old_Dragon("old_dragon_100", "Ender Dragons", 100, MobGroupEnums.Ender_Dragons, Islands.THE_END),
     Young_Dragon("young_dragon_100", "Ender Dragons", 100, MobGroupEnums.Ender_Dragons, Islands.THE_END),
@@ -73,6 +73,65 @@ public enum MobEnums {
     Enderman_42("enderman_42", "Enderman", 42, MobGroupEnums.Enderman, Islands.THE_END),
     Enderman_45("enderman_45", "Enderman", 45, MobGroupEnums.Enderman, Islands.THE_END),
     Enderman_50("enderman_50", "Enderman", 50, MobGroupEnums.Enderman, Islands.THE_END),
+    Blaze_25("blaze_25", "Blaze", 25, MobGroupEnums.Blaze, Islands.CRIMSON_ISLE),
+    Blaze_70("blaze_70", "Blaze", 70, MobGroupEnums.Blaze, Islands.CRIMSON_ISLE),
+    Bezal_80("bezal_80", "Blaze", 80, MobGroupEnums.Blaze, Islands.CRIMSON_ISLE),
+    Mutated_Blaze_70("mutated_blaze_70", "Mutated Blaze", 70, MobGroupEnums.Blaze, Islands.CRIMSON_ISLE),
+    Smoldering_Blaze_95("smoldering_blaze_95", "Smoldering Blaze", 95, MobGroupEnums.Blaze, Islands.CRIMSON_ISLE),
+    Old_Blaze_110("old_blaze_110", "Millenia-Aged Blaze", 110, MobGroupEnums.Blaze, Islands.CRIMSON_ISLE),
+    Flaming_Spider_80("flaming_spider_80", "Flaming Spider", 80, MobGroupEnums.Spider, Islands.CRIMSON_ISLE),
+//    Flare("flare_90", "Flare", 90, MobGroupEnums.Flare, Islands.CRIMSON_ISLE),
+//    Ghast("ghast_85", "Ghast", 85, MobGroupEnums.Ghast, Islands.CRIMSON_ISLE),
+//    Dive_Ghast("dive_ghast_90", "Dive Ghast", 90, MobGroupEnums.Ghast, Islands.CRIMSON_ISLE),
+//    Pack_Magma_Cube_90("pack_magma_cube_90", "Magma Cube", 90, MobGroupEnums.Magma_Cube, Islands.CRIMSON_ISLE),
+//    Magma_Cube_75("magma_cube_75", "Magma Cube", 75, MobGroupEnums.Magma_Cube, Islands.CRIMSON_ISLE),
+//    Fireball_Magma_Cube_75("fireball_magma_cube_75", "Magma Cube", 75, MobGroupEnums.Magma_Cube, Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.CRIMSON_ISLE),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+//    Null("", "", , MobGroupEnums., Islands.),
+
     Golden_Goblin("goblin_50", "Golden Goblin", 50, MobGroupEnums.GOBLIN, Islands.DWARVEN_MINES, Islands.CRYSTAL_HOLLOWS),
     Ashfang_200("ashfang_200", "Ashfang", 200, MobGroupEnums.Nether_Bosses, Islands.CRIMSON_ISLE),
     Barbarian_Duke_x_200("barbarian_duke_x_200", "Barbarian Duke X", 200, MobGroupEnums.Nether_Bosses, Islands.CRIMSON_ISLE),
@@ -83,11 +142,11 @@ public enum MobEnums {
 
     ;
 
-    public final String id;
-    public final String displayName;
-    public final int level;
-    public final MobGroupEnums mobGroup;
-    public final Islands[] island;
+    private String id;
+    private String displayName;
+    private int level;
+    private MobGroupEnums mobGroup;
+    private Islands[] island;
 
 
     MobEnums(String id, String displayName, int level, MobGroupEnums mobGroup, Islands... island) {
@@ -100,5 +159,22 @@ public enum MobEnums {
 
     public MobGroupEnums getMobGroup() {
         return mobGroup;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Islands[] getIsland() {
+        return island;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+
+    public String getDisplayName() {
+        return displayName;
     }
 }

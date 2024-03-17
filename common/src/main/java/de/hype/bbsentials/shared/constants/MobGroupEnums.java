@@ -11,16 +11,12 @@ public enum MobGroupEnums {
     Pig("Pig"),
     Rabbit("Rabbit"),
     Sheep("Sheep"),
-    Arachne("Arachne"),
+    Spider("Spider"),
+    Arachne_Boss("Arachne Boss"),
     Broodmother("Broodmother"),
-    Dasher_Spider("Dasher Spider"),
     Skeleton("Skeleton"),
     Rain_Slime("Rain Slime"),
     Silverfish("Silverfish"),
-    Spider_Jockey("Spider Jockey"),
-    Splitter_Spider("Splitter Spider"),
-    Voracious_Spider("Voracious Spider"),
-    Weaver_Spider("Weaver Spider"),
     Enderman("Enderman"),
     Endermite("Endermite"),
     Obsidian_Defender("Obsidian Defender"),
@@ -30,6 +26,7 @@ public enum MobGroupEnums {
     TEAM_TREASURITE("Team Treasurite"),
     GOBLIN("Goblin"),
     Nether_Bosses("Crimson Isle Minibosses"),
+    Blaze("Blaze"),
 
     
 

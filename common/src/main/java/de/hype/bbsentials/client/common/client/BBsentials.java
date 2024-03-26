@@ -16,6 +16,7 @@ import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.shared.constants.Islands;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -155,6 +156,7 @@ public class BBsentials {
         }
         if (funConfig.lowPlayTimeHelpers) {
             ServerSwitchTask.onServerJoinTask(() -> {
+                BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
                 String serverId = EnvironmentCore.utils.getServerId();
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
@@ -162,9 +164,6 @@ public class BBsentials {
                         Chat.sendPrivateMessageToSelfError("45 Seconds over");
                     }
                 }, 40, TimeUnit.SECONDS);
-            }, true);
-            ServerSwitchTask.onServerJoinTask(() -> {
-                String serverId = EnvironmentCore.utils.getServerId();
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         EnvironmentCore.utils.playsound("entity.horse.death");

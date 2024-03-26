@@ -136,21 +136,22 @@ public class GameSDKManager extends DiscordEventAdapter {
 
 
         String path = "/native/" + osName + "/" + arch + "/" + jniName;
-        InputStream in = Core.class.getResourceAsStream(path);
-        if (in == null)
-            throw new RuntimeException(new FileNotFoundException("cannot find Discord native library at " + path));
-
         File jniStoragePath = new File(sdkDir, jniName);
-
-        try {
-            Files.copy(in, jniStoragePath.toPath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (!jniStoragePath.exists()) {
+            InputStream in = Core.class.getResourceAsStream(path);
+            if (in == null)
+                throw new RuntimeException(new FileNotFoundException("cannot find Discord native library at " + path));
+            try {
+                Files.copy(in, jniStoragePath.toPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         System.load(jniStoragePath.getAbsolutePath());
         Core.initDiscordNative(dcNativeLibraryStoragePath.getAbsolutePath());
     }
+
     public void joinLobby(Long lobbyId, String secret, boolean connectToVc, boolean blocking) {
         LobbyManager mgn = getLobbyManager();
         leaveLobby(mgn, currentLobby);

@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -172,7 +173,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 if (key.equals("enchantments")) continue;
                 if (key.equals("timestamp")) {
                     Long stamp = extraAttributes.getLong(key);
-                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + new Date(stamp) + ")"))));
+                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"))));
                     continue;
                 }
                 loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of(key + ": " + extraAttributes.get(key)))));
@@ -453,7 +454,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
+        else if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
             ChChestUpdateListener listener = UpdateListenerManager.chChestUpdateListener;
 
             int x = 10;
@@ -500,6 +501,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
                 y += 10; // Adjust the vertical position for the next string
             }
+        }
+        else if (BBsentials.funConfig.lowPlayTimeHelpers) {
+            int differece = ((Instant.now().getNano() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getNano()) / 1000) + 3;
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
         }
     }
 

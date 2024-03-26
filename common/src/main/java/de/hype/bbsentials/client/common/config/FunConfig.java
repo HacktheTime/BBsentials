@@ -1,6 +1,8 @@
 package de.hype.bbsentials.client.common.config;
 
 
+import java.time.Instant;
+
 public class FunConfig extends BBsentialsConfig {
     public boolean swapActionBarChat = false;
     public boolean swapOnlyNormal = true;
@@ -10,6 +12,8 @@ public class FunConfig extends BBsentialsConfig {
     public Boolean hub17To29Troll = false;
     public boolean show404IfNotPositioned = false;
     public boolean lowPlayTimeHelpers = false;
+    public transient Instant lowPlaytimeHelperJoinDate = null;
+
 
     public FunConfig() {
         super(1);

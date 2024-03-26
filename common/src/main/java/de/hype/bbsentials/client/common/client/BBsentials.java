@@ -164,14 +164,20 @@ public class BBsentials {
                 String serverId = EnvironmentCore.utils.getServerId();
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
-                        EnvironmentCore.utils.playsound("entity.horse.death");
-                        Chat.sendPrivateMessageToSelfError("45 Seconds over");
+                        long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
+                        if (currentTimeInLobby < 50 && currentTimeInLobby > 40) {
+                            EnvironmentCore.utils.playsound("entity.horse.death");
+                            Chat.sendPrivateMessageToSelfError("45 Seconds over");
+                        }
                     }
                 }, 45 - baseTimeAlready, TimeUnit.SECONDS);
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
-                        EnvironmentCore.utils.playsound("entity.horse.death");
-                        Chat.sendPrivateMessageToSelfError("50 Seconds over");
+                        long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
+                        if (currentTimeInLobby < 55 && currentTimeInLobby > 45) {
+                            EnvironmentCore.utils.playsound("entity.horse.death");
+                            Chat.sendPrivateMessageToSelfError("50 Seconds over");
+                        }
                     }
                 }, 50 - baseTimeAlready, TimeUnit.SECONDS);
             }, true);

@@ -504,7 +504,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
         else if (BBsentials.funConfig.lowPlayTimeHelpers && BBsentials.funConfig.lowPlaytimeHelperJoinDate != null) {
             long differece = ((Instant.now().getEpochSecond() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
-            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
+            String colorCode = "§a";
+            if (differece > 50) colorCode = "§4§l";
+            else if (differece > 45) colorCode = "§4";
+            else if (differece > 40) colorCode = "§6";
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
         }
     }
 

@@ -19,4 +19,14 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
     public List<String> test() {
         return Collections.singletonList("");
     }
+
+    @Override
+    public void onServerJoin() {
+
+    }
+
+    @Override
+    public void onServerLeave() {
+
+    }
 }

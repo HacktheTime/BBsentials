@@ -155,21 +155,25 @@ public class BBsentials {
             }
         }
         if (funConfig.lowPlayTimeHelpers) {
-            ServerSwitchTask.onServerJoinTask(() -> {
+            ServerSwitchTask.onServerLeaveTask(() -> {
                 BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
+            }, true);
+            ServerSwitchTask.onServerJoinTask(() -> {
+                if (funConfig.lowPlaytimeHelperJoinDate == null) return;
+                long baseTimeAlready = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
                 String serverId = EnvironmentCore.utils.getServerId();
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         EnvironmentCore.utils.playsound("entity.horse.death");
                         Chat.sendPrivateMessageToSelfError("45 Seconds over");
                     }
-                }, 40, TimeUnit.SECONDS);
+                }, 45 - baseTimeAlready, TimeUnit.SECONDS);
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         EnvironmentCore.utils.playsound("entity.horse.death");
                         Chat.sendPrivateMessageToSelfError("50 Seconds over");
                     }
-                }, 45, TimeUnit.SECONDS);
+                }, 50 - baseTimeAlready, TimeUnit.SECONDS);
             }, true);
         }
     }

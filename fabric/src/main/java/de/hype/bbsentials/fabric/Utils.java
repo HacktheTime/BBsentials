@@ -502,8 +502,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        else if (BBsentials.funConfig.lowPlayTimeHelpers) {
-            int differece = ((Instant.now().getNano() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getNano()) / 1000) + 3;
+        else if (BBsentials.funConfig.lowPlayTimeHelpers && BBsentials.funConfig.lowPlaytimeHelperJoinDate != null) {
+            long differece = ((Instant.now().getEpochSecond() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
             drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
         }
     }

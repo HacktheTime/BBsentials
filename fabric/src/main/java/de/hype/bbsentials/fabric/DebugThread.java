@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -107,5 +108,15 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
             }
 
         }, 100, 100, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void onServerJoin() {
+        Chat.sendPrivateMessageToSelfError("Hub Join exec");
+    }
+
+    @Override
+    public void onServerLeave() {
+        Chat.sendPrivateMessageToSelfError("Hub Leave exec");
     }
 }

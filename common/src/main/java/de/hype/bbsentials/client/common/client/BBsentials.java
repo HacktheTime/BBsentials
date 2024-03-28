@@ -58,6 +58,7 @@ public class BBsentials {
     public static GameSDKManager dcGameSDK;
     private static boolean initialised = false;
     private static volatile ScheduledFuture<?> futureServerJoin;
+    private static volatile boolean futureServerJoinRunning;
 
     public static void connectToBBserver() {
         connectToBBserver(bbServerConfig.connectToBeta);
@@ -103,10 +104,14 @@ public class BBsentials {
     public synchronized static void onServerJoin() {
         onServerLeave();
         if (futureServerJoin != null) {
-            Chat.sendPrivateMessageToSelfError("BB: You switched Lobbies so quickly that some things may weren't completed in time. Do not report this as bug!");
             futureServerJoin.cancel(false);
+            if (futureServerJoinRunning)
+                Chat.sendPrivateMessageToSelfError("BB: You switched Lobbies so quickly that some things may weren't completed in time. Do not report this as bug!");
+            else
+                System.out.println("BB-Debug Output: Swapped Lobbies really quickly. Lobby Join events tasks were not executed.");
         }
         futureServerJoin = executionService.schedule(() -> {
+            futureServerJoinRunning = true;
             for (ServerSwitchTask task : onServerJoin.values()) {
                 if (!task.permanent) {
                     onServerJoin.remove(task.getId());
@@ -114,6 +119,7 @@ public class BBsentials {
                 executionService.execute(task::run);
             }
             futureServerJoin = null;
+            futureServerJoinRunning = false;
         }, 5, TimeUnit.SECONDS);
     }
 

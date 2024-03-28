@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -172,7 +173,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 if (key.equals("enchantments")) continue;
                 if (key.equals("timestamp")) {
                     Long stamp = extraAttributes.getLong(key);
-                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + new Date(stamp) + ")"))));
+                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"))));
                     continue;
                 }
                 loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of(key + ": " + extraAttributes.get(key)))));
@@ -324,7 +325,6 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             //Potion: Jump BoostAmplifier: 5 Duration: 39520
             //Potion: HasteAmplifier: 3 Duration: 39379
             //Potion: AbsorptionAmplifier: 0 Duration: 39368
-
             if (display) {
                 if (prefix.isEmpty()) stringList.add(Text.Serialization.toJsonString(player.getDisplayName()));
                 else {
@@ -335,6 +335,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             }
         }
         return stringList;
+    }
+
+    public boolean isSelfBingo() {
+        assert MinecraftClient.getInstance().player != null;
+        return Objects.requireNonNull(MinecraftClient.getInstance().player.getDisplayName()).getString().contains("Ⓑ");
     }
 
     public void displayToast(BBToast toast) {
@@ -449,7 +454,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
+        else if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
             ChChestUpdateListener listener = UpdateListenerManager.chChestUpdateListener;
 
             int x = 10;
@@ -496,6 +501,14 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
                 y += 10; // Adjust the vertical position for the next string
             }
+        }
+        else if (BBsentials.funConfig.lowPlayTimeHelpers && BBsentials.funConfig.lowPlaytimeHelperJoinDate != null) {
+            long differece = ((Instant.now().getEpochSecond() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
+            String colorCode = "§a";
+            if (differece > 50) colorCode = "§4§l";
+            else if (differece > 45) colorCode = "§4";
+            else if (differece > 40) colorCode = "§6";
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
         }
     }
 

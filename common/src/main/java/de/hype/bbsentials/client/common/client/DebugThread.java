@@ -42,4 +42,8 @@ public abstract class DebugThread implements Runnable {
         gameSDKManager = BBsentials.dcGameSDK;
         connection = BBsentials.connection;
     }
+
+    public abstract void onServerJoin();
+
+    public abstract void onServerLeave();
 }

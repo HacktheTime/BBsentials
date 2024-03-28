@@ -16,6 +16,7 @@ import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.shared.constants.Islands;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -154,23 +155,31 @@ public class BBsentials {
             }
         }
         if (funConfig.lowPlayTimeHelpers) {
-            ServerSwitchTask.onServerJoinTask(() -> {
-                String serverId = EnvironmentCore.utils.getServerId();
-                executionService.schedule(() -> {
-                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
-                        EnvironmentCore.utils.playsound("entity.horse.death");
-                        Chat.sendPrivateMessageToSelfError("45 Seconds over");
-                    }
-                }, 40, TimeUnit.SECONDS);
+            ServerSwitchTask.onServerLeaveTask(() -> {
+                BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
             }, true);
             ServerSwitchTask.onServerJoinTask(() -> {
+                if (funConfig.lowPlaytimeHelperJoinDate == null) return;
+                long baseTimeAlready = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
                 String serverId = EnvironmentCore.utils.getServerId();
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
-                        EnvironmentCore.utils.playsound("entity.horse.death");
-                        Chat.sendPrivateMessageToSelfError("50 Seconds over");
+                        long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
+                        if (currentTimeInLobby < 47 && currentTimeInLobby > 43) {
+                            EnvironmentCore.utils.playsound("entity.horse.death");
+                            Chat.sendPrivateMessageToSelfError("45 Seconds over");
+                        }
                     }
-                }, 45, TimeUnit.SECONDS);
+                }, 45 - baseTimeAlready, TimeUnit.SECONDS);
+                executionService.schedule(() -> {
+                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
+                        long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
+                        if (currentTimeInLobby < 52 && currentTimeInLobby > 48) {
+                            EnvironmentCore.utils.playsound("entity.horse.death");
+                            Chat.sendPrivateMessageToSelfError("50 Seconds over");
+                        }
+                    }
+                }, 50 - baseTimeAlready, TimeUnit.SECONDS);
             }, true);
         }
     }

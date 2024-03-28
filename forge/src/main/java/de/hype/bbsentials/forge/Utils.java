@@ -91,7 +91,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public void playsound(String eventName) {
         if (eventName.isEmpty()) Minecraft.getMinecraft().getSoundHandler().stopSounds();
-        else Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation(eventName), 1.0F, 1.0F, 0.0F));
+        else
+            Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation(eventName), 1.0F, 1.0F, 0.0F));
     }
 
     public int getPotTime() {
@@ -230,6 +231,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     @Override
     public void showErrorScreen(String s) {
 
+    }
+
+    @Override
+    public boolean isSelfBingo() {
+        return Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText().contains("Ⓑ");
     }
 
     @Override

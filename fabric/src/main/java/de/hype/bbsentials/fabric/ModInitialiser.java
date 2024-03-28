@@ -369,9 +369,14 @@ public class ModInitialiser implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        System.out.println("BBsentials : onInit called");
         EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread());
         codes = new NumPadCodes();
         BBsentials.init();
+        if (generalConfig.hasBBRoles("dev")) {
+            ServerSwitchTask.onServerJoinTask(() -> EnvironmentCore.debug.onServerJoin(), true);
+            ServerSwitchTask.onServerLeaveTask(() -> EnvironmentCore.debug.onServerLeave(), true);
+        }
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
             BBsentials.onServerJoin();
         });

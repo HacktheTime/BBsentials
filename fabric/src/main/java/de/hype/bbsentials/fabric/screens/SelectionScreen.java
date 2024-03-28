@@ -25,14 +25,16 @@ public abstract class SelectionScreen<T> extends Screen {
 
     public SelectionScreen(Screen parent, String displayName) {
         super(Text.of(displayName));
+        if (parent == null) parent = MinecraftClient.getInstance().currentScreen;
         this.parent = parent;
     }
 
     public abstract List<T> getObjectList();
 
-    private List<T> getObjectsInternal(){
+    private List<T> getObjectsInternal() {
         return new ArrayList<>(getObjectList());
     }
+
     @Override
     protected void init() {
         if (okButton == null) {

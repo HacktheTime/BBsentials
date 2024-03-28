@@ -42,7 +42,7 @@ public class RouteConfigScreen extends SelectionScreen<RouteNode> {
 
     @Override
     public String getButtonString(RouteNode object) {
-        return object.name;
+        return object.toString();
     }
 
     public void done() {

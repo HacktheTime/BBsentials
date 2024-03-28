@@ -16,14 +16,14 @@ public class RoutesConfigScreen extends SelectionScreen<WaypointRoute> {
     @Override
     public List<WaypointRoute> getObjectList() {
         List<WaypointRoute> routes = new ArrayList<>();
+        File[] files = WaypointRoute.waypointRouteDirectory.listFiles();
         try {
-            for (File file : WaypointRoute.waypointRouteDirectory.listFiles()) {
+            for (File file : files) {
                 try {
-
-                } catch (Exception ignored) {
                     if (file.getName().endsWith(".json")) {
                         routes.add(WaypointRoute.loadFromFile(file));
                     }
+                } catch (Exception ignored) {
                 }
             }
         } catch (Exception ignored) {

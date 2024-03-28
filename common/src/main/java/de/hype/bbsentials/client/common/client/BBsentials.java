@@ -116,7 +116,12 @@ public class BBsentials {
                 if (!task.permanent) {
                     onServerJoin.remove(task.getId());
                 }
-                executionService.execute(task::run);
+                try {
+                    executionService.execute(task::run);
+                } catch (Exception e) {
+                    System.out.println("Error in a task.");
+                    e.printStackTrace();
+                }
             }
             futureServerJoin = null;
             futureServerJoinRunning = false;
@@ -128,7 +133,12 @@ public class BBsentials {
             if (!task.permanent) {
                 onServerLeave.remove(task.getId()).run();
             }
-            executionService.execute(task::run);
+            try {
+                executionService.execute(task::run);
+            } catch (Exception e) {
+                System.out.println("Error in a task.");
+                e.printStackTrace();
+            }
         }
     }
 

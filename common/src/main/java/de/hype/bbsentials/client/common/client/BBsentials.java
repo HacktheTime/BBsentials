@@ -188,21 +188,21 @@ public class BBsentials {
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
-//                        if (currentTimeInLobby < 47 && currentTimeInLobby > 43) {
+                        if (currentTimeInLobby < 47 && currentTimeInLobby > 43) {
                         EnvironmentCore.utils.playsound("entity.horse.death");
                         Chat.sendPrivateMessageToSelfError("45 Seconds over");
-//                        }
+                        }
                     }
-                }, 15 - baseTimeAlready, TimeUnit.SECONDS);
+                }, 45 - baseTimeAlready, TimeUnit.SECONDS);
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
-//                        if (currentTimeInLobby < 52 && currentTimeInLobby > 48) {
+                        if (currentTimeInLobby < 52 && currentTimeInLobby > 48) {
                         EnvironmentCore.utils.playsound("entity.horse.death");
                         Chat.sendPrivateMessageToSelfError("50 Seconds over");
-//                        }
+                        }
                     }
-                }, 20 - baseTimeAlready, TimeUnit.SECONDS);
+                }, 50 - baseTimeAlready, TimeUnit.SECONDS);
             }, true);
         }
     }

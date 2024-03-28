@@ -1,5 +1,6 @@
 package de.hype.bbsentials.fabric.screens;
 
+import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.shared.objects.WaypointData;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -36,9 +37,11 @@ public class WaypointConfigScreen {
         main.addEntry(entryBuilder.startIntField(Text.literal("X:"), data.position.x).setDefaultValue(data.position.x).setSaveConsumer((newx) -> data.position.x = newx).build());
         main.addEntry(entryBuilder.startIntField(Text.literal("Y:"), data.position.y).setDefaultValue(data.position.y).setSaveConsumer((newy) -> data.position.y = newy).build());
         main.addEntry(entryBuilder.startIntField(Text.literal("Z:"), data.position.z).setDefaultValue(data.position.z).setSaveConsumer((newz) -> data.position.z = newz).build());
-        main.addEntry(entryBuilder.startIntField(Text.literal("Render Distance:"), data.renderDistance).setDefaultValue(10000).setSaveConsumer((newvalue) -> data.renderDistance = newvalue).setTooltip(Text.literal("Maximum Distance for the waypoint to be rendered")).build());
+        //Issue is the accuracy limitation in bits for float basically Integer overflow problem like
+        main.addEntry(entryBuilder.startIntField(Text.literal("Render Distance:"), data.renderDistance).setDefaultValue(10000).setSaveConsumer((newvalue) -> data.renderDistance = newvalue).setTooltip(Text.literal("Maximum Distance for the waypoint to be rendered. \n The System is not able to display Waypoint over large distances due too technical limitations. Do not ask for help if you increase this number.")).build());
         main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Visible"), data.visible).setDefaultValue(true).setSaveConsumer(newValue -> data.visible = newValue).build());
         main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Delete on Server Swap"), data.deleteOnServerSwap).setDefaultValue(true).setSaveConsumer(newValue -> data.deleteOnServerSwap = newValue).build());
+        main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Show Tracer"), data.doTracer).setTooltip(Text.of("Show Tracers to the Waypoint?\nThis will render a line to the waypoint on your screen. Default can be changed in the Visual Config")).setDefaultValue(BBsentials.visualConfig.waypointDefaultWithTracer).setSaveConsumer(newValue -> data.doTracer = newValue).build());
         //TODO do the custom textures for waypoints
         try {
             return builder.build();

@@ -4,6 +4,7 @@ import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.util.math.BlockPos;
 
@@ -11,8 +12,8 @@ import java.util.List;
 
 public class WaypointsConfigScreen extends SelectionScreen<Waypoints> {
 
-    public WaypointsConfigScreen() {
-        super(null, "Waypoints");
+    public WaypointsConfigScreen(Screen parent) {
+        super(parent, "Waypoints");
     }
 
     @Override

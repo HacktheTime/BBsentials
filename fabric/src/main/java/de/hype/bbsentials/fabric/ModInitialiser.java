@@ -16,6 +16,7 @@ import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
+import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
@@ -258,6 +259,10 @@ public class ModInitialiser implements ClientModInitializer {
                                             }))
                                     )
                             )
+                            .executes((context -> {
+                                MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen(null)));
+                                return 1;
+                            }))
                     ).then(ClientCommandManager.literal("route")
                             .then(ClientCommandManager.literal("load")
                                     .then(ClientCommandManager.argument("fileName", StringArgumentType.string())

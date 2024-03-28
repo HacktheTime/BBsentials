@@ -105,26 +105,31 @@ public abstract class SelectionScreen<T> extends Screen {
         int codeX = width / 2 - (width / 6); // Start position for commandTextFields
 
         clearChildren();
-        int count = 0;
-        getObjectsInternal().forEach((object) -> {
-            int hight = 60 + count * 30;
-
+        int entriesBerPage = entriesPerPage();
+        List<T> objects = getObjectsInternal();
+        int startPoint = page * entriesBerPage;
+        int end = Math.min(((page + 1) * entriesBerPage), objects.size());
+        List<T> sublist = objects.subList(startPoint, end);
+        for (int i = 0; i < sublist.size(); i++) {
+            int height = 60 + i * 30;
+            T object = sublist.get(i);
             ButtonWidget removeButton = ButtonWidget.builder(Text.of("-"), button -> removeRow(object)).build();
 
             // Set the positions for commandTextFields
             Text buttonText = Text.of(getButtonString(object));
             ButtonWidget codeButton = ButtonWidget.builder(buttonText, (buttonWidget) -> doOnButtonClick(object, buttonWidget)).build();
             codeButton.setX(codeX);
-            codeButton.setY(hight);
+            codeButton.setY(height);
             codeButton.setWidth(width / 3);
 
             // Set positions for removeButtonFields
             removeButton.setWidth(width / 12);
             removeButton.setX(width - width / 6); // Place the remove button to the right
-            removeButton.setY(hight);
+            removeButton.setY(height);
             addDrawableChild(codeButton);
             addDrawableChild(removeButton);
-        });
+        }
+
         addDrawableChild(nextPage);
         addDrawableChild(previosPage);
         addDrawableChild(lastPage);

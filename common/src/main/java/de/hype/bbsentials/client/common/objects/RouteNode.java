@@ -32,5 +32,8 @@ public class RouteNode {
         this.route = route;
     }
 
-
+    @Override
+    public String toString() {
+        return name + ": " + coords.toString();
+    }
 }

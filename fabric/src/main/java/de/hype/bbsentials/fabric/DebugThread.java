@@ -4,6 +4,7 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -117,6 +118,7 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
 
     @Override
     public void onServerLeave() {
+        Chat.sendPrivateMessageToSelfInfo(EnvironmentCore.utils.getServerId());
         Chat.sendPrivateMessageToSelfError("Hub Leave exec");
     }
 }

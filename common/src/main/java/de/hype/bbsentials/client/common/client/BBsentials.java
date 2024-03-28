@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class BBsentials {
@@ -56,6 +57,7 @@ public class BBsentials {
     public static AddonManager addonManager;
     public static GameSDKManager dcGameSDK;
     private static boolean initialised = false;
+    private static volatile ScheduledFuture<?> futureServerJoin;
 
     public static void connectToBBserver() {
         connectToBBserver(bbServerConfig.connectToBeta);
@@ -100,13 +102,18 @@ public class BBsentials {
 
     public synchronized static void onServerJoin() {
         onServerLeave();
-        executionService.schedule(() -> {
+        if (futureServerJoin != null) {
+            Chat.sendPrivateMessageToSelfError("BB: You switched Lobbies so quickly that some things may weren't completed in time. Do not report this as bug!");
+            futureServerJoin.cancel(false);
+        }
+        futureServerJoin = executionService.schedule(() -> {
             for (ServerSwitchTask task : onServerJoin.values()) {
                 if (!task.permanent) {
                     onServerJoin.remove(task.getId());
                 }
                 executionService.execute(task::run);
             }
+            futureServerJoin = null;
         }, 5, TimeUnit.SECONDS);
     }
 
@@ -165,21 +172,21 @@ public class BBsentials {
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
-                        if (currentTimeInLobby < 47 && currentTimeInLobby > 43) {
-                            EnvironmentCore.utils.playsound("entity.horse.death");
-                            Chat.sendPrivateMessageToSelfError("45 Seconds over");
-                        }
+//                        if (currentTimeInLobby < 47 && currentTimeInLobby > 43) {
+                        EnvironmentCore.utils.playsound("entity.horse.death");
+                        Chat.sendPrivateMessageToSelfError("45 Seconds over");
+//                        }
                     }
-                }, 45 - baseTimeAlready, TimeUnit.SECONDS);
+                }, 15 - baseTimeAlready, TimeUnit.SECONDS);
                 executionService.schedule(() -> {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
-                        if (currentTimeInLobby < 52 && currentTimeInLobby > 48) {
-                            EnvironmentCore.utils.playsound("entity.horse.death");
-                            Chat.sendPrivateMessageToSelfError("50 Seconds over");
-                        }
+//                        if (currentTimeInLobby < 52 && currentTimeInLobby > 48) {
+                        EnvironmentCore.utils.playsound("entity.horse.death");
+                        Chat.sendPrivateMessageToSelfError("50 Seconds over");
+//                        }
                     }
-                }, 50 - baseTimeAlready, TimeUnit.SECONDS);
+                }, 20 - baseTimeAlready, TimeUnit.SECONDS);
             }, true);
         }
     }

@@ -8,6 +8,7 @@
   ],
   "client": [
     "ClientCommandSourceMixin",
+    "CustomItemData",
     "CustomItemTextures",
     "CustomItemTooltip",
     "ScreenMixin",

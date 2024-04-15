@@ -11,9 +11,11 @@ public class EnvironmentCore {
     public static MCEvents mcevents;
     public static DebugThread debug;
     public static String versionType;
+    public static TextUtils textutils;
 
-    private EnvironmentCore(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, String versionType) {
+    private EnvironmentCore(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils, String versionType) {
         EnvironmentCore.utils = utils;
+        EnvironmentCore.textutils = textUtils;
         EnvironmentCore.chat = chat;
         EnvironmentCore.commands = commands;
         EnvironmentCore.mcevents = events;
@@ -23,12 +25,12 @@ public class EnvironmentCore {
     }
 
 
-    public static EnvironmentCore fabric(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug) {
-        return new EnvironmentCore(utils, events, chat, commands, options, debug, "modern");
+    public static EnvironmentCore fabric(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils) {
+        return new EnvironmentCore(utils, events, chat, commands, options, debug, textUtils, "modern");
     }
 
-    public static EnvironmentCore forge(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug) {
-        return new EnvironmentCore(utils, events, chat, commands, options, debug, "1.8.9");
+    public static EnvironmentCore forge(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils) {
+        return new EnvironmentCore(utils, events, chat, commands, options, debug, textUtils, "1.8.9");
     }
 
     public static Boolean isFabric() {

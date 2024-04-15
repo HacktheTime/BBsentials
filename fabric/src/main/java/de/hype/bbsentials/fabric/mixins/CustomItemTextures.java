@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric.mixins;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
+import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.LivingEntity;
@@ -14,6 +15,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,25 +42,14 @@ public abstract class CustomItemTextures {
     @Shadow
     public abstract void drawGuiTexture(Identifier texture, int x, int y, int z, int width, int height);
 
+    @Shadow
+    public abstract void drawItemInSlot(TextRenderer textRenderer, ItemStack stack, int x, int y, @Nullable String countOverride);
+
     @ModifyVariable(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), argsOnly = true)
     private ItemStack modifyItemStack(ItemStack stack) {
         String stackItemName = stack.getName().getString();
         Integer stackCount = stack.getCount();
-//        if (BBsentials.funConfig.hub17To29Troll) {
-//            if (stackItemName.equals("SkyBlock Hub #17")) {
-//                stack.setCustomName(Text.translatable("§aSkyBlock Hub #29"));
-//            }
-//            stackCount = 29;
-//        }
-//        if (BBsentials.funConfig.hub29Troll) {
-//            if (stackItemName.startsWith("SkyBlock Hub #")) {
-//                if (!stack.getName().getString().endsWith("29")) {
-//                    stack.setCustomName(Text.translatable("§aSkyBlock Hub #29 (" + stackItemName.replaceAll("\\D", "") + ")"));
-//                    stackCount = 29;
-//                }
-//                stackCount=29;
-//            }
-//        }
+        stackCount = 29;
         if ((stack.getItem() == Items.EMERALD_BLOCK || stack.getItem() == Items.IRON_BLOCK) && BBsentials.visualConfig.showContributorPositionInCount) {
             NbtList list = stack.getNbt().getCompound("display").getList("Lore", NbtElement.STRING_TYPE);
             if (list.size() >= 2 && Text.Serialization.fromJson(list.get(0).asString()).getString().equals("Community Goal")) {
@@ -86,11 +77,21 @@ public abstract class CustomItemTextures {
                 }
             }
         }
+
         return stack.copyWithCount(stackCount);
     }
 
+    @SuppressWarnings("UnreachableCode")
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), cancellable = true)
     private void onRenderItem(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
+        if (stack == null) return;
+        ICusomItemDataAccess data = (((ICusomItemDataAccess) (Object) stack));
+        String tpath = data.BBsentialsAll$getCustomItemTexture();
+        if (tpath != null) {
+            drawGuiTexture(new Identifier(tpath), x, y, 16, 16);
+            ci.cancel();
+            return;
+        }
         String stackItemName = stack.getName().getString();
         boolean cancel = false;
         for (CustomItemTexture itemTexture : BBsentials.customItemTextures.values()) {
@@ -110,4 +111,13 @@ public abstract class CustomItemTextures {
         }
         if (cancel) ci.cancel();
     }
+
+    @ModifyVariable(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "HEAD"), argsOnly = true)
+    public String BBsentials$renderItem(@Nullable String originalCount, TextRenderer renderer, ItemStack stack, int x, int y, @Nullable String z) {
+        if (stack == null) return originalCount;
+        ICusomItemDataAccess data = (((ICusomItemDataAccess) (Object) stack));
+        //noinspection UnreachableCode
+        return data.BBsentialsAll$getCount();
+    }
+
 }

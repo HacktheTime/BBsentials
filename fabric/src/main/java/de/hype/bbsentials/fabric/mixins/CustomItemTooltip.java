@@ -48,14 +48,27 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
 
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack modfiedItemStack(ItemStack original) {
-        ItemStack itemStack = original.copy();
-        if (itemStack.getItem() == Items.EMERALD_BLOCK || itemStack.getItem() == Items.IRON_BLOCK || itemStack.getItem() == Items.PAPER) {
-            Utils.doBingoRankManipulations(itemStack);
+        ItemStack stack = original.copy();
+        String stackItemName = stack.getName().getString();
+
+        if (stack.getItem() == Items.EMERALD_BLOCK || stack.getItem() == Items.IRON_BLOCK || stack.getItem() == Items.PAPER) {
+            Utils.doBingoRankManipulations(stack);
         }
         if (BBsentials.developerConfig.hypixelItemInfo) {
-            Utils.addDebugInfoToRender(itemStack);
+            Utils.addDebugInfoToRender(stack);
         }
-        return itemStack;
+        if (BBsentials.funConfig.hub17To29Troll) {
+            if (stackItemName.equals("SkyBlock Hub #17")) {
+                stack.setCustomName(Text.translatable("§aSkyBlock Hub #29"));
+            }
+        }
+        if (BBsentials.funConfig.hub29Troll) {
+            if (stackItemName.startsWith("SkyBlock Hub #")) {
+                stack.setCustomName(Text.translatable("§aSkyBlock Hub #29 (" + stackItemName.replaceAll("\\D", "") + ")"));
+            }
+        }
+        stack.setCustomName(Text.translatable("§aSkyBlock Hub #29 (" + stackItemName.replaceAll("\\D", "") + ")"));
+        return stack;
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -82,11 +95,6 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
         }
     }
 
-//    @Inject(method = "render", at = @At("RETURN"))
-//    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-//        if (BBsentials.splashConfig.smallestHubName == null) return;
-//        context.drawText(textRenderer, getSmallestHubText(), 10, 50, 16777215, false);
-//    }
 
     @Unique
     private Text getSmallestHubText() {

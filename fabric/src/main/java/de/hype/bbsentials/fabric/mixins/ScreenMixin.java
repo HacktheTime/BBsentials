@@ -1,5 +1,6 @@
 package de.hype.bbsentials.fabric.mixins;
 
+import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
@@ -17,12 +18,6 @@ import java.util.List;
 public abstract class ScreenMixin extends AbstractParentElement implements Drawable {
     @Inject(method = "getTooltipFromItem", at = @At("RETURN"), cancellable = true)
     private static void getTooltipFromItem(MinecraftClient client, ItemStack stack, CallbackInfoReturnable<List<Text>> ci) {
-        /*// Cancel the original method
-        List<Text> temp = ci.getReturnValue();
-        temp.add(1,Text.literal("§6Splash on going by missing"));
-        ci.setReturnValue(temp);*/
-
-        //TODO this is an only visual addition for time tooltip.
-        // This means it can be used to add data the server cant see.
+        List<Text> text = (((ICusomItemDataAccess) (Object) stack)).BBsentialsAll$getItemRenderTooltip();
     }
 }

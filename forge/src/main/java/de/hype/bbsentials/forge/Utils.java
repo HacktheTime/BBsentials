@@ -239,6 +239,13 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     @Override
+    public String getServerConnectedAddress() {
+        String s = Minecraft.getMinecraft().getNetHandler().getNetworkManager().getRemoteAddress().toString();
+        if (s == null) return "";
+        return s.split("/")[0];
+    }
+
+    @Override
     public List<String> getPlayers() {
         return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getFormattedText()).collect(Collectors.toList());
     }

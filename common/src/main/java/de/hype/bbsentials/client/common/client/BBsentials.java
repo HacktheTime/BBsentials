@@ -143,6 +143,7 @@ public class BBsentials {
     }
 
     public static void init() {
+        if (debugThread != null) return;
         debugThread = new Thread(
                 EnvironmentCore.debug
         );

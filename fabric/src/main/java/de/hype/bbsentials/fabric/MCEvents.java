@@ -1,15 +1,27 @@
 package de.hype.bbsentials.fabric;
 
+import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bbsentials.client.common.config.constants.ClickableArmorStand;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.Position;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.block.ChestBlock;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MCEvents {
     public Utils utils = (Utils) EnvironmentCore.utils;
@@ -83,6 +95,26 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
             }
             return ActionResult.PASS;
         });
+        UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+                    BBsentials.executionService.execute(() -> {
+                        onArmorstandInteraction(player, world, hand, entity, hitResult);
+                    });
+                    return ActionResult.PASS;
+                }
+        );
+    }
+
+    public void onArmorstandInteraction(PlayerEntity player, World world, Hand hand, Entity entity, @Nullable EntityHitResult hitResult) {
+        if (entity instanceof ArmorStandEntity) {
+            entity.getArmorItems().forEach(itemStack -> {
+                if (itemStack.getItem() == Items.PLAYER_HEAD) {
+                    String texture = itemStack.getNbt().getCompound("SkullOwner").getCompound("Properties").getList("textures", NbtElement.COMPOUND_TYPE).getCompound(0).getString("Value");
+                    ClickableArmorStand armorStand = ClickableArmorStand.getFromTexture(texture);
+//                    if (armorStand != null) Chat.sendPrivateMessageToSelfSuccess(armorStand.toString()+" was clicked");
+                    //TODO Maybe used for fairysouls here soon
+                }
+            });
+        }
     }
 
     @Override

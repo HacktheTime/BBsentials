@@ -223,6 +223,10 @@ public class ModInitialiser implements ClientModInitializer {
                                 int wpId = IntegerArgumentType.getInteger(context, "waypointid");
                                 return (Waypoints.waypoints.remove(wpId) != null) ? 1 : 0;
                             })))
+//                            .then(ClientCommandManager.literal("clear").executes((context -> {
+//                                 Waypoints.waypoints.clear();
+//                                 return 1;
+//                            })))
                             .then(ClientCommandManager.literal("setvisibility")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer())
                                     .then(ClientCommandManager.argument("visible", BoolArgumentType.bool()).executes((context -> {
                                         int wpId = IntegerArgumentType.getInteger(context, "waypointid");
@@ -280,7 +284,6 @@ public class ModInitialiser implements ClientModInitializer {
                                                     .executes((context -> {
                                                         try {
                                                             WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName") + ".json").setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
-
                                                             return 1;
                                                         } catch (Exception e) {
                                                             return 0;

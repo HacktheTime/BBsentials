@@ -1,6 +1,9 @@
 package de.hype.bbsentials.client.common.objects;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.CustomGson;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
@@ -21,13 +24,13 @@ public class WaypointRoute {
     public List<RouteNode> nodes = new ArrayList<>();
     public String name;
 
-    public WaypointRoute(String name, List<RouteNode> nodes){
-        this.name =name;
-        if (name.isEmpty()){
-            this.name=new Date().toString().replace(" ","_");
+    public WaypointRoute(String name, List<RouteNode> nodes) {
+        this.name = name;
+        if (name.isEmpty()) {
+            this.name = new Date().toString().replace(" ", "_");
         }
-        this.nodes=nodes;
-        this.currentNode=0;
+        this.nodes = nodes;
+        this.currentNode = 0;
     }
     private WaypointRoute(File file) {
         String fileName = file.getName();
@@ -38,6 +41,7 @@ public class WaypointRoute {
     /**
      * Does not actually load the route into the mod but acutally gets it as object from the file.
      * To actually load it use {@link #loadRoute(String)}
+     *
      * @param file file to load from
      * @return the route
      * @throws Exception when there is a problem when loading the route
@@ -79,12 +83,12 @@ public class WaypointRoute {
         File file = new File(nameOrPath);
         if (!file.exists()) {
             if (!nameOrPath.endsWith(".json")) nameOrPath += ".json";
-            file = new File(file, nameOrPath);
+            file = new File(waypointRouteDirectory.getPath(), nameOrPath);
             if (!file.exists()) throw new Exception("Route does not exist");
             BBsentials.temporaryConfig.route = new WaypointRoute(file);
             return BBsentials.temporaryConfig.route;
         }
-       throw new Exception("Route does not exist");
+        throw new Exception("Route does not exist");
     }
 
     private void loadFromColewehightsFormat(File file) {
@@ -101,7 +105,7 @@ public class WaypointRoute {
                 float b = nodeObject.get("b").getAsFloat();
                 String name = nodeObject.getAsJsonObject("options").get("name").getAsString();
 
-                RouteNode node = new RouteNode(x, y, z, r, g, b, name,true, this);
+                RouteNode node = new RouteNode(x, y, z, r, g, b, name, true, this);
                 nodes.add(node);
             }
         } catch (IOException e) {

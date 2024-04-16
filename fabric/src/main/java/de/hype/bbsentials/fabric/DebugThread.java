@@ -3,14 +3,21 @@ package de.hype.bbsentials.fabric;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.Waypoints;
+import de.hype.bbsentials.shared.objects.Position;
+import de.hype.bbsentials.shared.objects.RenderInformation;
+import de.hype.bbsentials.shared.objects.WaypointData;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +42,7 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
     }
 
     public void onNumpadCode() {
-        init();
+//        init();
         return;
     }
 
@@ -120,5 +127,15 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
     public void onServerLeave() {
         Chat.sendPrivateMessageToSelfInfo(EnvironmentCore.utils.getServerId());
         Chat.sendPrivateMessageToSelfError("Hub Leave exec");
+    }
+
+    //Keep in mind that this is not allowed and should only be used for debugging purposes ONLY.
+    public void setWaypointsFromEntities(List<Entity> entities) {
+        if (!EnvironmentCore.utils.getServerConnectedAddress().startsWith("alpha.hypixel.net")) return;
+        Waypoints.waypoints.clear();
+        for (Entity entity : entities) {
+            BlockPos pos = entity.getBlockPos();
+            new Waypoints(new WaypointData(new Position(pos.getX(), pos.getY(), pos.getZ()), Message.of("ddd").getJson(), 1000, true, false, List.of(new RenderInformation(null, null)), true));
+        }
     }
 }

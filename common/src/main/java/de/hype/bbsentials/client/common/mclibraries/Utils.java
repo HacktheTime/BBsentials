@@ -183,4 +183,6 @@ public interface Utils {
     }
 
     boolean isSelfBingo();
+
+    String getServerConnectedAddress();
 }

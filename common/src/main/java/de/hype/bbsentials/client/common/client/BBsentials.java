@@ -10,7 +10,6 @@ import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.discordintegration.DiscordIntegration;
 import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
-import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.shared.constants.Islands;
@@ -31,8 +30,6 @@ public class BBsentials {
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     public static Map<Integer, ServerSwitchTask> onServerJoin = new HashMap<>();
     public static Map<Integer, ServerSwitchTask> onServerLeave = new HashMap<>();
-
-    public static Map<Integer, CustomItemTexture> customItemTextures = new HashMap<>();
     public static Thread bbthread;
     public static Chat chat = new Chat();
     public static Thread debugThread;
@@ -143,6 +140,7 @@ public class BBsentials {
     }
 
     public static void init() {
+        if (debugThread != null) return;
         debugThread = new Thread(
                 EnvironmentCore.debug
         );
@@ -189,8 +187,8 @@ public class BBsentials {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
                         if (currentTimeInLobby < 47 && currentTimeInLobby > 43) {
-                        EnvironmentCore.utils.playsound("entity.horse.death");
-                        Chat.sendPrivateMessageToSelfError("45 Seconds over");
+                            EnvironmentCore.utils.playsound("entity.horse.death");
+                            Chat.sendPrivateMessageToSelfError("45 Seconds over");
                         }
                     }
                 }, 45 - baseTimeAlready, TimeUnit.SECONDS);
@@ -198,8 +196,8 @@ public class BBsentials {
                     if (serverId.equals(EnvironmentCore.utils.getServerId())) {
                         long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
                         if (currentTimeInLobby < 52 && currentTimeInLobby > 48) {
-                        EnvironmentCore.utils.playsound("entity.horse.death");
-                        Chat.sendPrivateMessageToSelfError("50 Seconds over");
+                            EnvironmentCore.utils.playsound("entity.horse.death");
+                            Chat.sendPrivateMessageToSelfError("50 Seconds over");
                         }
                     }
                 }, 50 - baseTimeAlready, TimeUnit.SECONDS);

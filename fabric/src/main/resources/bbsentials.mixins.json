@@ -1,13 +1,14 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "de.hype.bbsentials.fabric.mixins",
+  "package": "de.hype.bbsentials.fabric.mixins.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "CommandSourceMixin"
   ],
   "client": [
     "ClientCommandSourceMixin",
+    "CustomItemData",
     "CustomItemTextures",
     "CustomItemTooltip",
     "ScreenMixin",

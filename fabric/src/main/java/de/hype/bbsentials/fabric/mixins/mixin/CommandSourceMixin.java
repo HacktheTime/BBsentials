@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins;
+package de.hype.bbsentials.fabric.mixins.mixin;
 
 import com.mojang.brigadier.tree.CommandNode;
 import org.spongepowered.asm.mixin.Mixin;

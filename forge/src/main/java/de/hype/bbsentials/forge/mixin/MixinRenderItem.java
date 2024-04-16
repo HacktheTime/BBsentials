@@ -38,7 +38,7 @@ public abstract class MixinRenderItem {
     private void overrideItemTextureForHubs(ItemStack stack, int x, int y, CallbackInfo ci) {
         try {
             for (CustomItemTexture itemTexture : BBsentials.customItemTextures.values()) {
-                if (itemTexture.isItem(stack.getDisplayName(), stack.getTagCompound().toString(), stack)) {
+                if (itemTexture.isItem(stack.getDisplayName(), stack.getTagCompound().toString())) {
                     textureManager.bindTexture(new ResourceLocation(itemTexture.nameSpace, "textures/gui/sprites/" + itemTexture.renderTextureId + ".png"));
                     Gui.drawModalRectWithCustomSizedTexture(
                             x, y, 0, 0, 16, 16, 16, 16

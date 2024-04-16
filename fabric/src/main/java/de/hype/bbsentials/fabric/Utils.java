@@ -688,4 +688,14 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             }
         }
     }
+
+    @Override
+    public String getServerConnectedAddress() {
+        try {
+            return MinecraftClient.getInstance().getNetworkHandler().getConnection().getAddress().toString().split("/")[0];
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins;
+package de.hype.bbsentials.fabric.mixins.mixin;
 
 import de.hype.bbsentials.client.common.api.ISimpleOption;
 import net.minecraft.client.MinecraftClient;

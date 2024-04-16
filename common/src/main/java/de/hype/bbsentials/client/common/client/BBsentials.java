@@ -10,7 +10,6 @@ import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.discordintegration.DiscordIntegration;
 import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
-import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.shared.constants.Islands;
@@ -31,8 +30,6 @@ public class BBsentials {
     public static ScheduledExecutorService executionService = Executors.newScheduledThreadPool(1000);
     public static Map<Integer, ServerSwitchTask> onServerJoin = new HashMap<>();
     public static Map<Integer, ServerSwitchTask> onServerLeave = new HashMap<>();
-
-    public static Map<Integer, CustomItemTexture> customItemTextures = new HashMap<>();
     public static Thread bbthread;
     public static Chat chat = new Chat();
     public static Thread debugThread;

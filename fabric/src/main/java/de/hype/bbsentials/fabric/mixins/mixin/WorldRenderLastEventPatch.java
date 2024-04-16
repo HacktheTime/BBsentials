@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins;
+package de.hype.bbsentials.fabric.mixins.mixin;
 
 import de.hype.bbsentials.fabric.Utils;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;

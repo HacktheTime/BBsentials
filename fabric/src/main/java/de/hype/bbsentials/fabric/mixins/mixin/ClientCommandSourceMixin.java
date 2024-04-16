@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins;
+package de.hype.bbsentials.fabric.mixins.mixin;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;

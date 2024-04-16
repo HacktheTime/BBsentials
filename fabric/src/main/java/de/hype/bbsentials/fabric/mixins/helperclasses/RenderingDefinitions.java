@@ -1,7 +1,10 @@
-package de.hype.bbsentials.fabric.mixins;
+package de.hype.bbsentials.fabric.mixins.helperclasses;
 
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -41,6 +44,11 @@ public abstract class RenderingDefinitions {
     public static void clearAndInitDefaults() {
         defsBlocking.clear();
         defsNonBlocking.clear();
+        ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
+            modifyItemTooltip(stack, context, lines);
+        });
+
+
         new RenderingDefinitions(false) {
             @Override
             public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
@@ -79,7 +87,6 @@ public abstract class RenderingDefinitions {
                 return true;
             }
         };
-
         new RenderingDefinitions() {
             @Override
             public boolean modifyItem(ItemStack stacks, RenderStackItemCheck check, String itemName) {
@@ -157,17 +164,31 @@ public abstract class RenderingDefinitions {
             public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
                 if (BBsentials.funConfig.hub29Troll) {
                     if (itemName.startsWith("SkyBlock Hub #")) {
-                        stack.setCustomName(Text.translatable("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
+                        check.setItemStackName(Text.translatable("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
                     }
                 }
                 else if (BBsentials.funConfig.hub17To29Troll) {
                     if (itemName.equals("SkyBlock Hub #17")) {
-                        stack.setCustomName(Text.translatable("§aSkyBlock Hub #29"));
+                        check.setItemStackName(Text.translatable("§aSkyBlock Hub #29"));
                     }
                 }
                 return false;
             }
         };
+    }
+
+    private static void modifyItemTooltip(ItemStack stack, TooltipContext context, List<Text> lines) {
+        if (context.isAdvanced()) {
+            for (int i = lines.size() - 1; i >= 0; i--) {
+                if (lines.get(i).getString().matches("NBT: \\d+ tag\\(s\\)")) {
+                    lines.remove(i);
+                }
+            }
+        }
+        List<Text> texts = (((ICusomItemDataAccess) (Object) stack)).BBsentialsAll$getItemRenderTooltip();
+        if (texts == null) return;
+        lines.clear();
+        lines.addAll(texts);
     }
 
     public boolean isRegistered() {
@@ -208,6 +229,7 @@ public abstract class RenderingDefinitions {
                     return;
                 }
             }
+            getTextTooltip();
         }
 
         public List<Text> getTextTooltip() {
@@ -219,7 +241,7 @@ public abstract class RenderingDefinitions {
             NbtList list = b1.getList("Lore", NbtElement.STRING_TYPE);
             List<Text> text = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
-                Text.Serialization.fromJson(list.get(i).asString());
+                text.add(Text.Serialization.fromJson(list.get(i).asString()));
             }
             texts = text;
             return text;
@@ -268,7 +290,7 @@ public abstract class RenderingDefinitions {
         }
 
         public void renderAsItem(Item item) {
-            texturePath = Registries.ITEM.getId(item).getPath();
+            texturePath = Registries.ITEM.getId(item).toString();
         }
 
         public Text getItemStackName() {
@@ -276,7 +298,8 @@ public abstract class RenderingDefinitions {
         }
 
         public void setItemStackName(Text itemStackName) {
-            getTextTooltip().set(0, itemStackName);
+            if (texts == null) getTextTooltip();
+            texts.set(0, itemStackName);
         }
     }
 }

@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins;
+package de.hype.bbsentials.fabric.mixins.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import de.hype.bbsentials.client.common.client.BBsentials;
@@ -58,7 +58,7 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
                     }
                 }
                 BBsentials.splashConfig.smallestHubName = lowestYetHub.getName().getString();
-                ((ICusomItemDataAccess) ((Object) lowestYetHub)).BBsentialsAll$reevaluate(lowestYetHub);
+                ((ICusomItemDataAccess) ((Object) lowestYetHub)).BBsentialsAll$reevaluate();
             }, 30, TimeUnit.MILLISECONDS);
         }
     }

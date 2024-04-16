@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins;
+package de.hype.bbsentials.fabric.mixins.mixin;
 
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import net.minecraft.client.font.TextRenderer;

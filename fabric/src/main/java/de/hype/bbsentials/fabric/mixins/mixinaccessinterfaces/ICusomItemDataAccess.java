@@ -12,5 +12,7 @@ public interface ICusomItemDataAccess {
 
     String BBsentialsAll$getCustomItemTexture();
 
-    void BBsentialsAll$reevaluate(ItemStack stack);
+    void BBsentialsAll$reevaluate();
+
+    ItemStack BBsentials$getAsItemStack();
 }

@@ -381,6 +381,7 @@ public class ModInitialiser implements ClientModInitializer {
         EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread());
         codes = new NumPadCodes();
         BBsentials.init();
+        RenderingDefinitions.clearAndInitDefaults();
         if (generalConfig.hasBBRoles("dev")) {
             ServerSwitchTask.onServerJoinTask(() -> EnvironmentCore.debug.onServerJoin(), true);
             ServerSwitchTask.onServerLeaveTask(() -> EnvironmentCore.debug.onServerLeave(), true);

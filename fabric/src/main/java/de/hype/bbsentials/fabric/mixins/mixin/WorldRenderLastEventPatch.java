@@ -21,7 +21,7 @@ public abstract class WorldRenderLastEventPatch implements SynchronousResourceRe
     private BufferBuilderStorage bufferBuilders;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;renderChunkDebugInfo(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/Camera;)V", shift = At.Shift.BEFORE))
-    public void onWorldRenderLast(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
+    public void BBsentials$onWorldRenderLast(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
         WorldRenderLastEvent event = new WorldRenderLastEvent(
                 matrices, tickDelta, renderBlockOutline,
                 camera, gameRenderer, lightmapTextureManager, projectionMatrix,

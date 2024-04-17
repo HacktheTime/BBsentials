@@ -11,9 +11,11 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.mclibraries.TextUtils;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
+import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
 import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
@@ -378,7 +380,17 @@ public class ModInitialiser implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         System.out.println("BBsentials : onInit called");
-        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread());
+        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new TextUtils() {
+            @Override
+            public String getContentFromJson(String json) {
+                return Text.Serialization.fromJson(json).getString();
+            }
+
+            @Override
+            public String getJsonFromContent(String content) {
+                return Text.Serialization.toJsonString(Text.of(content));
+            }
+        });
         codes = new NumPadCodes();
         BBsentials.init();
         RenderingDefinitions.clearAndInitDefaults();

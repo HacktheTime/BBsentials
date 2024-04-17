@@ -1,5 +1,6 @@
 package de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
@@ -11,6 +12,8 @@ public interface ICusomItemDataAccess {
     String BBsentialsAll$getCount();
 
     String BBsentialsAll$getCustomItemTexture();
+
+    Item BBsentialsAll$getRenderAsItem();
 
     void BBsentialsAll$reevaluate();
 

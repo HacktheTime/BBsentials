@@ -11,7 +11,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 
 import java.time.Instant;
@@ -165,11 +164,13 @@ public abstract class RenderingDefinitions {
                 if (BBsentials.funConfig.hub29Troll) {
                     if (itemName.startsWith("SkyBlock Hub #")) {
                         check.setItemStackName(Text.translatable("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
+                        check.setItemCount(29);
                     }
                 }
                 else if (BBsentials.funConfig.hub17To29Troll) {
                     if (itemName.equals("SkyBlock Hub #17")) {
                         check.setItemStackName(Text.translatable("§aSkyBlock Hub #29"));
+                        check.setItemCount(29);
                     }
                 }
                 return false;
@@ -185,9 +186,11 @@ public abstract class RenderingDefinitions {
                 }
             }
         }
+        //This is subject to change soon this is temporary
         List<Text> texts = (((ICusomItemDataAccess) (Object) stack)).BBsentialsAll$getItemRenderTooltip();
         if (texts == null) return;
         lines.clear();
+        lines.add(stack.getName());
         lines.addAll(texts);
     }
 
@@ -217,9 +220,11 @@ public abstract class RenderingDefinitions {
         private String itemCount = null;
         private List<Text> texts = null;
         private List<Text> itemLore = null;
+        private Item renderAsItem = null;
 
         public RenderStackItemCheck(ItemStack stack) {
             this.stack = stack;
+            renderAsItem = stack.getItem();
             String itemName = stack.getName().getString();
             for (RenderingDefinitions def : defsNonBlocking.values()) {
                 def.modifyItem(stack, this, itemName);
@@ -273,7 +278,7 @@ public abstract class RenderingDefinitions {
             this.itemCount = itemCount;
         }
 
-        public void setItemcount(int value) {
+        public void setItemCount(int value) {
             this.itemCount = String.valueOf(value);
         }
 
@@ -289,8 +294,9 @@ public abstract class RenderingDefinitions {
             this.texts = texts;
         }
 
-        public void renderAsItem(Item item) {
-            texturePath = Registries.ITEM.getId(item).toString();
+        public void renderAsItem(Item renderAsItem) {
+            texturePath = null;
+            this.renderAsItem = renderAsItem;
         }
 
         public Text getItemStackName() {
@@ -300,6 +306,10 @@ public abstract class RenderingDefinitions {
         public void setItemStackName(Text itemStackName) {
             if (texts == null) getTextTooltip();
             texts.set(0, itemStackName);
+        }
+
+        public Item getRenderAsItem() {
+            return renderAsItem;
         }
     }
 }

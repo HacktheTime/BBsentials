@@ -15,14 +15,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("UnreachableCode")
 @Mixin(DrawContext.class)
 public abstract class CustomItemTextures {
     @Shadow
     public abstract void drawGuiTexture(Identifier texture, int x, int y, int width, int height);
 
-    @SuppressWarnings("UnreachableCode")
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), cancellable = true)
-    private void onRenderItem(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
+    private void BBsentials$onRenderItem(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
         if (stack == null) return;
         ICusomItemDataAccess data = (((ICusomItemDataAccess) (Object) stack));
         String tpath = data.BBsentialsAll$getCustomItemTexture();

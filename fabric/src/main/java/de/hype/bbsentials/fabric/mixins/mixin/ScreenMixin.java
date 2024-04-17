@@ -8,6 +8,6 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(Screen.class)
 public abstract class ScreenMixin extends AbstractParentElement implements Drawable {
 //    @ModifyReturnValue(method = "getTooltipFromItem", at = @At("RETURN"))
-//    private static List<Text> getTooltipFromItem(MinecraftClient client, ItemStack stack, CallbackInfoReturnable<List<Text>> ci) {
+//    private static List<Text> BBsentials$getTooltipFromItem(MinecraftClient client, ItemStack stack, CallbackInfoReturnable<List<Text>> ci) {
 //    }
 }

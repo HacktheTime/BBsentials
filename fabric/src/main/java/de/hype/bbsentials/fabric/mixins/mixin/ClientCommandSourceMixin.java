@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
-import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -10,11 +10,10 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.command.CommandSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -39,19 +38,9 @@ public abstract class ClientCommandSourceMixin<S> implements CommandSource {
      * This method returns a collection of player names from the playerList.
      * This method is now also used by server-side commands.
      */
-    @Overwrite
-    public Collection<String> getPlayerNames() {
-        List<String> list = Lists.newArrayList();
-        Iterator var2 = this.networkHandler.getPlayerList().iterator();
-
-        while (var2.hasNext()) {
-            PlayerListEntry playerListEntry = (PlayerListEntry) var2.next();
-            String playerName = playerListEntry.getProfile().getName();
-            if (!playerName.startsWith("!")) {
-                list.add(playerName);
-            }
-        }
-
-        return list;
+    @ModifyReturnValue(method = "getPlayerNames", at = @At("RETURN"))
+    public Collection<String> BBsentials$getPlayerNames(Collection<String> original) {
+        original.removeIf((entry) -> !entry.startsWith("!"));
+        return original;
     }
 }

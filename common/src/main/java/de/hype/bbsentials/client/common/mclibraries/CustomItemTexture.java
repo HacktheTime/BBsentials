@@ -26,19 +26,19 @@ public abstract class CustomItemTexture {
     }
 
     protected void addToPool() {
-        poolId = EnvironmentCore.utils.addRender(this);
+//        poolId = EnvironmentCore.utils.addRender(this);
     }
 
     public void removeFromPool() {
-        EnvironmentCore.utils.removeRenderId(this.textureId);
+//        EnvironmentCore.utils.removeRenderId(this.textureId);
     }
-
-    /**
-     * @param itemName
-     * @param nbt
-     * @return
-     */
-    public boolean isItem(String itemName, String nbt);
+//
+//    /**
+//     * @param itemName
+//     * @param nbt
+//     * @return
+//     */
+//    public boolean isItem(String itemName, String nbt);
 
     /**
      * Keep in mind that there is also a full method for which you can use either

@@ -11,6 +11,7 @@
     "CustomItemData",
     "CustomItemTextures",
     "CustomItemTooltip",
+    "ItemRendererMixin",
     "ScreenMixin",
     "SimpleOptionMixin",
     "WorldRenderLastEventPatch"

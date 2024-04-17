@@ -2,9 +2,12 @@ package de.hype.bbsentials.fabric.mixins.mixin;
 
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -20,10 +23,16 @@ public abstract class CustomItemData implements ICusomItemDataAccess {
     String texturename = null;
     @Unique
     List<Text> itemTooltip = null;
+    @Unique
     boolean notInitialised = true;
+    @Unique
+    Item renderasItem = null;
 
     @Shadow
     public abstract String toString();
+
+    @Shadow
+    public abstract ItemStack finishUsing(World par1, LivingEntity par2);
 
     @Override
     public List<Text> BBsentialsAll$getItemRenderTooltip() {
@@ -43,16 +52,23 @@ public abstract class CustomItemData implements ICusomItemDataAccess {
         return texturename;
     }
 
+    @Override
+    public Item BBsentialsAll$getRenderAsItem() {
+        if (notInitialised) BBsentialsAll$reevaluate();
+        return renderasItem;
+    }
+
 
     @Unique
     @SuppressWarnings("UnreachableCode")
     @Override
     public void BBsentialsAll$reevaluate() {
-        notInitialised = true;
+        notInitialised = false;
         ItemStack stack = BBsentials$getAsItemStack();
         if (stack == null) return;
         if (stack.getItem() == Items.AIR) return;
         RenderingDefinitions.RenderStackItemCheck data = new RenderingDefinitions.RenderStackItemCheck(stack);
+        renderasItem = data.getRenderAsItem();
         itemCountCustom = data.getItemCount();
         texturename = data.getTexturePath();
         itemTooltip = data.getTextTooltip();

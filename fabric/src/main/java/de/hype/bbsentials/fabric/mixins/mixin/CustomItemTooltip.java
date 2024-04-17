@@ -1,8 +1,6 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.fabric.Utils;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -30,16 +28,16 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
     }
 
 
-    @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
-    private ItemStack modfiedItemStack(ItemStack original) {
-        if (original.getItem() == Items.EMERALD_BLOCK || original.getItem() == Items.IRON_BLOCK || original.getItem() == Items.PAPER) {
-            Utils.doBingoRankManipulations(original);
-        }
-        return original;
-    }
+//    @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
+//    private ItemStack BBsentials$modfiedItemStack(ItemStack original) {
+//        if (original.getItem() == Items.EMERALD_BLOCK || original.getItem() == Items.IRON_BLOCK || original.getItem() == Items.PAPER) {
+//            Utils.doBingoRankManipulations(original);
+//        }
+//        return original;
+//    }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void onConstructor(ScreenHandler handler, PlayerInventory inventory, Text title, CallbackInfo ci) {
+    private void BBsentials$onConstructor(ScreenHandler handler, PlayerInventory inventory, Text title, CallbackInfo ci) {
         if (title.getString().equals("SkyBlock Hub Selector")) {
             BBsentials.executionService.schedule(() -> {
                 int lowestYetAmount = Integer.MAX_VALUE;
@@ -64,7 +62,7 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
     }
 
     @Inject(method = "close", at = @At("HEAD"))
-    private void onClose(CallbackInfo ci) {
+    private void BBsentials$onClose(CallbackInfo ci) {
         BBsentials.splashConfig.smallestHubName = null;
     }
 }

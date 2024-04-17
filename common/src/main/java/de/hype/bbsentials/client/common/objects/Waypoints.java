@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Waypoints extends ClientWaypointData {
-    public static Map<Integer, Waypoints> waypoints = new HashMap<>();
+    public static volatile Map<Integer, Waypoints> waypoints = new HashMap<>();
     int removeRunnableId;
 
 

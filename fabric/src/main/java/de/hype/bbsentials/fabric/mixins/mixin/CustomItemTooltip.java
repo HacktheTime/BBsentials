@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
@@ -17,8 +16,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("UnreachableCode")
 @Mixin(HandledScreen.class)
 public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
 
@@ -28,28 +30,50 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
     }
 
 
-//    @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
+    //    @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
 //    private ItemStack BBsentials$modfiedItemStack(ItemStack original) {
 //        if (original.getItem() == Items.EMERALD_BLOCK || original.getItem() == Items.IRON_BLOCK || original.getItem() == Items.PAPER) {
 //            Utils.doBingoRankManipulations(original);
 //        }
 //        return original;
 //    }
-
     @Inject(method = "<init>", at = @At("RETURN"))
     private void BBsentials$onConstructor(ScreenHandler handler, PlayerInventory inventory, Text title, CallbackInfo ci) {
         if (title.getString().equals("SkyBlock Hub Selector")) {
+            BBsentials.temporaryConfig.lastServerIdUpdateDate = Instant.now();
+            BBsentials.temporaryConfig.serverIdToHubNumber.clear();
             BBsentials.executionService.schedule(() -> {
                 int lowestYetAmount = Integer.MAX_VALUE;
                 ItemStack lowestYetHub = null;
                 for (Slot slot : handler.slots) {
                     ItemStack stack = slot.getStack();
                     if (stack.getItem() == Items.BLACK_STAINED_GLASS_PANE) continue;
+                    if (!stack.getName().getString().startsWith("SkyBlock Hub")) continue;
                     try {
-                        String data = stack.getNbt().getCompound("display").getList("Lore", NbtElement.STRING_TYPE).get(0).asString();
-                        int amount = Integer.parseInt(Text.Serialization.fromJson(data).getString().replace("Players:", "").split("/")[0].trim());
-                        if (amount < lowestYetAmount) {
-                            lowestYetAmount = amount;
+                        ICusomItemDataAccess access = (ICusomItemDataAccess) (Object) stack;
+                        List<Text> texts = access.BBsentialsAll$getItemRenderTooltip();
+                        String serverid = "";
+                        int playerCount = -1;
+                        int hubNumber;
+                        boolean full = false;
+
+                        for (Text text : texts) {
+                            String line = text.getString();
+                            if (line.matches("Players: \\d+/\\d+")) {
+                                playerCount = Integer.parseInt(line.replace("Players:", "").split("/")[0].trim());
+                                if (line.equals("Players: " + playerCount + "/" + playerCount)) full = true;
+                            }
+                            else if (line.matches("Server: .*")) {
+                                serverid = line.replace("Server:", "").trim();
+                            }
+                        }
+                        hubNumber = stack.getCount();
+                        if (!serverid.isEmpty()) {
+                            BBsentials.temporaryConfig.serverIdToHubNumber.put(serverid, hubNumber);
+                        }
+
+                        if (playerCount < lowestYetAmount && !full) {
+                            lowestYetAmount = playerCount;
                             lowestYetHub = stack;
                         }
                     } catch (Exception e) {

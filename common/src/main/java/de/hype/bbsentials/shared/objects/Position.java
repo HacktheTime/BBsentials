@@ -37,4 +37,15 @@ public class Position {
         Position pos2 = ((Position) obj);
         return (pos2.x == x && pos2.y == y && pos2.z == z);
     }
+
+    public Double getDistanceBetween(Position pos) {
+        Integer x = pos.x - this.x;
+        Integer y = pos.y - this.y;
+        Integer z = pos.z - this.z;
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    public boolean isInRange(Position otherPos, int range) {
+        return getDistanceBetween(otherPos) < range;
+    }
 }

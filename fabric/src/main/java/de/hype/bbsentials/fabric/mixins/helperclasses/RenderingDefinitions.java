@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric.mixins.helperclasses;
 
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.item.TooltipContext;
@@ -46,7 +47,66 @@ public abstract class RenderingDefinitions {
         ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
             modifyItemTooltip(stack, context, lines);
         });
+        new RenderingDefinitions() {
+            @Override
+            public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
+                {
+                    if (!itemName.startsWith("SkyBlock Hub")) return false;
+                    String serverid = "";
+                    int playerCount = -1;
+                    int hubNumber;
+                    boolean full = false;
 
+                    List<Text> texts = check.getTextTooltip();
+                    for (Text text : texts) {
+                        String line = text.getString();
+                        if (line.matches("Players: \\d+/\\d+")) {
+                            playerCount = Integer.parseInt(line.replace("Players:", "").split("/")[0].trim());
+                            if (line.equals("Players: " + playerCount + "/" + playerCount)) full = true;
+                        }
+                        else if (line.matches("Server: .*")) {
+                            serverid = line.replace("Servers: ", "").trim();
+                        }
+                    }
+                    hubNumber = stack.getCount();
+                    if (!SplashManager.splashPool.isEmpty()) {
+                        for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
+                            if (value.serverID.equals(serverid)) {
+                                if (value.receivedTime.isAfter(Instant.now().minusSeconds(20))) {
+                                    if (full) check.texturePath = "customitems/splash_hub_full";
+                                    else check.texturePath = "customitems/splash_hub";
+                                    return true;
+                                }
+                            }
+                            else if (value.serverID.isEmpty()) {
+                                if (value.hubNumber == hubNumber) {
+                                    if (full) check.texturePath = "customitems/splash_hub_full";
+                                    else check.texturePath = "customitems/splash_hub";
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    if (BBsentials.splashConfig.showSmallestHub && (BBsentials.splashConfig.smallestHubName != null)) {
+                        if (itemName.equals(BBsentials.splashConfig.smallestHubName)) {
+                            check.setTexturePath("bbsentials:customitems/low_player_hub");
+                            return true;
+                        }
+                    }
+                    if (BBsentials.funConfig.hub29Troll) {
+                        check.setItemStackName(Text.translatable("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
+                        check.setItemCount(29);
+                    }
+                    else if (BBsentials.funConfig.hub17To29Troll) {
+                        if (hubNumber == 17) {
+                            check.setItemStackName(Text.translatable("§aSkyBlock Hub #29"));
+                            check.setItemCount(29);
+                        }
+                    }
+                    return false;
+                }
+            }
+        };
 
         new RenderingDefinitions(false) {
             @Override
@@ -72,18 +132,6 @@ public abstract class RenderingDefinitions {
                     e.printStackTrace();
                 }
                 return false;
-            }
-        };
-
-        new RenderingDefinitions() {
-            @Override
-            public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
-                if (BBsentials.splashConfig.showSmallestHub && (BBsentials.splashConfig.smallestHubName != null)) {
-                    if (itemName.equals(BBsentials.splashConfig.smallestHubName)) {
-                        check.setTexturePath("bbsentials:customitems/low_player_hub");
-                    }
-                }
-                return true;
             }
         };
         new RenderingDefinitions() {
@@ -158,24 +206,7 @@ public abstract class RenderingDefinitions {
                 return true;
             }
         };
-        new RenderingDefinitions(false) {
-            @Override
-            public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
-                if (BBsentials.funConfig.hub29Troll) {
-                    if (itemName.startsWith("SkyBlock Hub #")) {
-                        check.setItemStackName(Text.translatable("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
-                        check.setItemCount(29);
-                    }
-                }
-                else if (BBsentials.funConfig.hub17To29Troll) {
-                    if (itemName.equals("SkyBlock Hub #17")) {
-                        check.setItemStackName(Text.translatable("§aSkyBlock Hub #29"));
-                        check.setItemCount(29);
-                    }
-                }
-                return false;
-            }
-        };
+
     }
 
     private static void modifyItemTooltip(ItemStack stack, TooltipContext context, List<Text> lines) {
@@ -190,7 +221,6 @@ public abstract class RenderingDefinitions {
         List<Text> texts = (((ICusomItemDataAccess) (Object) stack)).BBsentialsAll$getItemRenderTooltip();
         if (texts == null) return;
         lines.clear();
-        lines.add(stack.getName());
         lines.addAll(texts);
     }
 
@@ -245,6 +275,7 @@ public abstract class RenderingDefinitions {
             if (b1 == null) return new ArrayList<>();
             NbtList list = b1.getList("Lore", NbtElement.STRING_TYPE);
             List<Text> text = new ArrayList<>();
+            text.add(stack.getName());
             for (int i = 0; i < list.size(); i++) {
                 text.add(Text.Serialization.fromJson(list.get(i).asString()));
             }

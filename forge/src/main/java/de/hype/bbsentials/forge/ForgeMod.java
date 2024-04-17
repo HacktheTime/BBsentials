@@ -2,7 +2,9 @@ package de.hype.bbsentials.forge;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.mclibraries.TextUtils;
 import de.hype.bbsentials.forge.client.MoulConfig;
+import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -18,7 +20,17 @@ public class ForgeMod {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         printLocation();
-        EnvironmentCore core = EnvironmentCore.forge(new Utils(), new MCEvents(), new ForgeChat(), new Commands(), new Options(), new DebugThread());
+        EnvironmentCore core = EnvironmentCore.forge(new Utils(), new MCEvents(), new ForgeChat(), new Commands(), new Options(), new DebugThread(), new TextUtils() {
+            @Override
+            public String getContentFromJson(String json) {
+                return IChatComponent.Serializer.jsonToComponent(json).getUnformattedText();
+            }
+
+            @Override
+            public String getJsonFromContent(String content) {
+                return IChatComponent.Serializer.componentToJson(new IChatComponent("sdd"));
+            }
+        });
         MinecraftForge.EVENT_BUS.register(this);
         sentials = new BBsentials();
         BBsentials.init();

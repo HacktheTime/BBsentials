@@ -1,7 +1,7 @@
 package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.APIUtils;
@@ -461,38 +461,28 @@ public class Commands implements MCCommand {
         if (hasSplasher) {
             event.register((dispatcher, registryAccess) -> dispatcher.register(
                     literal("splashAnnounce")
-                            .then(argument("Hub", IntegerArgumentType.integer(1, 28))
-                                    .then(argument("location", StringArgumentType.string())
-                                            .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{"kat", "bea", "guild-house"}, builder))
-                                            .then(argument("lasswaste", StringArgumentType.string())
-                                                    .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{"true", "false"}, builder))
-                                                    .then(argument("extramessage", StringArgumentType.greedyString())
-                                                            .executes((context) -> {
-                                                                int hub = IntegerArgumentType.getInteger(context, "Hub");
-                                                                String extramessage = StringArgumentType.getString(context, "extramessage");
-                                                                String location = StringArgumentType.getString(context, "location");
-                                                                boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                                splashAnnounce(hub, location, extramessage, lessWaste);
-                                                                return 1;
-                                                            })
-                                                    )
-                                                    .executes((context) -> {
-                                                        int hub = IntegerArgumentType.getInteger(context, "Hub");
-                                                        String location = StringArgumentType.getString(context, "location");
-                                                        boolean lessWaste = Boolean.parseBoolean(StringArgumentType.getString(context, "lasswaste"));
-                                                        splashAnnounce(hub, location, "", lessWaste);
-                                                        return 1;
-                                                    })
-                                            ))
+                            .then(argument("lesswaste", BoolArgumentType.bool())
+                                    .then(argument("extramessage", StringArgumentType.greedyString())
+                                            .executes((context) -> {
+                                                String extramessage = StringArgumentType.getString(context, "extramessage");
+                                                boolean lessWaste = BoolArgumentType.getBool(context, "lesswaste");
+                                                splashAnnounce(extramessage, lessWaste);
+                                                return 1;
+                                            })
+                                    )
                                     .executes((context) -> {
-                                        int hub = IntegerArgumentType.getInteger(context, "Hub");
-                                        String location = "bea";
-                                        splashAnnounce(hub, location, "", true);
+                                        boolean lessWaste = BoolArgumentType.getBool(context, "lesswaste");
+                                        splashAnnounce(BBsentials.splashConfig.defaultExtraMessage, lessWaste);
                                         return 1;
                                     })
-
                             )
-            ));/*SplashAnnounce*/
+                            .executes((context) -> {
+                                        splashAnnounce(BBsentials.splashConfig.defaultExtraMessage, BBsentials.splashConfig.defaultUseLessWaste);
+                                        return 1;
+                                    }
+                            )
+                    )
+            );/*SplashAnnounce*/
             event.register((dispatcher, registryAccess) -> dispatcher.register(
                     literal("requestpottimes")
                             .executes((context) -> {
@@ -539,9 +529,28 @@ public class Commands implements MCCommand {
         }
     }
 
-    public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
+    public void splashAnnounce(String extramessage, boolean lessWaste) {
+        String serverid = EnvironmentCore.utils.getServerId();
+        if (serverid == null) {
+            Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");
+            return;
+        }
+        Integer hubNumber = BBsentials.temporaryConfig.getHubNumberFromCache(serverid);
+        if (hubNumber == null) {
+            Chat.sendPrivateMessageToSelfError("Cache is either outdated or missing the current hub. Open the Hub Selector and try again.");
+            return;
+        }
+        Position playerPos = EnvironmentCore.utils.getPlayersPosition();
+        SplashLocation loc = null;
+        for (SplashLocation value : SplashLocations.values()) {
+            if (value.getCoords().isInRange(playerPos, 10)) {
+                loc = value.getSplashLocation();
+            }
+        }
+        if (loc == null)
+            loc = new SplashLocation(new Position(playerPos.x, playerPos.y + 1, playerPos.z), null);
         try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste)));
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, loc, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste, serverid)));
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
         }

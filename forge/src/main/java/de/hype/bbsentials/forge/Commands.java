@@ -6,8 +6,8 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.forge.CommandImplementations.*;
-import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.SplashData;
+import de.hype.bbsentials.shared.objects.SplashLocation;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import net.minecraftforge.client.ClientCommandHandler;
 
@@ -41,9 +41,19 @@ public class Commands implements MCCommand {
         }
     }
 
-    public void splashAnnounce(int hubNumber, String locationInHub, String extramessage, boolean lessWaste) {
+    public void splashAnnounce(String serverid, Integer hubNumber, SplashLocation locationInHub, String extramessage, boolean lessWaste) {
+        if (serverid == null) serverid = EnvironmentCore.utils.getServerId();
+        if (serverid == null) {
+            Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");
+            return;
+        }
+        if (hubNumber == null) hubNumber = BBsentials.temporaryConfig.getHubNumberFromCache(serverid);
+        if (hubNumber == null) {
+            Chat.sendPrivateMessageToSelfError("Cache is either outdated or missing the current hub. Open the Hub Selector and try again.");
+            return;
+        }
         try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste)));
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste, serverid)));
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
         }

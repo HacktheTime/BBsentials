@@ -5,7 +5,6 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.client.common.objects.Waypoints;
@@ -15,7 +14,6 @@ import de.hype.bbsentials.environment.packetconfig.PacketUtils;
 import de.hype.bbsentials.shared.constants.*;
 import de.hype.bbsentials.shared.objects.ClientWaypointData;
 import de.hype.bbsentials.shared.objects.PunishmentData;
-import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.*;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
@@ -231,18 +229,6 @@ public class BBsentialConnection {
 
     public <T extends AbstractPacket> void dummy(T o) {
         //this does absolutely nothing. dummy for packet in packt manager
-    }
-
-    public void splashHighlightItem(SplashData splash, long displayTimeInMilliseconds) {
-        CustomItemTexture toHighlightHub = new CustomItemTexture("customitems/splash_hub") {
-            @Override
-            public boolean isItem(String itemName) {
-                return itemName.endsWith("Hub #" + splash.hubNumber);
-            }
-        };
-        BBsentials.executionService.schedule(() -> {
-            toHighlightHub.removeFromPool();
-        }, displayTimeInMilliseconds, TimeUnit.MILLISECONDS);
     }
 
 

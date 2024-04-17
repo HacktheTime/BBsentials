@@ -12,11 +12,16 @@ import de.hype.bbsentials.client.common.discordintegration.DiscordIntegration;
 import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.objects.RenderInformation;
 
+import java.awt.*;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,6 +61,7 @@ public class BBsentials {
     private static boolean initialised = false;
     private static volatile ScheduledFuture<?> futureServerJoin;
     private static volatile boolean futureServerJoinRunning;
+
 
     public static void connectToBBserver() {
         connectToBBserver(bbServerConfig.connectToBeta);
@@ -163,6 +169,18 @@ public class BBsentials {
             String status = "Lobby Gaming";
             if (island != null) status = "Playing in the " + island.getDisplayName();
             BBsentials.discordIntegration.setNewStatus(status);
+        }, true);
+        ServerSwitchTask.onServerJoinTask(() -> {
+            if (BBsentials.visualConfig.addSplashWaypoint) {
+                String serverId = EnvironmentCore.utils.getServerId();
+                for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
+                    if (value.serverID.equals(serverId) && value.receivedTime.isAfter(Instant.now().minusSeconds(60))) {
+                        List<RenderInformation> temp = new ArrayList<>();
+                        temp.add(new RenderInformation("bbsentials", "customitems/splash_hub"));
+                        new Waypoints(value.locationInHub.getCoords(), EnvironmentCore.textutils.getJsonFromContent("§6Splash"), 1000, true, true, temp, Color.YELLOW, true);
+                    }
+                }
+            }
         }, true);
         if (discordConfig.useRichPresence) {
             try {

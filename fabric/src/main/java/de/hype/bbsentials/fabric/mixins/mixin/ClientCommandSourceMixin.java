@@ -40,7 +40,7 @@ public abstract class ClientCommandSourceMixin<S> implements CommandSource {
      */
     @ModifyReturnValue(method = "getPlayerNames", at = @At("RETURN"))
     public Collection<String> BBsentials$getPlayerNames(Collection<String> original) {
-        original.removeIf((entry) -> !entry.startsWith("!"));
+        original.removeIf((entry) -> entry.startsWith("!"));
         return original;
     }
 }

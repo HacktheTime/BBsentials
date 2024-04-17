@@ -148,6 +148,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("What Color should waypoints have by default"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.waypointDefaultColor = new java.awt.Color(newValue))
                     .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Splash Location Waypoint"), BBsentials.visualConfig.addSplashWaypoint)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Will add a waypoint if you are in a splashlobby of where splash is going to be."))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.addSplashWaypoint = newValue)
+                    .build());
             visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Position as Item Count"), BBsentials.visualConfig.waypointDefaultWithTracer)
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Will show your leaderboard postion for the community goals as item count"))
@@ -548,7 +553,16 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Will highlight the smallest hub with a magenta texture."))
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.showSmallestHub = newValue)
                     .build());
-
+            splasher.addEntry(entryBuilder.startBooleanToggle(Text.of("User Lesswaste System DEFAULT"), BBsentials.splashConfig.defaultUseLessWaste)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Use the less waste system?\nThere will be a extra delay after the following formula:\n[Potion Time in Seconds] / 80 BUT a maximum of 25 Seconds. Meaning everything More than 30 Minutes is notified after 25 Seconds"))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.showSmallestHub = newValue)
+                    .build());
+            splasher.addEntry(entryBuilder.startTextField(Text.of("Splash Extramessage Default"), BBsentials.splashConfig.defaultExtraMessage)
+                    .setDefaultValue("")
+                    .setTooltip(Text.of("Default Extramessage if non is specified"))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.defaultExtraMessage = newValue)
+                    .build());
         }
         return builder.build();
     }

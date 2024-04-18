@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric.screens;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 
@@ -12,6 +13,13 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
     public TrustedPartyMembersConfigScreen(Screen parent) {
         super(parent, "Trusted Party Members");
     }
+
+    public static void openFromNothing() {
+        TrustedPartyMembersConfigScreen sc = new TrustedPartyMembersConfigScreen(MinecraftClient.getInstance().currentScreen);
+        sc.setScreen(sc);
+    }
+
+
 
     @Override
     public List<TrustedPartyMember> getObjectList() {

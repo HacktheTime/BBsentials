@@ -130,7 +130,7 @@ public class Message {
     }
 
     public void replyToUser(String message) {
-        if (isMsg()) BBsentials.sender.addImmediateSendTask("/r " + message);
+        if (isMsg()) BBsentials.sender.addImmediateSendTask("/msg " + getPlayerName() + " " + message);
         else if (isFromParty()) BBsentials.sender.addImmediateSendTask("/pc @" + getPlayerName() + " " + message);
         else if (isServerMessage()) BBsentials.sender.addImmediateSendTask("/ac @" + getPlayerName() + " " + message);
         else if (isFromGuild()) BBsentials.sender.addImmediateSendTask("/gc @" + getPlayerName() + " " + message);

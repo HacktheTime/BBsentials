@@ -176,7 +176,7 @@ public class BBsentials {
                 for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
                     if (value.serverID.equals(serverId) && value.receivedTime.isAfter(Instant.now().minusSeconds(60))) {
                         List<RenderInformation> temp = new ArrayList<>();
-                        temp.add(new RenderInformation("bbsentials", "customitems/splash_hub"));
+                        temp.add(new RenderInformation("bbsentials", "textures/waypoints/splash_location.png"));
                         new Waypoints(value.locationInHub.getCoords(), EnvironmentCore.textutils.getJsonFromContent("§6Splash"), 1000, true, true, temp, Color.YELLOW, true);
                     }
                 }

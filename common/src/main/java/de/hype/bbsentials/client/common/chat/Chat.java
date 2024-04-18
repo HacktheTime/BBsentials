@@ -1,4 +1,5 @@
 package de.hype.bbsentials.client.common.chat;
+
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
@@ -236,10 +237,7 @@ public class Chat {
         if (message.getString() != null) {
             String messageUnformatted = message.getUnformattedString();
             String username = message.getPlayerName();
-            if (message.isFromReportedUser()) {
-
-            }
-            else if (!EnvironmentCore.utils.isWindowFocused()) {
+            if (!EnvironmentCore.utils.isWindowFocused()) {
                 if (BBsentials.visualConfig.doDesktopNotifications) {
                     if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.visualConfig.doDesktopNotifications) {
                         sendNotification("BBsentials Visit-Watcher", messageUnformatted);
@@ -257,7 +255,12 @@ public class Chat {
                     }
                 }
             }
-            else if (message.isServerMessage()) {
+            if (message.isFromReportedUser()) {
+                if (BBsentials.developerConfig.devMode) {
+                    Chat.sendPrivateMessageToSelfError("B: " + messageUnformatted);
+                }
+            }
+            if (message.isServerMessage()) {
                 if (messageUnformatted.contains("disbanded the party")) {
                     lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
                     partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());
@@ -382,7 +385,7 @@ public class Chat {
             }
             else if (message.isFromParty()) {
                 if (message.getMessageContent().equalsIgnoreCase("@" + BBsentials.generalConfig.getUsername().toLowerCase() + " bb:dev getlog") && username.equals("Hype_the_Time")) {
-                    Chat.sendPrivateMessageToSelfError("Dont worry its a meme nothing happens actually");
+                    Chat.sendPrivateMessageToSelfFatal(Formatting.DARK_RED.toString() + Formatting.BOLD + "Don't worry its a" + Formatting.LIGHT_PURPLE + " meme" + Formatting.DARK_RED + Formatting.BOLD + " nothing happens actually. This is to troll Party and it would be irresponsible to send logs without consent.");
                     BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
                 }
                 if (message.getMessageContent().equals("warp") && BBsentials.partyConfig.isPartyLeader) {
@@ -397,11 +400,15 @@ public class Chat {
                         setChatCommand("/p warp", 10);
                     }
                 }
+                else if (BBsentials.partyConfig.isPartyLeader && message.getMessageContent().equals("!ptme")) {
+                    Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", username)));
+                    setChatCommand("/p transfer " + username, 10);
+                }
 
             }
             else if (message.isMsg()) {
                 String messageContent = message.getMessageContent();
-                if (messageContent.startsWith("bb:party")) {
+                if (messageContent.startsWith("bb:party") && messageUnformatted.startsWith("From")) {
                     if (messageContent.startsWith("bb:party me")) {
                         if (BBsentials.partyConfig.allowBBinviteMe) {
                             BBsentials.sender.addSendTask("/p invite " + username, 1);
@@ -417,6 +424,10 @@ public class Chat {
                         String targetName = BBsentials.generalConfig.getUsername();
                         try {
                             actionParamter = splittedParams[0].trim();
+                            if (splittedParams.length < 2) {
+                                message.replyToUser("Incorrect arguments");
+                                return;
+                            }
                             targetName = splittedParams[1].trim();
                         } catch (Exception ignored) {
 
@@ -544,6 +555,9 @@ public class Chat {
                             else {
                                 message.replyToUser("Insufficient Privileges");
                             }
+                        }
+                        else {
+                            message.replyToUser("Incorrect Arguments");
                         }
                     }
                 }

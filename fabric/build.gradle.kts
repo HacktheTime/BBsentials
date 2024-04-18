@@ -10,6 +10,7 @@ plugins {
 repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://maven.xpple.dev/maven2")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
 }
 
 
@@ -29,6 +30,7 @@ dependencies {
     modImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     modImplementation("dev.xpple:clientarguments:1.7")?.let { include(it) }
     implementation("com.github.JnCrMx:discord-game-sdk4j:v0.5.5")
+    modImplementation("net.hypixel:mod-api:0.3.1")
     modApi(libs.clothConfig) {
         exclude(group = "net.fabricmc.fabric-api")
     }
@@ -48,7 +50,7 @@ tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
 java {
     java {
 
-    withSourcesJar()
+        withSourcesJar()
         targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
     }

@@ -45,7 +45,7 @@ public class ChChestUpdateListener extends UpdateListener {
             }
             List<String> chestItems = Arrays.stream(chest.items).filter(item -> !item.isCustom()).map(ChChestItem::getDisplayName).collect(Collectors.toList());
             List<RenderInformation> renderInformationList = new ArrayList<>();
-            chestItems.forEach((item) -> renderInformationList.add(new RenderInformation("bbsentials", "textures/gui/sprites/waypoints/" + item + ".png")));
+            chestItems.forEach((item) -> renderInformationList.add(new RenderInformation("bbsentials", "textures/waypoints/" + item + ".png")));
             if (Waypoints.waypoints.values().stream().noneMatch(waypointFiltered -> waypointFiltered.position.equals(chest.coords))) {
                 Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + String.join(", ", chestItems.subList(0, Math.min(chestItems.size(), 3))) + "\"}", 1000, shouldDisplay, true, renderInformationList, BBsentials.chChestConfig.defaultWaypointColor, BBsentials.chChestConfig.doChestWaypointsTracers);
                 waypoints.put(newpoint.position, newpoint);

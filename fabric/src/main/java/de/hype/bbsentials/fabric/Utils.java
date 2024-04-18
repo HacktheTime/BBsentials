@@ -91,7 +91,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                             Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
                             it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
                         }
-                        it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 32, 32);
+                        it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 25, 25);
 
                     }
                     return Unit.INSTANCE;

@@ -182,6 +182,7 @@ public abstract class SelectionScreen<T> extends Screen {
         MinecraftClient client = MinecraftClient.getInstance();
         client.execute(() -> client.setScreen(screen));
     }
+
 }
 
 

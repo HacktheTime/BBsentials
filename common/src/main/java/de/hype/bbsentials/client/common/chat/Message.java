@@ -6,16 +6,17 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Message {
     public boolean actionBar = false;
-    Boolean guild = null;
-    Boolean party = null;
-    Boolean msg = null;
-    Boolean server = null;
+    private Boolean guild = null;
+    private Boolean party = null;
+    private Boolean msg = null;
+    private Boolean server = null;
     private String text;
     private String unformattedString = null;
     private String playerName = null;
     private String string;
     private String unformattedStringJsonEscape = null;
     private String noRanks;
+    private Boolean isFromSelf;
 
     public Message(String textJson, String string) {
         this.text = textJson;
@@ -75,7 +76,13 @@ public class Message {
 
     public boolean isMsg() {
         if (msg != null) return msg;
-        msg = getUnformattedString().startsWith("From") || getUnformattedString().startsWith("To");
+        if (getUnformattedString().startsWith("From")) {
+            msg = true;
+        }
+        else if (getUnformattedString().startsWith("To")) {
+            msg = true;
+            playerName = BBsentials.generalConfig.getUsername();
+        }
         return msg;
     }
 
@@ -130,6 +137,7 @@ public class Message {
     }
 
     public void replyToUser(String message) {
+        if (isFromSelf()) return;
         if (isMsg()) BBsentials.sender.addImmediateSendTask("/msg " + getPlayerName() + " " + message);
         else if (isFromParty()) BBsentials.sender.addImmediateSendTask("/pc @" + getPlayerName() + " " + message);
         else if (isServerMessage()) BBsentials.sender.addImmediateSendTask("/ac @" + getPlayerName() + " " + message);
@@ -139,5 +147,10 @@ public class Message {
     @Override
     public String toString() {
         return getUnformattedString();
+    }
+
+    public Boolean isFromSelf() {
+        if (isFromSelf == null) isFromSelf = getPlayerName().equals(BBsentials.generalConfig.getUsername());
+        return isFromSelf;
     }
 }

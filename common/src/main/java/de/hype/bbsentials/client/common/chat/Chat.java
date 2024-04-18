@@ -388,7 +388,7 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfFatal(Formatting.DARK_RED.toString() + Formatting.BOLD + "Don't worry its a" + Formatting.LIGHT_PURPLE + " meme" + Formatting.DARK_RED + Formatting.BOLD + " nothing happens actually. This is to troll Party and it would be irresponsible to send logs without consent.");
                     BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
                 }
-                if (message.getMessageContent().equals("warp") && BBsentials.partyConfig.isPartyLeader) {
+                if (message.getMessageContent().equals("warp") || message.getMessageContent().equals("!warp") && BBsentials.partyConfig.isPartyLeader && !message.isFromSelf()) {
                     if (BBsentials.partyConfig.partyMembers.size() == 1) {
                         Chat.sendCommand("/p warp");
                     }
@@ -408,7 +408,7 @@ public class Chat {
             }
             else if (message.isMsg()) {
                 String messageContent = message.getMessageContent();
-                if (messageContent.startsWith("bb:party") && messageUnformatted.startsWith("From")) {
+                if (messageContent.startsWith("bb:party") && !message.isFromSelf()) {
                     if (messageContent.startsWith("bb:party me")) {
                         if (BBsentials.partyConfig.allowBBinviteMe) {
                             BBsentials.sender.addSendTask("/p invite " + username, 1);
@@ -612,7 +612,7 @@ public class Chat {
 
     public String getPartyAnnounceAction(String username, String actionParamter, String targetName) {
         String updatedActionParamter = new String(actionParamter);
-        if (actionParamter.equalsIgnoreCase("transferred")) {
+        if (actionParamter.equalsIgnoreCase("transfer")) {
             updatedActionParamter = "transferred the party to";
         }
         else if (actionParamter.endsWith("e"))

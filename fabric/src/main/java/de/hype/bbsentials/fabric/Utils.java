@@ -494,7 +494,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                     String author = "";
                     if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder)) author = " [" + chest.finder + "]";
                     toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
-                    Arrays.stream(chest.items).map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
+                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
             }
             for (Text text : toRender) {

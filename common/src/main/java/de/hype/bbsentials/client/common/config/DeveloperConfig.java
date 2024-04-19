@@ -7,8 +7,11 @@ package de.hype.bbsentials.client.common.config;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 
-
+/**
+ * DO NOT MODIFY THIS CLASS! If you modify this class you can easily do things which will ban you from the network permanently without prior notice nor warning!
+ */
 public class DeveloperConfig extends BBsentialsConfig {
+
     public boolean devMode = false;
     public boolean detailedDevMode = false;
     public boolean doDevDashboardConfig = true;
@@ -20,10 +23,16 @@ public class DeveloperConfig extends BBsentialsConfig {
         doInit();
     }
 
+    /**
+     * DO NOT MODIFY THIS METHOD! If you modify this method you can easily do things which will ban you from the network permanently without prior notice nor warning!
+     */
     public boolean isDevModeEnabled() {
         return devMode && hasDevPerm();
     }
 
+    /**
+     * DO NOT MODIFY THIS METHOD! If you modify this method you can easily do things which will ban you from the network permanently without prior notice nor warning!
+     */
     public boolean isDetailedDevModeEnabled() {
         return detailedDevMode && hasDevPerm();
     }
@@ -41,6 +50,9 @@ public class DeveloperConfig extends BBsentialsConfig {
 
     }
 
+    /**
+     * DO NOT MODIFY THIS METHOD! If you modify this method you can easily do things which will ban you from the network permanently without prior notice nor warning!
+     */
     private boolean hasDevPerm() {
         return BBsentials.generalConfig.hasBBRoles("dev");
     }

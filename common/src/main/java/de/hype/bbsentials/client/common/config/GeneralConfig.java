@@ -47,6 +47,11 @@ public class GeneralConfig extends BBsentialsConfig {
         return start.minus(12, ChronoUnit.HOURS).isBefore(now) && end.plus(2, ChronoUnit.HOURS).isAfter(now);
     }
 
+
+    /**
+     * @param roleName required role. Modifying this method for things which require devmode may be violating the license and will result in a permanent blocking from the network!
+     * @return true when user has the role
+     */
     public boolean hasBBRoles(String roleName) {
         if (roleName == null) return true;
         if (roleName.isEmpty()) return true;

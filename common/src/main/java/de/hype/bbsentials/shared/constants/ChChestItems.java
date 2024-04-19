@@ -30,16 +30,15 @@ import java.util.stream.Collectors;
  * </pre>
  */
 public class ChChestItems {
-    public static final ChChestItem PrehistoricEgg = new ChChestItem("Prehistoric Egg");
-    public static final ChChestItem Pickonimbus2000 = new ChChestItem("Pickonimbus 2000");
-    public static final ChChestItem ControlSwitch = new ChChestItem("Control Switch");
-    public static final ChChestItem ElectronTransmitter = new ChChestItem("Electron Transmitter");
-    public static final ChChestItem FTX3070 = new ChChestItem("FTX 3070");
-    public static final ChChestItem RobotronReflector = new ChChestItem("Robotron Reflector");
-    public static final ChChestItem SuperliteMotor = new ChChestItem("Superlite Motor");
-    public static final ChChestItem SyntheticHeart = new ChChestItem("Synthetic Heart");
-    public static final ChChestItem FlawlessGemstone = new ChChestItem("Flawless Gemstone");
-    public static final ChChestItem JungleHeart = new ChChestItem("Jungle Heart");
+    public static final ChChestItem PrehistoricEgg = new ChChestItem("Prehistoric Egg", "prehistoric_egg");
+    public static final ChChestItem Pickonimbus2000 = new ChChestItem("Pickonimbus 2000", "pickonimbus");
+    public static final ChChestItem ControlSwitch = new ChChestItem("Control Switch", "control_switch");
+    public static final ChChestItem ElectronTransmitter = new ChChestItem("Electron Transmitter", "electron_transmitter");
+    public static final ChChestItem FTX3070 = new ChChestItem("FTX 3070", "ftx_3070");
+    public static final ChChestItem RobotronReflector = new ChChestItem("Robotron Reflector", "robotron_reflector");
+    public static final ChChestItem SuperliteMotor = new ChChestItem("Superlite Motor", "superlite_motor");
+    public static final ChChestItem SyntheticHeart = new ChChestItem("Synthetic Heart", "synthetic_heart");
+    public static final ChChestItem FlawlessGemstone = new ChChestItem("Flawless Gemstone", "flawless_gemstone");
     private static final List<ChChestItem> items = new ArrayList<>();
 
     // Automatically populate predefined items using reflection
@@ -76,10 +75,10 @@ public class ChChestItems {
         return null;
     }
 
-    public static ChChestItem[] getItem(String[] displayNames) {
-        ChChestItem[] result = new ChChestItem[displayNames.length];
+    public static List<ChChestItem> getItem(String[] displayNames) {
+        List<ChChestItem> result = new ArrayList<>();
         for (int i = 0; i < displayNames.length; i++) {
-            result[i] = getItem(displayNames[i]);
+            result.add(getItem(displayNames[i]));
         }
         return result;
     }

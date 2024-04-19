@@ -19,8 +19,6 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
         sc.setScreen(sc);
     }
 
-
-
     @Override
     public List<TrustedPartyMember> getObjectList() {
         return BBsentials.partyConfig.trustedPartyMembers;
@@ -28,7 +26,7 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
 
     @Override
     public TrustedPartyMember getNewDefaultObject() {
-        return new TrustedPartyMember(null, null);
+        return new TrustedPartyMember("", "");
     }
 
     /**

@@ -9,6 +9,7 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
+import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.TextUtils;
@@ -37,6 +38,7 @@ import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,233 +95,257 @@ public class ModInitialiser implements ClientModInitializer {
         });//sbsocialoptions
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("bbi")
-                    .then(ClientCommandManager.literal("reconnect")
-                            .executes((context) -> {
-                                connectToBBserver();
-                                return 1;
-                            }))
-                    .then(ClientCommandManager.literal("disconnect")
-                            .executes((context) -> {
-                                connection.close();
-                                Chat.sendPrivateMessageToSelfInfo("Disconnected");
-                                return 1;
-                            }))
-                    .then(ClientCommandManager.literal("reconnect-stable-server")
-                            .executes((context) -> {
-                                connectToBBserver(false);
-                                return 1;
-                            }))
-                    .then(ClientCommandManager.literal("reconnect-test-server")
-                            .executes((context) -> {
-                                connectToBBserver(true);
-                                return 1;
-                            }))
-                    .then(ClientCommandManager.literal("config")
-                            .then(ClientCommandManager.argument("category", StringArgumentType.string())
-                                    .suggests((context, builder) -> {
-                                        // Provide tab-completion options for configManager subfolder
-                                        return CommandSource.suggestMatching(new String[]{"saveAll", "reset", "load"}, builder);
-                                    }).executes((context) -> {
-                                        String category = StringArgumentType.getString(context, "category");
-                                        switch (category) {
-                                            case "saveAll":
-                                                ConfigManager.saveAll();
-                                                Chat.sendPrivateMessageToSelfSuccess("Saved configs successfully");
-                                                break;
-                                            case "load":
-                                                ConfigManager.reloadAllConfigs();
-                                                break;
-                                            case "reset":
-                                                // Reset logic here
-                                                break;
-                                        }
+                            .then(ClientCommandManager.literal("reconnect")
+                                    .executes((context) -> {
+                                        connectToBBserver();
                                         return 1;
                                     }))
-                            .then(ClientCommandManager.literal("set-value")
-                                    .then(ClientCommandManager.argument("className", StringArgumentType.string())
+                            .then(ClientCommandManager.literal("disconnect")
+                                    .executes((context) -> {
+                                        connection.close();
+                                        Chat.sendPrivateMessageToSelfInfo("Disconnected");
+                                        return 1;
+                                    }))
+                            .then(ClientCommandManager.literal("reconnect-stable-server")
+                                    .executes((context) -> {
+                                        connectToBBserver(false);
+                                        return 1;
+                                    }))
+                            .then(ClientCommandManager.literal("reconnect-test-server")
+                                    .executes((context) -> {
+                                        connectToBBserver(true);
+                                        return 1;
+                                    }))
+                            .then(ClientCommandManager.literal("reconnect-local-test-server")
+                                    .executes((context) -> {
+                                        executionService.execute(() -> {
+                                            try {
+                                                Socket test = new Socket("localhost", 5011);
+                                                test.close();
+                                            } catch (Exception e) {
+                                                Chat.sendPrivateMessageToSelfError("Could not reach a local test Server. Do you have one running?");
+                                                return;
+                                            }
+
+                                            if (connection != null) {
+                                                connection.close();
+                                            }
+                                            bbthread = new Thread(() -> {
+                                                connection = new BBsentialConnection();
+                                                coms = new de.hype.bbsentials.client.common.client.commands.Commands();
+                                                connection.connect("localhost", 5011);
+                                            });
+                                            bbthread.start();
+
+                                        });
+                                        return 1;
+                                    }))
+                            .then(ClientCommandManager.literal("config")
+                                    .then(ClientCommandManager.argument("category", StringArgumentType.string())
                                             .suggests((context, builder) -> {
-                                                // Provide tab-completion options for classes
-                                                List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
-                                                // Replace with your own logic to retrieve class names
-                                                return CommandSource.suggestMatching(classNames, builder);
-                                            })
-                                            .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
+                                                // Provide tab-completion options for configManager subfolder
+                                                return CommandSource.suggestMatching(new String[]{"saveAll", "reset", "load"}, builder);
+                                            }).executes((context) -> {
+                                                String category = StringArgumentType.getString(context, "category");
+                                                switch (category) {
+                                                    case "saveAll":
+                                                        ConfigManager.saveAll();
+                                                        Chat.sendPrivateMessageToSelfSuccess("Saved configs successfully");
+                                                        break;
+                                                    case "load":
+                                                        ConfigManager.reloadAllConfigs();
+                                                        break;
+                                                    case "reset":
+                                                        // Reset logic here
+                                                        break;
+                                                }
+                                                return 1;
+                                            }))
+                                    .then(ClientCommandManager.literal("set-value")
+                                            .then(ClientCommandManager.argument("className", StringArgumentType.string())
                                                     .suggests((context, builder) -> {
-                                                        // Provide tab-completion options for variable names
-                                                        List<String> variableNames = new ArrayList<>();
-                                                        try {
-                                                            variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", StringArgumentType.getString(context, "className")));
-                                                        } catch (Exception e) {
-                                                            context.getSource().sendError(Text.of("§cCouldnt locate the specified Classes Variables. Is the Class correct?"));
-                                                        }
-                                                        return CommandSource.suggestMatching(variableNames, builder);
+                                                        // Provide tab-completion options for classes
+                                                        List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
+                                                        // Replace with your own logic to retrieve class names
+                                                        return CommandSource.suggestMatching(classNames, builder);
                                                     })
-                                                    .then(ClientCommandManager.argument("variableValue", StringArgumentType.string())
+                                                    .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
+                                                            .suggests((context, builder) -> {
+                                                                // Provide tab-completion options for variable names
+                                                                List<String> variableNames = new ArrayList<>();
+                                                                try {
+                                                                    variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", StringArgumentType.getString(context, "className")));
+                                                                } catch (Exception e) {
+                                                                    context.getSource().sendError(Text.of("§cCouldnt locate the specified Classes Variables. Is the Class correct?"));
+                                                                }
+                                                                return CommandSource.suggestMatching(variableNames, builder);
+                                                            })
+                                                            .then(ClientCommandManager.argument("variableValue", StringArgumentType.string())
+                                                                    .executes((context) -> {
+                                                                        // Handle "variableName" and "variableValue" logic here
+                                                                        String variableName = StringArgumentType.getString(context, "variableName");
+                                                                        String variableValue = StringArgumentType.getString(context, "variableValue");
+                                                                        try {
+                                                                            if (!variableName.toLowerCase().contains("dev") || generalConfig.hasBBRoles("dev")) {
+                                                                                Chat.setVariableValue(StringArgumentType.getString(context, "className"), variableName, variableValue);
+                                                                            }
+                                                                            ConfigManager.saveAll();
+                                                                        } catch (ClassNotFoundException |
+                                                                                 NoSuchFieldException |
+                                                                                 IllegalAccessException |
+                                                                                 InstantiationException |
+                                                                                 InvocationTargetException |
+                                                                                 NoSuchMethodException e) {
+                                                                            context.getSource().sendError(Text.of("§cInvalid variable or value"));
+                                                                        }
+                                                                        return 1;
+                                                                    })))))
+                                    .then(ClientCommandManager.literal("get-value")
+                                            .then(ClientCommandManager.argument("className", StringArgumentType.string())
+                                                    .suggests((context, builder) -> {
+                                                        // Provide tab-completion options for classes
+                                                        List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
+                                                        // Replace with your own logic to retrieve class names
+                                                        return CommandSource.suggestMatching(classNames, builder);
+                                                    })
+                                                    .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
+                                                            .suggests((context, builder) -> {
+                                                                // Provide tab-completion options for variable names
+                                                                List<String> variableNames;
+                                                                variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", StringArgumentType.getString(context, "className")));
+                                                                return CommandSource.suggestMatching(variableNames, builder);
+                                                            })
                                                             .executes((context) -> {
                                                                 // Handle "variableName" and "variableValue" logic here
                                                                 String variableName = StringArgumentType.getString(context, "variableName");
-                                                                String variableValue = StringArgumentType.getString(context, "variableValue");
                                                                 try {
-                                                                    if (!variableName.toLowerCase().contains("dev") || generalConfig.hasBBRoles("dev")) {
-                                                                        Chat.setVariableValue(StringArgumentType.getString(context, "className"), variableName, variableValue);
-                                                                    }
-                                                                    ConfigManager.saveAll();
-                                                                } catch (ClassNotFoundException |
-                                                                         NoSuchFieldException |
-                                                                         IllegalAccessException |
-                                                                         InstantiationException |
-                                                                         InvocationTargetException |
-                                                                         NoSuchMethodException e) {
+                                                                    Chat.getVariableValue(StringArgumentType.getString(context, "className"), variableName);
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
                                                                     context.getSource().sendError(Text.of("§cInvalid variable or value"));
                                                                 }
                                                                 return 1;
-                                                            })))))
-                            .then(ClientCommandManager.literal("get-value")
-                                    .then(ClientCommandManager.argument("className", StringArgumentType.string())
-                                            .suggests((context, builder) -> {
-                                                // Provide tab-completion options for classes
-                                                List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
-                                                // Replace with your own logic to retrieve class names
-                                                return CommandSource.suggestMatching(classNames, builder);
+                                                            }))).executes((context) -> {
+                                                return 1;
                                             })
-                                            .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
-                                                    .suggests((context, builder) -> {
-                                                        // Provide tab-completion options for variable names
-                                                        List<String> variableNames;
-                                                        variableNames = List.of(Chat.getVariableNames("de.hype.bbsentials.client.common.config", StringArgumentType.getString(context, "className")));
-                                                        return CommandSource.suggestMatching(variableNames, builder);
-                                                    })
-                                                    .executes((context) -> {
-                                                        // Handle "variableName" and "variableValue" logic here
-                                                        String variableName = StringArgumentType.getString(context, "variableName");
-                                                        try {
-                                                            Chat.getVariableValue(StringArgumentType.getString(context, "className"), variableName);
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                            context.getSource().sendError(Text.of("§cInvalid variable or value"));
-                                                        }
-                                                        return 1;
-                                                    }))).executes((context) -> {
-                                        return 1;
-                                    })
+                                    )
                             )
-                    )
-                    .then(ClientCommandManager.literal("waypoint")
-                            .then(ClientCommandManager.literal("add")
-                                    .then(ClientCommandManager.argument("name", StringArgumentType.string())
-                                            .then(ClientCommandManager.argument("position", CBlockPosArgumentType.blockPos())
-                                                    .then(ClientCommandManager.argument("deleteonserverswap", BoolArgumentType.bool())
-                                                            .then(ClientCommandManager.argument("visible", BoolArgumentType.bool())
-                                                                    .then(ClientCommandManager.argument("maxrenderdistance", IntegerArgumentType.integer())
-                                                                            .then(ClientCommandManager.argument("customtexture", StringArgumentType.string())
-                                                                                    .executes(this::createWaypointFromCommandContext)
+                            .then(ClientCommandManager.literal("waypoint")
+                                            .then(ClientCommandManager.literal("add")
+                                                    .then(ClientCommandManager.argument("name", StringArgumentType.string())
+                                                            .then(ClientCommandManager.argument("position", CBlockPosArgumentType.blockPos())
+                                                                    .then(ClientCommandManager.argument("deleteonserverswap", BoolArgumentType.bool())
+                                                                            .then(ClientCommandManager.argument("visible", BoolArgumentType.bool())
+                                                                                    .then(ClientCommandManager.argument("maxrenderdistance", IntegerArgumentType.integer())
+                                                                                            .then(ClientCommandManager.argument("customtexture", StringArgumentType.string())
+                                                                                                    .executes(this::createWaypointFromCommandContext)
+                                                                                            )
+                                                                                            .executes(this::createWaypointFromCommandContext)
+                                                                                    )
                                                                             )
-                                                                            .executes(this::createWaypointFromCommandContext)
                                                                     )
                                                             )
                                                     )
                                             )
-                                    )
-                            )
-                            .then(ClientCommandManager.literal("remove")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
-                                int wpId = IntegerArgumentType.getInteger(context, "waypointid");
-                                return (Waypoints.waypoints.remove(wpId) != null) ? 1 : 0;
-                            })))
+                                            .then(ClientCommandManager.literal("remove")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
+                                                int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                                return (Waypoints.waypoints.remove(wpId) != null) ? 1 : 0;
+                                            })))
 //                            .then(ClientCommandManager.literal("clear").executes((context -> {
 //                                 Waypoints.waypoints.clear();
 //                                 return 1;
 //                            })))
-                            .then(ClientCommandManager.literal("setvisibility")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer())
-                                    .then(ClientCommandManager.argument("visible", BoolArgumentType.bool()).executes((context -> {
-                                        int wpId = IntegerArgumentType.getInteger(context, "waypointid");
-                                        boolean visible = BoolArgumentType.getBool(context, "setvisibility");
-                                        Waypoints waypoint = Waypoints.waypoints.get(wpId);
-                                        if (waypoint == null) {
-                                            context.getSource().sendError(Text.of("No Waypoint on that ID found"));
-                                            return 0;
-                                        }
-                                        if (waypoint.visible == visible) {
-                                            Chat.sendPrivateMessageToSelfInfo("Nothing changed. Waypoint visibility was that state already");
-                                            return 1;
-                                        }
-                                        else {
-                                            waypoint.visible = visible;
-                                            Chat.sendPrivateMessageToSelfSuccess("Nothing changed. Waypoint visibility was that state already");
-                                            return 1;
-                                        }
-                                    })))
-                                    .then(ClientCommandManager.literal("info")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
-                                        int wpId = IntegerArgumentType.getInteger(context, "waypointid");
-                                        try {
-                                            Chat.sendPrivateMessageToSelfInfo(Waypoints.waypoints.get(wpId).getFullInfoString());
-                                            return 1;
-                                        } catch (NullPointerException ignored) {
-                                            return 0;
-                                        }
-                                    })))
-                                    .then(ClientCommandManager.literal("list").executes((context -> {
-                                                Waypoints.waypoints.forEach(((integer, waypoint) -> {
-                                                    Chat.sendPrivateMessageToSelfInfo(waypoint.getMinimalInfoString());
-                                                }));
+                                            .then(ClientCommandManager.literal("setvisibility")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer())
+                                                    .then(ClientCommandManager.argument("visible", BoolArgumentType.bool()).executes((context -> {
+                                                        int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                                        boolean visible = BoolArgumentType.getBool(context, "setvisibility");
+                                                        Waypoints waypoint = Waypoints.waypoints.get(wpId);
+                                                        if (waypoint == null) {
+                                                            context.getSource().sendError(Text.of("No Waypoint on that ID found"));
+                                                            return 0;
+                                                        }
+                                                        if (waypoint.visible == visible) {
+                                                            Chat.sendPrivateMessageToSelfInfo("Nothing changed. Waypoint visibility was that state already");
+                                                            return 1;
+                                                        }
+                                                        else {
+                                                            waypoint.visible = visible;
+                                                            Chat.sendPrivateMessageToSelfSuccess("Nothing changed. Waypoint visibility was that state already");
+                                                            return 1;
+                                                        }
+                                                    })))
+                                                    .then(ClientCommandManager.literal("info")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
+                                                        int wpId = IntegerArgumentType.getInteger(context, "waypointid");
+                                                        try {
+                                                            Chat.sendPrivateMessageToSelfInfo(Waypoints.waypoints.get(wpId).getFullInfoString());
+                                                            return 1;
+                                                        } catch (NullPointerException ignored) {
+                                                            return 0;
+                                                        }
+                                                    })))
+                                                    .then(ClientCommandManager.literal("list").executes((context -> {
+                                                                Waypoints.waypoints.forEach(((integer, waypoint) -> {
+                                                                    Chat.sendPrivateMessageToSelfInfo(waypoint.getMinimalInfoString());
+                                                                }));
+                                                                return 1;
+                                                            }))
+                                                    )
+                                            )
+                                            .executes((context -> {
+                                                MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen(null)));
                                                 return 1;
                                             }))
-                                    )
-                            )
-                            .executes((context -> {
-                                MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen(null)));
-                                return 1;
-                            }))
-                    ).then(ClientCommandManager.literal("route")
-                            .then(ClientCommandManager.literal("load")
-                                    .then(ClientCommandManager.argument("fileName", StringArgumentType.string())
-                                            .suggests(((context, builder) -> {
-                                                if (waypointRouteDirectory.exists() && waypointRouteDirectory.isDirectory()) {
-                                                    List<String> routeNames = Arrays.stream(waypointRouteDirectory.listFiles())
-                                                            .filter(file -> file.isFile() && file.getName().endsWith(".json"))
-                                                            .map(file -> file.getName().replace(".json", ""))
-                                                            .collect(Collectors.toList());
+                            ).then(ClientCommandManager.literal("route")
+                                    .then(ClientCommandManager.literal("load")
+                                            .then(ClientCommandManager.argument("fileName", StringArgumentType.string())
+                                                    .suggests(((context, builder) -> {
+                                                        if (waypointRouteDirectory.exists() && waypointRouteDirectory.isDirectory()) {
+                                                            List<String> routeNames = Arrays.stream(waypointRouteDirectory.listFiles())
+                                                                    .filter(file -> file.isFile() && file.getName().endsWith(".json"))
+                                                                    .map(file -> file.getName().replace(".json", ""))
+                                                                    .collect(Collectors.toList());
 
-                                                    return CommandSource.suggestMatching(routeNames, builder);
-                                                }
-                                                return Suggestions.empty();
-                                            })).then(ClientCommandManager.argument("startingnodeid", IntegerArgumentType.integer())
+                                                            return CommandSource.suggestMatching(routeNames, builder);
+                                                        }
+                                                        return Suggestions.empty();
+                                                    })).then(ClientCommandManager.argument("startingnodeid", IntegerArgumentType.integer())
+                                                            .executes((context -> {
+                                                                try {
+                                                                    WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName") + ".json").setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
+                                                                    return 1;
+                                                                } catch (Exception e) {
+                                                                    return 0;
+                                                                }
+                                                            })))
                                                     .executes((context -> {
                                                         try {
-                                                            WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName") + ".json").setCurentNode(IntegerArgumentType.getInteger(context, "startingnodeid"));
+                                                            WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName"));
                                                             return 1;
                                                         } catch (Exception e) {
                                                             return 0;
                                                         }
-                                                    })))
-                                            .executes((context -> {
-                                                try {
-                                                    WaypointRoute.loadRoute(StringArgumentType.getString(context, "fileName"));
-                                                    return 1;
-                                                } catch (Exception e) {
-                                                    return 0;
-                                                }
-                                            }))
-                                    )
-                            )//TODO suggest names automatically and actual load code.
-                            .then(ClientCommandManager.literal("unload").executes((context) -> {
-                                temporaryConfig.route = null;
-                                Chat.sendPrivateMessageToSelfSuccess("Unloaded current route");
-                                return 1;
-                            }))
-                            .then(ClientCommandManager.literal("setCurrentNode")
-                                    .then(ClientCommandManager.argument("number", IntegerArgumentType.integer())
-                                            .executes((context -> {
-                                                int id = IntegerArgumentType.getInteger(context, "number");
-                                                if (temporaryConfig.route == null) {
-                                                    context.getSource().sendError(Text.of("No Route loaded"));
-                                                    return 0;
-                                                }
-                                                temporaryConfig.route.currentNode = id;
-                                                return 1;
-                                            }))
+                                                    }))
+                                            )
+                                    )//TODO suggest names automatically and actual load code.
+                                    .then(ClientCommandManager.literal("unload").executes((context) -> {
+                                        temporaryConfig.route = null;
+                                        Chat.sendPrivateMessageToSelfSuccess("Unloaded current route");
+                                        return 1;
+                                    }))
+                                    .then(ClientCommandManager.literal("setCurrentNode")
+                                            .then(ClientCommandManager.argument("number", IntegerArgumentType.integer())
+                                                    .executes((context -> {
+                                                        int id = IntegerArgumentType.getInteger(context, "number");
+                                                        if (temporaryConfig.route == null) {
+                                                            context.getSource().sendError(Text.of("No Route loaded"));
+                                                            return 0;
+                                                        }
+                                                        temporaryConfig.route.currentNode = id;
+                                                        return 1;
+                                                    }))
+                                            )
                                     )
                             )
-                    )
             );
 
         }); //bbi

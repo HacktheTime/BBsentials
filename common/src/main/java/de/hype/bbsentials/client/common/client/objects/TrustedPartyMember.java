@@ -33,7 +33,7 @@ public class TrustedPartyMember {
     }
 
     public boolean isUsernameInitialised() {
-        return username == null;
+        return username != null;
     }
     public static TrustedPartyMember fromUsername(String username) {
         return new TrustedPartyMember(getMcUUIDbyUsername(username), username);

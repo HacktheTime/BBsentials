@@ -260,7 +260,7 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfError("B: " + messageUnformatted);
                 }
             }
-            if (message.isServerMessage()) {
+            else if (message.isServerMessage()) {
                 if (messageUnformatted.contains("disbanded the party")) {
                     lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
                     partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());

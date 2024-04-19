@@ -77,6 +77,7 @@ public abstract class SelectionScreen<T> extends Screen {
     }
 
     private void addNewRow() {
+        if (getObjectList() == null) objects = new ArrayList<>();
         getObjectsInternal().add(getNewDefaultObject());
         updateFields();
     }

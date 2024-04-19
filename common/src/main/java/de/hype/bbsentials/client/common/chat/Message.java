@@ -76,6 +76,7 @@ public class Message {
 
     public boolean isMsg() {
         if (msg != null) return msg;
+        msg = false;
         if (getUnformattedString().startsWith("From")) {
             msg = true;
         }

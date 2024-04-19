@@ -5,16 +5,19 @@ package de.hype.bbsentials.shared.constants;
  */
 public class ChChestItem {
     private String displayName;
+    private String displayPath;
     private boolean custom;
 
-    public ChChestItem(String displayName) {
+    public ChChestItem(String displayName, String displayPath) {
         this.displayName = displayName;
+        this.displayPath = displayPath;
         this.custom = false;
     }
 
     public ChChestItem(String displayName, boolean custom) {
         this.displayName = displayName;
         this.custom = custom;
+        displayPath = null;
     }
 
     public String getDisplayName() {
@@ -28,6 +31,10 @@ public class ChChestItem {
 
     public boolean isCustom() {
         return custom;
+    }
+
+    public String getDisplayPath() {
+        return displayPath;
     }
 
     @Override
@@ -45,5 +52,9 @@ public class ChChestItem {
             if (displayName.equals(roboPart)) return true;
         }
         return false;
+    }
+
+    public boolean hasDisplayPath() {
+        return displayPath != null;
     }
 }

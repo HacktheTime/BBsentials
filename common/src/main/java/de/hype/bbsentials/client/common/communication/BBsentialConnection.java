@@ -74,72 +74,81 @@ public class BBsentialConnection {
         System.setProperty("javax.net.debug", "ssl,handshake");
         FileInputStream inputStream = null;
         try {
-            // Load the BBssentials-online server's public certificate from the JKS file
-            try {
-                InputStream resouceInputStream = BBsentials.class.getResourceAsStream("/assets/public_bbsentials_cert.crt");
+            if (!serverIP.equals("localhost")) {
+                // Load the BBssentials-online server's public certificate from the JKS file
+                try {
+                    InputStream resouceInputStream = BBsentials.class.getResourceAsStream("/assets/public_bbsentials_cert.crt");
 
-                // Check if the resource exists
-                if (resouceInputStream == null) {
-                    System.out.println("The resource '/assets/public_bbsentials_cert.crt' was not found.");
-                    return;
+                    // Check if the resource exists
+                    if (resouceInputStream == null) {
+                        System.out.println("The resource '/assets/public_bbsentials_cert.crt' was not found.");
+                        return;
+                    }
+
+                    File tempFile = File.createTempFile("public_bbsentials_cert", ".crt");
+                    tempFile.deleteOnExit();
+
+                    FileOutputStream outputStream = new FileOutputStream(tempFile);
+
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = resouceInputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+
+                    outputStream.close();
+                    resouceInputStream.close();
+
+                    // Now you have the .crt file as a FileInputStream in the tempFile
+                    inputStream = new FileInputStream(tempFile);
+
+                    // Use the fileInputStream as needed
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+                X509Certificate serverCertificate = (X509Certificate) certFactory.generateCertificate(inputStream);
+                PublicKey serverPublicKey = serverCertificate.getPublicKey();
 
-                File tempFile = File.createTempFile("public_bbsentials_cert", ".crt");
-                tempFile.deleteOnExit();
+                // Create a TrustManager that trusts only the server's public key
+                TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null; // We don't need to check the client's certificates
+                    }
 
-                FileOutputStream outputStream = new FileOutputStream(tempFile);
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+                        // Do nothing, client certificate validation not required
+                    }
 
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = resouceInputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-
-                outputStream.close();
-                resouceInputStream.close();
-
-                // Now you have the .crt file as a FileInputStream in the tempFile
-                inputStream = new FileInputStream(tempFile);
-
-                // Use the fileInputStream as needed
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-            X509Certificate serverCertificate = (X509Certificate) certFactory.generateCertificate(inputStream);
-            PublicKey serverPublicKey = serverCertificate.getPublicKey();
-
-            // Create a TrustManager that trusts only the server's public key
-            TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null; // We don't need to check the client's certificates
-                }
-
-                public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-                    // Do nothing, client certificate validation not required
-                }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-                    // Check if the server certificate matches the expected one
-                    if (certs.length == 1) {
-                        PublicKey publicKey = certs[0].getPublicKey();
-                        if (!publicKey.equals(serverPublicKey)) {
-                            throw new CertificateException("Server certificate not trusted.");
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+                        // Check if the server certificate matches the expected one
+                        if (certs.length == 1) {
+                            PublicKey publicKey = certs[0].getPublicKey();
+                            if (!publicKey.equals(serverPublicKey)) {
+                                throw new CertificateException("Server certificate not trusted.");
+                            }
+                        }
+                        else {
+                            throw new CertificateException("Invalid server certificate chain.");
                         }
                     }
-                    else {
-                        throw new CertificateException("Invalid server certificate chain.");
-                    }
-                }
-            }};
+                }};
 
-            // Create an SSL context with the custom TrustManager
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustManagers, new SecureRandom());
-            // Create an SSL socket factory
-            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-            socket = sslSocketFactory.createSocket(serverIP, serverPort);
+                // Create an SSL context with the custom TrustManager
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, trustManagers, new SecureRandom());
+                // Create an SSL socket factory
+                SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+                socket = sslSocketFactory.createSocket(serverIP, serverPort);
+            }
+            else {
+                try {
+                    socket = new Socket(serverIP, serverPort);
+                } catch (Exception e) {
+                    Chat.sendPrivateMessageToSelfError("You are connected to the LocalTest Server!");
+                }
+            }
             socket.setKeepAlive(true); // Enable Keep-Alive
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
@@ -322,6 +331,8 @@ public class BBsentialConnection {
         if (packet.success) {
             BBsentials.generalConfig.bbsentialsRoles = packet.roles;
             Chat.sendPrivateMessageToSelfSuccess("Login Success");
+            if (socket.getRemoteSocketAddress().toString().startsWith("localhost"))
+                Chat.sendPrivateMessageToSelfError("You are connected to the Local Test Server!");
             if (!packet.motd.isEmpty()) {
                 Chat.sendPrivateMessageToSelfImportantInfo(packet.motd);
             }
@@ -591,6 +602,7 @@ public class BBsentialConnection {
     public void onSkyblockLobbyDataPacket(SkyblockLobbyDataPacket packet) {
         packet.preparePacketToReplyToThis(new SkyblockLobbyDataPacket(EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.getLobbyTime(), EnvironmentCore.utils.getServerId(), EnvironmentCore.utils.getCurrentIsland()));
     }
+
     public void onPunishedPacket(PunishedPacket packet) {
         for (PunishmentData data : packet.data) {
             if (!data.isActive()) continue;

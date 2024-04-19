@@ -11,8 +11,8 @@ import de.hype.bbsentials.shared.constants.ChChestItems;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.ChestLobbyData;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -53,7 +53,7 @@ public class UpdateListenerManager {
                 if (showChChest(data.chests.get(0).items)) {
                     String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
                     tellrawText = tellrawText.replace("@username", data.contactMan);
-                    tellrawText = tellrawText.replace("@item", Arrays.stream(data.chests.get(0).items)
+                    tellrawText = tellrawText.replace("@item", data.chests.get(0).items.stream()
                             .map(ChChestItem::getDisplayName)
                             .collect(Collectors.toList())
                             .toString());
@@ -84,7 +84,7 @@ public class UpdateListenerManager {
         }
     }
 
-    public static boolean showChChest(ChChestItem[] items) {
+    public static boolean showChChest(List<ChChestItem> items) {
         if (BBsentials.chChestConfig.allChChestItem) return true;
         for (ChChestItem item : items) {
             if (BBsentials.chChestConfig.customChChestItem && item.isCustom()) return true;
@@ -95,6 +95,8 @@ public class UpdateListenerManager {
                 return true;
             if (BBsentials.chChestConfig.controlSwitch && item.equals(ChChestItems.ControlSwitch)) return true;
             if (BBsentials.chChestConfig.electronTransmitter && item.equals(ChChestItems.ElectronTransmitter))
+                return true;
+            if (BBsentials.chChestConfig.ftx3070 && item.equals(ChChestItems.FTX3070))
                 return true;
             if (BBsentials.chChestConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector))
                 return true;

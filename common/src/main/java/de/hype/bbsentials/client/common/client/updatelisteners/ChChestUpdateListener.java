@@ -43,11 +43,12 @@ public class ChChestUpdateListener extends UpdateListener {
                 waypoint.visible = shouldDisplay;
                 continue;
             }
-            List<String> chestItems = Arrays.stream(chest.items).filter(item -> !item.isCustom()).map(ChChestItem::getDisplayName).collect(Collectors.toList());
+            List<ChChestItem> chestItems = new ArrayList<>();
+            lobby.chests.stream().forEach(chChestData -> chestItems.addAll(chChestData.items));
             List<RenderInformation> renderInformationList = new ArrayList<>();
-            chestItems.forEach((item) -> renderInformationList.add(new RenderInformation("bbsentials", "textures/waypoints/" + item + ".png")));
+            chestItems.stream().filter(ChChestItem::hasDisplayPath).forEach((item) -> renderInformationList.add(new RenderInformation("bbsentials", "textures/waypoints/" + item.getDisplayPath() + ".png")));
             if (Waypoints.waypoints.values().stream().noneMatch(waypointFiltered -> waypointFiltered.position.equals(chest.coords))) {
-                Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + String.join(", ", chestItems.subList(0, Math.min(chestItems.size(), 3))) + "\"}", 1000, shouldDisplay, true, renderInformationList, BBsentials.chChestConfig.defaultWaypointColor, BBsentials.chChestConfig.doChestWaypointsTracers);
+                Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + chestItems.subList(0, Math.min(chestItems.size(), 3)).stream().map(ChChestItem::getDisplayName).collect(Collectors.joining(", ")) + "\"}", 1000, shouldDisplay, true, renderInformationList, BBsentials.chChestConfig.defaultWaypointColor, BBsentials.chChestConfig.doChestWaypointsTracers);
                 waypoints.put(newpoint.position, newpoint);
             }
         }

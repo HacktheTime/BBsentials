@@ -106,7 +106,6 @@ public class UpdateListenerManager {
                 return true;
             if (BBsentials.chChestConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone))
                 return true;
-            if (BBsentials.chChestConfig.jungleHeart && item.equals(ChChestItems.JungleHeart)) return true;
         }
         return false;
     }

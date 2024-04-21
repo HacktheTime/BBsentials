@@ -349,12 +349,6 @@ public class BBsentialsConfigScreenFactory {
                     .setSaveConsumer(newValue -> BBsentials.chChestConfig.flawlessGemstone = newValue)
                     .setRequirement(notAllItemsRequirement)
                     .build());
-            chChestItems.addEntry(entryBuilder.startBooleanToggle(Text.of("Jungle Heart"), BBsentials.chChestConfig.jungleHeart)
-                    .setDefaultValue(false)
-                    .setTooltip(Text.of("Select to receive notifications when a JungleHeart is found"))
-                    .setSaveConsumer(newValue -> BBsentials.chChestConfig.jungleHeart = newValue)
-                    .setRequirement(notAllItemsRequirement)
-                    .build());
         }//CHChestItems
         ConfigCategory miningEvents = builder.getOrCreateCategory(Text.of("Mining Events"));
         {

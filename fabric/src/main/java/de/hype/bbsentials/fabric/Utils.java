@@ -20,6 +20,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -514,14 +515,16 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public Islands getCurrentIsland() {
         try {
+            ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+            if (t == null) return null;
             String string;
             if (isSecondRowInfoRow()) {
                 //Its in Second Row
-                string = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-b").getDisplayName().getString();
+                string = t.getPlayerListEntry("!B-b").getDisplayName().getString();
             }
             else {
                 //Its 3 row. default from before
-                string = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!C-b").getDisplayName().getString();
+                string = t.getPlayerListEntry("!C-b").getDisplayName().getString();
             }
             if (!string.startsWith("Area: ") && !string.startsWith("Dungeon: ")) {
                 Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
@@ -536,21 +539,28 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     private boolean isSecondRowInfoRow() {
-        return MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-a").getDisplayName().getString().trim().startsWith("Info");
+        ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+        if (t == null) return false;
+        PlayerListEntry entry = t.getPlayerListEntry("!B-a");
+        if (entry == null) return false;
+        return entry.getDisplayName().getString().trim().startsWith("Info");
     }
 
     public int getPlayerCount() {
-        return MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().size();
+        ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+        if (t == null) return 0;
+        return t.getCommandSource().getPlayerNames().size();
     }
 
     public String getServerId() {
-
+        ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+        if (t == null) return "";
         PlayerListEntry entry;
         if (isSecondRowInfoRow()) {
-            entry = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!B-c");
+            entry = t.getPlayerListEntry("!B-c");
         }
         else {
-            entry = MinecraftClient.getInstance().getNetworkHandler().getPlayerListEntry("!C-c");
+            entry = t.getPlayerListEntry("!C-c");
         }
         if (entry == null) return null;
         return entry.getDisplayName().getString().replace("Server:", "").trim();

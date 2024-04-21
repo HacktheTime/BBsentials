@@ -14,8 +14,8 @@ dependencies {
     implementation("com.google.guava:guava:33.0.0-jre")
     implementation("javazoom:jlayer:1.0.1")
     implementation(libs.discordJDA)
-    implementation("me.nullicorn:Nedit:2.2.0")
-    implementation("com.github.JnCrMx:discord-game-sdk4j:v0.5.5")
+    implementation("me.nullicorn:Nedit:latest.release")
+    implementation("com.github.JnCrMx:discord-game-sdk4j:latest.release")
 }
 java.withSourcesJar()
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(8))

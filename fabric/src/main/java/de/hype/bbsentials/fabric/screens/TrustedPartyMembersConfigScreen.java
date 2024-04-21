@@ -9,7 +9,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import java.util.List;
 
 public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPartyMember> {
-
     public TrustedPartyMembersConfigScreen(Screen parent) {
         super(parent, "Trusted Party Members");
     }
@@ -17,6 +16,7 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
     public static void openFromNothing() {
         TrustedPartyMembersConfigScreen sc = new TrustedPartyMembersConfigScreen(MinecraftClient.getInstance().currentScreen);
         sc.setScreen(sc);
+        sc.updateFields();
     }
 
     @Override
@@ -25,8 +25,8 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
     }
 
     @Override
-    public TrustedPartyMember getNewDefaultObject() {
-        return new TrustedPartyMember("", "");
+    protected void addNewRow() {
+        BBsentials.partyConfig.trustedPartyMembers.add(new TrustedPartyMember("", ""));
     }
 
     /**

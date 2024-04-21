@@ -28,7 +28,7 @@ moulconfig = "2.5.0"
 apache_httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "apache_httpcomponents" }
 legacyGson = { module = "com.google.code.gson:gson", version = "2.10.1" }
 lwjglGlfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjglModern" }
-discordJDA = { module = "net.dv8tion:JDA", version = "5.0.0-beta.20" }
+discordJDA = { module = "net.dv8tion:JDA", version = "latest.release" }
 legacy_mcp = { module = "de.oceanlabs.mcp:mcp_stable", version.ref = "legacy_mcp" }
 legacy_minecraft = { module = "com.mojang:minecraft", version.ref = "legacy_minecraft" }
 legacy_forge = { module = "net.minecraftforge:forge", version.ref = "legacy_forge" }

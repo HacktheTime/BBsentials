@@ -13,13 +13,13 @@ import static de.hype.bbsentials.client.common.client.APIUtils.getMcUUIDbyUserna
 public class TrustedPartyMember {
     public String mcUuid;
     //Permissions
-    private boolean canKick = true;
-    private boolean canBan = true;
-    private boolean canInvite = true;
-    private boolean canMute = false;
-    private boolean partyAdmin = false;
-    private boolean canRequestWarp = false;
-    private boolean canRequestPolls = true;
+    boolean canKick = true;
+    boolean canBan = true;
+    boolean canInvite = true;
+    boolean canMute = false;
+    boolean partyAdmin = false;
+    boolean canRequestWarp = false;
+    boolean canRequestPolls = true;
 
     private transient String username = null;
 

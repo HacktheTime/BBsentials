@@ -41,13 +41,13 @@ public class GameSDKManager extends DiscordEventAdapter {
         // Initialize the Core
         if (core == null) {
             initCore();
+            connectToDiscord();
             callbackRunner = BBsentials.executionService.scheduleAtFixedRate(() -> {
                 try {
                     runContinously();
                 } catch (Exception ignored) {
                 }
             }, 0, 14, TimeUnit.MILLISECONDS);
-            connectToDiscord();
             BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 20, TimeUnit.SECONDS);
         }
 
@@ -185,12 +185,6 @@ public class GameSDKManager extends DiscordEventAdapter {
             core.runCallbacks();
         } catch (Exception e) {
 
-        }
-        try {
-            // Sleep a bit to save CPU
-            Thread.sleep(16);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -488,7 +482,7 @@ public class GameSDKManager extends DiscordEventAdapter {
         // Set parameters for the Core
 //            CreateParams params;
         try {
-            disconnectLobby();
+//            disconnectLobby();
 //                params = new CreateParams();
             CreateParams params = new CreateParams();
 

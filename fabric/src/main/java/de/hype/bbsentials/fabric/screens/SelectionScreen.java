@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * @param <T> Objects the screen is used for to be selected between.
  */
+
 public abstract class SelectionScreen<T> extends Screen {
-    public List<T> objects;
     ButtonWidget addButton;
     ButtonWidget okButton;
     ButtonWidget firstPage;
@@ -40,7 +40,7 @@ public abstract class SelectionScreen<T> extends Screen {
         if (okButton == null) {
             okButton = new ButtonWidget.Builder(Text.of("Done"), button -> done()).build();
             addButton = new ButtonWidget.Builder(Text.of("+"), button -> {
-                addNewRow();
+                addNewRowPrivate();
             }).build();
             firstPage = new ButtonWidget.Builder(Text.of("First"), button -> setPage(0)).build();
             lastPage = new ButtonWidget.Builder(Text.of("Last"), button -> setPage(-2)).build();
@@ -76,13 +76,12 @@ public abstract class SelectionScreen<T> extends Screen {
         updateFields();
     }
 
-    private void addNewRow() {
-        if (getObjectList() == null) objects = new ArrayList<>();
-        getObjectsInternal().add(getNewDefaultObject());
+    protected abstract void addNewRow();
+
+    private void addNewRowPrivate() {
+        addNewRow();
         updateFields();
     }
-
-    public abstract T getNewDefaultObject();
 
     void removeRow(T node) {
         try {
@@ -153,7 +152,7 @@ public abstract class SelectionScreen<T> extends Screen {
     }
 
     public int entriesPerPage() {
-        return Math.min((height - 100) / 30, getObjectsInternal().size());
+        return Math.max(5, Math.min((height - 100) / 30, getObjectsInternal().size()));
     }
 
     public int getHighestEntry() {

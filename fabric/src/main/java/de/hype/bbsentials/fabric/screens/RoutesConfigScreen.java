@@ -13,6 +13,7 @@ public class RoutesConfigScreen extends SelectionScreen<WaypointRoute> {
         super(parent, "Routes");
     }
 
+
     @Override
     public List<WaypointRoute> getObjectList() {
         List<WaypointRoute> routes = new ArrayList<>();
@@ -32,8 +33,8 @@ public class RoutesConfigScreen extends SelectionScreen<WaypointRoute> {
     }
 
     @Override
-    public WaypointRoute getNewDefaultObject() {
-        return new WaypointRoute("", new ArrayList<>());
+    protected void addNewRow() {
+        new WaypointRoute("", new ArrayList<>()).save();
     }
 
     /**

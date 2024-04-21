@@ -22,7 +22,7 @@ public class WaypointsConfigScreen extends SelectionScreen<Waypoints> {
     }
 
     @Override
-    public Waypoints getNewDefaultObject() {
+    protected void addNewRow() {
         BlockPos pos = null;
         try {
             pos = MinecraftClient.getInstance().player.getBlockPos();
@@ -31,7 +31,8 @@ public class WaypointsConfigScreen extends SelectionScreen<Waypoints> {
         if (pos == null) {
             pos = new BlockPos(0, 100, 0);
         }
-        return new Waypoints(new Position(pos.getX(), pos.getY(), pos.getZ()), "", 10000, true, true,new RenderInformation("",""));
+        new Waypoints(new Position(pos.getX(), pos.getY(), pos.getZ()), "", 10000, true, true, new RenderInformation("", ""));
+        //not added cause automatic adding
     }
 
     @Override

@@ -1,5 +1,5 @@
 [![Discord](https://img.shields.io/discord/1145639466216738816?style=plastic&logo=discord)](https://discord.gg/qr5mPRq8uG)
-[![Modrinth](https://img.shields.io/modrinth/dt/Cp13oI7e?style=plastic&logo=modrinth)](https://modrinth.com/mod/bbsentials)
+[![Modrinth](https://img.shields.io/modrinth/dt/bbsentials?style=plastic&logo=modrinth)](https://modrinth.com/mod/bbsentials)
 [![Github Releases](https://img.shields.io/github/downloads/HacktheTime/BBsentials/total?style=plastic&logo=github)](https://github.com/HacktheTime/bbsentials/releases)
 
 # BBsentials

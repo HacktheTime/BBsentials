@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.UUID;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.generalConfig;
 
@@ -65,6 +66,10 @@ public class GeneralConfig extends BBsentialsConfig {
 
     public String getMCUUID() {
         return EnvironmentCore.utils.getMCUUID().replace("-", "");
+    }
+
+    public UUID getMCUUIDID() {
+        return EnvironmentCore.utils.getMCUUIDID();
     }
 
     public String getUsername() {

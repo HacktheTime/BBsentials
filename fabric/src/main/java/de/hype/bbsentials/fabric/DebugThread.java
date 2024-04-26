@@ -5,6 +5,7 @@ import com.mojang.brigadier.tree.RootCommandNode;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.objects.Position;
@@ -13,6 +14,7 @@ import de.hype.bbsentials.shared.objects.WaypointData;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
@@ -43,6 +45,7 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
 
     public void onNumpadCode() {
 //        init();
+        ClientboundPartyInfoPacket packet = HPModAPIPacket.PARTYINFO.complete();
         return;
     }
 

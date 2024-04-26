@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public interface Utils {
@@ -192,4 +193,6 @@ public interface Utils {
     void sendPacket(HypixelPacket packet);
 
     void sendPacket(String identifier);
+
+    UUID getMCUUIDID();
 }

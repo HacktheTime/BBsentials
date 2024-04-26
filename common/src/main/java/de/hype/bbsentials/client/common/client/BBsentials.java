@@ -10,18 +10,14 @@ import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.discordintegration.DiscordIntegration;
 import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
+import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
+import de.hype.bbsentials.client.common.hpmodapi.HypixelModAPICore;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import net.hypixel.modapi.HypixelModAPI;
-import net.hypixel.modapi.handler.ClientboundPacketHandler;
-import net.hypixel.modapi.packet.ClientboundHypixelPacket;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPlayerInfoPacket;
 
 import java.awt.*;
 import java.io.IOException;
@@ -68,6 +64,8 @@ public class BBsentials {
     private static boolean initialised = false;
     private static volatile ScheduledFuture<?> futureServerJoin;
     private static volatile boolean futureServerJoinRunning;
+    public static HypixelModAPICore hpModAPICore;
+    public static BBDataStorage dataStorage;
 
 
     public static void connectToBBserver() {
@@ -114,6 +112,7 @@ public class BBsentials {
     public synchronized static void onServerJoin() {
         onServerLeave();
         if (futureServerJoin != null) {
+            HPModAPIPacket.LOCATION.complete();
             futureServerJoin.cancel(false);
             if (futureServerJoinRunning)
                 Chat.sendPrivateMessageToSelfError("BB: You switched Lobbies so quickly that some things may weren't completed in time. Do not report this as bug!");
@@ -228,32 +227,8 @@ public class BBsentials {
                 }, 50 - baseTimeAlready, TimeUnit.SECONDS);
             }, true);
         }
-        HypixelModAPI.getInstance().registerHandler(new ClientboundPacketHandler() {
-            private void handle(ClientboundHypixelPacket packet) {
-                if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Rec" + packet);
-            }
-
-            @Override
-            public void onPingPacket(ClientboundPingPacket packet) {
-                handle(packet);
-            }
-
-            @Override
-            public void onLocationPacket(ClientboundLocationPacket packet) {
-                handle(packet);
-            }
-
-            @Override
-            public void onPartyInfoPacket(ClientboundPartyInfoPacket packet) {
-                handle(packet);
-            }
-
-            @Override
-            public void onPlayerInfoPacket(ClientboundPlayerInfoPacket packet) {
-                handle(packet);
-            }
-
-        });
+        hpModAPICore = new HypixelModAPICore();
+        HypixelModAPI.getInstance().registerHandler(hpModAPICore);
         EnvironmentCore.utils.registerNetworkHandlers();
 
     }

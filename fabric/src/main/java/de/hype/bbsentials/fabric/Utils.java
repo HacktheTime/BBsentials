@@ -224,6 +224,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return MinecraftClient.getInstance().getSession().getUuidOrNull().toString();
     }
 
+    public UUID getMCUUIDID() {
+        return MinecraftClient.getInstance().getSession().getUuidOrNull();
+    }
+
     public void playsound(String eventName) {
         if (eventName.isEmpty()) MinecraftClient.getInstance().getSoundManager().stopAll();
         else

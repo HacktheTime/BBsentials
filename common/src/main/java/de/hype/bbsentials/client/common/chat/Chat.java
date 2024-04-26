@@ -315,6 +315,9 @@ public class Chat {
                     if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                         sendPrivateMessageToSelfDebug("Leader: " + BBsentials.partyConfig.isPartyLeader);
                     }
+//                    if (HPModAPIPacket.PARTYINFO.complete().getLeader().get().equals(BBsentials.generalConfig.getMCUUID())) {
+//                        BBsentials.partyConfig.isPartyLeader = true;
+//                    }
                 }
                 else if (BBsentials.partyConfig.partyMembers.isEmpty() && messageUnformatted.endsWith("to the party! They have 60 seconds to accept")) {
                     BBsentials.partyConfig.isPartyLeader = true;
@@ -338,6 +341,9 @@ public class Chat {
                     if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                         sendPrivateMessageToSelfDebug("Leader: " + BBsentials.partyConfig.isPartyLeader);
                     }
+//                    if (HPModAPIPacket.PARTYINFO.complete().getLeader().get().equals(BBsentials.generalConfig.getMCUUID())) {
+//                        BBsentials.partyConfig.isPartyLeader = true;
+//                    }
                 }
                 else if (message.getUnformattedString().equals("Please type /report confirm to log your report for staff review.")) {
                     sendCommand("/report confirm");

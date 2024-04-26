@@ -9,13 +9,22 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven("https://repo.spongepowered.org/maven/")
-        maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+        gradlePluginPortal()
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        maven("https://maven.architectury.dev/")
         maven("https://maven.notenoughupdates.org/releases/")
+        maven("https://maven.fabricmc.net")
+        maven("https://maven.minecraftforge.net/")
+        maven("https://repo.spongepowered.org/maven/")
+        maven("https://repo.sk1er.club/repository/maven-releases/")
+        maven("https://maven.wagyourtail.xyz/releases")
+        maven("https://maven.wagyourtail.xyz/snapshots")
+        maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+        maven("https://maven.xpple.dev/maven2")
         maven("https://maven.terraformersmc.com/releases")
         maven("https://maven.shedaniel.me/")
         maven("https://jitpack.io")
-        jcenter()
+        maven("https://repo.hypixel.net/repository/Hypixel/")
     }
 
     afterEvaluate {

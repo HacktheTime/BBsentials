@@ -400,7 +400,7 @@ public class Chat {
                         setChatCommand("/p warp", 10);
                     }
                 }
-                else if (BBsentials.partyConfig.isPartyLeader && message.getMessageContent().equals("!ptme")) {
+                else if (BBsentials.partyConfig.isPartyLeader && message.getMessageContent().equals("!ptme") && message.isFromSelf()) {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", username)));
                     setChatCommand("/p transfer " + username, 10);
                 }

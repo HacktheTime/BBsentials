@@ -12,6 +12,8 @@ pluginManagement {
         maven("https://maven.wagyourtail.xyz/releases")
         maven("https://maven.wagyourtail.xyz/snapshots")
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+        maven("https://maven.xpple.dev/maven2")
+        maven("https://repo.hypixel.net/repository/Hypixel/")
     }
     resolutionStrategy {
         eachPlugin {

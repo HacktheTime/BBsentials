@@ -15,6 +15,13 @@ import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.RenderInformation;
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.handler.ClientboundPacketHandler;
+import net.hypixel.modapi.packet.ClientboundHypixelPacket;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPlayerInfoPacket;
 
 import java.awt.*;
 import java.io.IOException;
@@ -221,5 +228,33 @@ public class BBsentials {
                 }, 50 - baseTimeAlready, TimeUnit.SECONDS);
             }, true);
         }
+        HypixelModAPI.getInstance().registerHandler(new ClientboundPacketHandler() {
+            private void handle(ClientboundHypixelPacket packet) {
+                if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Rec" + packet);
+            }
+
+            @Override
+            public void onPingPacket(ClientboundPingPacket packet) {
+                handle(packet);
+            }
+
+            @Override
+            public void onLocationPacket(ClientboundLocationPacket packet) {
+                handle(packet);
+            }
+
+            @Override
+            public void onPartyInfoPacket(ClientboundPartyInfoPacket packet) {
+                handle(packet);
+            }
+
+            @Override
+            public void onPlayerInfoPacket(ClientboundPlayerInfoPacket packet) {
+                handle(packet);
+            }
+
+        });
+        EnvironmentCore.utils.registerNetworkHandlers();
+
     }
 }

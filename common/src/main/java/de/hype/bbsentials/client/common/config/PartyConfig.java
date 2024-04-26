@@ -10,7 +10,7 @@ import static de.hype.bbsentials.client.common.client.APIUtils.getMcUUIDbyUserna
 
 
 public class PartyConfig extends BBsentialsConfig {
-    public List<String> partyMembers = new ArrayList<>();
+    public transient List<String> partyMembers = new ArrayList<>();
     public boolean allowBBinviteMe = true;
     public List<TrustedPartyMember> trustedPartyMembers = new ArrayList<>();
     public boolean useRecommendedTrustedMembers = false;

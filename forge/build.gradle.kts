@@ -57,7 +57,8 @@ unimined.minecraft {
 
 repositories {
     mavenCentral()
-
+    maven("https://maven.xpple.dev/maven2")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -77,7 +78,7 @@ dependencies {
 
     implementation(libs.legacy.devauth)
     shadowModImpl(libs.discordJDA)
-
+    shadowImpl("net.hypixel:mod-api:latest.release")
     "shadowModImpl"(libs.legacy.moulconfig)
 }
 
@@ -129,6 +130,7 @@ tasks.shadowJar {
     configurations = listOf(shadowImpl, shadowModImpl)
     relocate("io.github.moulberry.moulconfig", "de.hype.bbsentials.deps.moulconfig")
     relocate("net.dv8tion", "de.hype.bbsentials.deps.dcJDA")
+    relocate("net.hypixel", "de.hype.bbsentials.deps.net.hypixel")
 
 }
 tasks.assemble.get().dependsOn(remapJar)

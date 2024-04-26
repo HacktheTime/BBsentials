@@ -7,6 +7,7 @@ import de.hype.bbsentials.shared.objects.Position;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
+import net.hypixel.modapi.packet.HypixelPacket;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -185,4 +186,10 @@ public interface Utils {
     boolean isSelfBingo();
 
     String getServerConnectedAddress();
+
+    void registerNetworkHandlers();
+
+    void sendPacket(HypixelPacket packet);
+
+    void sendPacket(String identifier);
 }

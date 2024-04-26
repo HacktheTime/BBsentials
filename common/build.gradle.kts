@@ -15,6 +15,7 @@ dependencies {
     implementation("javazoom:jlayer:1.0.1")
     implementation(libs.discordJDA)
     implementation("me.nullicorn:Nedit:latest.release")
+    implementation("net.hypixel:mod-api:latest.release")
     implementation("com.github.JnCrMx:discord-game-sdk4j:latest.release")
 }
 java.withSourcesJar()

@@ -71,6 +71,7 @@ tasks.jar {
 tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
+    relocate("net.hypixel", "de.hype.bbsentials.deps")
     configurations = listOf(shadowImpl)
 }
 

@@ -15,8 +15,13 @@ import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.packet.HypixelPacket;
+import net.hypixel.modapi.serializer.PacketSerializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
@@ -36,6 +41,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
@@ -57,6 +63,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+
+import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
 
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
     public static boolean isBingo(PlayerEntity player) {
@@ -708,4 +716,33 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
     }
 
+    @Override
+    public void registerNetworkHandlers() {
+        for (String identifier : HypixelModAPI.getInstance().getRegistry().getIdentifiers()) {
+            ClientPlayNetworking.registerGlobalReceiver(new Identifier(identifier), (client, handler, buf, responseSender) -> {
+                buf.retain();
+                client.execute(() -> {
+                    try {
+                        HypixelModAPI.getInstance().handle(identifier, new PacketSerializer(buf));
+                    } finally {
+                        buf.release();
+                    }
+                });
+            });
+        }
+    }
+
+    @Override
+    public void sendPacket(HypixelPacket packet) {
+        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send" + packet);
+        PacketByteBuf buf = PacketByteBufs.create();
+        packet.write(new PacketSerializer(buf));
+        ClientPlayNetworking.send(new Identifier(packet.getIdentifier()), buf);
+    }
+
+    @Override
+    public void sendPacket(String identifier) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        ClientPlayNetworking.send(new Identifier(identifier), buf);
+    }
 }

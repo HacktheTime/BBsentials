@@ -20,6 +20,7 @@ public class PartyConfig extends BBsentialsConfig {
     public transient boolean isPartyLeader = false;
     public boolean allowServerPartyInvite = true;
     public transient List<TrustedPartyMember> recommendedTrustedMembers;
+    public boolean announceRemoteMsgPartyCommands = true;
 
     public PartyConfig() {
         super(1);

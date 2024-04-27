@@ -124,7 +124,7 @@ public abstract class RenderingDefinitions {
                             if (itemName.startsWith("Farming")) check.renderAsItem(Items.STONE_HOE);
                             if (itemName.startsWith("Foraging")) check.renderAsItem(Items.STONE_AXE);
                             if (itemName.startsWith("Fishing")) check.renderAsItem(Items.FISHING_ROD);
-                            if (itemName.startsWith("Mining")) check.renderAsItem(Items.STONE_PICKAXE);
+                            if (itemName.startsWith("Mining")) check.renderAsItem(Items.EMERALD_BLOCK);
                             if (itemName.startsWith("Alchemy")) check.renderAsItem(Items.BREWING_STAND);
                             if (itemName.startsWith("Enchanting")) check.renderAsItem(Items.ENCHANTING_TABLE);
                             if (itemName.startsWith("Combat")) check.renderAsItem(Items.STONE_SWORD);

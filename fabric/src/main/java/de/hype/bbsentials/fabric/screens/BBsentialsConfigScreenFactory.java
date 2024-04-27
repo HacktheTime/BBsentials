@@ -120,6 +120,16 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Allow the Server to party players for you automatically. (Convenience Feature. Is used for example for services to automatically party the persons which joined it)"))
                     .setSaveConsumer(newValue -> BBsentials.partyConfig.allowServerPartyInvite = newValue)
                     .build());
+            party.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), BBsentials.partyConfig.acceptReparty)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.acceptReparty = newValue)
+                    .build());
+            party.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept auto invite"), BBsentials.partyConfig.allowBBinviteMe)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.allowBBinviteMe = newValue)
+                    .build());
         }//Party
         ConfigCategory visual = builder.getOrCreateCategory(Text.of("Visual"));
         {
@@ -205,16 +215,6 @@ public class BBsentialsConfigScreenFactory {
         }
         //Notifications
         ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));
-        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept Reparties"), BBsentials.partyConfig.acceptReparty)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Select if you want BBsentials to automatically accept reparties"))
-                .setSaveConsumer(newValue -> BBsentials.partyConfig.acceptReparty = newValue)
-                .build());
-        other.addEntry(entryBuilder.startBooleanToggle(Text.of("Accept auto invite"), BBsentials.partyConfig.allowBBinviteMe)
-                .setDefaultValue(true)
-                .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
-                .setSaveConsumer(newValue -> BBsentials.partyConfig.allowBBinviteMe = newValue)
-                .build());
 
         {
             BooleanListEntry hub29Troll = (entryBuilder.startBooleanToggle(Text.of("Hub 29s"), BBsentials.funConfig.hub29Troll)

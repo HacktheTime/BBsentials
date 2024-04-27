@@ -51,6 +51,7 @@ public class DiscordIntegration extends ListenerAdapter {
         BBsentials.executionService.scheduleAtFixedRate(() -> updateStatus(), 0, 10, TimeUnit.MINUTES);
         // Schedule the message update task
         executorService.scheduleAtFixedRate(this::updateDMs, 0, 30, TimeUnit.SECONDS);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> jda.shutdown()));
     }
 
     public static void reply(GenericCommandInteractionEvent event, String message) {

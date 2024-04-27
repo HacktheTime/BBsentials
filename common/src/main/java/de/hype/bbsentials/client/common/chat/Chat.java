@@ -422,7 +422,7 @@ public class Chat {
                             BBsentials.sender.addSendTask("/p invite " + username, 1);
                         }
                     }
-                    else {
+                    else if (BBsentials.partyConfig.isPartyLeader) {
                         TrustedPartyMember person = BBsentials.partyConfig.getTrustedUsername(username);
                         if (person == null) {
                             message.replyToUser("Permission Denied");
@@ -442,7 +442,8 @@ public class Chat {
                         }
                         if (actionParamter.equalsIgnoreCase("invite")) {
                             if (person.canInvite()) {
-                                BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
                                 BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
                             }
                             else {
@@ -460,7 +461,8 @@ public class Chat {
                         }
                         else if (actionParamter.equalsIgnoreCase("demote")) {
                             if (person.partyAdmin()) {
-                                BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
                                 BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
                             }
                             else {
@@ -469,7 +471,8 @@ public class Chat {
                         }
                         else if (actionParamter.equalsIgnoreCase("kick")) {
                             if (person.canKick()) {
-                                BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
                                 BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
                             }
                             else {
@@ -512,7 +515,8 @@ public class Chat {
                         }
                         else if (actionParamter.equalsIgnoreCase("transfer")) {
                             if (person.partyAdmin()) {
-                                BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
                                 BBsentials.sender.addSendTask("/p transfer " + targetName, 1);
                             }
                             else {
@@ -567,6 +571,9 @@ public class Chat {
                         else {
                             message.replyToUser("Incorrect Arguments");
                         }
+                    }
+                    else {
+                        message.replyToUser("Currently not in a Party / not party Leader");
                     }
                 }
             }

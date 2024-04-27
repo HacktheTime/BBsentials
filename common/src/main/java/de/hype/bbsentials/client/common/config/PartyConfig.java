@@ -1,5 +1,7 @@
 package de.hype.bbsentials.client.common.config;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 
@@ -44,6 +46,13 @@ public class PartyConfig extends BBsentialsConfig {
 
     @Override
     public void onInit() {
+        List<LinkedTreeMap<String, Object>> map = (List<LinkedTreeMap<String, Object>>) (Object) trustedPartyMembers;
+        List<TrustedPartyMember> members = new ArrayList<>();
+        for (LinkedTreeMap<String, Object> linkedTreeMap : map) {
+            members.add(new Gson().fromJson(new Gson().toJson(linkedTreeMap), TrustedPartyMember.class));
+        }
+        trustedPartyMembers = members;
+
         recommendedTrustedMembers = new ArrayList<>();
         recommendedTrustedMembers.add(TrustedPartyMember.fromUUID("4fa1228c8dd647c48fe3b04b580311b8").partyAdmin(true));//Hype_the_Time: Dev
         recommendedTrustedMembers.add(TrustedPartyMember.fromUUID("09856db6f0214c659ed43a7b3a5f2ca1").partyAdmin(true));//Bossflea Splasher

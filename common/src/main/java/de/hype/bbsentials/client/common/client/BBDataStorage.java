@@ -14,9 +14,9 @@ public class BBDataStorage {
     public final Islands island;
     public final String map;
     public final ServerType gameType;
-    public final String currentProfileID;
-    public final String profileType;
-    public final String currentProfileCuteName;
+    public String currentProfileID;
+    public String profileType;
+    public String currentProfileCuteName;
     public final String proxyName;
     public final Environment environment;
 

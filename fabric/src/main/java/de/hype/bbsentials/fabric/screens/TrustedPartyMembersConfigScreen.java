@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric.screens;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
+import de.hype.bbsentials.client.common.config.ConfigManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -48,6 +49,7 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
 
     @Override
     public void done() {
+        ConfigManager.saveAll();
         close();
     }
 

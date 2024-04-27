@@ -112,7 +112,6 @@ public class BBsentials {
     public synchronized static void onServerJoin() {
         onServerLeave();
         if (futureServerJoin != null) {
-            HPModAPIPacket.LOCATION.complete();
             futureServerJoin.cancel(false);
             if (futureServerJoinRunning)
                 Chat.sendPrivateMessageToSelfError("BB: You switched Lobbies so quickly that some things may weren't completed in time. Do not report this as bug!");
@@ -121,6 +120,7 @@ public class BBsentials {
         }
         futureServerJoin = executionService.schedule(() -> {
             futureServerJoinRunning = true;
+            HPModAPIPacket.LOCATION.complete();
             for (ServerSwitchTask task : onServerJoin.values()) {
                 if (!task.permanent) {
                     onServerJoin.remove(task.getId());

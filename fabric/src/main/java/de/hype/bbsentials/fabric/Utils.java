@@ -738,7 +738,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public void sendPacket(HypixelPacket packet) {
-        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send" + packet);
+        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send: " + packet.getIdentifier());
         PacketByteBuf buf = PacketByteBufs.create();
         packet.write(new PacketSerializer(buf));
         ClientPlayNetworking.send(new Identifier(packet.getIdentifier()), buf);

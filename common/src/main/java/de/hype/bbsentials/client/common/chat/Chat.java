@@ -382,7 +382,9 @@ public class Chat {
                     BBsentials.connection.sendPacket(new CompletedGoalPacket("", "", "", "", CompletedGoalPacket.CompletionType.CARD, -1, BBsentials.visualConfig.broadcastGoalAndCardCompletion));
                 }
                 else if (messageUnformatted.startsWith("Profile ID: ")) {
-                    BBsentials.generalConfig.profileIds.add(messageUnformatted.replace("Profile ID: ", "").trim());
+                    String id = messageUnformatted.replace("Profile ID: ", "").trim();
+                    BBsentials.generalConfig.profileIds.add(id);
+                    BBsentials.dataStorage.currentProfileID = id;
                 }
             }
 

@@ -10,6 +10,7 @@ public class SplashConfig extends BBsentialsConfig {
     public boolean showSmallestHub = false;
     public boolean defaultUseLessWaste = true;
     public String defaultExtraMessage = "";
+    public boolean xpBoostHighlight = false;
 
     public SplashConfig() {
         super(1);

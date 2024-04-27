@@ -44,7 +44,7 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
 
     @Override
     public String getButtonString(TrustedPartyMember object) {
-        return object.getUsername();
+        return object.toString();
     }
 
     @Override

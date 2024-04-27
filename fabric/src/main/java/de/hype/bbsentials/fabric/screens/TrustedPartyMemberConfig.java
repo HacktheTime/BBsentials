@@ -11,8 +11,8 @@ import net.minecraft.text.Text;
 
 public class TrustedPartyMemberConfig {
     public static Screen create(Screen parent, TrustedPartyMember data) {
-        String originalUsername = new String(data.getUsername());
-        String originalUUID = new String(data.mcUuid.replace("-", ""));
+        String originalUsername = data.getUsername();
+        String originalUUID = data.mcUuid.replace("-", "");
 
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
@@ -22,13 +22,13 @@ public class TrustedPartyMemberConfig {
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory main = builder.getOrCreateCategory(Text.literal(data.getUsername()));
 
-        StringListEntry username = entryBuilder.startTextField(Text.of("Username"), text.getString())
+        StringListEntry username = entryBuilder.startTextField(Text.of("Username"), originalUsername)
                 .setDefaultValue(text.getString())
                 .setSaveConsumer(data::setUsernameOverwrite)
                 .setTooltip(Text.literal("The Username of the person"))
                 .build();
         main.addEntry(username);
-        main.addEntry(entryBuilder.startTextField(Text.of("UUID"), text.getString())
+        main.addEntry(entryBuilder.startTextField(Text.of("UUID"), originalUUID)
                 .setDefaultValue(text.getString())
                 .setSaveConsumer((value) -> {
                     data.mcUuid = value.replace("-", "");

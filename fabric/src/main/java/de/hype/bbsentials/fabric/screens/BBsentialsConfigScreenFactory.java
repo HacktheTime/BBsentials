@@ -557,6 +557,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Default Extramessage if non is specified"))
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.defaultExtraMessage = newValue)
                     .build());
+            splasher.addEntry(entryBuilder.startBooleanToggle(Text.of("Special XP Boost Textures"), BBsentials.splashConfig.xpBoostHighlight)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Renders the XP Boost Potions differently. Not recommended outside of splash preparation"))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.xpBoostHighlight = newValue)
+                    .build());
         }
         return builder.build();
     }

@@ -85,7 +85,7 @@ public class TrustedPartyMember {
     }
 
     public String getUsername() {
-        if (username == null) {
+        if (username == null && mcUuid != null && !mcUuid.isEmpty()) {
             username = getMinecraftUserNameByMCUUID(mcUuid);
         }
         return username;
@@ -183,5 +183,12 @@ public class TrustedPartyMember {
      */
     public void setUsernameOverwrite(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        if (getUsername() != null) return username;
+        if (mcUuid != null) return mcUuid;
+        return "";
     }
 }

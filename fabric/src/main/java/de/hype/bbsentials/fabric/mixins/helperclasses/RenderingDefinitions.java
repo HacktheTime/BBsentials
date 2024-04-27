@@ -107,7 +107,34 @@ public abstract class RenderingDefinitions {
                 }
             }
         };
-
+        if (BBsentials.generalConfig.hasBBRoles("splasher")) {
+            new RenderingDefinitions() {
+                @Override
+                public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
+                    if (!BBsentials.splashConfig.xpBoostHighlight) return false;
+                    if (itemName.endsWith("Potion")) {
+                        if (itemName.contains("XP Boost")) {
+                            NbtCompound c1 = stack.getNbt();
+                            if (c1 == null) return false;
+                            NbtCompound c2 = c1.getCompound("ExtraAttributes");
+                            if (c2 == null) return false;
+                            int t1 = c2.getInt("potion_level");
+                            String countString = "T" + t1;
+                            check.setItemCount(countString);
+                            if (itemName.startsWith("Farming")) check.renderAsItem(Items.STONE_HOE);
+                            if (itemName.startsWith("Foraging")) check.renderAsItem(Items.STONE_AXE);
+                            if (itemName.startsWith("Fishing")) check.renderAsItem(Items.FISHING_ROD);
+                            if (itemName.startsWith("Mining")) check.renderAsItem(Items.STONE_PICKAXE);
+                            if (itemName.startsWith("Alchemy")) check.renderAsItem(Items.BREWING_STAND);
+                            if (itemName.startsWith("Enchanting")) check.renderAsItem(Items.ENCHANTING_TABLE);
+                            if (itemName.startsWith("Combat")) check.renderAsItem(Items.STONE_SWORD);
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+            };
+        }
         new RenderingDefinitions(false) {
             @Override
             public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {

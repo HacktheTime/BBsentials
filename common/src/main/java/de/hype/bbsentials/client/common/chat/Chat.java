@@ -238,12 +238,15 @@ public class Chat {
             String messageUnformatted = message.getUnformattedString();
             String username = message.getPlayerName();
             if (!EnvironmentCore.utils.isWindowFocused()) {
-                if (BBsentials.visualConfig.doDesktopNotifications) {
-                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.visualConfig.doDesktopNotifications) {
+                if (BBsentials.generalConfig.doDesktopNotifications) {
+                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.generalConfig.doDesktopNotifications) {
                         sendNotification("BBsentials Visit-Watcher", messageUnformatted);
                     }
                     else if (message.isMsg()) {
                         sendNotification("BBsentials Message Notifier", username + " sent you the following message: " + message.getMessageContent());
+                    }
+                    else if (message.isServerMessage() && messageUnformatted.startsWith("HOPPITY'S HUNT")) {
+                        sendNotification("BBsentials Hoppity Notifier", messageUnformatted);
                     }
                     if (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.getUsername().toLowerCase()) || (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.nickname.toLowerCase() + " ") && BBsentials.generalConfig.notifForMessagesType.toLowerCase().equals("nick")) || BBsentials.generalConfig.notifForMessagesType.toLowerCase().equals("all")) {
                         sendNotification("BBsentials Party Chat Notification", username + " : " + message.getMessageContent());

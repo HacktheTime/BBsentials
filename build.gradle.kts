@@ -30,7 +30,7 @@ allprojects {
     afterEvaluate {
         tasks.withType(AbstractArchiveTask::class) {
             archiveBaseName.set("BBsentials-${project.name}")
-            archiveVersion.set(libs.versions.modVersion)
+            archiveVersion.set(libs.versions.version)
         }
         tasks.withType(JavaCompile::class) {
             options.encoding = "UTF-8"

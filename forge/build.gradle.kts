@@ -95,7 +95,7 @@ tasks.processResources {
     from(project(":common").sourceSets["main"].resources.srcDirs)
 
     //inputs.property("mod_version", libs.versions.modVersion)
-    inputs.property("mod_version", libs.versions.modVersion)
+    inputs.property("mod_version", libs.versions.version)
 
     filesMatching(listOf("mcmod.info", "mixins.bbsentials.json")) {
         expand(inputs.properties)

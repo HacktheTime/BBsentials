@@ -168,7 +168,7 @@ public abstract class RenderingDefinitions {
                 if (BBsentials.visualConfig.showContributorPositionInCount && (stackItem == Items.EMERALD_BLOCK || stackItem == Items.IRON_BLOCK)) {
                     List<Text> text = check.getTextTooltip();
                     if (text.size() >= 20) {
-                        String line = text.get(2).getString();
+                        String line = text.get(1).getString();
                         if (!line.equals("Community Goal")) return false;
                         String[] temp = itemName.split(" ");
                         String tierString = temp[temp.length - 1];

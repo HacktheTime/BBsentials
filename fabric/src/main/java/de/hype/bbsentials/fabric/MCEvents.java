@@ -1,5 +1,6 @@
 package de.hype.bbsentials.fabric;
 
+import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.config.constants.ClickableArmorStand;
@@ -10,6 +11,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,11 +19,14 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.TimeUnit;
 
 public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MCEvents {
     public Utils utils = (Utils) EnvironmentCore.utils;
@@ -80,20 +85,7 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
     @Override
     public void registerUseClick() {
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (hitResult.getBlockPos() == null) return ActionResult.PASS;
-            if (hitResult.getType() == HitResult.Type.BLOCK) {
-                BlockPos blockPos = hitResult.getBlockPos();
-                if (world.getBlockState(blockPos).getBlock() instanceof ChestBlock) {
-                    try {
-                        if (utils.getCurrentIsland().equals(Islands.CRYSTAL_HOLLOWS)) {
-                            UpdateListenerManager.chChestUpdateListener.addOpenedChest(new Position(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
-                        }
-                    } catch (Exception e) {
-                        return ActionResult.PASS;
-                    }
-                }
-            }
-            return ActionResult.PASS;
+            return onBlockClickInteraction(player, world, hand, hitResult);
         });
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
                     BBsentials.executionService.execute(() -> {
@@ -102,6 +94,28 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
                     return ActionResult.PASS;
                 }
         );
+    }
+
+    private ActionResult onBlockClickInteraction(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+        if (hitResult.getBlockPos() == null) return ActionResult.PASS;
+        if (hitResult.getType() == HitResult.Type.BLOCK) {
+            BlockPos blockPos = hitResult.getBlockPos();
+            if (world.getBlockState(blockPos).getBlock() instanceof ChestBlock) {
+                try {
+                    if (utils.getCurrentIsland().equals(Islands.CRYSTAL_HOLLOWS)) {
+                        UpdateListenerManager.chChestUpdateListener.addOpenedChest(new Position(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
+                        BBsentials.executionService.schedule(() -> {
+                            if (!(world.getBlockState(blockPos).getBlock() instanceof ChestBlock)) return;
+                            if (ChestBlockEntity.getPlayersLookingInChestCount(world, blockPos) == 0) return;
+                            Chat.sendPrivateMessageToSelfDebug("Global Chest Detected. Content:");
+                        }, 3, TimeUnit.SECONDS);
+                    }
+                } catch (Exception e) {
+                    return ActionResult.PASS;
+                }
+            }
+        }
+        return ActionResult.PASS;
     }
 
     public void onArmorstandInteraction(PlayerEntity player, World world, Hand hand, Entity entity, @Nullable EntityHitResult hitResult) {

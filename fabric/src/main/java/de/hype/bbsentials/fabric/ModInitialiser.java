@@ -384,11 +384,18 @@ public class ModInitialiser implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (petKeyBind.wasPressed()) MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/pets");
         });
-        KeyBinding tradesKeyBind = new KeyBinding("Trades Menu", InputUtil.Type.KEYSYM, 0, "BBsentials");
+        KeyBinding tradesKeyBind = new KeyBinding("Trades Menu", InputUtil.Type.KEYSYM, -1, "BBsentials");
         KeyBindingHelper.registerKeyBinding(tradesKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (tradesKeyBind.wasPressed()) {
                 MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/trades");
+            }
+        });
+        KeyBinding pickUpStashKeybind = new KeyBinding("Pick up stash", InputUtil.Type.KEYSYM, -1, "BBsentials");
+        KeyBindingHelper.registerKeyBinding(pickUpStashKeybind);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (pickUpStashKeybind.wasPressed()) {
+                MinecraftClient.getInstance().getNetworkHandler().sendChatMessage("/pickupstash");
             }
         });
 //        for (int i = 1; i <= 9; i++) {

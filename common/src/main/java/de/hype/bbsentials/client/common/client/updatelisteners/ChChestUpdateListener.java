@@ -36,9 +36,10 @@ public class ChChestUpdateListener extends UpdateListener {
 
     public void setWaypoints() {
         if (!BBsentials.chChestConfig.addWaypointForChests || lobby == null) return;
+        String username = BBsentials.generalConfig.getUsername();
         for (ChChestData chest : lobby.chests) {
             Waypoints waypoint = waypoints.get(chest.coords);
-            boolean shouldDisplay = !chestsOpened.contains(chest.coords);
+            boolean shouldDisplay = !(chestsOpened.contains(chest.coords) || chest.finder.equals(username));
             if (waypoint != null) {
                 waypoint.visible = shouldDisplay;
                 continue;

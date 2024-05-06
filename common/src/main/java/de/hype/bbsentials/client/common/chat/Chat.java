@@ -399,7 +399,7 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfFatal(Formatting.DARK_RED.toString() + Formatting.BOLD + "Don't worry its a" + Formatting.LIGHT_PURPLE + " meme" + Formatting.DARK_RED + Formatting.BOLD + " nothing happens actually. This is to troll Party and it would be irresponsible to send logs without consent.");
                     BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
                 }
-                if (message.getMessageContent().equals("warp") || message.getMessageContent().equals("!warp") && BBsentials.partyConfig.isPartyLeader && !message.isFromSelf()) {
+                if ((message.getMessageContent().equals("warp") || message.getMessageContent().equals("!warp")) && BBsentials.partyConfig.isPartyLeader && !message.isFromSelf()) {
                     if (BBsentials.partyConfig.partyMembers.size() == 1) {
                         Chat.sendCommand("/p warp");
                     }

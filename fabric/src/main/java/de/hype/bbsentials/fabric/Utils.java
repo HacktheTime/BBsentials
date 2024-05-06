@@ -25,6 +25,7 @@ import net.hypixel.modapi.serializer.PacketSerializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
@@ -609,7 +610,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public void showErrorScreen(String message) {
-        MinecraftClient.getInstance().execute((() -> MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen), Text.of("§cBBsentials"), Text.of(message)))));
+        Screen screen = MinecraftClient.getInstance().currentScreen;
+        MinecraftClient.getInstance().execute((() -> MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(screen), Text.of("§cBBsentials"), Text.of(message)))));
     }
 
     public long getLobbyTime() {

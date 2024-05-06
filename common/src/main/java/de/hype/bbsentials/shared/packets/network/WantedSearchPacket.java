@@ -28,4 +28,10 @@ public class WantedSearchPacket extends AbstractPacket {
         packet.targetFound = false;
         return packet;
     }
+
+    public static WantedSearchPacket findMegaServer() {
+        WantedSearchPacket packet = new WantedSearchPacket(null, "mega");
+        packet.targetFound = false;
+        return packet;
+    }
 }

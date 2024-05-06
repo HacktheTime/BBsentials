@@ -593,8 +593,9 @@ public class BBsentialConnection {
     }
 
     public void onWantedSearchPacket(WantedSearchPacket packet) {
-        if (packet.serverId != null) if (packet.serverId.equals(EnvironmentCore.utils.getServerId()))
-            sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.serverId)));
+        if (packet.serverId != null)
+            if (packet.serverId.equals(EnvironmentCore.utils.getServerId()) || (packet.serverId.equals("maga") && EnvironmentCore.utils.isOnMegaServer() && EnvironmentCore.utils.getCurrentIsland().equals(Islands.HUB)))
+                sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.serverId)));
         if (packet.username != null) if (EnvironmentCore.utils.getPlayers().contains(packet.username))
             sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.serverId)));
     }

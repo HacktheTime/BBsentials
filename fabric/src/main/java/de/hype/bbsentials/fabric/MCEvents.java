@@ -1,10 +1,13 @@
 package de.hype.bbsentials.fabric;
 
 import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.config.constants.ClickableArmorStand;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.IChestBlockEntityMixinAccess;
+import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.Position;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -26,7 +29,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MCEvents {
     public Utils utils = (Utils) EnvironmentCore.utils;
@@ -104,11 +109,32 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
                 try {
                     if (utils.getCurrentIsland().equals(Islands.CRYSTAL_HOLLOWS)) {
                         UpdateListenerManager.chChestUpdateListener.addOpenedChest(new Position(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
+                        IChestBlockEntityMixinAccess access = (IChestBlockEntityMixinAccess) world.getBlockEntity(blockPos);
+                        //is it open already? if so ignore cause not new
+                        boolean alreadyOpened = access.BBsentials$isOpen();
+                        //schedule to check after processing to allow detecting whether chest is now opened → just opened
                         BBsentials.executionService.schedule(() -> {
-                            if (!(world.getBlockState(blockPos).getBlock() instanceof ChestBlock)) return;
-                            if (ChestBlockEntity.getPlayersLookingInChestCount(world, blockPos) == 0) return;
-                            Chat.sendPrivateMessageToSelfDebug("Global Chest Detected. Content:");
-                        }, 3, TimeUnit.SECONDS);
+                            if (!(world.getBlockEntity(blockPos) instanceof ChestBlockEntity)) return;
+                            if (!access.BBsentials$isOpen() || alreadyOpened) return;
+                            BBsentials.executionService.schedule(() -> {
+                                //Check whether it still exists → filter for the powder chest with unfortunate timing
+                                if (!(world.getBlockEntity(blockPos) instanceof ChestBlockEntity)) return;
+                                Set<ChChestItem> items = BBsentials.temporaryConfig.chestParts;
+                                items.clear();
+                                BBsentials.executionService.schedule(() -> {
+//                                    Chat.sendPrivateMessageToSelfDebug("Global Chest Detected");
+                                    BBsentials.executionService.schedule(() -> {
+                                        if (BBsentials.temporaryConfig.chestParts.isEmpty()) {
+//                                            Chat.sendPrivateMessageToSelfDebug("Global Chest " + blockPos.toShortString() + ":" + " Nothing of value");
+                                            return;
+                                        }
+                                        Position pos = new Position(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+                                        Chat.sendPrivateMessageToSelfText(Message.tellraw("{\"text\":\"Global Chest Found ($coords): $items (Click here to announce)\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/chchest \\\"$items\\\" $coords \\\"/msg $username bb:party me\\\" Ⓐ\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"You remain responsible. The detection is not flawless and can be wrong\",\"color\":\"dark_red\"}]}}".replace("$coords", pos.toString()).replace("$username", BBsentials.generalConfig.getUsername()).replace("$items", String.join("2", items.stream().map(ChChestItem::getDisplayName).collect(Collectors.joining(";"))))));
+                                    }, 2, TimeUnit.SECONDS);
+                                }, 2, TimeUnit.SECONDS);
+                            }, 1, TimeUnit.SECONDS);
+                        }, 1, TimeUnit.SECONDS);
+
                     }
                 } catch (Exception e) {
                     return ActionResult.PASS;

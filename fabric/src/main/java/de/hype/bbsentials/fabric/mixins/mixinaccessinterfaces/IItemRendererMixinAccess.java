@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public interface IItemRendererMixinAccess {
-
     @Unique
     ItemModels BBsentials$getModels();
 
-    void BBsentials$$getModel(ItemStack stack, World world, LivingEntity entity, int seed, CallbackInfoReturnable<BakedModel> cir);
+    void BBsentials$getModel(ItemStack stack, World world, LivingEntity entity, int seed, CallbackInfoReturnable<BakedModel> cir);
 }
+

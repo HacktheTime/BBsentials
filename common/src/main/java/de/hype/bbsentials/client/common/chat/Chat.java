@@ -6,6 +6,8 @@ import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
+import de.hype.bbsentials.shared.constants.ChChestItem;
+import de.hype.bbsentials.shared.constants.ChChestItems;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -388,6 +390,16 @@ public class Chat {
                     String id = messageUnformatted.replace("Profile ID: ", "").trim();
                     BBsentials.generalConfig.profileIds.add(id);
                     BBsentials.dataStorage.currentProfileID = id;
+                }
+                else if (messageUnformatted.startsWith("You received")) {
+                    String itemName = messageUnformatted.replace("You received", "").replace(".", "").trim();
+                    if (itemName.contains("Flawless") && itemName.contains("Gemstone"))
+                        BBsentials.temporaryConfig.chestParts.add(ChChestItems.FlawlessGemstone);
+                    for (ChChestItem item : ChChestItems.getAllItems()) {
+                        if (itemName.endsWith(item.getDisplayName())) {
+                            BBsentials.temporaryConfig.chestParts.add(item);
+                        }
+                    }
                 }
             }
 

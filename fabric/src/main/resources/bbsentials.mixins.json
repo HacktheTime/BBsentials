@@ -4,9 +4,11 @@
   "package": "de.hype.bbsentials.fabric.mixins.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "ChestLidMixin",
     "CommandSourceMixin"
   ],
   "client": [
+    "ChestMixin",
     "ClientCommandSourceMixin",
     "CustomItemData",
     "CustomItemTextures",

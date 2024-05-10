@@ -593,12 +593,15 @@ public class BBsentialConnection {
     }
 
     public void onWantedSearchPacket(WantedSearchPacket packet) {
-        if (packet.serverId != null)
-            if (packet.serverId.equals(EnvironmentCore.utils.getServerId()) || (packet.serverId.equals("maga") && EnvironmentCore.utils.isOnMegaServer() && EnvironmentCore.utils.getCurrentIsland().equals(Islands.HUB)))
-                sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.serverId)));
-        if (packet.username != null) if (EnvironmentCore.utils.getPlayers().contains(packet.username))
-            sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket(packet.username, packet.serverId)));
+        if (packet.serverId != null && !packet.serverId.equals(EnvironmentCore.utils.getServerId())) return;
+        if (packet.mega != null && packet.mega != EnvironmentCore.utils.isOnMegaServer()) return;
+        List<String> playerCount = EnvironmentCore.utils.getPlayers();
+        if (packet.maximumPlayerCount != null && packet.maximumPlayerCount > playerCount.size()) return;
+        if (packet.minimumPlayerCount != null && packet.minimumPlayerCount < playerCount.size()) return;
+        if (packet.username != null && !playerCount.contains(packet.username)) return;
+        sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket.WantedSearchPacketReply(BBsentials.generalConfig.getUsername(), EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.isOnMegaServer(), EnvironmentCore.utils.getServerId())));
     }
+
 
     public void onSkyblockLobbyDataPacket(SkyblockLobbyDataPacket packet) {
         packet.preparePacketToReplyToThis(new SkyblockLobbyDataPacket(EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.getLobbyTime(), EnvironmentCore.utils.getServerId(), EnvironmentCore.utils.getCurrentIsland()));

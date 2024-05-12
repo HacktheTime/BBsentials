@@ -153,7 +153,7 @@ public class DiscordIntegration extends ListenerAdapter {
     public boolean filter(de.hype.bbsentials.client.common.chat.Message advancedMessage) {
         String simpleMessage = advancedMessage.getUnformattedString();
         if (simpleMessage.isEmpty()) return false;
-        if (advancedMessage.actionBar) return false;
+        if (advancedMessage.isActionBar()) return false;
         if (simpleMessage.contains("stash")) return false;
         if (simpleMessage.contains("to pick them up")) return false;
         return true;

@@ -1,25 +1,27 @@
 package de.hype.bbsentials.client.common.client;
 
 import com.google.gson.*;
+import de.hype.bbsentials.shared.objects.Message;
 
 import java.awt.*;
 import java.lang.reflect.Type;
 
 public class CustomGson {
+    public static Gson ownSerializer = new GsonBuilder().create();
     public static Gson create() {
-        return new GsonBuilder()
-//                .registerTypeHierarchyAdapter(BBDisplayNameProvider.class, new BBDisplayNameProviderSerializer())
-                .registerTypeAdapter(Color.class, new ColorSerializer())
-                .setPrettyPrinting()
-                .create();
+        return getBase().setPrettyPrinting().create();
 
     }
-    public static Gson createNotPrettyPrinting() {
-        return new GsonBuilder()
-//                .registerTypeHierarchyAdapter(BBDisplayNameProvider.class, new BBDisplayNameProviderSerializer())
-                .registerTypeAdapter(Color.class, new ColorSerializer())
-                .create();
 
+    public static Gson createNotPrettyPrinting() {
+        return getBase().create();
+    }
+
+    private static GsonBuilder getBase() {
+        return new GsonBuilder()
+                .registerTypeAdapter(Color.class, new ColorSerializer())
+                .registerTypeAdapter(Message.class, new MessageSerializer())
+                ;
     }
 
     private static class ColorSerializer implements JsonSerializer<Color>, JsonDeserializer<Color> {
@@ -43,6 +45,13 @@ public class CustomGson {
             jsonObject.addProperty("a", src.getAlpha());
 
             return jsonObject;
+        }
+    }
+
+    private static class MessageSerializer implements JsonDeserializer<Message> {
+        @Override
+        public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return ownSerializer.fromJson(json, de.hype.bbsentials.client.common.chat.Message.class);
         }
     }
 

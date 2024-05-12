@@ -1,7 +1,7 @@
 package de.hype.bbsentials.shared.packets.addonpacket;
 
-import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.environment.addonpacketconfig.AbstractAddonPacket;
+import de.hype.bbsentials.shared.objects.Message;
 
 /**
  * Used to tell the addon what message came in.

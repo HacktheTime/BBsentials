@@ -184,6 +184,7 @@ public abstract class Message {
         public static MessageSource getMessageSource(Message message) {
             String string = message.getUnformattedString();
             for (MessageSource value : MessageSource.values()) {
+                if (value.detection == null) continue;
                 if (value.detection.test(string)) return value;
             }
             if (message.getPlayerName() != null) return ALL_CHAT;

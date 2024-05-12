@@ -30,7 +30,13 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
@@ -426,6 +432,18 @@ public class ModInitialiser implements ClientModInitializer {
         });
         codes = new NumPadCodes();
         BBsentials.init();
+        if (developerConfig.quickLaunch) {
+            executionService.execute(() -> {
+                while (!MinecraftClient.getInstance().isFinishedLoading()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                MinecraftClient.getInstance().execute(this::joinHypixel);
+            });
+        }
         RenderingDefinitions.clearAndInitDefaults();
         if (generalConfig.hasBBRoles("dev")) {
             ServerSwitchTask.onServerJoinTask(() -> EnvironmentCore.debug.onServerJoin(), true);
@@ -473,5 +491,26 @@ public class ModInitialiser implements ClientModInitializer {
 
         Waypoints waypoint = new Waypoints(position, jsonName, maxRenderDist, visible, deleteOnServerSwap, new RenderInformation(customTextureNameSpace, customTexturePath));
         return 1;
+    }
+
+
+    public void disconnectServer() {
+        MinecraftClient.getInstance().disconnect();
+    }
+
+    public void joinHypixel() {
+        String serverAddress = "mc.hypixel.net";
+        MinecraftClient client = MinecraftClient.getInstance();
+        ServerList serverList = new ServerList(client);
+        serverList.loadFile();
+        ServerInfo serverInfo = serverList.get(serverAddress);
+        if (serverInfo == null) {
+            serverInfo = new ServerInfo("Hypixel", serverAddress, ServerInfo.ServerType.OTHER);
+            serverList.add(serverInfo, true);
+            serverList.saveFile();
+        }
+        ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
+
+        ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true);
     }
 }

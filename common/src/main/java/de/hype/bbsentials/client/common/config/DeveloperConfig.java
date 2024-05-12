@@ -17,6 +17,7 @@ public class DeveloperConfig extends BBsentialsConfig {
     public boolean doDevDashboardConfig = true;
     public boolean devSecurity = true;
     public boolean hypixelItemInfo = false;
+    public boolean quickLaunch = false;
 
     public DeveloperConfig() {
         super(1);

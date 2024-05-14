@@ -9,12 +9,21 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import java.awt.*;
 import java.util.List;
 
+import static de.hype.bbsentials.client.common.client.BBsentials.temporaryConfig;
+
 public class RouteConfigScreen extends SelectionScreen<RouteNode> {
     WaypointRoute route;
 
     public RouteConfigScreen(Screen parent, WaypointRoute route) {
         super(parent, "Route Nodes");
         this.route = route;
+    }
+
+    public static Screen openCurrent(Screen parent) {
+        WaypointRoute route = temporaryConfig.route;
+        if (route == null) route = new WaypointRoute("Current");
+        temporaryConfig.route = route;
+        return new RouteConfigScreen(parent, route);
     }
 
 

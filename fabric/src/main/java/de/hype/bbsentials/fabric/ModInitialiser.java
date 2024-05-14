@@ -19,6 +19,8 @@ import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
+import de.hype.bbsentials.fabric.screens.RouteConfigScreen;
+import de.hype.bbsentials.fabric.screens.RoutesConfigScreen;
 import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
@@ -302,6 +304,16 @@ public class ModInitialiser implements ClientModInitializer {
                                                 return 1;
                                             }))
                             ).then(ClientCommandManager.literal("route")
+                                    .executes((context -> {
+                                        MinecraftClient.getInstance().setScreen(new RoutesConfigScreen(MinecraftClient.getInstance().currentScreen));
+                                        return 1;
+                                    }))
+                                    .then(ClientCommandManager.literal("current")
+                                            .executes((context -> {
+                                                MinecraftClient.getInstance().setScreen(RouteConfigScreen.openCurrent(new RoutesConfigScreen(MinecraftClient.getInstance().currentScreen)));
+                                                return 1;
+                                            }))
+                                    )
                                     .then(ClientCommandManager.literal("load")
                                             .then(ClientCommandManager.argument("fileName", StringArgumentType.string())
                                                     .suggests(((context, builder) -> {
@@ -346,7 +358,11 @@ public class ModInitialiser implements ClientModInitializer {
                                                             context.getSource().sendError(Text.of("No Route loaded"));
                                                             return 0;
                                                         }
-                                                        temporaryConfig.route.currentNode = id;
+                                                        if (id >= temporaryConfig.route.nodes.size() || id <= 0) {
+                                                            context.getSource().sendError(Text.of("Out of Bounds. The number you specified is higher than the node count or lower than 1"));
+                                                            return 0;
+                                                        }
+                                                        temporaryConfig.route.currentNode = id - 1;
                                                         return 1;
                                                     }))
                                             )

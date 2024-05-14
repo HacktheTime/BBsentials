@@ -32,6 +32,10 @@ public class WaypointRoute {
     private WaypointRoute() {
     }
 
+    public WaypointRoute(String name) {
+        this.name = name;
+    }
+
     /**
      * Does not actually load the route into the mod but acutally gets it as object from the file.
      * To actually load it use {@link #loadRoute(String)}
@@ -78,7 +82,7 @@ public class WaypointRoute {
             if (!nameOrPath.endsWith(".json")) nameOrPath += ".json";
             file = new File(waypointRouteDirectory.getPath(), nameOrPath);
             if (!file.exists()) throw new Exception("Route does not exist");
-            BBsentials.temporaryConfig.route = new WaypointRoute();
+            BBsentials.temporaryConfig.route = loadConfiguration(file);
             return BBsentials.temporaryConfig.route;
         }
         throw new Exception("Route does not exist");

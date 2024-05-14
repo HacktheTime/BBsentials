@@ -20,6 +20,7 @@ public class RoutesConfigScreen extends SelectionScreen<WaypointRoute> {
         File[] files = WaypointRoute.waypointRouteDirectory.listFiles();
         try {
             for (File file : files) {
+                if (!file.isFile()) continue;
                 try {
                     if (file.getName().endsWith(".json")) {
                         routes.add(WaypointRoute.loadFromFile(file));

@@ -58,7 +58,6 @@ public class RouteConfigScreen extends SelectionScreen<RouteNode> {
     @Override
     public void close() {
         setScreen(parent);
-        doDefaultClose();
     }
 }
 

@@ -10,7 +10,7 @@ public class RouteNode {
     public String name;
     public Color color;
     public boolean doTracer=true;
-    public int triggerNextRange = -1;
+    public int triggerNextRange = DEFAULT_TRIGGER_NEXT_RANGE;
     transient WaypointRoute route;
 
     public RouteNode(Position coords, Color color, boolean doTracer, int triggerNextRange, String name, WaypointRoute route) {

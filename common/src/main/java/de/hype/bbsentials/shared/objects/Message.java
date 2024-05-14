@@ -187,8 +187,8 @@ public abstract class Message {
                 if (value.detection == null) continue;
                 if (value.detection.test(string)) return value;
             }
-            if (message.getPlayerName() != null) return ALL_CHAT;
-            return SERVER;
+            if (message.getPlayerName() != null && message.getPlayerName().isEmpty()) return SERVER;
+            return ALL_CHAT;
 
         }
 

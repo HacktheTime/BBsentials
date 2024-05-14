@@ -6,6 +6,7 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.MCChat;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.text.Text;
 
 public class FabricChat implements MCChat {
@@ -72,6 +73,8 @@ public class FabricChat implements MCChat {
     }
 
     public void sendChatMessage(String message) {
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler == null) return;
         MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(message);
     }
 }

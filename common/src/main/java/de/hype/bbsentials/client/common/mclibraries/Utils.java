@@ -155,22 +155,24 @@ public interface Utils {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             processBuilder = new ProcessBuilder("shutdown", "/s", "/t", String.valueOf(20), "/c", "The System is shutting down forcefully in 20 Seconds. Make sure to save everything.");
+            processBuilder.start();
         }
         else {
             processBuilder = new ProcessBuilder("systemctl", "poweroff");
+            BBsentials.executionService.schedule(processBuilder::start, 20, TimeUnit.SECONDS);
         }
-        processBuilder.start();
     }
 
     default void hibernatePC() throws IOException {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             processBuilder = new ProcessBuilder("shutdown", "/s", "/hybrid", "/t", String.valueOf(20), "/c", "The System is going into hibernation in 20 Seconds. Make sure to save everything.");
+            processBuilder.start();
         }
         else {
             processBuilder = new ProcessBuilder("systemctl", "hibernate");
+            BBsentials.executionService.schedule(processBuilder::start, 20, TimeUnit.SECONDS);
         }
-        processBuilder.start();
     }
 
     default void suspendPC() throws IOException {
@@ -181,7 +183,7 @@ public interface Utils {
         else {
             processBuilder = new ProcessBuilder("systemctl", "suspend");
         }
-        processBuilder.start();
+        BBsentials.executionService.schedule(processBuilder::start, 20, TimeUnit.SECONDS);
     }
 
     boolean isSelfBingo();

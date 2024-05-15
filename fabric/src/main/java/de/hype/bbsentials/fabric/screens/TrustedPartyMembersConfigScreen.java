@@ -16,8 +16,8 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
 
     public static void openFromNothing() {
         TrustedPartyMembersConfigScreen sc = new TrustedPartyMembersConfigScreen(MinecraftClient.getInstance().currentScreen);
-        sc.setScreen(sc);
         sc.updateFields();
+        sc.setScreen(sc);
     }
 
     @Override
@@ -45,6 +45,18 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
     @Override
     public String getButtonString(TrustedPartyMember object) {
         return object.toString();
+    }
+
+    @Override
+    void removeRow(TrustedPartyMember node) {
+        List<TrustedPartyMember> members = BBsentials.partyConfig.trustedPartyMembers;
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).mcUuid.equals(node.mcUuid)) {
+                members.remove(i);
+                updateFields();
+                return;
+            }
+        }
     }
 
     @Override

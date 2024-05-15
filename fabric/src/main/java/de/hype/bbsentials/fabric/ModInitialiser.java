@@ -50,6 +50,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.*;
@@ -300,17 +301,26 @@ public class ModInitialiser implements ClientModInitializer {
                                                     )
                                             )
                                             .executes((context -> {
-                                                MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen(null)));
+                                                executionService.schedule(() -> {
+                                                    MinecraftClient client = MinecraftClient.getInstance();
+                                                    client.execute(() -> client.setScreen(RouteConfigScreen.openCurrent(new WaypointsConfigScreen(MinecraftClient.getInstance().currentScreen))));
+                                                }, 10, TimeUnit.MILLISECONDS);
                                                 return 1;
                                             }))
                             ).then(ClientCommandManager.literal("route")
                                     .executes((context -> {
-                                        MinecraftClient.getInstance().setScreen(new RoutesConfigScreen(MinecraftClient.getInstance().currentScreen));
+                                        executionService.schedule(() -> {
+                                            MinecraftClient client = MinecraftClient.getInstance();
+                                            client.execute(() -> client.setScreen(new RoutesConfigScreen(MinecraftClient.getInstance().currentScreen)));
+                                        }, 10, TimeUnit.MILLISECONDS);
                                         return 1;
                                     }))
                                     .then(ClientCommandManager.literal("current")
                                             .executes((context -> {
-                                                MinecraftClient.getInstance().setScreen(RouteConfigScreen.openCurrent(new RoutesConfigScreen(MinecraftClient.getInstance().currentScreen)));
+                                                executionService.schedule(() -> {
+                                                    MinecraftClient client = MinecraftClient.getInstance();
+                                                    client.execute(() -> client.setScreen(RouteConfigScreen.openCurrent(new RoutesConfigScreen(MinecraftClient.getInstance().currentScreen))));
+                                                }, 10, TimeUnit.MILLISECONDS);
                                                 return 1;
                                             }))
                                     )

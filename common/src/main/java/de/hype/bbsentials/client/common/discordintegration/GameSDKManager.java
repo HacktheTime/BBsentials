@@ -36,9 +36,7 @@ public class GameSDKManager extends DiscordEventAdapter {
 
     public GameSDKManager() throws Exception {
         // Initialize the Core
-        if (initCore()) {
-            throw new Exception("Could not initialise the discord game sdk");
-        }
+        if (!initCore()) throw new Exception("Could not initialise the discord game sdk");
         connectToDiscord();
         callbackRunner = BBsentials.executionService.scheduleAtFixedRate(() -> {
             try {

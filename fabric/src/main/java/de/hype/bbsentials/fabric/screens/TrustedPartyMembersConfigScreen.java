@@ -16,8 +16,8 @@ public class TrustedPartyMembersConfigScreen extends SelectionScreen<TrustedPart
 
     public static void openFromNothing() {
         TrustedPartyMembersConfigScreen sc = new TrustedPartyMembersConfigScreen(MinecraftClient.getInstance().currentScreen);
-        sc.updateFields();
         sc.setScreen(sc);
+        sc.updateFields();
     }
 
     @Override

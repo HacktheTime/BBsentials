@@ -61,11 +61,11 @@ jar {
     manifest {
         attributes([
                 'Specification-Title'   : mod_name,
-//                'Specification-Vendor'  : mod_author,
+                'Specification-Vendor'  : mod_author,
                 'Specification-Version' : project.jar.archiveVersion,
                 'Implementation-Title'  : project.name,
                 'Implementation-Version': project.jar.archiveVersion,
-//                'Implementation-Vendor' : mod_author,
+                'Implementation-Vendor' : mod_author,
                 'Built-On-Minecraft'    : libs.versions.modern.minecraft
         ])
     }

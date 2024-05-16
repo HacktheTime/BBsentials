@@ -4,10 +4,10 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
 }
 dependencies {
-    minecraft "com.mojang:minecraft:${libs.modern.minecraft}"
+    minecraft "com.mojang:minecraft:${libs.versions.modern.minecraft.get()}"
     mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${libs.modern.fabric.loader}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${libs.modern.fabric.api}"
+    modImplementation "net.fabricmc:fabric-loader:${libs.versions.modern.fabric.loader.get()}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${libs.versions.modern.fabric.api.get()}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 

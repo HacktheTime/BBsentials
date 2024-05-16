@@ -5,7 +5,7 @@ import de.hype.bbsentials.shared.constants.Islands;
 import net.hypixel.data.region.Environment;
 import net.hypixel.data.type.GameType;
 import net.hypixel.data.type.ServerType;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket;
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 
 public class BBDataStorage {
     public final String serverId;
@@ -17,8 +17,8 @@ public class BBDataStorage {
     public String currentProfileID;
     public String profileType;
     public String currentProfileCuteName;
-    public final String proxyName;
-    public final Environment environment;
+//    public final String proxyName;
+//    public final Environment environment;
 
     public BBDataStorage(ClientboundLocationPacket packet) {
         BBDataStorage data = BBsentials.dataStorage;
@@ -38,8 +38,8 @@ public class BBDataStorage {
         this.currentProfileID = data.currentProfileID;
         this.profileType = data.profileType;
         this.currentProfileCuteName = data.currentProfileCuteName;
-        this.proxyName = packet.getProxyName();
-        this.environment = packet.getEnvironment();
+//        this.proxyName = packet.getProxyName();
+//        this.environment = packet.getEnvironment();
         if (packet.getMode().isPresent()) {
             this.mode = packet.getMode().get();
             if (isInSkyblock()) this.island = EnumUtils.getEnumByValue(Islands.class, mode);
@@ -60,10 +60,11 @@ public class BBDataStorage {
     }
 
     public boolean isOnHypixel() {
-        return environment != null;
+        return true;
+//                environment != null;
     }
 
-    public boolean isOnMain() {
-        return environment == Environment.PRODUCTION;
-    }
+//    public boolean isOnMain() {
+//        return environment == Environment.PRODUCTION;
+//    }
 }

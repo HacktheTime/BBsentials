@@ -6,10 +6,10 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import net.hypixel.modapi.handler.ClientboundPacketHandler;
 import net.hypixel.modapi.packet.ClientboundHypixelPacket;
 import net.hypixel.modapi.packet.impl.VersionedPacket;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPlayerInfoPacket;
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,10 +51,8 @@ public class HypixelModAPICore implements ClientboundPacketHandler {
         Chat.sendPrivateMessageToSelfSuccess("Your Ping is: " + packet.getResponse());
     }
 
-    @Override
     public void onLocationPacket(ClientboundLocationPacket packet) {
         handlePacketDebug(packet);
-        completeGoal(packet, HPModAPIPacket.LOCATION.getType());
         BBsentials.dataStorage = new BBDataStorage(packet);
     }
 

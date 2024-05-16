@@ -3,11 +3,9 @@ package de.hype.bbsentials.client.common.hpmodapi;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.hypixel.modapi.packet.impl.VersionedPacket;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPlayerInfoPacket;
-import net.hypixel.modapi.packet.impl.serverbound.ServerboundLocationPacket;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPlayerInfoPacket;
@@ -18,7 +16,6 @@ import java.util.function.Consumer;
 public class HPModAPIPacket {
     public static final PING_REGISTRY PING = new PING_REGISTRY();
     public static final PLAYER_INFO_REGISTRY PLAYER_INFO = new PLAYER_INFO_REGISTRY();
-    public static final LOCATION_REGISTRY LOCATION = new LOCATION_REGISTRY();
     public static final PARTYINFO_REGISTRY PARTYINFO = new PARTYINFO_REGISTRY();
 
     Class<? extends VersionedPacket> serverboundClass;
@@ -110,16 +107,6 @@ public class HPModAPIPacket {
 
         public HPModAPIPacketEnum getType() {
             return HPModAPIPacketEnum.PLAYER_INFO;
-        }
-    }
-
-    public static class LOCATION_REGISTRY extends BasicPacket<ServerboundLocationPacket, ClientboundLocationPacket> {
-        LOCATION_REGISTRY() {
-            super(ServerboundLocationPacket.class);
-        }
-
-        public HPModAPIPacketEnum getType() {
-            return HPModAPIPacketEnum.LOCATION;
         }
     }
 

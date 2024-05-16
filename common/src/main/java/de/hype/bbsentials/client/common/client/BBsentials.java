@@ -121,7 +121,6 @@ public class BBsentials {
         }
         futureServerJoin = executionService.schedule(() -> {
             futureServerJoinRunning = true;
-            HPModAPIPacket.LOCATION.complete();
             for (ServerSwitchTask task : onServerJoin.values()) {
                 if (!task.permanent) {
                     onServerJoin.remove(task.getId());

@@ -1,0 +1,61 @@
+plugins {
+    id 'multiloader-common'
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+minecraft {
+    version('1.20.5')
+    def aw = file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWideners(aw)
+    }
+}
+repositories {
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    maven { url = uri("https://maven.architectury.dev/") }
+    maven { url = uri("https://maven.notenoughupdates.org/releases/") }
+    maven { url = uri("https://maven.fabricmc.net") }
+    maven { url = uri("https://maven.minecraftforge.net/") }
+    maven { url = uri("https://repo.spongepowered.org/maven/") }
+    maven { url = uri("https://repo.sk1er.club/repository/maven-releases/") }
+    maven { url = uri("https://maven.wagyourtail.xyz/releases") }
+    maven { url = uri("https://maven.wagyourtail.xyz/snapshots") }
+    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
+    maven { url = uri("https://maven.xpple.dev/maven2") }
+    maven { url = uri("https://maven.terraformersmc.com/releases") }
+    maven { url = uri("https://maven.shedaniel.me/") }
+    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://repo.hypixel.net/repository/Hypixel/") }
+}
+
+dependencies {
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    implementation(libs.apache.httpclient)
+    implementation(libs.legacyGson)
+    implementation("org.apache.commons:commons-lang3:3.14.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
+    implementation("com.google.guava:guava:33.0.0-jre")
+    implementation("javazoom:jlayer:1.0.1")
+    implementation("net.dv8tion:JDA:5.0.0-beta.23")
+//    implementation(libs.discordJDA)
+    implementation("me.nullicorn:Nedit:latest.release")
+    implementation("net.hypixel:mod-api:latest.release")
+    implementation("com.github.JnCrMx:discord-game-sdk4j:latest.release")
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}

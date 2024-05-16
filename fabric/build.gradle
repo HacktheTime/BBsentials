@@ -1,0 +1,44 @@
+plugins {
+    id 'multiloader-loader'
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'org.jetbrains.kotlin.jvm'
+}
+dependencies {
+    minecraft "com.mojang:minecraft:${libs.modern.minecraft}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${libs.modern.fabric.loader}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${libs.modern.fabric.api}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+loom {
+    def aw = project(":common").file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("runs/client")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("runs/server")
+        }
+    }
+    log4jConfigs.from(project.rootProject.file("log4j2.xml"))
+
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(21)
+}

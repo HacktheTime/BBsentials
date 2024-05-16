@@ -1,5 +1,5 @@
 [versions]
-version = "0.99.2.7"
+modVersion = "0.99.2.7"
 kotlinVersion = "1.9.0"
 apache_httpcomponents = "4.5.13"
 lwjglModern = "3.3.3"
@@ -23,6 +23,7 @@ cloth = "13.0.121"
 devauth = "1.1.2"
 
 moulconfig = "2.5.0"
+javaVersion = "21"
 
 [libraries]
 apache_httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "apache_httpcomponents" }

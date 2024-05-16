@@ -65,6 +65,7 @@ public class BBsentials {
     private static volatile ScheduledFuture<?> futureServerJoin;
     private static volatile boolean futureServerJoinRunning;
     public static HypixelModAPICore hpModAPICore;
+    public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
 
 

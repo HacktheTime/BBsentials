@@ -2,8 +2,10 @@ package de.hype.bbsentials.fabric.mixins.helperclasses;
 
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.DummyDataStorage;
 import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
+import de.hype.bbsentials.shared.packets.function.PositionCommunityFeedback;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
@@ -165,26 +167,32 @@ public abstract class RenderingDefinitions {
             @Override
             public boolean modifyItem(ItemStack stacks, RenderStackItemCheck check, String itemName) {
                 Item stackItem = stacks.getItem();
-                if (BBsentials.visualConfig.showContributorPositionInCount && (stackItem == Items.EMERALD_BLOCK || stackItem == Items.IRON_BLOCK)) {
+                if ((stackItem == Items.EMERALD_BLOCK || stackItem == Items.IRON_BLOCK)) {
                     List<Text> text = check.getTextTooltip();
+                    boolean display = BBsentials.visualConfig.showContributorPositionInCount;
                     if (text.size() >= 20) {
                         String line = text.get(1).getString();
                         if (!line.equals("Community Goal")) return false;
                         String[] temp = itemName.split(" ");
                         String tierString = temp[temp.length - 1];
-                        switch (tierString) {
-                            case "V", "5" -> check.renderAsItem(Items.NETHERITE_BLOCK);
-                            case "IV", "4" -> check.renderAsItem(Items.DIAMOND_BLOCK);
-                            case "III", "3" -> check.renderAsItem(Items.GOLD_BLOCK);
-                            case "II", "2" -> check.renderAsItem(Items.IRON_BLOCK);
-                            case "I", "1" -> check.renderAsItem(Items.COPPER_BLOCK);
-                            default -> check.renderAsItem(Items.REDSTONE_BLOCK);
+                        if (display) {
+                            switch (tierString) {
+                                case "V", "5" -> check.renderAsItem(Items.NETHERITE_BLOCK);
+                                case "IV", "4" -> check.renderAsItem(Items.DIAMOND_BLOCK);
+                                case "III", "3" -> check.renderAsItem(Items.GOLD_BLOCK);
+                                case "II", "2" -> check.renderAsItem(Items.IRON_BLOCK);
+                                case "I", "1" -> check.renderAsItem(Items.COPPER_BLOCK);
+                                default -> check.renderAsItem(Items.REDSTONE_BLOCK);
+                            }
                         }
                         Integer position = null;
                         Double topPos = null;
+                        Integer contribution = null;
                         for (int i = 20; i < text.size(); i++) {
-
-                            line = text.get(i).getString();
+                            line = text.get(i).getString().trim();
+                            if (line.startsWith("Contribution:")) {
+                                contribution = Integer.parseInt(line.replaceAll("\\D+", ""));
+                            }
                             if (line.contains("contributor")) {
                                 position = Integer.parseInt(line.replaceAll("\\D", ""));
                             }
@@ -192,6 +200,10 @@ public abstract class RenderingDefinitions {
                                 topPos = Double.parseDouble(line.replaceAll("[^0-9.]", ""));
                             }
                         }
+                        PositionCommunityFeedback.ComGoalPosition positioning = new PositionCommunityFeedback.ComGoalPosition(stackItem.getName().getString(), contribution, topPos, position);
+                        DummyDataStorage.addComGoalDataToPacket(positioning);
+
+                        if (!display) return false;
                         if (topPos != null) {
                             if (position != null) {
                                 //Display Position not %

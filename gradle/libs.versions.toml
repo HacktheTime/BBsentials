@@ -6,10 +6,10 @@ lwjglModern = "3.3.3"
 
 minecraft_versionSupported = "1.20.*"
 
-modern_minecraft = "1.20.4"
-modern_yarn = "1.20.4+build.3"
-modern_fabric_loader = "0.15.9"
-modern_fabric_api = "0.96.0+1.20.4"
+modern_minecraft = "1.20.6"
+modern_yarn = "1.20.6+build.1"
+modern_fabric_loader = "0.15.11"
+modern_fabric_api = "0.98.0+1.20.6"
 
 legacy_mcp = "22-1.8.9"
 legacy_minecraft = "1.8.9"

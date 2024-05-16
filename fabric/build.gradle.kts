@@ -3,9 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
     idea
-    kotlin("jvm") version (libs.versions.kotlinVersion)
+    kotlin("jvm")
     id("com.github.johnrengelman.shadow")
-    id("fabric-loom") version "1.4.5"
+    id("fabric-loom") version "1.6.5"
 }
 repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
@@ -51,8 +51,8 @@ java {
     java {
 
         withSourcesJar()
-        targetCompatibility = JavaVersion.VERSION_17
-        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
     }
 }
 

@@ -1,7 +1,7 @@
 plugins {
     java
     idea
-    kotlin("jvm") version (libs.versions.kotlinVersion)
+    kotlin("jvm")
     id("com.github.johnrengelman.shadow")
 }
 

@@ -148,8 +148,8 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
         if (entity instanceof ArmorStandEntity) {
             ((ArmorStandEntity) entity).getArmorItems().forEach(itemStack -> {
                 if (itemStack.getItem() == Items.PLAYER_HEAD) {
-//TODO                    String texture = itemStack.getNbt().getCompound("SkullOwner").getCompound("Properties").getList("textures", NbtElement.COMPOUND_TYPE).getCompound(0).getString("Value");
-//                    ClickableArmorStand armorStand = ClickableArmorStand.getFromTexture(texture);
+                    String texture = itemStack.getNbt().getCompound("SkullOwner").getCompound("Properties").getList("textures", NbtElement.COMPOUND_TYPE).getCompound(0).getString("Value");
+                    ClickableArmorStand armorStand = ClickableArmorStand.getFromTexture(texture);
 //                    if (armorStand != null) Chat.sendPrivateMessageToSelfSuccess(armorStand.toString()+" was clicked");
                     //TODO Maybe used for fairysouls here soon
                 }

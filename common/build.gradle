@@ -5,12 +5,13 @@ plugins {
 }
 
 minecraft {
-    version('1.20.5')
+    version(libs.versions.modern.minecraft.get())
     def aw = file("src/main/resources/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWideners(aw)
     }
 }
+
 repositories {
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
     maven { url = uri("https://maven.architectury.dev/") }
@@ -31,8 +32,8 @@ repositories {
 
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    implementation(libs.apache.httpclient)
-    implementation(libs.legacyGson)
+    implementation(libs.apache.httpclient.get())
+    implementation(libs.legacyGson.get())
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     implementation("com.google.guava:guava:33.0.0-jre")

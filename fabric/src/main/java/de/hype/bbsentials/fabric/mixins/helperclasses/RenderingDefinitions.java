@@ -7,13 +7,14 @@ import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import de.hype.bbsentials.shared.packets.function.PositionCommunityFeedback;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 
 import java.time.Instant;
@@ -49,7 +50,7 @@ public abstract class RenderingDefinitions {
         ItemTooltipCallback.EVENT.register(RenderingDefinitions::modifyItemTooltip);
         new RenderingDefinitions() {
             @Override
-            public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
+            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 {
                     if (!itemName.startsWith("SkyBlock Hub")) return false;
                     String serverid = "";
@@ -110,16 +111,13 @@ public abstract class RenderingDefinitions {
         if (BBsentials.generalConfig.hasBBRoles("splasher")) {
             new RenderingDefinitions() {
                 @Override
-                public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
+                public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
                     if (!BBsentials.splashConfig.xpBoostHighlight) return false;
                     if (itemName.endsWith("Potion")) {
                         if (itemName.contains("XP Boost")) {
-                            NbtCompound c1 = stack.getNbt();
-                            if (c1 == null) return false;
-                            NbtCompound c2 = c1.getCompound("ExtraAttributes");
-                            if (c2 == null) return false;
-                            int t1 = c2.getInt("potion_level");
-                            String countString = "T" + t1;
+                            if (extraNbt==null) return false;
+                            int potionLevel = extraNbt.getInt("potion_level");
+                            String countString = "T" + potionLevel;
                             check.setItemCount(countString);
                             if (itemName.startsWith("Farming")) check.renderAsItem(Items.STONE_HOE);
                             if (itemName.startsWith("Foraging")) check.renderAsItem(Items.STONE_AXE);
@@ -137,34 +135,28 @@ public abstract class RenderingDefinitions {
         }
         new RenderingDefinitions(false) {
             @Override
-            public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
+            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (!BBsentials.developerConfig.hypixelItemInfo) return false;
-                try {
-                    NbtCompound nbt = stack.getOrCreateNbt();
-                    NbtCompound extraAttributes = nbt.getCompound("ExtraAttributes");
-                    List<Text> itemTooltip = check.getTextTooltip();
-                    Set<String> keys = extraAttributes.getKeys();
-                    for (String key : keys) {
-                        if (key.equals("enchantments")) continue;
-                        if (key.equals("timestamp")) {
-                            Long stamp = extraAttributes.getLong(key);
-                            itemTooltip.add(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"));
-                            continue;
-                        }
-                        itemTooltip.add(Text.of(key + ": " + extraAttributes.get(key)));
+                NbtComponent customComponent = stack.get(DataComponentTypes.CUSTOM_DATA);
+                LoreComponent loreComponent = stack.get(DataComponentTypes.LORE);
+                if (customComponent == null) return false;
+                NbtCompound compound = customComponent.copyNbt();
+                for (String key : compound.getKeys()) {
+                    if (key.equals("enchantments")) continue;
+                    if (key.equals("timestamp")) {
+                        Long stamp = compound.getLong(key);
+                        loreComponent.lines().add(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"));
+                        continue;
                     }
-                    stack.getNbt().putBoolean("addedDebug", true);
-                } catch (NullPointerException ignored) {
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    loreComponent.lines().add(Text.of(key + ": " + compound.get(key)));
                 }
                 return false;
             }
         };
         new RenderingDefinitions() {
             @Override
-            public boolean modifyItem(ItemStack stacks, RenderStackItemCheck check, String itemName) {
-                Item stackItem = stacks.getItem();
+            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
+                Item stackItem = stack.getItem();
                 if ((stackItem == Items.EMERALD_BLOCK || stackItem == Items.IRON_BLOCK)) {
                     List<Text> text = check.getTextTooltip();
                     boolean display = BBsentials.visualConfig.showContributorPositionInCount;
@@ -279,7 +271,7 @@ public abstract class RenderingDefinitions {
      *
      * @return return value defines whether you want to stop after the check
      */
-    public abstract boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName);
+    public abstract boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName);
 
     public static class RenderStackItemCheck {
         private final ItemStack stack;
@@ -293,11 +285,14 @@ public abstract class RenderingDefinitions {
             this.stack = stack;
             renderAsItem = stack.getItem();
             String itemName = stack.getName().getString();
+            NbtCompound nbt = null;
+            NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
+            if (customData != null) nbt = customData.copyNbt();
             for (RenderingDefinitions def : defsNonBlocking.values()) {
-                def.modifyItem(stack, this, itemName);
+                def.modifyItem(stack, nbt, this, itemName);
             }
             for (RenderingDefinitions def : defsBlocking.values()) {
-                if (def.modifyItem(stack, this, itemName)) {
+                if (def.modifyItem(stack, nbt, this, itemName)) {
                     return;
                 }
             }
@@ -306,30 +301,20 @@ public abstract class RenderingDefinitions {
 
         public List<Text> getTextTooltip() {
             if (texts != null) return texts;
-            NbtCompound b = stack.getNbt();
-            if (b == null) return new ArrayList<>();
-            NbtCompound b1 = b.getCompound("display");
-            if (b1 == null) return new ArrayList<>();
-            NbtList list = b1.getList("Lore", NbtElement.STRING_TYPE);
+            LoreComponent loreComponent = stack.get(DataComponentTypes.LORE);
+            if (loreComponent == null) return new ArrayList<>();
             List<Text> text = new ArrayList<>();
             text.add(stack.getName());
-            for (int i = 0; i < list.size(); i++) {
-                text.add(Text.Serialization.fromJson(list.get(i).asString()));
-            }
+            text.addAll(loreComponent.lines());
             texts = text;
             return text;
         }
 
         public List<Text> getItemLore() {
             if (itemLore != null) return itemLore;
-            itemLore = new ArrayList<>();
-            NbtCompound b = stack.getNbt();
-            if (b == null) return itemLore;
-            NbtCompound b1 = b.getCompound("display");
-            if (b1 == null) return itemLore;
-            NbtList list = b1.getList("Lore", NbtElement.STRING_TYPE);
-            if (list == null) return itemLore;
-            itemLore = new ArrayList<>(list.stream().map(t -> Text.Serialization.fromJson(t.asString())).toList());
+            LoreComponent loreComponent = stack.get(DataComponentTypes.LORE);
+            if (loreComponent == null) return new ArrayList<>();
+            itemLore = new ArrayList<>(loreComponent.lines());
             return itemLore;
         }
 

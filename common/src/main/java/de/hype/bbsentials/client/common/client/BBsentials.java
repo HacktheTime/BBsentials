@@ -228,7 +228,6 @@ public class BBsentials {
             }, true);
         }
         hpModAPICore = new HypixelModAPICore();
-        HypixelModAPI.getInstance().registerHandler(hpModAPICore);
         EnvironmentCore.utils.registerNetworkHandlers();
 
     }

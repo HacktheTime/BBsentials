@@ -15,11 +15,12 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -29,6 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -148,7 +150,9 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
         if (entity instanceof ArmorStandEntity) {
             ((ArmorStandEntity) entity).getArmorItems().forEach(itemStack -> {
                 if (itemStack.getItem() == Items.PLAYER_HEAD) {
-                    String texture = itemStack.getNbt().getCompound("SkullOwner").getCompound("Properties").getList("textures", NbtElement.COMPOUND_TYPE).getCompound(0).getString("Value");
+                    ProfileComponent profileComponent =itemStack.get(DataComponentTypes.PROFILE);
+                    if (profileComponent==null) return;
+                    String texture = profileComponent.properties().get("textures").stream().toList().getFirst().value();
                     ClickableArmorStand armorStand = ClickableArmorStand.getFromTexture(texture);
 //                    if (armorStand != null) Chat.sendPrivateMessageToSelfSuccess(armorStand.toString()+" was clicked");
                     //TODO Maybe used for fairysouls here soon

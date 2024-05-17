@@ -46,4 +46,6 @@ public abstract class DebugThread implements Runnable {
     public abstract void onServerJoin();
 
     public abstract void onServerLeave();
+
+    public abstract boolean isDevEnv();
 }

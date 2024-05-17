@@ -194,7 +194,5 @@ public interface Utils {
 
     void sendPacket(HypixelPacket packet);
 
-    void sendPacket(String identifier);
-
     UUID getMCUUIDID();
 }

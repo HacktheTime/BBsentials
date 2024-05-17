@@ -56,6 +56,7 @@ public class GeneralConfig extends BBsentialsConfig {
     public boolean hasBBRoles(String roleName) {
         if (roleName == null) return true;
         if (roleName.isEmpty()) return true;
+        if (roleName.equals("debug") && EnvironmentCore.debug.isDevEnv() ) return true;
         for (String role : bbsentialsRoles) {
             if (role.equalsIgnoreCase(roleName)) {
                 return true;

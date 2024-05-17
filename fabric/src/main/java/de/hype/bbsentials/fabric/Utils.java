@@ -15,13 +15,11 @@ import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.HypixelPacket;
-import net.hypixel.modapi.serializer.PacketSerializer;
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
@@ -33,16 +31,15 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
@@ -66,6 +63,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
+import static de.hype.bbsentials.client.common.client.BBsentials.hpModAPICore;
 
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
     public static boolean isBingo(PlayerEntity player) {
@@ -96,7 +94,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 0.2f);
                         it.block(pos);
                         it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 1f);
-                        it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                        it.waypoint(pos, FabricTextUtils.jsonToText(waypoint.jsonToRenderText));
                         if (waypoint.doTracer) {
                             Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
                             it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
@@ -169,32 +167,6 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-    }
-
-    public static void addDebugInfoToRender(ItemStack stack) {
-        try {
-            if (stack.getNbt().getBoolean("addedDebug")) return;
-            NbtCompound nbt = stack.getOrCreateNbt();
-            NbtCompound displayTag = nbt.getCompound("display");
-            NbtCompound extraAttributes = nbt.getCompound("ExtraAttributes");
-            NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
-            Set<String> keys = extraAttributes.getKeys();
-            for (String key : keys) {
-                if (key.equals("enchantments")) continue;
-                if (key.equals("timestamp")) {
-                    Long stamp = extraAttributes.getLong(key);
-                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"))));
-                    continue;
-                }
-                loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of(key + ": " + extraAttributes.get(key)))));
-            }
-            displayTag.put("Lore", loreList);
-            stack.getNbt().put("display", displayTag);
-            stack.getNbt().putBoolean("addedDebug", true);
-        } catch (NullPointerException ignored) {
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public boolean isWindowFocused() {
@@ -304,7 +276,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             if (doPants) {
                 for (ItemStack armorItem : player.getArmorItems()) {
                     try {
-                        if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
+                        NbtComponent customData = armorItem.get(DataComponentTypes.CUSTOM_DATA);
+                        if (customData == null) continue;
+                        String hypixelId = customData.copyNbt().getString("id");
+                        if (hypixelId != null && hypixelId.equals("MUSIC_PANTS")) {
                             prefix = "§4[♪]§r ";
                             display = true;
                         }
@@ -618,6 +593,28 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return MinecraftClient.getInstance().world.getLevelProperties().getTimeOfDay();
     }
 
+    @Override
+    public String getServerConnectedAddress() {
+        try {
+            return MinecraftClient.getInstance().getNetworkHandler().getConnection().getAddress().toString().split("/")[0];
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public void registerNetworkHandlers() {
+        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
+        HypixelModAPI.getInstance().registerHandler(hpModAPICore);
+
+    }
+
+    @Override
+    public void sendPacket(HypixelPacket packet) {
+        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send: " + packet.getIdentifier());
+        HypixelModAPI.getInstance().sendPacket(packet);
+    }
+
     public static class BBToast implements Toast {
         public static final int DEFAULT_DURATION_MS = 5000;
         private static final Identifier TEXTURE = new Identifier("toast/advancement");
@@ -711,44 +708,5 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 this.id = id;
             }
         }
-    }
-
-    @Override
-    public String getServerConnectedAddress() {
-        try {
-            return MinecraftClient.getInstance().getNetworkHandler().getConnection().getAddress().toString().split("/")[0];
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Override
-    public void registerNetworkHandlers() {
-        for (String identifier : HypixelModAPI.getInstance().getRegistry().getIdentifiers()) {
-            ClientPlayNetworking.registerGlobalReceiver(new Identifier(identifier), (client, handler, buf, responseSender) -> {
-                buf.retain();
-                client.execute(() -> {
-                    try {
-                        HypixelModAPI.getInstance().handle(identifier, new PacketSerializer(buf));
-                    } finally {
-                        buf.release();
-                    }
-                });
-            });
-        }
-    }
-
-    @Override
-    public void sendPacket(HypixelPacket packet) {
-        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send: " + packet.getIdentifier());
-        PacketByteBuf buf = PacketByteBufs.create();
-        packet.write(new PacketSerializer(buf));
-        ClientPlayNetworking.send(new Identifier(packet.getIdentifier()), buf);
-    }
-
-    @Override
-    public void sendPacket(String identifier) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        ClientPlayNetworking.send(new Identifier(identifier), buf);
     }
 }

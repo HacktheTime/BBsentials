@@ -11,8 +11,8 @@ minecraft {
         accessWideners(aw)
     }
 }
-
 repositories {
+    mavenCentral()
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
     maven { url = uri("https://maven.architectury.dev/") }
     maven { url = uri("https://maven.notenoughupdates.org/releases/") }
@@ -29,7 +29,6 @@ repositories {
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://repo.hypixel.net/repository/Hypixel/") }
 }
-
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     implementation(libs.apache.httpclient.get())

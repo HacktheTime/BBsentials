@@ -43,6 +43,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
@@ -96,7 +97,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 0.2f);
                         it.block(pos);
                         it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 1f);
-                        it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
+                        it.waypoint(pos, FabricTextUtils.jsonToText(waypoint.jsonToRenderText));
                         if (waypoint.doTracer) {
                             Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
                             it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
@@ -172,29 +173,29 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public static void addDebugInfoToRender(ItemStack stack) {
-        try {
-            if (stack.getNbt().getBoolean("addedDebug")) return;
-            NbtCompound nbt = stack.getOrCreateNbt();
-            NbtCompound displayTag = nbt.getCompound("display");
-            NbtCompound extraAttributes = nbt.getCompound("ExtraAttributes");
-            NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
-            Set<String> keys = extraAttributes.getKeys();
-            for (String key : keys) {
-                if (key.equals("enchantments")) continue;
-                if (key.equals("timestamp")) {
-                    Long stamp = extraAttributes.getLong(key);
-                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"))));
-                    continue;
-                }
-                loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of(key + ": " + extraAttributes.get(key)))));
-            }
-            displayTag.put("Lore", loreList);
-            stack.getNbt().put("display", displayTag);
-            stack.getNbt().putBoolean("addedDebug", true);
-        } catch (NullPointerException ignored) {
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//  TODO      try {
+//            if (stack.getNbt().getBoolean("addedDebug")) return;
+//            NbtCompound nbt = stack.getOrCreateNbt();
+//            NbtCompound displayTag = nbt.getCompound("display");
+//            NbtCompound extraAttributes = nbt.getCompound("ExtraAttributes");
+//            NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
+//            Set<String> keys = extraAttributes.getKeys();
+//            for (String key : keys) {
+//                if (key.equals("enchantments")) continue;
+//                if (key.equals("timestamp")) {
+//                    Long stamp = extraAttributes.getLong(key);
+//                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"))));
+//                    continue;
+//                }
+//                loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of(key + ": " + extraAttributes.get(key)))));
+//            }
+//            displayTag.put("Lore", loreList);
+//            stack.getNbt().put("display", displayTag);
+//            stack.getNbt().putBoolean("addedDebug", true);
+//        } catch (NullPointerException ignored) {
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public boolean isWindowFocused() {
@@ -304,10 +305,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             if (doPants) {
                 for (ItemStack armorItem : player.getArmorItems()) {
                     try {
-                        if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
-                            prefix = "§4[♪]§r ";
-                            display = true;
-                        }
+//TODO                        if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
+//                            prefix = "§4[♪]§r ";
+//                            display = true;
+//                        }
                     } catch (Exception ignored) {
                         continue;
                     }
@@ -724,31 +725,31 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public void registerNetworkHandlers() {
-        for (String identifier : HypixelModAPI.getInstance().getRegistry().getIdentifiers()) {
-            ClientPlayNetworking.registerGlobalReceiver(new Identifier(identifier), (client, handler, buf, responseSender) -> {
-                buf.retain();
-                client.execute(() -> {
-                    try {
-                        HypixelModAPI.getInstance().handle(identifier, new PacketSerializer(buf));
-                    } finally {
-                        buf.release();
-                    }
-                });
-            });
-        }
+//TODO        for (String identifier : HypixelModAPI.getInstance().getRegistry().getIdentifiers()) {
+//            ClientPlayNetworking.registerGlobalReceiver(new Identifier(identifier), (client, handler, buf, responseSender) -> {
+//                buf.retain();
+//                client.execute(() -> {
+//                    try {
+//                        HypixelModAPI.getInstance().handle(identifier, new PacketSerializer(buf));
+//                    } finally {
+//                        buf.release();
+//                    }
+//                });
+//            });
+//        }
     }
 
     @Override
     public void sendPacket(HypixelPacket packet) {
-        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send: " + packet.getIdentifier());
-        PacketByteBuf buf = PacketByteBufs.create();
-        packet.write(new PacketSerializer(buf));
-        ClientPlayNetworking.send(new Identifier(packet.getIdentifier()), buf);
+//TODO        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send: " + packet.getIdentifier());
+//        PacketByteBuf buf = PacketByteBufs.create();
+//        packet.write(new PacketSerializer(buf));
+//        ClientPlayNetworking.send(new Identifier(packet.getIdentifier()), buf);
     }
 
     @Override
     public void sendPacket(String identifier) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        ClientPlayNetworking.send(new Identifier(identifier), buf);
+//TODO        PacketByteBuf buf = PacketByteBufs.create();
+//        ClientPlayNetworking.send(new Identifier(identifier), buf);
     }
 }

@@ -31,6 +31,10 @@ class RenderInWorldContext private constructor(
 //    val effectiveFov = (MinecraftClient.getInstance().gameRenderer as AccessorGameRenderer).getFov_firmament(camera, tickDelta, true)
 //    val effectiveFovScaleFactor = 1 / tan(toRadians(effectiveFov) / 2)
 
+    fun color(color: me.shedaniel.math.Color) {
+        color(color.red / 255F, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+    }
+
     fun color(red: Float, green: Float, blue: Float, alpha: Float) {
         RenderSystem.setShaderColor(red, green, blue, alpha)
     }
@@ -177,9 +181,9 @@ class RenderInWorldContext private constructor(
             val normal =
                 Vector3f(x.toFloat(), y.toFloat(), z.toFloat()).sub(i.toFloat(), j.toFloat(), k.toFloat()).normalize()
             buf.vertex(matrix.positionMatrix, i.toFloat(), j.toFloat(), k.toFloat())
-                .normal(matrix.normalMatrix, normal.x, normal.y, normal.z).next()
+                .normal(matrix, normal.x, normal.y, normal.z).next()
             buf.vertex(matrix.positionMatrix, x.toFloat(), y.toFloat(), z.toFloat())
-                .normal(matrix.normalMatrix, normal.x, normal.y, normal.z).next()
+                .normal(matrix, normal.x, normal.y, normal.z).next()
         }
 
         private fun doTracer(
@@ -301,7 +305,7 @@ class RenderInWorldContext private constructor(
         u2: Float, v2: Float,
     ) {
         val backupColor = RenderSystem.getShaderColor()
-        color(1f,1f,1f,1f)
+        color(1f, 1f, 1f, 1f)
         withFacingThePlayer(position) {
             RenderSystem.setShaderTexture(0, texture)
             RenderSystem.setShader(GameRenderer::getPositionColorTexProgram)
@@ -322,27 +326,28 @@ class RenderInWorldContext private constructor(
             buf.unfixColor()
             BufferRenderer.drawWithGlobalProgram(buf.end())
         }
-        RenderSystem.setShaderColor(backupColor[0],backupColor[1],backupColor[2],backupColor[3])
+        RenderSystem.setShaderColor(backupColor[0], backupColor[1], backupColor[2], backupColor[3])
     }
-    fun doWaypointIcon(position: Vec3d, textures: List<RenderInformation>, width: Int, height: Int){
-        val xStartPosition = -((textures.dropLast(1).sumOf{it.spaceToNext})/2).toFloat()
+
+    fun doWaypointIcon(position: Vec3d, textures: List<RenderInformation>, width: Int, height: Int) {
+        val xStartPosition = -((textures.dropLast(1).sumOf { it.spaceToNext }) / 2).toFloat()
         var xmodifer = xStartPosition
-        for ((index, value) in textures.withIndex()){
+        for ((index, value) in textures.withIndex()) {
             if (value.pathToFile.isEmpty()) continue
-            waypointIcon(position,value,width,height,xmodifer)
+            waypointIcon(position, value, width, height, xmodifer)
             xmodifer += width
         }
 
     }
     fun waypointIcon(
-        position: Vec3d, textures: RenderInformation, width: Int, height: Int,xmodifier:Float
+        position: Vec3d, textures: RenderInformation, width: Int, height: Int, xmodifier: Float
     ) {
         val backupColor = RenderSystem.getShaderColor()
-        color(1f,1f,1f,1f)
+        color(1f, 1f, 1f, 1f)
         withFacingThePlayer(position) {
             matrixStack.push()
-            matrixStack.translate(xmodifier,-25f,0f)
-            RenderSystem.setShaderTexture(0, Identifier(textures.namespace,textures.pathToFile))
+            matrixStack.translate(xmodifier, -25f, 0f)
+            RenderSystem.setShaderTexture(0, Identifier(textures.namespace, textures.pathToFile))
             RenderSystem.setShader(GameRenderer::getPositionColorTexProgram)
             val hw = width / 2F
             val hh = height / 2F
@@ -362,7 +367,7 @@ class RenderInWorldContext private constructor(
             BufferRenderer.drawWithGlobalProgram(buf.end())
             matrixStack.pop()
         }
-        RenderSystem.setShaderColor(backupColor[0],backupColor[1],backupColor[2],backupColor[3])
+        RenderSystem.setShaderColor(backupColor[0], backupColor[1], backupColor[2], backupColor[3])
     }
 }
 

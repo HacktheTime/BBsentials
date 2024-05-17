@@ -46,9 +46,7 @@ public abstract class RenderingDefinitions {
     public static void clearAndInitDefaults() {
         defsBlocking.clear();
         defsNonBlocking.clear();
-        ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
-            modifyItemTooltip(stack, context, lines);
-        });
+        ItemTooltipCallback.EVENT.register(RenderingDefinitions::modifyItemTooltip);
         new RenderingDefinitions() {
             @Override
             public boolean modifyItem(ItemStack stack, RenderStackItemCheck check, String itemName) {
@@ -248,8 +246,8 @@ public abstract class RenderingDefinitions {
 
     }
 
-    private static void modifyItemTooltip(ItemStack stack, TooltipContext context, List<Text> lines) {
-        if (context.isAdvanced()) {
+    private static void modifyItemTooltip(ItemStack stack, Item.TooltipContext context, TooltipType type, List<Text> lines) {
+        if (type.isAdvanced()) {
             for (int i = lines.size() - 1; i >= 0; i--) {
                 if (lines.get(i).getString().matches("NBT: \\d+ tag\\(s\\)")) {
                     lines.remove(i);

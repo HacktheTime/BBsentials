@@ -274,7 +274,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         // Iterate through all players and check their distance from the source player
         for (PlayerEntity player : MinecraftClient.getInstance().player.getEntityWorld().getPlayers()) {
             if (!player.getDisplayName().getString().startsWith("!")) {
-                if (Pattern.compile("\"color\":\"(?!white)\\w+\"").matcher(Text.Serialization.toJsonString(player.getDisplayName())).find()) {
+                if (Pattern.compile("\"color\":\"(?!white)\\w+\"").matcher(FabricTextUtils.textToJson(player.getDisplayName())).find()) {
                     players.add(player);
                 }
             }
@@ -315,8 +315,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             }
 
             Integer leechPotions = 0;
-            for (Map.Entry<StatusEffect, StatusEffectInstance> entry : player.getActiveStatusEffects().entrySet()) {
-                StatusEffect effect = entry.getKey();
+            for (Map.Entry<RegistryEntry<StatusEffect>, StatusEffectInstance> entry : player.getActiveStatusEffects().entrySet()) {
+                StatusEffect effect = entry.getKey().value();
                 Integer amplifier = entry.getValue().getAmplifier();
                 if (effect == StatusEffects.STRENGTH && amplifier >= 7) {
                     if (entry.getValue().getDuration() >= 60000) {
@@ -340,10 +340,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             //Potion: HasteAmplifier: 3 Duration: 39379
             //Potion: AbsorptionAmplifier: 0 Duration: 39368
             if (display) {
-                if (prefix.isEmpty()) stringList.add(Text.Serialization.toJsonString(player.getDisplayName()));
+                if (prefix.isEmpty()) stringList.add(FabricTextUtils.opposite(player.getDisplayName()));
                 else {
-                    String prefixAddition = Text.Serialization.toJsonString(Text.of(prefix));
-                    String normal = Text.Serialization.toJsonString(player.getDisplayName());
+                    String prefixAddition = FabricTextUtils.opposite(Text.of(prefix));
+                    String normal = FabricTextUtils.opposite(player.getDisplayName());
                     stringList.add("[" + prefixAddition + "," + normal + "]");
                 }
             }
@@ -412,7 +412,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     @Override
     public String getStringFromTextJson(String textJSon) throws Exception {
         try {
-            return Text.Serialization.fromJson(textJSon).getString();
+            return FabricTextUtils.opposite(textJSon).getString();
         } catch (Exception e) {
             throw e;
         }
@@ -426,7 +426,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     @Override
     public boolean isJsonParseableToText(String json) {
         try {
-            Text.Serialization.fromJson(json);
+            FabricTextUtils.opposite(json);
             return true;
         } catch (Exception ignored) {
             return false;
@@ -436,7 +436,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     @Override
     public String stringToTextJson(String string) {
         if (isJsonParseableToText(string)) return string;
-        return Text.Serialization.toJsonString(Text.of(string));
+        return FabricTextUtils.opposite(Text.of(string));
     }
 
     @Override
@@ -462,7 +462,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             List<Text> toDisplay = new ArrayList<>();
             toDisplay.add(Text.of("§6Total: " + allParticipiants.size() + " | Bingos: " + (allParticipiants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
 
-            toDisplay.addAll(splashLeechers.stream().map(Text.Serialization::fromJson).toList());
+            toDisplay.addAll(splashLeechers.stream().map(FabricTextUtils::opposite).toList());
             for (Text text : toDisplay) {
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
                 y += 10; // Adjust the vertical position for the next string

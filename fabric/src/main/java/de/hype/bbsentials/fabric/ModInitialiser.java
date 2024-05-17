@@ -24,7 +24,7 @@ import de.hype.bbsentials.fabric.screens.RoutesConfigScreen;
 import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
-import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
+import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -242,7 +242,7 @@ public class ModInitialiser implements ClientModInitializer {
                             .then(ClientCommandManager.literal("waypoint")
                                             .then(ClientCommandManager.literal("add")
                                                     .then(ClientCommandManager.argument("name", StringArgumentType.string())
-                                                            .then(ClientCommandManager.argument("position", CBlockPosArgumentType.blockPos())
+                                                            .then(ClientCommandManager.argument("position", CBlockPosArgument.blockPos())
                                                                     .then(ClientCommandManager.argument("deleteonserverswap", BoolArgumentType.bool())
                                                                             .then(ClientCommandManager.argument("visible", BoolArgumentType.bool())
                                                                                     .then(ClientCommandManager.argument("maxrenderdistance", IntegerArgumentType.integer())
@@ -445,17 +445,7 @@ public class ModInitialiser implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         System.out.println("BBsentials : onInit called");
-        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new TextUtils() {
-            @Override
-            public String getContentFromJson(String json) {
-                return Text.Serialization.fromJson(json).getString();
-            }
-
-            @Override
-            public String getJsonFromContent(String content) {
-                return Text.Serialization.toJsonString(Text.of(content));
-            }
-        });
+        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new FabricTextUtils());
         codes = new NumPadCodes();
         BBsentials.init();
         if (developerConfig.quickLaunch) {
@@ -494,7 +484,7 @@ public class ModInitialiser implements ClientModInitializer {
     public int createWaypointFromCommandContext(CommandContext context) {
         String jsonName = StringArgumentType.getString(context, "name");
         jsonName = EnvironmentCore.utils.stringToTextJson(jsonName);
-        BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "position");
+        BlockPos pos = CBlockPosArgument.getBlockPos(context, "position");
         Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
         Boolean deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
         Boolean visible = BoolArgumentType.getBool(context, "visible");
@@ -537,6 +527,6 @@ public class ModInitialiser implements ClientModInitializer {
         }
         ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
 
-        ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true);
+        ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true,null);
     }
 }

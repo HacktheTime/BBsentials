@@ -23,7 +23,7 @@ import de.hype.bbsentials.shared.packets.network.BingoChatMessagePacket;
 import de.hype.bbsentials.shared.packets.network.BroadcastMessagePacket;
 import de.hype.bbsentials.shared.packets.network.InternalCommandPacket;
 import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
-import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
+import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.event.Event;
@@ -120,13 +120,13 @@ public class Commands implements MCCommand {
 
                             return CommandSource.suggestMatching(suggestions, builder);
                         })
-                        .then(argument("coordinates", CBlockPosArgumentType.blockPos())
+                        .then(argument("coordinates", CBlockPosArgument.blockPos())
                                 .then(argument("ContactWay", StringArgumentType.string())
                                         .suggests(((context, builder) -> CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.generalConfig.getUsername() + " bb:party me\"", "\"/p join " + BBsentials.generalConfig.getUsername() + "\""}, builder)))
                                         .then(argument("extraMessage", StringArgumentType.greedyString())
                                                 .executes((context) -> {
                                                             String item = StringArgumentType.getString(context, "Item");
-                                                            BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "coordinates");
+                                                            BlockPos pos = CBlockPosArgument.getBlockPos(context, "coordinates");
                                                             String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                             String extraMessage = StringArgumentType.getString(context, "extraMessage");
 
@@ -151,7 +151,7 @@ public class Commands implements MCCommand {
                                         )
                                         .executes((context) -> {
                                                     String item = StringArgumentType.getString(context, "Item");
-                                                    BlockPos pos = CBlockPosArgumentType.getCBlockPos(context, "coordinates");
+                                                    BlockPos pos = CBlockPosArgument.getBlockPos(context, "coordinates");
                                                     String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                     if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
                                                         context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));

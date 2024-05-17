@@ -146,7 +146,7 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
 
     public void onArmorstandInteraction(PlayerEntity player, World world, Hand hand, Entity entity, @Nullable EntityHitResult hitResult) {
         if (entity instanceof ArmorStandEntity) {
-            entity.getArmorItems().forEach(itemStack -> {
+            ((ArmorStandEntity) entity).getArmorItems().forEach(itemStack -> {
                 if (itemStack.getItem() == Items.PLAYER_HEAD) {
                     String texture = itemStack.getNbt().getCompound("SkullOwner").getCompound("Properties").getList("textures", NbtElement.COMPOUND_TYPE).getCompound(0).getString("Value");
                     ClickableArmorStand armorStand = ClickableArmorStand.getFromTexture(texture);

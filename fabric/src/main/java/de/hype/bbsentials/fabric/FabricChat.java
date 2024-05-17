@@ -22,7 +22,7 @@ public class FabricChat implements MCChat {
 //            chat.onEvent(new Message(Text.Serialization.toJsonString(message), message.getString()));
 //        });
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, isActionBar) -> {
-            boolean block = (BBsentials.chat.processNotThreaded(new Message(Text.Serialization.toJsonString(message), message.getString()), isActionBar) == null);
+            boolean block = (BBsentials.chat.processNotThreaded(new Message(FabricTextUtils.opposite(message), message.getString()), isActionBar) == null);
             return !block;
         });
         ClientReceiveMessageEvents.MODIFY_GAME.register(this::prepareOnEvent);
@@ -30,7 +30,7 @@ public class FabricChat implements MCChat {
     }
 
     public Text prepareOnEvent(Text text, boolean actionbar) {
-        String json = Text.Serialization.toJsonString(text);
+        String json = FabricTextUtils.opposite(text);
         Message message = new Message(json, text.getString(), actionbar);
 
         if (!actionbar) {
@@ -38,9 +38,9 @@ public class FabricChat implements MCChat {
         }
         Text toReturn = null;
         try {
-            toReturn = Text.Serialization.fromJson(message.getJson());
+            toReturn = FabricTextUtils.opposite(message.getJson());
         } catch (Exception e) {
-            Chat.sendPrivateMessageToSelfError("Text: " + Text.Serialization.toJsonString(text) + " Error: " + e.getMessage());
+            Chat.sendPrivateMessageToSelfError("Text: " + FabricTextUtils.opposite(text) + " Error: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -59,7 +59,7 @@ public class FabricChat implements MCChat {
     public void sendClientSideMessage(Message message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
-            client.player.sendMessage(Text.Serialization.fromJson(message.getJson()));
+            client.player.sendMessage(FabricTextUtils.opposite(message.getJson()));
         }
     }
 
@@ -68,7 +68,7 @@ public class FabricChat implements MCChat {
         if (client.player != null) {
             if (BBsentials.funConfig.overwriteActionBar.isEmpty())
                 message = Message.of(BBsentials.funConfig.overwriteActionBar);
-            client.player.sendMessage(Text.Serialization.fromJson(message.getJson()), true);
+            client.player.sendMessage(FabricTextUtils.opposite(message.getJson()), true);
         }
     }
 

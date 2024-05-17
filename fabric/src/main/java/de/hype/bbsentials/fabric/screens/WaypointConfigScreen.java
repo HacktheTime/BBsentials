@@ -1,6 +1,8 @@
 package de.hype.bbsentials.fabric.screens;
 
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.TextUtils;
+import de.hype.bbsentials.fabric.FabricTextUtils;
 import de.hype.bbsentials.shared.objects.WaypointData;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -16,7 +18,7 @@ public class WaypointConfigScreen {
                 .setTitle(Text.of("BBsentials Waypoint Config"));
         Text text = Text.literal("");
         try {
-            text = Text.Serialization.fromJson(data.jsonToRenderText);
+            text = FabricTextUtils.jsonToText(data.jsonToRenderText);
         } catch (Exception ignored) {
 
         }
@@ -28,7 +30,7 @@ public class WaypointConfigScreen {
                 .setDefaultValue(text.getString())
                 .setSaveConsumer((value) -> {
                     if (value.equals(finalText.getString())) return;
-                    data.jsonToRenderText = Text.Serialization.toJsonString(Text.literal(value.replace("&", "§")));
+                    data.jsonToRenderText = FabricTextUtils.literalJson(value.replace("&", "§"));
                 })
                 .setTooltip(Text.literal("The Name will only be updated when you change it. Formatting is lost in display here but is not lost normally."))
                 .build());

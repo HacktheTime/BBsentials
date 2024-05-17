@@ -27,7 +27,8 @@ repositories {
 dependencies {
     minecraft "com.mojang:minecraft:${libs.versions.modern.minecraft.get()}"
     mappings "net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2"
-    modApi("dev.xpple:clientarguments:1.7")
+    modRuntimeOnly(libs.modern.devauth)
+    modApi("dev.xpple:clientarguments:1.8.2")
     modImplementation(include("com.github.JnCrMx:discord-game-sdk4j:latest.release"))
     modApi("net.hypixel:mod-api:latest.release")
     modImplementation(libs.modmenu)

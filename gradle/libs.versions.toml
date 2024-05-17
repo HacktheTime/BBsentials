@@ -17,8 +17,8 @@ legacy_forge = "1.8.9-11.15.1.2318-1.8.9"
 legacy_mixin_rt = "0.7.11-SNAPSHOT"
 legacy_mixin_processor = "0.8.5-SNAPSHOT"
 
-modmenu = "9.0.0"
-cloth = "13.0.121"
+modmenu = "10.0.0-beta.1"
+cloth = "14.0.126"
 
 devauth = "1.1.2"
 

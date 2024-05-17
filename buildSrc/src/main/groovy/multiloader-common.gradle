@@ -4,7 +4,7 @@ plugins {
 }
 
 base {
-    archivesName = "${libs.versions.modVersion.get()}-${project.name}-${libs.versions.modern.minecraft.get()}"
+    archivesName = "${mod_id}-${project.name}-${libs.versions.modern.minecraft.get()}"
 }
 
 java {
@@ -39,17 +39,20 @@ dependencies {
 // Read more about capabilities here: https://docs.gradle.org/current/userguide/component_capabilities.html#sec:declaring-additional-capabilities-for-a-local-component
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
     configurations."$variant".outgoing {
-        capability("$group:${libs.versions.modVersion.get()}-${project.name}-${libs.versions.modern.minecraft.get()}:$version")
-        capability("$group:${libs.versions.modVersion.get()}:$version")
+        capability("$group:$mod_id-${project.name}-${libs.versions.modern.minecraft.get()}:$version")
+        capability("$group:$mod_id:$version")
     }
     publishing.publications.configureEach {
         suppressPomMetadataWarningsFor(variant)
     }
 }
-
+//TODO undo this
+tasks.withType(Javadoc) {
+    enabled = false
+}
 sourcesJar {
     from(rootProject.file("LICENSE")) {
-        rename { "${it}_${libs}" }
+        rename { "${it}_${mod_name}" }
     }
 }
 
@@ -73,15 +76,16 @@ jar {
 
 processResources {
     def expandProps = [
-            "version"              : version,
-            "group"                : project.group, //Else we target the task's group.
-            "minecraft_version"    : libs.versions.modern.minecraft.get(),
-            "fabric_version"       : libs.versions.modern.fabric.api.get(),
-            "fabric_loader_version": libs.versions.modern.fabric.loader.get(),
-            "mod_name"             : mod_name,
-            "mod_id"               : mod_id,
+            "version"                    : version,
+            "group"                      : project.group, //Else we target the task's group.
+            "minecraft_version"          : libs.versions.modern.minecraft.get(),
+            "minecraft_versionsSupported": libs.versions.minecraft.versionSupported,
+            "fabric_api_version"         : libs.versions.modern.fabric.api.get(),
+            "fabric_loader_version"      : libs.versions.modern.fabric.loader.get(),
+            "mod_name"                   : mod_name,
+            "mod_id"                     : mod_id,
 //            "description": project.description,
-            "java_version"         : libs.versions.javaVersion.get()
+            "java_version"               : libs.versions.javaVersion.get()
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

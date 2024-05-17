@@ -6,7 +6,7 @@
 THIS MOD IS NOT AFFILIATED WITH BINGO BREWERS ANYMORE since indigo had a problem with me focusing
 on 1.20 and refusing to collaborate with me on request.
 
-The mod is availibel on modrinth https://modrinth.com/mod/bbsentials
+The mod is available on modrinth https://modrinth.com/mod/bbsentials
 
 Worked on by 
 Hype_the_Time/hackthetime (Main Developer)

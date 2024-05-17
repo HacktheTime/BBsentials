@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "bbsentials",
-  "version": "${version}",
+  "version": "${mod_version}",
   "name": "BBsentials",
   "icon": "logo.png",
   "description": "Mod to connect to the BBsentials Network for Splashes and more",

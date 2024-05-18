@@ -18,7 +18,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class RenderingDefinitions {
     /**
@@ -115,7 +118,7 @@ public abstract class RenderingDefinitions {
                     if (!BBsentials.splashConfig.xpBoostHighlight) return false;
                     if (itemName.endsWith("Potion")) {
                         if (itemName.contains("XP Boost")) {
-                            if (extraNbt==null) return false;
+                            if (extraNbt == null) return false;
                             int potionLevel = extraNbt.getInt("potion_level");
                             String countString = "T" + potionLevel;
                             check.setItemCount(countString);
@@ -138,17 +141,17 @@ public abstract class RenderingDefinitions {
             public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (!BBsentials.developerConfig.hypixelItemInfo) return false;
                 NbtComponent customComponent = stack.get(DataComponentTypes.CUSTOM_DATA);
-                LoreComponent loreComponent = stack.get(DataComponentTypes.LORE);
                 if (customComponent == null) return false;
                 NbtCompound compound = customComponent.copyNbt();
+                List<Text> lore = check.getTextTooltip();
                 for (String key : compound.getKeys()) {
                     if (key.equals("enchantments")) continue;
                     if (key.equals("timestamp")) {
                         Long stamp = compound.getLong(key);
-                        loreComponent.lines().add(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"));
+                        lore.add(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"));
                         continue;
                     }
-                    loreComponent.lines().add(Text.of(key + ": " + compound.get(key)));
+                    lore.add(Text.of(key + ": " + compound.get(key)));
                 }
                 return false;
             }

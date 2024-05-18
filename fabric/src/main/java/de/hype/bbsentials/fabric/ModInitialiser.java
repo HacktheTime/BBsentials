@@ -1,5 +1,6 @@
 package de.hype.bbsentials.fabric;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -28,6 +29,7 @@ import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -58,8 +60,10 @@ import static de.hype.bbsentials.client.common.objects.WaypointRoute.waypointRou
 
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
+    public static CommandDispatcher<FabricClientCommandSource> dispatcher;
 
     {
+        ClientCommandRegistrationCallback.EVENT.register((a, b) -> BBsentials.coms=new de.hype.bbsentials.client.common.client.commands.Commands());
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
                     .then(ClientCommandManager.argument("playername", StringArgumentType.greedyString())

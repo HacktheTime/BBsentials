@@ -13,6 +13,7 @@
     "CustomItemData",
     "CustomItemTextures",
     "CustomItemTooltip",
+    "IncomingPacketListenerPatches",
     "ItemRendererMixin",
     "SimpleOptionMixin",
     "WorldRenderLastEventPatch"

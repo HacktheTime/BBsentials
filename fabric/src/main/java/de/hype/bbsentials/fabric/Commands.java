@@ -11,10 +11,7 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
-import de.hype.bbsentials.shared.constants.ChChestItem;
-import de.hype.bbsentials.shared.constants.ChChestItems;
-import de.hype.bbsentials.shared.constants.MiningEvents;
-import de.hype.bbsentials.shared.constants.StatusConstants;
+import de.hype.bbsentials.shared.constants.*;
 import de.hype.bbsentials.shared.objects.*;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
@@ -24,9 +21,9 @@ import de.hype.bbsentials.shared.packets.network.BroadcastMessagePacket;
 import de.hype.bbsentials.shared.packets.network.InternalCommandPacket;
 import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +37,6 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class Commands implements MCCommand {
-    Event<ClientCommandRegistrationCallback> event = ClientCommandRegistrationCallback.EVENT;
 
     private static void simpleCommand(CommandDispatcher<FabricClientCommandSource> dispatcher, String commandName, String[] parameters) {
         dispatcher.register(
@@ -72,26 +68,121 @@ public class Commands implements MCCommand {
     }
 
     public void registerMain() {
-        event.register((dispatcher, registryAccess) -> dispatcher.register(literal("creport")
+        CommandDispatcher<FabricClientCommandSource> dispatcher = ClientCommandManager.getActiveDispatcher();
+        if (dispatcher==null) return;
+        ModInitialiser.dispatcher = dispatcher;
+        dispatcher.register(literal("creport")
                 .then(argument("Player_Name", StringArgumentType.string())
                         .executes((context) -> {
                             String playerName = StringArgumentType.getString(context, "Player_Name");
                             BBsentials.sender.addSendTask("/creport " + playerName, 0);
                             BBsentials.temporaryConfig.alreadyReported.add(playerName);
                             return 1;
-                        }))));//creport helper → no double report during same launch
-        event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "goblinraid", MiningEvents.GOBLIN_RAID));/*goblinraid*/
-        event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "2xpowder", MiningEvents.DOUBLE_POWDER));/*2xpowder*/
-        event.register((dispatcher, registryAccess) -> dispatcher.register(literal("getLobbyTime")
+                        })));//creport helper → no double report during same launch
+        dispatcher.register(literal("party")
+                .then(literal("accept")
+                        .then(argument("playername", StringArgumentType.string())
+                                .executes((context) -> {
+                                    String playername = StringArgumentType.getString(context, "playername");
+                                    BBsentials.sender.addSendTask("/party accept " + playername, 0);
+                                    return 1;
+                                })))
+                .then(literal("demote")
+                        .then(argument("playername", StringArgumentType.string())
+                                .executes((context) -> {
+                                    String playername = StringArgumentType.getString(context, "playername");
+                                    BBsentials.sender.addSendTask("/party demote " + playername, 0);
+                                    return 1;
+                                })))
+                .then(literal("disband")
+                        .executes((context) -> {
+                            BBsentials.sender.addSendTask("/party disband", 0);
+                            return 1;
+                        }))
+                .then(literal("invite")
+                        .then(argument("players", StringArgumentType.greedyString())
+                                .executes((context) -> {
+                                    String players = StringArgumentType.getString(context, "players");
+                                    BBsentials.sender.addSendTask("/party invite " + players, 0);
+                                    return 1;
+                                })))
+                .then(literal("kick")
+                        .then(argument("player", StringArgumentType.string())
+                                .executes((context) -> {
+                                    String player = StringArgumentType.getString(context, "player");
+                                    BBsentials.sender.addSendTask("/party kick " + player, 0);
+                                    return 1;
+                                })))
+                .then(literal("kickoffline")
+                        .executes((context) -> {
+                            BBsentials.sender.addSendTask("/party kickoffline", 0);
+                            return 1;
+                        }))
+                .then(literal("leave")
+                        .executes((context) -> {
+                            BBsentials.sender.addSendTask("/party leave", 0);
+                            return 1;
+                        }))
+                .then(literal("list")
+                        .executes((context) -> {
+                            BBsentials.sender.addSendTask("/party list", 0);
+                            return 1;
+                        }))
+                .then(literal("mute")
+                        .executes((context) -> {
+                            BBsentials.sender.addSendTask("/party mute", 0);
+                            return 1;
+                        }))
+                .then(literal("poll")
+                        .then(argument("question", StringArgumentType.greedyString())
+                                .executes((context) -> {
+                                    String question = StringArgumentType.getString(context, "question");
+                                    BBsentials.sender.addSendTask("/party poll " + question, 0);
+                                    return 1;
+                                })))
+                .then(literal("private")
+                        .executes((context) -> {
+                            BBsentials.sender.addSendTask("/party private", 0);
+                            return 1;
+                        }))
+                .then(literal("promote")
+                        .then(argument("player", StringArgumentType.string())
+                                .executes((context) -> {
+                                    String player = StringArgumentType.getString(context, "player");
+                                    BBsentials.sender.addSendTask("/party promote " + player, 0);
+                                    return 1;
+                                })))
+                .then(literal("settings")
+                        .then(literal("allinvite")
+                                .executes((context) -> {
+                                    BBsentials.sender.addSendTask("/party settings allinvite", 0);
+                                    return 1;
+                                })))
+                .then(literal("transfer")
+                        .then(argument("player", StringArgumentType.string())
+                                .executes((context) -> {
+                                    String player = StringArgumentType.getString(context, "player");
+                                    BBsentials.sender.addSendTask("/party transfer " + player, 0);
+                                    return 1;
+                                })))
+                .then(literal("warp")
+                        .executes((context) -> {
+                            BBsentials.sender.addSendTask("/party warp", 0);
+                            return 1;
+                        })));
+
+        miningEvent(dispatcher, "goblinraid", MiningEvents.GOBLIN_RAID);/*goblinraid*/
+        miningEvent(dispatcher, "2xpowder", MiningEvents.DOUBLE_POWDER);/*2xpowder*/
+        dispatcher.register(literal("getLobbyTime")
                 .executes((context) -> {
                     Chat.sendPrivateMessageToSelfSuccess("Day: " + EnvironmentCore.utils.getLobbyDay());
                     return 1;
-                })));/*2xpowder*/
-        event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "bettertogether", MiningEvents.BETTER_TOGETHER));/*b2g*/
-        event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "raffle", MiningEvents.RAFFLE));/*raffle*/
-        event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "gonewiththewind", MiningEvents.GONE_WITH_THE_WIND));/*gonewiththewind*/
-        event.register((dispatcher, registryAccess) -> miningEvent(dispatcher, "mithrilgourmand", MiningEvents.MITHRIL_GOURMAND));/*gonewiththewind*/
-        event.register((dispatcher, registryAccess) -> dispatcher.register(literal("chchest")
+                }));/*2xpowder*/
+        miningEvent(dispatcher, "bettertogether", MiningEvents.BETTER_TOGETHER);/*b2g*/
+        miningEvent(dispatcher, "raffle", MiningEvents.RAFFLE);/*raffle*/
+        miningEvent(dispatcher, "gonewiththewind", MiningEvents.GONE_WITH_THE_WIND);/*gonewiththewind*/
+        miningEvent(dispatcher, "mithrilgourmand", MiningEvents.MITHRIL_GOURMAND);/*gonewiththewind*/
+        dispatcher.register(literal("chchest")
                 .then(argument("Item", StringArgumentType.string())
                         .suggests((context, builder) -> {
                             List<String> items = ChChestItems.getAllItems().stream().map(ChChestItem::getDisplayName).toList();
@@ -164,8 +255,8 @@ public class Commands implements MCCommand {
                                 )
                         )
                 )
-        ));/*chchest*/
-        event.register((dispatcher, registryAccess) -> dispatcher.register(
+        );/*chchest*/
+        dispatcher.register(
                 literal("bc")
                         .then(argument("Message to Bingo Chat", StringArgumentType.greedyString())
                                 .executes((context) -> {
@@ -174,8 +265,9 @@ public class Commands implements MCCommand {
                                     return 1;
                                 })
                         )
-        ));/*BincoChatShort*/
-        event.register((dispatcher, registryAccess) -> dispatcher.register(
+        );/*BincoChatShort*/
+
+        dispatcher.register(
                 literal("bingochat")
                         .then(argument("Message to Bingo Chat", StringArgumentType.greedyString())
                                 .executes((context) -> {
@@ -184,167 +276,32 @@ public class Commands implements MCCommand {
                                     return 1;
                                 })
                         )
-        ));/*BingoChatLong*/
-        event.register((dispatcher, registryAccess) -> dispatcher.register(
+        );/*BingoChatLong*/
+        dispatcher.register(
                 literal("bbi").then(literal("discord")
-                                .then(literal("refreshConnection").executes(context -> {
-                                    if (BBsentials.dcGameSDK != null) {
-                                        Chat.sendPrivateMessageToSelfInfo("The refresh may take a couple of seconds");
-                                        BBsentials.executionService.execute(() -> BBsentials.dcGameSDK.connectToDiscord());
-                                        return 1;
-                                    }
-                                    else {
-                                        Chat.sendPrivateMessageToSelfError("You cant refresh something which does not exist.");
-                                        return 0;
-                                    }
-                                    // Due too how stuff works you cant initialise the stuff here,
-                                    // because it would freeze the screen.
-                                    // And if the sdk is downloaded, this is basically a crash
-                                }))
-                        //Lobbies and VCs have been deprecated by Discord. → Removed
-                        /*.then(literal("openVCSettings").executes(context -> {
-                            try {
-                                BBsentials.dcGameSDK.openVoiceSettings();
-                                Chat.sendPrivateMessageToSelfSuccess("Success");
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Error");
-                                return 2;
-                            }
-                            return 1;
-                        }))
-                        .then(literal("join")
-                                .then(argument("lobbyid", LongArgumentType.longArg())
-                                        .then(argument("secret", StringArgumentType.string()).executes(context -> {
-                                            try {
-                                                BBsentials.dcGameSDK.joinLobby(LongArgumentType.getLong(context, "lobbyid"), StringArgumentType.getString(context, "secret"), false, true);
-                                                Chat.sendPrivateMessageToSelfSuccess("Success");
-                                            } catch (Exception e) {
-                                                Chat.sendPrivateMessageToSelfError("Error");
-                                                return 2;
-                                            }
-                                            return 1;
-                                        })))
-                                .then(argument("activity secret", StringArgumentType.string())
-                                        .executes(context -> {
-                                            try {
-                                                BBsentials.dcGameSDK.blockingJoinLobbyWithActivitySecret(StringArgumentType.getString(context, "activity secret"));
-                                                Chat.sendPrivateMessageToSelfSuccess("Success");
-                                            } catch (Exception e) {
-                                                Chat.sendPrivateMessageToSelfError("Error");
-                                                return 2;
-                                            }
-                                            return 1;
-                                        })
-                                )
-                        )
-                        .then(literal("mute").executes(context -> {
-                            try {
-                                boolean mute = !BBsentials.dcGameSDK.getCore().voiceManager().isSelfMute();
-                                BBsentials.dcGameSDK.getCore().voiceManager().setSelfMute(mute);
-                                if (mute) Chat.sendPrivateMessageToSelfSuccess("You are now muted");
-                                else Chat.sendPrivateMessageToSelfSuccess("You are now UNmuted");
+                        .then(literal("refreshConnection").executes(context -> {
+                            if (BBsentials.dcGameSDK != null) {
+                                Chat.sendPrivateMessageToSelfInfo("The refresh may take a couple of seconds");
+                                BBsentials.executionService.execute(() -> BBsentials.dcGameSDK.connectToDiscord());
                                 return 1;
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Could not mute etc. Are you connected?");
+                            }
+                            else {
+                                Chat.sendPrivateMessageToSelfError("You cant refresh something which does not exist.");
                                 return 0;
                             }
+                            // Due too how stuff works you cant initialise the stuff here,
+                            // because it would freeze the screen.
+                            // And if the sdk is downloaded, this is basically a crash
                         }))
-                        .then(literal("deafen").executes(context -> {
-                            try {
-                                boolean mute = !BBsentials.dcGameSDK.getCore().voiceManager().isSelfDeaf();
-                                BBsentials.dcGameSDK.getCore().voiceManager().setSelfDeaf(mute);
-                                if (mute) Chat.sendPrivateMessageToSelfSuccess("You are now deafened");
-                                else Chat.sendPrivateMessageToSelfSuccess("You are not longer deafened");
-                                return 1;
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Could not mute etc. Are you connected?");
-                                return 0;
-                            }
-                        }))
-                        .then(literal("getActivitySecret").executes(context -> {
-                            if (BBsentials.dcGameSDK.getCurrentLobby() == null) {
-                                Chat.sendPrivateMessageToSelfError("You are not in a Lobby.");
-                                return 0;
-                            }
-                            Chat.sendPrivateMessageToSelfText(Message.tellraw("{\"text\":\"click here to copy the secret into your clipboard.\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"@actvitysecret\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"This can be used with /bbi discord join {secret} to connect to the lobby.\"]}}".replace("@actvitysecret", BBsentials.dcGameSDK.getLobbyManager().getLobbyActivitySecret(BBsentials.dcGameSDK.getCurrentLobby()))));
-                            return 1;
-                        }))
-                        .then(literal("createDefault").executes(context -> {
-                            BBsentials.dcGameSDK.blockingCreateDefaultLobby();
-                            return 1;
-                        }))
-                        .then(literal("joinVC").executes(context -> {
-                            try {
-                                BBsentials.dcGameSDK.joinVC();
-                                Chat.sendPrivateMessageToSelfSuccess("Success");
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Error");
-                                return 2;
-                            }
-                            return 1;
-                        }))
-                        .then(literal("disconnect").executes(context -> {
-                            try {
-                                BBsentials.dcGameSDK.disconnectLobby();
-                                Chat.sendPrivateMessageToSelfSuccess("Success");
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Error");
-                                return 2;
-                            }
-                            return 1;
-                        }))
-                        .then(literal("disconnectVC").executes(context -> {
-                            try {
-                                BBsentials.dcGameSDK.disconnectLobbyVC();
-                                Chat.sendPrivateMessageToSelfSuccess("Success");
-                            } catch (Exception e) {
-                                Chat.sendPrivateMessageToSelfError("Error");
-                                return 2;
-                            }
-                            return 1;
-                        }))*/
-                )));/*BingoChatLong*/
-//        event.register((dispatcher, registryAccess) -> {
-//            dispatcher.register(ClientCommandManager.literal("p")
-//                    .then(ClientCommandManager.argument("subcommand", StringArgumentType.word())
-//                            .suggests((context, builder) -> {
-//                                // Your custom suggestions logic
-//                                String input = builder.getRemaining().toLowerCase();
-//
-//                                if (input.startsWith("w")) {
-//                                    builder.suggest("warp");
-//                                }
-//
-//                                if (input.startsWith("d")) {
-//                                    builder.suggest("disband");
-//                                }
-//
-//                                return builder.buildFuture();
-//                            })
-//                            .executes(context -> {
-//                                String subcommand = StringArgumentType.getString(context, "subcommand");
-//
-//                                switch (subcommand) {
-//                                    case "warp":
-//                                        context.getSource().sendFeedback(Text.of("Teleporting to warp..."));
-//                                        break;
-//                                    case "disband":
-//                                        context.getSource().sendFeedback(Text.of("Disbanding the group..."));
-//                                        break;
-//                                    default:
-//                                        context.getSource().sendError(Text.of("Unknown subcommand: " + subcommand));
-//                                        break;
-//                                }
-//
-//                                return 1;
-//                            })));
-//        });
+                ));/*BingoChatLong*/
     }
 
     public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher,
                                      boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {
+        CommandDispatcher<FabricClientCommandSource> dispatcher = ModInitialiser.dispatcher;
+        if (dispatcher==null) return;
         if (hasMod) {
-            event.register((dispatcher, registryAccess) -> dispatcher.register(
+            dispatcher.register(
                     literal("bannounce")
                             .then(argument("message", StringArgumentType.greedyString())
                                     .executes((context) -> {
@@ -353,102 +310,101 @@ public class Commands implements MCCommand {
                                         return 1;
                                     })
                             )
-            ));/*bAnnounce*/
-            event.register((dispatcher, registryAccess) -> dispatcher.register(literal("punish")
-                            .then(literal("ban")
-                                    .then(argument("userId/mcusername", StringArgumentType.string())
-                                            .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                                    .then(argument("reason", StringArgumentType.greedyString())
-                                                            .executes((context) -> {
-                                                                String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                                String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
-                                                                String reason = StringArgumentType.getString(context, "reason");
-                                                                int userId = -1;
-                                                                String mcusername = "";
-                                                                try {
-                                                                    userId = Integer.parseInt(identification);
-                                                                } catch (Exception e) {
-                                                                    mcusername = identification;
-                                                                }
+            );/*bAnnounce*/
+            dispatcher.register(literal("punish")
+                    .then(literal("ban")
+                            .then(argument("userId/mcusername", StringArgumentType.string())
+                                    .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+                                            .then(argument("reason", StringArgumentType.greedyString())
+                                                    .executes((context) -> {
+                                                        String identification = StringArgumentType.getString(context, "userId/mcusername");
+                                                        String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
+                                                        String reason = StringArgumentType.getString(context, "reason");
+                                                        int userId = -1;
+                                                        String mcusername = "";
+                                                        try {
+                                                            userId = Integer.parseInt(identification);
+                                                        } catch (Exception e) {
+                                                            mcusername = identification;
+                                                        }
 
-                                                                Date till;
-                                                                try {
-                                                                    till = PunishmentData.getTillDateFromDurationString(duration);
-                                                                } catch (Exception e) {
-                                                                    Chat.sendPrivateMessageToSelfError(e.getMessage());
-                                                                    return 0;
-                                                                }
-                                                                sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BAN, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
-                                                                return 1;
-                                                            })
-                                                    )
+                                                        Date till;
+                                                        try {
+                                                            till = PunishmentData.getTillDateFromDurationString(duration);
+                                                        } catch (Exception e) {
+                                                            Chat.sendPrivateMessageToSelfError(e.getMessage());
+                                                            return 0;
+                                                        }
+                                                        sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BAN, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
+                                                        return 1;
+                                                    })
                                             )
                                     )
                             )
-                            .then(literal("mute")
-                                    .then(argument("userId/mcusername", StringArgumentType.string())
-                                            .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                                    .then(argument("reason", StringArgumentType.greedyString())
-                                                            .executes((context) -> {
-                                                                String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                                String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
-                                                                String reason = StringArgumentType.getString(context, "reason");
-                                                                int userId = -1;
-                                                                String mcusername = "";
-                                                                try {
-                                                                    userId = Integer.parseInt(identification);
-                                                                } catch (Exception e) {
-                                                                    mcusername = identification;
-                                                                }
+                    )
+                    .then(literal("mute")
+                            .then(argument("userId/mcusername", StringArgumentType.string())
+                                    .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+                                            .then(argument("reason", StringArgumentType.greedyString())
+                                                    .executes((context) -> {
+                                                        String identification = StringArgumentType.getString(context, "userId/mcusername");
+                                                        String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
+                                                        String reason = StringArgumentType.getString(context, "reason");
+                                                        int userId = -1;
+                                                        String mcusername = "";
+                                                        try {
+                                                            userId = Integer.parseInt(identification);
+                                                        } catch (Exception e) {
+                                                            mcusername = identification;
+                                                        }
 
-                                                                Date till;
-                                                                try {
-                                                                    till = PunishmentData.getTillDateFromDurationString(duration);
-                                                                } catch (Exception e) {
-                                                                    Chat.sendPrivateMessageToSelfError(e.getMessage());
-                                                                    return 0;
-                                                                }
-                                                                sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.MUTE, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
-                                                                return 1;
-                                                            })
-                                                    )
+                                                        Date till;
+                                                        try {
+                                                            till = PunishmentData.getTillDateFromDurationString(duration);
+                                                        } catch (Exception e) {
+                                                            Chat.sendPrivateMessageToSelfError(e.getMessage());
+                                                            return 0;
+                                                        }
+                                                        sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.MUTE, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
+                                                        return 1;
+                                                    })
                                             )
                                     )
                             )
-                            .then(literal("blacklist")
-                                    .then(argument("userId/mcusername", StringArgumentType.string())
-                                            .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                                    .then(argument("reason", StringArgumentType.greedyString())
-                                                            .executes((context) -> {
-                                                                String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                                String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
-                                                                String reason = StringArgumentType.getString(context, "reason");
-                                                                int userId = -1;
-                                                                String mcusername = "";
-                                                                try {
-                                                                    userId = Integer.parseInt(identification);
-                                                                } catch (Exception e) {
-                                                                    mcusername = identification;
-                                                                }
+                    )
+                    .then(literal("blacklist")
+                            .then(argument("userId/mcusername", StringArgumentType.string())
+                                    .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+                                            .then(argument("reason", StringArgumentType.greedyString())
+                                                    .executes((context) -> {
+                                                        String identification = StringArgumentType.getString(context, "userId/mcusername");
+                                                        String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
+                                                        String reason = StringArgumentType.getString(context, "reason");
+                                                        int userId = -1;
+                                                        String mcusername = "";
+                                                        try {
+                                                            userId = Integer.parseInt(identification);
+                                                        } catch (Exception e) {
+                                                            mcusername = identification;
+                                                        }
 
-                                                                Date till;
-                                                                try {
-                                                                    till = PunishmentData.getTillDateFromDurationString(duration);
-                                                                } catch (Exception e) {
-                                                                    Chat.sendPrivateMessageToSelfError(e.getMessage());
-                                                                    return 0;
-                                                                }
-                                                                sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BLACKLIST, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
-                                                                return 1;
-                                                            })
-                                                    )
+                                                        Date till;
+                                                        try {
+                                                            till = PunishmentData.getTillDateFromDurationString(duration);
+                                                        } catch (Exception e) {
+                                                            Chat.sendPrivateMessageToSelfError(e.getMessage());
+                                                            return 0;
+                                                        }
+                                                        sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BLACKLIST, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
+                                                        return 1;
+                                                    })
                                             )
                                     )
                             )
                     )
             );/*bpunish*/
 
-            event.register((dispatcher, registryAccess) -> dispatcher.register(literal("bgetinfo")
+            dispatcher.register(literal("bgetinfo")
                     .then(argument("userId/mcusername", StringArgumentType.string())
                             .executes((context) -> {
                                 String identification = StringArgumentType.getString(context, "userId/mcusername");
@@ -456,10 +412,10 @@ public class Commands implements MCCommand {
                                 return 1;
                             })
                     )
-            ));/*getInfo*/
+            );/*getInfo*/
         }
         if (hasSplasher) {
-            event.register((dispatcher, registryAccess) -> dispatcher.register(
+            dispatcher.register(
                     literal("splashAnnounce")
                             .then(argument("lesswaste", BoolArgumentType.bool())
                                     .then(argument("extramessage", StringArgumentType.greedyString())
@@ -481,16 +437,15 @@ public class Commands implements MCCommand {
                                         return 1;
                                     }
                             )
-                    )
             );/*SplashAnnounce*/
-            event.register((dispatcher, registryAccess) -> dispatcher.register(
+            dispatcher.register(
                     literal("requestpottimes")
                             .executes((context) -> {
                                 sendPacket(new InternalCommandPacket(InternalCommandPacket.REQUEST_POT_DURATION, new String[0]));
                                 return 1;
                             })
-            ));/*requestpottimes*/
-            event.register((dispatcher, registryAccess) -> dispatcher.register(
+            );/*requestpottimes*/
+            dispatcher.register(
                     literal("getLeecher")
                             .executes((context) -> {
                                 BBsentials.executionService.execute(() -> {
@@ -501,10 +456,10 @@ public class Commands implements MCCommand {
                                 });
                                 return 1;
                             })
-            ));/*getLeecher*/
+            );/*getLeecher*/
         }
         if (hasAdmin) {
-            event.register((dispatcher, registryAccess) -> dispatcher.register(
+            dispatcher.register(
                     literal("bshutdown")
                             .then(argument("Reason", StringArgumentType.greedyString())
                                     .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{"Emergency Shutdown", "System Shutdown", "Other"}, builder))
@@ -514,8 +469,8 @@ public class Commands implements MCCommand {
                                         return 1;
                                     })
                             )
-            ));/*BBShutdown*/
-            event.register((dispatcher, registryAccess) -> dispatcher.register(
+            );/*BBShutdown*/
+            dispatcher.register(
                     literal("bsetmotd")
                             .then(argument("Message", StringArgumentType.greedyString())
                                     .suggests((context, builder) -> CommandSource.suggestMatching(new String[]{""}, builder))
@@ -525,7 +480,7 @@ public class Commands implements MCCommand {
                                         return 1;
                                     })
                             )
-            ));/*BBServerMotd*/
+            );/*BBServerMotd*/
         }
     }
 

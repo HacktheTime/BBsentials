@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
-// Credits for this code goes to Nea89o Firmanent.
+// Credits for this code goes to Nea89o Firmanent. 2024 under MIT License
 
 
 import com.llamalad7.mixinextras.sugar.Local;

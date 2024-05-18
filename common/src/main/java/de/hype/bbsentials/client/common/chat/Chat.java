@@ -250,13 +250,14 @@ public class Chat {
                     else if (message.isServerMessage() && messageUnformatted.startsWith("HOPPITY'S HUNT")) {
                         sendNotification("BBsentials Hoppity Notifier", messageUnformatted);
                     }
-                    if (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.getUsername().toLowerCase()) || (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.nickname.toLowerCase() + " ") && BBsentials.generalConfig.notifForMessagesType.toLowerCase().equals("nick")) || BBsentials.generalConfig.notifForMessagesType.toLowerCase().equals("all")) {
-                        sendNotification("BBsentials Party Chat Notification", username + " : " + message.getMessageContent());
-                    }
-                    else {
-                        if (message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.getUsername().toLowerCase()) || message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.nickname.toLowerCase() + " ")) {
-                            sendNotification("BBsentials Notifier", "You got mentioned in chat! " + message.getMessageContent());
-                        }
+                    boolean matchesNick = message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.nickname.toLowerCase()) && BBsentials.generalConfig.notifForMessagesType.equalsIgnoreCase("nick");
+                    boolean matchesAll = message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.getUsername().toLowerCase()) || (BBsentials.generalConfig.notifForMessagesType.equalsIgnoreCase("all"));
+                    boolean none = BBsentials.generalConfig.notifForMessagesType.equalsIgnoreCase("none");
+                    if (!none && (matchesAll || matchesNick)) {
+                        if (message.isFromParty())
+                            sendNotification("BBsentials Party Chat Notifier", username + " : " + message.getMessageContent());
+                        else if (message.source == de.hype.bbsentials.shared.objects.Message.MessageSource.ALL_CHAT)
+                            sendNotification("BBsentials Chat Notifier", username + " : " + message.getMessageContent());
                     }
                 }
             }

@@ -11,7 +11,10 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
-import de.hype.bbsentials.shared.constants.*;
+import de.hype.bbsentials.shared.constants.ChChestItem;
+import de.hype.bbsentials.shared.constants.ChChestItems;
+import de.hype.bbsentials.shared.constants.MiningEvents;
+import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.*;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
@@ -22,7 +25,6 @@ import de.hype.bbsentials.shared.packets.network.InternalCommandPacket;
 import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
@@ -69,7 +71,7 @@ public class Commands implements MCCommand {
 
     public void registerMain() {
         CommandDispatcher<FabricClientCommandSource> dispatcher = ClientCommandManager.getActiveDispatcher();
-        if (dispatcher==null) return;
+        if (dispatcher == null) return;
         ModInitialiser.dispatcher = dispatcher;
         dispatcher.register(literal("creport")
                 .then(argument("Player_Name", StringArgumentType.string())
@@ -79,7 +81,88 @@ public class Commands implements MCCommand {
                             BBsentials.temporaryConfig.alreadyReported.add(playerName);
                             return 1;
                         })));//creport helper → no double report during same launch
-        dispatcher.register(literal("party")
+        dispatcher.register(literal("warp")
+                .then(argument("location", StringArgumentType.string())
+                        .suggests((context, builder) -> {
+                                    List<String> suggestions = List.of("home",
+                                            "island",
+                                            "hub",
+                                            "village",
+                                            "elizabeth",
+                                            "castle",
+                                            "da",
+                                            "crypt",
+                                            "crypts",
+                                            "museum",
+                                            "dungeon_hub",
+                                            "dungeons",
+                                            "dhub",
+                                            "barn",
+                                            "desert",
+                                            "trapper",
+                                            "trap",
+                                            "park",
+                                            "jungle",
+                                            "howl",
+                                            "gold",
+                                            "deep",
+                                            "mines",
+                                            "forge",
+                                            "forge",
+                                            "crystals",
+                                            "hollows",
+                                            "dh",
+                                            "nucleus",
+                                            "spider",
+                                            "spiders",
+                                            "top",
+                                            "nest",
+                                            "mound",
+                                            "arachne",
+                                            "end",
+                                            "drag",
+                                            "void",
+                                            "sepulture",
+                                            "crimson",
+                                            "nether",
+                                            "isle",
+                                            "kuudra",
+                                            "wasteland",
+                                            "dragontail",
+                                            "scarleton",
+                                            "smoldering",
+                                            "smoldering_tomb",
+                                            "smold",
+                                            "garden",
+                                            "winter",
+                                            "jerry",
+                                            "workshop",
+                                            "basecamp",
+                                            "camp",
+                                            "glacite",
+                                            "base",
+                                            "tunnels",
+                                            "tunnel",
+                                            "gt"
+                                    );
+                                    return CommandSource.suggestMatching(suggestions, builder);
+                                }
+                        )
+
+                        .executes((context) -> {
+                            String location = StringArgumentType.getString(context, "location");
+                            BBsentials.sender.addSendTask("/warp " + location, 0);
+                            return 1;
+                        }))
+                );
+
+        dispatcher.register(literal("p")
+                .then(argument("players", StringArgumentType.greedyString())
+                        .executes((context) -> {
+                            String playernames = StringArgumentType.getString(context, "players");
+                            BBsentials.sender.addSendTask("/p " + playernames, 0);
+                            return 1;
+                        }))
                 .then(literal("accept")
                         .then(argument("playername", StringArgumentType.string())
                                 .executes((context) -> {
@@ -89,6 +172,11 @@ public class Commands implements MCCommand {
                                 })))
                 .then(literal("demote")
                         .then(argument("playername", StringArgumentType.string())
+                                .suggests((context, builder) -> {
+                                            List<String> suggestions = BBsentials.partyConfig.partyMembers;
+                                            return CommandSource.suggestMatching(suggestions, builder);
+                                        }
+                                )
                                 .executes((context) -> {
                                     String playername = StringArgumentType.getString(context, "playername");
                                     BBsentials.sender.addSendTask("/party demote " + playername, 0);
@@ -108,6 +196,11 @@ public class Commands implements MCCommand {
                                 })))
                 .then(literal("kick")
                         .then(argument("player", StringArgumentType.string())
+                                .suggests((context, builder) -> {
+                                            List<String> suggestions = BBsentials.partyConfig.partyMembers;
+                                            return CommandSource.suggestMatching(suggestions, builder);
+                                        }
+                                )
                                 .executes((context) -> {
                                     String player = StringArgumentType.getString(context, "player");
                                     BBsentials.sender.addSendTask("/party kick " + player, 0);
@@ -147,6 +240,11 @@ public class Commands implements MCCommand {
                         }))
                 .then(literal("promote")
                         .then(argument("player", StringArgumentType.string())
+                                .suggests((context, builder) -> {
+                                            List<String> suggestions = BBsentials.partyConfig.partyMembers;
+                                            return CommandSource.suggestMatching(suggestions, builder);
+                                        }
+                                )
                                 .executes((context) -> {
                                     String player = StringArgumentType.getString(context, "player");
                                     BBsentials.sender.addSendTask("/party promote " + player, 0);
@@ -160,6 +258,11 @@ public class Commands implements MCCommand {
                                 })))
                 .then(literal("transfer")
                         .then(argument("player", StringArgumentType.string())
+                                .suggests((context, builder) -> {
+                                            List<String> suggestions = BBsentials.partyConfig.partyMembers;
+                                            return CommandSource.suggestMatching(suggestions, builder);
+                                        }
+                                )
                                 .executes((context) -> {
                                     String player = StringArgumentType.getString(context, "player");
                                     BBsentials.sender.addSendTask("/party transfer " + player, 0);
@@ -299,7 +402,7 @@ public class Commands implements MCCommand {
     public void registerRoleRequired(boolean hasDev, boolean hasAdmin, boolean hasMod, boolean hasSplasher,
                                      boolean hasBeta, boolean hasMiningEvents, boolean hasChChest) {
         CommandDispatcher<FabricClientCommandSource> dispatcher = ModInitialiser.dispatcher;
-        if (dispatcher==null) return;
+        if (dispatcher == null) return;
         if (hasMod) {
             dispatcher.register(
                     literal("bannounce")

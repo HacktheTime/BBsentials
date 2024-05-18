@@ -29,7 +29,8 @@ public abstract class InventoryKeyBinds extends HandledScreen<GenericContainerSc
     @Intrinsic(displace = true)
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (focusedSlot != null && keyCode==258) onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        else return super.keyPressed(keyCode, scanCode, modifiers);
+        return true;
     }
 
     @Intrinsic(displace = true)

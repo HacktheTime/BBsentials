@@ -6,7 +6,7 @@ public class ServerSwitchTask {
     public static int counter = 0;
     private final int id = counter++;
     public Runnable runnable;
-    public boolean permanent;
+    public boolean permanent = false;
 
     private ServerSwitchTask(Runnable runnable) {
         this.runnable = runnable;

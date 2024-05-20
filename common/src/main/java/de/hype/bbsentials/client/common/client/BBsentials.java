@@ -10,14 +10,12 @@ import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.*;
 import de.hype.bbsentials.client.common.discordintegration.DiscordIntegration;
 import de.hype.bbsentials.client.common.discordintegration.GameSDKManager;
-import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.hpmodapi.HypixelModAPICore;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.RenderInformation;
-import net.hypixel.modapi.HypixelModAPI;
 
 import java.awt.*;
 import java.io.IOException;
@@ -61,13 +59,12 @@ public class BBsentials {
     public static DiscordIntegration discordIntegration = new DiscordIntegration();
     public static AddonManager addonManager;
     public static GameSDKManager dcGameSDK;
-    private static boolean initialised = false;
-    private static volatile ScheduledFuture<?> futureServerJoin;
-    private static volatile boolean futureServerJoinRunning;
     public static HypixelModAPICore hpModAPICore;
     public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
-
+    private static boolean initialised = false;
+    private static volatile ScheduledFuture<?> futureServerJoin;
+    private static volatile boolean futureServerJoinRunning;
 
     public static void connectToBBserver() {
         connectToBBserver(bbServerConfig.connectToBeta);
@@ -121,34 +118,34 @@ public class BBsentials {
         }
         futureServerJoin = executionService.schedule(() -> {
             futureServerJoinRunning = true;
-            for (ServerSwitchTask task : onServerJoin.values()) {
-                if (!task.permanent) {
-                    onServerJoin.remove(task.getId());
-                }
-                try {
-                    executionService.execute(task::run);
-                } catch (Exception e) {
-                    System.out.println("Error in a task.");
-                    e.printStackTrace();
-                }
-            }
+            onServerJoin.values().removeIf(value -> {
+                BBsentials.executionService.execute(()->{
+                    try {
+                        value.run();
+                    } catch (Exception e) {
+                        Chat.sendPrivateMessageToSelfError("Error Occur during a Server Join Task! Please report this!");
+                        e.printStackTrace();
+                    }
+                });
+                return !value.permanent;
+            });
             futureServerJoin = null;
             futureServerJoinRunning = false;
         }, 5, TimeUnit.SECONDS);
     }
 
     public static void onServerLeave() {
-        for (ServerSwitchTask task : onServerLeave.values()) {
-            if (!task.permanent) {
-                onServerLeave.remove(task.getId()).run();
-            }
-            try {
-                executionService.execute(task::run);
-            } catch (Exception e) {
-                System.out.println("Error in a task.");
-                e.printStackTrace();
-            }
-        }
+        onServerLeave.values().removeIf(value -> {
+            BBsentials.executionService.execute(()->{
+                try {
+                    value.run();
+                } catch (Exception e) {
+                    Chat.sendPrivateMessageToSelfError("Error Occur during a Server Leave Task! Please report this!");
+                    e.printStackTrace();
+                }
+            });
+            return !value.permanent;
+        });
     }
 
     public static void init() {

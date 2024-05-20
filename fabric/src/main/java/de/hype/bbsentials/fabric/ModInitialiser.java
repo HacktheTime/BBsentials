@@ -13,7 +13,6 @@ import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.mclibraries.TextUtils;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
@@ -63,7 +62,7 @@ public class ModInitialiser implements ClientModInitializer {
     public static CommandDispatcher<FabricClientCommandSource> dispatcher;
 
     {
-        ClientCommandRegistrationCallback.EVENT.register((a, b) -> BBsentials.coms=new de.hype.bbsentials.client.common.client.commands.Commands());
+        ClientCommandRegistrationCallback.EVENT.register((a, b) -> BBsentials.coms = new de.hype.bbsentials.client.common.client.commands.Commands());
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
                     .then(ClientCommandManager.argument("playername", StringArgumentType.greedyString())
@@ -257,6 +256,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                                                     )
                                                                             )
                                                                     )
+                                                                    .executes(this::createWaypointFromCommandContext)
                                                             )
                                                     )
                                             )
@@ -490,9 +490,16 @@ public class ModInitialiser implements ClientModInitializer {
         jsonName = EnvironmentCore.utils.stringToTextJson(jsonName);
         BlockPos pos = CBlockPosArgument.getBlockPos(context, "position");
         Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
-        Boolean deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
-        Boolean visible = BoolArgumentType.getBool(context, "visible");
-        Integer maxRenderDist = IntegerArgumentType.getInteger(context, "maxrenderdistance");
+        Boolean deleteOnServerSwap = true ;
+        Boolean visible = true;
+        Integer maxRenderDist = 10000;
+        try {
+            deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
+            visible = BoolArgumentType.getBool(context, "visible");
+            maxRenderDist = IntegerArgumentType.getInteger(context, "maxrenderdistance");
+        }catch (IllegalArgumentException ignored){
+
+        }
         String customTextureFull = null;
         String customTextureNameSpace = "";
         String customTexturePath = "";
@@ -531,6 +538,6 @@ public class ModInitialiser implements ClientModInitializer {
         }
         ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
 
-        ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true,null);
+        ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
     }
 }

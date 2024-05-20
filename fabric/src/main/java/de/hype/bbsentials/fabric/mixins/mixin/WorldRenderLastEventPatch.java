@@ -4,6 +4,7 @@ package de.hype.bbsentials.fabric.mixins.mixin;
 
 
 import com.llamalad7.mixinextras.sugar.Local;
+import de.hype.bbsentials.fabric.Utils;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -29,5 +30,6 @@ public class WorldRenderLastEventPatch {
                 camera, gameRenderer, lightmapTextureManager,
                 this.bufferBuilders.getEntityVertexConsumers()
         );
+        Utils.renderWaypoints(event);
     }
 }

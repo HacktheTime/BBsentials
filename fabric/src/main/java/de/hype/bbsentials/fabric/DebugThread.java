@@ -124,13 +124,10 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
 
     @Override
     public void onServerJoin() {
-        Chat.sendPrivateMessageToSelfError("Hub Join exec");
     }
 
     @Override
     public void onServerLeave() {
-        Chat.sendPrivateMessageToSelfInfo(EnvironmentCore.utils.getServerId());
-        Chat.sendPrivateMessageToSelfError("Hub Leave exec");
     }
 
     //Keep in mind that this is not allowed and should only be used for debugging purposes ONLY.

@@ -213,6 +213,14 @@ public class Chat {
             }
             return null;
         }
+        if (message.isServerMessage()&&BBsentials.partyConfig.hidePartyPreAndSuffix){
+            if (message.getJson().equals("{\"text\":\"-----------------------------------------------------\",\"strikethrough\":true,\"color\":\"blue\"}")){
+                return null;
+            }
+            if (BBsentials.partyConfig.hidePartyDisconnet() &&message.getMessageContent().endsWith("has disconnected, they have 5 minutes to rejoin before they are removed from the party.")){
+                return null;
+            }
+        }
         if (actionbar) return message;
         if (message.isFromReportedUser()) {
             sendPrivateMessageToSelfBase("B: " + message.getUnformattedString(), Formatting.RED);

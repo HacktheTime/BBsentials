@@ -21,6 +21,10 @@ public class PartyConfig extends BBsentialsConfig {
     public boolean allowServerPartyInvite = true;
     public transient List<TrustedPartyMember> recommendedTrustedMembers;
     public boolean announceRemoteMsgPartyCommands = true;
+    public boolean hidePartyPreAndSuffix = false;
+    public Integer hidePartyDisconnect = 0;
+    public boolean hideOwnPartyWarps;
+    public boolean hidePartyChatCommands;
 
     public PartyConfig() {
         super(1);
@@ -68,4 +72,7 @@ public class PartyConfig extends BBsentialsConfig {
 
     }
 
+    public boolean hidePartyDisconnet() {
+        return hidePartyDisconnect < partyMembers.size() && hidePartyDisconnect > 0;
+    }
 }

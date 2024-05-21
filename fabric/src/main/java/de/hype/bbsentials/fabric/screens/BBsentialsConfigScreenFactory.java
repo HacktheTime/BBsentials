@@ -129,6 +129,33 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Do you want that whenever someone sends you a msg ending with 'bb:party me' to send them a party invite automatically?"))
                     .setSaveConsumer(newValue -> BBsentials.partyConfig.allowBBinviteMe = newValue)
                     .build());
+            BooleanListEntry hidePartyPreAndSuffix = entryBuilder.startBooleanToggle(Text.of("Hide Party Pre and Suffix"), BBsentials.partyConfig.hidePartyPreAndSuffix)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("""
+                            Requirement for other party hide options
+                            
+                            This hides the
+                            §9§m-----------------------------------------------------§r
+                            
+                            before and after party command feedbacks.
+                            """))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.hidePartyPreAndSuffix = newValue)
+                    .build();
+            party.addEntry(hidePartyPreAndSuffix);
+            SubCategoryBuilder partyHideSubCat = entryBuilder.startSubCategory(Text.of("Hide Party Messages"));
+            partyHideSubCat.setRequirement(Requirement.isTrue(hidePartyPreAndSuffix));
+            partyHideSubCat.add(entryBuilder.startIntSlider(Text.of("Hide Party Disconnects"), BBsentials.partyConfig.hidePartyDisconnect,0,100)
+                    .setDefaultValue(0)
+                    .setTooltip(Text.of("""
+                            Hide the party disconnects in parties.
+                            0 Never Hide
+                            1 Always Hide
+                            
+                            The party member size must be higher than the value set here to hide it.
+                            """))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.hidePartyDisconnect = newValue)
+                    .build());
+            party.addEntry(partyHideSubCat.build());
         }//Party
         ConfigCategory visual = builder.getOrCreateCategory(Text.of("Visual"));
         {

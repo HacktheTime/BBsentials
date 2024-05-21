@@ -1,12 +1,11 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
-import net.minecraft.client.Mouse;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Items;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
@@ -28,7 +27,8 @@ public abstract class InventoryKeyBinds extends HandledScreen<GenericContainerSc
 
     @Intrinsic(displace = true)
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (focusedSlot != null && keyCode==258) onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);
+        if (focusedSlot != null && keyCode == 258 && focusedSlot.getStack().getItem() != Items.AIR)
+            onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);
         else return super.keyPressed(keyCode, scanCode, modifiers);
         return true;
     }
@@ -36,6 +36,6 @@ public abstract class InventoryKeyBinds extends HandledScreen<GenericContainerSc
     @Intrinsic(displace = true)
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return super.mouseClicked(mouseX,mouseY,button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

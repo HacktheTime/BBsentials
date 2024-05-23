@@ -204,20 +204,20 @@ public class Chat {
 
     //Handle in the messages which need to be modified here
     public Message processNotThreaded(Message message, boolean actionbar) {
-//        if (message.isFromParty()) {
-//           message.replaceInJson("\"action\":\"run_command\",\"value\":\"/viewprofile", "\"action\":\"run_command\",\"value\":\"/bviewprofile " + messageUnformatted.split(">", 1)[1].trim());
-//        }
         if (actionbar && !BBsentials.funConfig.overwriteActionBar.isEmpty()) {
             if (message.getUnformattedString().equals(BBsentials.funConfig.overwriteActionBar.replaceAll("§.", ""))) {
                 return message;
             }
             return null;
         }
-        if (message.isServerMessage()&&BBsentials.partyConfig.hidePartyPreAndSuffix){
-            if (message.getJson().equals("{\"text\":\"-----------------------------------------------------\",\"strikethrough\":true,\"color\":\"blue\"}")){
+        if (message.isServerMessage() && BBsentials.partyConfig.hidePartyPreAndSuffix) {
+            if (message.getJson().equals("{\"text\":\"-----------------------------------------------------\",\"strikethrough\":true,\"color\":\"blue\"}")) {
                 return null;
             }
-            if (BBsentials.partyConfig.hidePartyDisconnet() &&message.getMessageContent().endsWith("has disconnected, they have 5 minutes to rejoin before they are removed from the party.")){
+            if (BBsentials.partyConfig.hidePartyDisconnet() && message.getMessageContent().endsWith("has disconnected, they have 5 minutes to rejoin before they are removed from the party.")) {
+                return null;
+            }
+            if (BBsentials.partyConfig.hidePartyJoinOrLeave() && (message.getMessageContent().endsWith("joined the party.") || message.getMessageContent().endsWith("left the party."))) {
                 return null;
             }
         }

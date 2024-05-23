@@ -155,6 +155,17 @@ public class BBsentialsConfigScreenFactory {
                             """))
                     .setSaveConsumer(newValue -> BBsentials.partyConfig.hidePartyDisconnect = newValue)
                     .build());
+            partyHideSubCat.add(entryBuilder.startIntSlider(Text.of("Hide Player Join/Leave"), BBsentials.partyConfig.hidePartyJoinAndLeave,0,100)
+                    .setDefaultValue(0)
+                    .setTooltip(Text.of("""
+                            Hide when a player join or leaves the party. Does not affect invite messages.
+                            0 Never Hide
+                            1 Always Hide
+                            
+                            The party member size must be higher than the value set here to hide it.
+                            """))
+                    .setSaveConsumer(newValue -> BBsentials.partyConfig.hidePartyJoinAndLeave = newValue)
+                    .build());
             party.addEntry(partyHideSubCat.build());
         }//Party
         ConfigCategory visual = builder.getOrCreateCategory(Text.of("Visual"));

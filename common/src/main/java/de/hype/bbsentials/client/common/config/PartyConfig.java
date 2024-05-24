@@ -23,6 +23,7 @@ public class PartyConfig extends BBsentialsConfig {
     public boolean announceRemoteMsgPartyCommands = true;
     public boolean hidePartyPreAndSuffix = false;
     public Integer hidePartyDisconnect = 0;
+    public Integer hidePartyJoinAndLeave = 0;
     public boolean hideOwnPartyWarps;
     public boolean hidePartyChatCommands;
 
@@ -74,5 +75,8 @@ public class PartyConfig extends BBsentialsConfig {
 
     public boolean hidePartyDisconnet() {
         return hidePartyDisconnect < partyMembers.size() && hidePartyDisconnect > 0;
+    }
+    public boolean hidePartyJoinOrLeave() {
+        return hidePartyJoinAndLeave < partyMembers.size() && hidePartyJoinAndLeave > 0;
     }
 }

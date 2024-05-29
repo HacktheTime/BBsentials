@@ -195,4 +195,8 @@ public interface Utils {
     void sendPacket(HypixelPacket packet);
 
     UUID getMCUUIDID();
+
+    String getModVersion();
+
+    String getGameVersion();
 }

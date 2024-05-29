@@ -475,13 +475,14 @@ public class BBsentialConnection {
         String clientRandom = serverBi.toString(16);
 
         String serverId = clientRandom + packet.serverIdSuffix;
+
         if (BBsentials.bbServerConfig.useMojangAuth) {
             EnvironmentCore.utils.mojangAuth(serverId);
-            RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), clientRandom, BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.MOJANG);
+            RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), clientRandom, EnvironmentCore.utils.getModVersion(), EnvironmentCore.utils.getGameVersion(), BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.MOJANG);
             sendPacket(connectPacket);
         }
         else {
-            sendPacket(new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), BBsentials.bbServerConfig.apiKey, BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.DATABASE));
+            sendPacket(new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), BBsentials.bbServerConfig.apiKey, EnvironmentCore.utils.getModVersion(), EnvironmentCore.utils.getGameVersion(), BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.DATABASE));
         }
     }
 

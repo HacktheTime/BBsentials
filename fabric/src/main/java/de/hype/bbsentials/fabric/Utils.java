@@ -17,6 +17,8 @@ import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.HypixelPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
@@ -66,6 +68,7 @@ import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig
 import static de.hype.bbsentials.client.common.client.BBsentials.hpModAPICore;
 
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
+    ModContainer self = FabricLoader.getInstance().getAllMods().stream().filter(modContainer -> modContainer.getMetadata().getId().equals("bbsentials")).toList().get(0);
     public static boolean isBingo(PlayerEntity player) {
         try {
             return player.getDisplayName().getString().contains("Ⓑ");
@@ -199,6 +202,16 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public UUID getMCUUIDID() {
         return MinecraftClient.getInstance().getSession().getUuidOrNull();
+    }
+
+    @Override
+    public String getModVersion() {
+        return self.getMetadata().getVersion().getFriendlyString();
+    }
+
+    @Override
+    public String getGameVersion() {
+        return ((FabricLoaderImpl) FabricLoader.getInstance()).getGameProvider().getRawGameVersion();
     }
 
     public void playsound(String eventName) {

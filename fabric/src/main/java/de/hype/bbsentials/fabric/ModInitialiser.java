@@ -16,6 +16,7 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
+import de.hype.bbsentials.fabric.command.Commands;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
@@ -490,14 +491,14 @@ public class ModInitialiser implements ClientModInitializer {
         jsonName = EnvironmentCore.utils.stringToTextJson(jsonName);
         BlockPos pos = CBlockPosArgument.getBlockPos(context, "position");
         Position position = new Position(pos.getX(), pos.getY(), pos.getZ());
-        Boolean deleteOnServerSwap = true ;
+        Boolean deleteOnServerSwap = true;
         Boolean visible = true;
         Integer maxRenderDist = 10000;
         try {
             deleteOnServerSwap = BoolArgumentType.getBool(context, "deleteonserverswap");
             visible = BoolArgumentType.getBool(context, "visible");
             maxRenderDist = IntegerArgumentType.getInteger(context, "maxrenderdistance");
-        }catch (IllegalArgumentException ignored){
+        } catch (IllegalArgumentException ignored) {
 
         }
         String customTextureFull = null;

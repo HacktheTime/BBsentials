@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric;
+package de.hype.bbsentials.fabric.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -11,6 +11,9 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
+import de.hype.bbsentials.fabric.ModInitialiser;
+import de.hype.bbsentials.fabric.command.argumentTypes.SackMaterialArgumentType;
+import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockWarpArgumentType;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.ChChestItems;
 import de.hype.bbsentials.shared.constants.MiningEvents;
@@ -82,79 +85,29 @@ public class Commands implements MCCommand {
                             return 1;
                         })));//creport helper → no double report during same launch
         dispatcher.register(literal("warp")
-                .then(argument("location", StringArgumentType.string())
-                        .suggests((context, builder) -> {
-                                    List<String> suggestions = List.of("home",
-                                            "island",
-                                            "hub",
-                                            "village",
-                                            "elizabeth",
-                                            "castle",
-                                            "da",
-                                            "crypt",
-                                            "crypts",
-                                            "museum",
-                                            "dungeon_hub",
-                                            "dungeons",
-                                            "dhub",
-                                            "barn",
-                                            "desert",
-                                            "trapper",
-                                            "trap",
-                                            "park",
-                                            "jungle",
-                                            "howl",
-                                            "gold",
-                                            "deep",
-                                            "mines",
-                                            "forge",
-                                            "forge",
-                                            "crystals",
-                                            "hollows",
-                                            "dh",
-                                            "nucleus",
-                                            "spider",
-                                            "spiders",
-                                            "top",
-                                            "nest",
-                                            "mound",
-                                            "arachne",
-                                            "end",
-                                            "drag",
-                                            "void",
-                                            "sepulture",
-                                            "crimson",
-                                            "nether",
-                                            "isle",
-                                            "kuudra",
-                                            "wasteland",
-                                            "dragontail",
-                                            "scarleton",
-                                            "smoldering",
-                                            "smoldering_tomb",
-                                            "smold",
-                                            "garden",
-                                            "winter",
-                                            "jerry",
-                                            "workshop",
-                                            "basecamp",
-                                            "camp",
-                                            "glacite",
-                                            "base",
-                                            "tunnels",
-                                            "tunnel",
-                                            "gt"
-                                    );
-                                    return CommandSource.suggestMatching(suggestions, builder);
-                                }
-                        )
-
+                .then(argument("location", SkyblockWarpArgumentType.warptype())
                         .executes((context) -> {
-                            String location = StringArgumentType.getString(context, "location");
+                            String location = SkyblockWarpArgumentType.getWarpString(context, "location");
                             BBsentials.sender.addSendTask("/warp " + location, 0);
                             return 1;
                         }))
                 );
+        dispatcher.register(literal("gfs")
+                .then(argument("material", SackMaterialArgumentType.materialidtype())
+                        .executes((context) -> {
+                            String material = SackMaterialArgumentType.getItemId(context, "material");
+                            BBsentials.sender.addImmediateSendTask("/gfs " + material);
+                            return 1;
+                        }))
+        );
+        dispatcher.register(literal("getfromsacks")
+                .then(argument("material", SackMaterialArgumentType.materialidtype())
+                        .executes((context) -> {
+                            String material = SackMaterialArgumentType.getItemId(context, "material");
+                            BBsentials.sender.addImmediateSendTask("/gfs " + material);
+                            return 1;
+                        }))
+        );
 
         dispatcher.register(literal("p")
                 .then(argument("players", StringArgumentType.greedyString())

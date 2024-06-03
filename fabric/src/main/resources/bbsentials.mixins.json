@@ -5,10 +5,11 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "ChestLidMixin",
-    "CommandSourceMixin",
+    "LiteralCommandNodeMixin",
     "SignaturePropertyErrorIgnoreMixin"
   ],
   "client": [
+    "BBsentialsCommandSource",
     "ChestMixin",
     "ClientCommandSourceMixin",
     "CustomItemData",

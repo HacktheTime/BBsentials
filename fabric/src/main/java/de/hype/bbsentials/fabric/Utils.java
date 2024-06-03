@@ -15,6 +15,7 @@ import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -42,6 +43,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
@@ -721,5 +723,13 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 this.id = id;
             }
         }
+    }
+
+    public List<String> getScoreboardEntries(){
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler==null) return null;
+        Scoreboard scoreboard = handler.getWorld().getScoreboard();
+        if (scoreboard==null) return new ArrayList<>();
+        return scoreboard.getObjectives().stream().map(o->o.getDisplayName().getString()).toList();
     }
 }

@@ -60,10 +60,8 @@ import static de.hype.bbsentials.client.common.objects.WaypointRoute.waypointRou
 
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
-    public static CommandDispatcher<FabricClientCommandSource> dispatcher;
 
     {
-        ClientCommandRegistrationCallback.EVENT.register((a, b) -> BBsentials.coms = new de.hype.bbsentials.client.common.client.commands.Commands());
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
                     .then(ClientCommandManager.argument("playername", StringArgumentType.greedyString())

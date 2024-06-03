@@ -29,22 +29,22 @@ dependencies {
     mappings "net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2"
     modRuntimeOnly(libs.modern.devauth)
     modImplementation("dev.xpple:clientarguments:1.8.2")
-    include(modImplementation("dev.xpple:clientarguments:1.8.2"))
+    include("dev.xpple:clientarguments:1.8.2")
     modImplementation("com.github.JnCrMx:discord-game-sdk4j:latest.release")
-    include(modImplementation("com.github.JnCrMx:discord-game-sdk4j:latest.release"))
-    include(modImplementation("net.hypixel:mod-api:latest.release"))
+    include("com.github.JnCrMx:discord-game-sdk4j:latest.release")
+    include("net.hypixel:mod-api:latest.release")
     modImplementation("net.hypixel:mod-api:latest.release")
     modImplementation(libs.modmenu)
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${libs.versions.cloth.get()}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    include(modImplementation("javazoom:jlayer:1.0.1"))
+    include("javazoom:jlayer:1.0.1")
     modImplementation("javazoom:jlayer:1.0.1")
     modImplementation "net.fabricmc:fabric-loader:${libs.versions.modern.fabric.loader.get()}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${libs.versions.modern.fabric.api.get()}"
-    include(modImplementation("net.dv8tion:JDA:5.0.0-beta.23"))
+    include("net.dv8tion:JDA:5.0.0-beta.23")
     modImplementation("net.dv8tion:JDA:5.0.0-beta.23")
-    include(modImplementation("me.nullicorn:Nedit:latest.release"))
+    include("me.nullicorn:Nedit:latest.release")
     modImplementation("me.nullicorn:Nedit:latest.release")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"

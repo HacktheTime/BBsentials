@@ -89,14 +89,6 @@ public class Commands implements MCCommand {
                         Chat.sendPrivateMessageToSelfSuccess("Day: " + EnvironmentCore.utils.getLobbyDay());
                         return 1;
                     }));
-            dispatcher.register(literal("lifeexamplecommand")
-                    .requires(s ->
-                            s.getPlayer().getMainHandStack().getItem() == Items.COMPASS
-                    )
-                    .executes((context) -> {
-                        Chat.sendPrivateMessageToSelfSuccess("I got executed");
-                        return 1;
-                    }));
             dispatcher.register(literal("chchest")
                     .then(argument("Item", StringArgumentType.string())
                             .suggests((context, builder) -> {

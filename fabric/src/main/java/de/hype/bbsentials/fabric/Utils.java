@@ -620,8 +620,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public void registerNetworkHandlers() {
-        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
-        HypixelModAPI.getInstance().registerHandler(hpModAPICore);
+//        HypixelModAPI.getInstance().registerHandler(hpModAPICore);
+//        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
 
     }
 

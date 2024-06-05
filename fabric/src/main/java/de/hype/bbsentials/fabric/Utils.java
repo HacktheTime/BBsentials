@@ -8,6 +8,7 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.RouteNode;
 import de.hype.bbsentials.client.common.objects.Waypoints;
+import de.hype.bbsentials.fabric.command.BBCommandDispatcher;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
@@ -42,6 +43,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
@@ -69,6 +71,7 @@ import static de.hype.bbsentials.client.common.client.BBsentials.hpModAPICore;
 
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
     ModContainer self = FabricLoader.getInstance().getAllMods().stream().filter(modContainer -> modContainer.getMetadata().getId().equals("bbsentials")).toList().get(0);
+
     public static boolean isBingo(PlayerEntity player) {
         try {
             return player.getDisplayName().getString().contains("Ⓑ");
@@ -408,7 +411,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public boolean executeClientCommand(String command) {
-        return ClientCommandInternals.executeCommand(command);
+        return ClientCommandInternals.executeCommand(command) || BBCommandDispatcher.executeCommand(command);
     }
 
     @Override
@@ -626,6 +629,14 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public void sendPacket(HypixelPacket packet) {
         if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send: " + packet.getIdentifier());
         HypixelModAPI.getInstance().sendPacket(packet);
+    }
+
+    public List<String> getScoreboardEntries() {
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler == null) return null;
+        Scoreboard scoreboard = handler.getWorld().getScoreboard();
+        if (scoreboard == null) return new ArrayList<>();
+        return scoreboard.getObjectives().stream().map(o -> o.getDisplayName().getString()).toList();
     }
 
     public static class BBToast implements Toast {

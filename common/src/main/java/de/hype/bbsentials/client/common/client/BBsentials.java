@@ -18,7 +18,11 @@ import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +66,7 @@ public class BBsentials {
     public static HypixelModAPICore hpModAPICore;
     public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
+    public static Map<String, String> itemIds = new HashMap<>();
     private static boolean initialised = false;
     private static volatile ScheduledFuture<?> futureServerJoin;
     private static volatile boolean futureServerJoinRunning;
@@ -227,5 +232,21 @@ public class BBsentials {
         hpModAPICore = new HypixelModAPICore();
         EnvironmentCore.utils.registerNetworkHandlers();
 
+    }
+
+    public static String downloadJson(String urlString) throws Exception {
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                result.append(line);
+            }
+        }
+
+        return result.toString();
     }
 }

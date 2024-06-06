@@ -22,7 +22,6 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.HypixelPacket;
-import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
@@ -44,6 +43,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
@@ -67,7 +67,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
-import static de.hype.bbsentials.client.common.client.BBsentials.hpModAPICore;
 
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
     ModContainer self = FabricLoader.getInstance().getAllMods().stream().filter(modContainer -> modContainer.getMetadata().getId().equals("bbsentials")).toList().get(0);
@@ -636,7 +635,23 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         if (handler == null) return null;
         Scoreboard scoreboard = handler.getWorld().getScoreboard();
         if (scoreboard == null) return new ArrayList<>();
-        return scoreboard.getObjectives().stream().map(o -> o.getDisplayName().getString()).toList();
+        return new ArrayList<>(scoreboard.getScoreboardEntries(scoreboard.getObjectives().stream().toList().get(0)).stream().filter(s -> !s.hidden()).sorted(Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER)).limit(15L).map(ScoreboardEntry::display).filter(e -> e != null).map(d -> d.getString()).toList());
+    }
+
+    public List<String> getScoreboardEntriesJson() {
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler == null) return null;
+        Scoreboard scoreboard = handler.getWorld().getScoreboard();
+        if (scoreboard == null) return new ArrayList<>();
+        return new ArrayList<>(scoreboard.getScoreboardEntries(scoreboard.getObjectives().stream().toList().get(0)).stream().filter(s -> !s.hidden()).sorted(Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER)).limit(15L).map(ScoreboardEntry::display).filter(e -> e != null).map(FabricTextUtils::textToJson).toList());
+    }
+
+    public List<Text> getScoreboardEntriesText() {
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler == null) return null;
+        Scoreboard scoreboard = handler.getWorld().getScoreboard();
+        if (scoreboard == null) return new ArrayList<>();
+        return new ArrayList<>(scoreboard.getScoreboardEntries(scoreboard.getObjectives().stream().toList().get(0)).stream().filter(s -> !s.hidden()).sorted(Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER)).limit(15L).map(ScoreboardEntry::display).filter(e -> e != null).toList());
     }
 
     public static class BBToast implements Toast {

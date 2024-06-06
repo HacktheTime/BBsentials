@@ -58,7 +58,7 @@ loom {
             client()
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
-            vmArg("--javaagent /home/spieler/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.13.3+mixin.0.8.5/9527e6b0d2449408958fd1302594dc65ec5ade9c/sponge-mixin-0.13.3+mixin.0.8.5.jar")
+            vmArg("--javaagent ~/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/*/*/*.jar")
             runDir("run")
         }
         server {

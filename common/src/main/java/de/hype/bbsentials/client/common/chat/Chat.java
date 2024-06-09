@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -378,10 +377,8 @@ public class Chat {
                     setChatPromtId(message.getJson());
                 }
                 else if (message.getUnformattedString().endsWith("Return to the Trapper soon to get a new animal to hunt!")) {
-                    BBsentials.executionService.schedule(() -> {
-                        setChatCommand("/warp trapper", 10);
-                        Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp back to the trapper\",\"color\":\"green\"}]"));
-                    }, 1, TimeUnit.SECONDS);
+                    setChatCommand("/warp trapper", 10);
+                    Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp back to the trapper\",\"color\":\"green\"}]"));
                 }
                 else if (message.getUnformattedString().endsWith("animal near the Desert Settlement.") || message.getUnformattedString().endsWith("animal near the Oasis.")) {
                     setChatCommand("/warp desert", 10);

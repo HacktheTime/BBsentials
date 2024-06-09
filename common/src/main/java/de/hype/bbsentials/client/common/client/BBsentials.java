@@ -190,17 +190,17 @@ public class BBsentials {
                 }
             }
         }, true);
-        if (discordConfig.useRichPresence) {
-            try {
-                dcGameSDK = new GameSDKManager();
-                if (discordConfig.useRichPresence) {
-                    dcGameSDK.updateActivity();
-                    ServerSwitchTask.onServerJoinTask(() -> dcGameSDK.updateActivity(), true);
-                }
-            } catch (Exception e) {
-                Chat.sendPrivateMessageToSelfError("Could not set Discord Rich Presence");
-            }
-        }
+//        if (discordConfig.useRichPresence) {
+//            try {
+//                dcGameSDK = new GameSDKManager();
+//                if (discordConfig.useRichPresence) {
+//                    dcGameSDK.updateActivity();
+//                    ServerSwitchTask.onServerJoinTask(() -> dcGameSDK.updateActivity(), true);
+//                }
+//            } catch (Exception e) {
+//                Chat.sendPrivateMessageToSelfError("Could not set Discord Rich Presence");
+//            }
+//        }
         if (funConfig.lowPlayTimeHelpers) {
             ServerSwitchTask.onServerLeaveTask(() -> {
                 BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();

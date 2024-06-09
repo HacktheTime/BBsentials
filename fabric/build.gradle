@@ -26,8 +26,8 @@ repositories {
 configurations {
     transitiveInclude {
         exclude group: "com.mojang"
-        exclude group: "org.jetbrains.kotlin"
-        exclude group: "org.jetbrains.kotlinx"
+//        exclude group: "org.jetbrains.kotlin"
+//        exclude group: "org.jetbrains.kotlinx"
     }
 }
 

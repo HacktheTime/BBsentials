@@ -158,7 +158,7 @@ public class BBsentials {
         );
         debugThread.start();
         debugThread.setName("Debug Thread");
-        if (GeneralConfig.isBingoTime() || bbServerConfig.overrideBingoTime) {
+        if (generalConfig.getBingoCard().isBingoTime() || bbServerConfig.overrideBingoTime) {
             connectToBBserver();
         }
         try {

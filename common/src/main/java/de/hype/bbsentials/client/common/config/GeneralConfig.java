@@ -32,7 +32,7 @@ public class GeneralConfig extends BBsentialsConfig {
     public boolean doDesktopNotifications = false;
     public String nickname = "";
     public String notifForMessagesType = "NONE";
-    public JsonObject recentBingoData = null;
+    private BingoCardManager bingoCard;
     public Set<String> profileIds = new HashSet<>();
 
     public GeneralConfig() {
@@ -40,14 +40,9 @@ public class GeneralConfig extends BBsentialsConfig {
         doInit();
     }
 
-
-    public static boolean isBingoTime() {
-        Instant start = Instant.ofEpochSecond(generalConfig.recentBingoData.get("start").getAsLong());
-        Instant end = Instant.ofEpochSecond(generalConfig.recentBingoData.get("end").getAsLong());
-        Instant now = Instant.now();
-        return start.minus(12, ChronoUnit.HOURS).isBefore(now) && end.plus(2, ChronoUnit.HOURS).isAfter(now);
+    public BingoCardManager getBingoCard() {
+        return bingoCard;
     }
-
 
     /**
      * @param roleName required role. Modifying this method for things which require devmode may be violating the license and will result in a permanent blocking from the network!
@@ -87,42 +82,10 @@ public class GeneralConfig extends BBsentialsConfig {
 
     public void onInit() {
         try {
-            checkForBingoData();
+            bingoCard=new BingoCardManager();
         } catch (IOException e) {
             Chat.sendPrivateMessageToSelfError("Error Trying to load Bingo Data.");
         }
     }
 
-    public JsonObject checkForBingoData() throws IOException {
-        ZonedDateTime hypixelDate = Instant.now().atZone(ZoneId.of("America/Chicago")).plusDays(3);
-        if (recentBingoData != null && recentBingoData.get("id").getAsInt() == hypixelDate.getMonthValue() * (hypixelDate.getYear() - 2022))
-            return recentBingoData;
-        String apiUrl = "https://api.hypixel.net/v2/resources/skyblock/bingo";
-
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        // Optional: Setze Verbindungseigenschaften (z.B., Timeout, Methode)
-        connection.setConnectTimeout(5000);
-        connection.setRequestMethod("GET");
-
-        int responseCode = connection.getResponseCode();
-
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            // Lese die API-Antwort
-            InputStream inputStream = connection.getInputStream();
-            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-            String apiResponse = scanner.hasNext() ? scanner.next() : "";
-
-            // Konvertiere die API-Antwort in ein JsonObject
-            recentBingoData = JsonParser.parseString(apiResponse).getAsJsonObject();
-            if (recentBingoData.get("success").getAsBoolean() && !recentBingoData.get("goals").isJsonNull() && !recentBingoData.getAsJsonArray("goals").isEmpty()) {
-                return recentBingoData;
-            }
-            throw new IOException("Invalid Bingo Data");
-        }
-        else {
-            throw new IOException("Error Requesting from API. HTTP-Statuscode: " + responseCode);
-        }
-    }
 }

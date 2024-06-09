@@ -2,77 +2,20 @@ package de.hype.bbsentials.fabric.command.argumentTypes;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import de.hype.bbsentials.fabric.NeuRepoManager;
+import io.github.moulberry.repo.constants.Islands;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class SkyblockWarpArgumentType implements ArgumentType<String> {
-    private static final List<String> warps = List.of(
-            "home",
-            "island",
-            "hub",
-            "village",
-            "elizabeth",
-            "castle",
-            "da",
-            "crypt",
-            "crypts",
-            "museum",
-            "dungeon_hub",
-            "dungeons",
-            "dhub",
-            "barn",
-            "desert",
-            "trapper",
-            "trap",
-            "park",
-            "jungle",
-            "howl",
-            "gold",
-            "deep",
-            "mines",
-            "forge",
-            "forge",
-            "crystals",
-            "hollows",
-            "dh",
-            "nucleus",
-            "spider",
-            "spiders",
-            "top",
-            "nest",
-            "mound",
-            "arachne",
-            "end",
-            "drag",
-            "void",
-            "sepulture",
-            "crimson",
-            "nether",
-            "isle",
-            "kuudra",
-            "wasteland",
-            "dragontail",
-            "scarleton",
-            "smoldering",
-            "smoldering_tomb",
-            "smold",
-            "garden",
-            "winter",
-            "jerry",
-            "workshop",
-            "basecamp",
-            "camp",
-            "glacite",
-            "base",
-            "tunnels",
-            "tunnel",
-            "gt");
+    private static final List<String> warps = NeuRepoManager.getWarps().stream().map(Islands.Warp::getWarp).toList();
 
     private SkyblockWarpArgumentType() {
     }

@@ -6,21 +6,21 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.NeuRepoManager;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class SkyblockItemIdArgumentType implements ArgumentType<String> {
-    private final static List<String> skyblockItemIds = NeuRepoManager.getItemIds();
+public class SkyblockRecipeArgumentType implements ArgumentType<String> {
+    private final static List<String> skyblockItemIds = NeuRepoManager.getRepository().getItems().getItems().entrySet().stream().filter(e->e.getValue().getRecipes().isEmpty()).map(Map.Entry::getKey).toList();
 
-    private SkyblockItemIdArgumentType() {
+    private SkyblockRecipeArgumentType() {
     }
 
-    public static SkyblockItemIdArgumentType itemidtype() {
-        return new SkyblockItemIdArgumentType();
+    public static SkyblockRecipeArgumentType itemidtype() {
+        return new SkyblockRecipeArgumentType();
     }
 
     public static String getItemId(final CommandContext<?> context, final String name) {
@@ -44,7 +44,7 @@ public class SkyblockItemIdArgumentType implements ArgumentType<String> {
 
     @Override
     public Collection<String> getExamples() {
-        return List.of("CARROT_GENERATOR_6", "FURBALL", "EMERALD_GENERATOR_4", "SPEEDSTER_ROD");
+        return List.of("CARROT_GENERATOR_6", "EMERALD_GENERATOR_4", "SPEEDSTER_ROD");
     }
 }
 

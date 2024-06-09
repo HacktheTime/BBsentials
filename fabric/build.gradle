@@ -19,6 +19,7 @@ repositories {
     maven { url = uri("https://maven.xpple.dev/maven2") }
     maven { url = uri("https://maven.terraformersmc.com/releases") }
     maven { url = uri("https://maven.shedaniel.me/") }
+    maven { url = uri("https://repo.nea.moe/releases") }
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://repo.hypixel.net/repository/Hypixel/") }
 }

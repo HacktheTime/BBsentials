@@ -23,7 +23,6 @@ import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandSource;
-import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
@@ -70,25 +69,12 @@ public class Commands implements MCCommand {
 
     public void registerMain() {
         ClientCommandRegistrationCallback.EVENT.register(((dispatcher) -> {
-            dispatcher.replaceRegister(literal("creport")
-                    .then(argument("Player_Name", StringArgumentType.string())
-                            .executes((context) -> {
-                                String playerName = StringArgumentType.getString(context, "Player_Name");
-                                BBsentials.sender.addSendTask("/creport " + playerName, 0);
-                                BBsentials.temporaryConfig.alreadyReported.add(playerName);
-                                return 1;
-                            })));
             miningEvent(dispatcher, "goblinraid", MiningEvents.GOBLIN_RAID);/*goblinraid*/
             miningEvent(dispatcher, "2xpowder", MiningEvents.DOUBLE_POWDER);/*2xpowder*/
             miningEvent(dispatcher, "bettertogether", MiningEvents.BETTER_TOGETHER);/*b2g*/
             miningEvent(dispatcher, "raffle", MiningEvents.RAFFLE);/*raffle*/
             miningEvent(dispatcher, "gonewiththewind", MiningEvents.GONE_WITH_THE_WIND);/*gonewiththewind*/
             miningEvent(dispatcher, "mithrilgourmand", MiningEvents.MITHRIL_GOURMAND);/*gonewiththewind*/
-            dispatcher.register(literal("getLobbyTime")
-                    .executes((context) -> {
-                        Chat.sendPrivateMessageToSelfSuccess("Day: " + EnvironmentCore.utils.getLobbyDay());
-                        return 1;
-                    }));
             dispatcher.register(literal("chchest")
                     .then(argument("Item", StringArgumentType.string())
                             .suggests((context, builder) -> {

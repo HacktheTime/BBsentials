@@ -66,8 +66,6 @@ public class BBsentials {
     public static HypixelModAPICore hpModAPICore;
     public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
-    public static Map<String, String> itemIds = new HashMap<>();
-    private static boolean initialised = false;
     private static volatile ScheduledFuture<?> futureServerJoin;
     private static volatile boolean futureServerJoinRunning;
 

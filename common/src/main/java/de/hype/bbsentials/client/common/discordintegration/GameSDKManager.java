@@ -45,7 +45,6 @@ public class GameSDKManager extends DiscordEventAdapter {
             }
         }, 0, 14, TimeUnit.MILLISECONDS);
         BBsentials.executionService.scheduleAtFixedRate(this::updateActivity, 1, 20, TimeUnit.SECONDS);
-
     }
 
     public static boolean initCore() throws IOException {

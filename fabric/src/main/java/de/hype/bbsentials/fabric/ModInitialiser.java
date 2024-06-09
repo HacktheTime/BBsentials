@@ -1,6 +1,5 @@
 package de.hype.bbsentials.fabric;
 
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -17,6 +16,10 @@ import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.command.Commands;
+import de.hype.bbsentials.fabric.command.argumentTypes.SackMaterialArgumentType;
+import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockItemIdArgumentType;
+import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockRecipeArgumentType;
+import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockWarpArgumentType;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
@@ -29,7 +32,6 @@ import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -57,6 +59,8 @@ import java.util.stream.Collectors;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.*;
 import static de.hype.bbsentials.client.common.objects.WaypointRoute.waypointRouteDirectory;
+import static de.hype.bbsentials.fabric.command.ClientCommandManager.argument;
+import static de.hype.bbsentials.fabric.command.ClientCommandManager.literal;
 
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
@@ -104,6 +108,50 @@ public class ModInitialiser implements ClientModInitializer {
                                 return 1;
                             })));
         });//sbsocialoptions
+        de.hype.bbsentials.fabric.command.ClientCommandRegistrationCallback.EVENT.register(dispatcher -> {
+            dispatcher.replaceRegister(literal("creport")
+                    .then(argument("Player_Name", StringArgumentType.string())
+                            .executes((context) -> {
+                                String playerName = StringArgumentType.getString(context, "Player_Name");
+                                BBsentials.sender.addSendTask("/creport " + playerName, 0);
+                                BBsentials.temporaryConfig.alreadyReported.add(playerName);
+                                return 1;
+                            })));
+            dispatcher.replaceRegister(literal("warp")
+                    .then(argument("warp", SkyblockWarpArgumentType.warptype())
+                            .executes(context -> {
+                                BBsentials.sender.addImmediateSendTask("/warp " + SkyblockWarpArgumentType.getWarpString(context, "warp"));
+                                return 1;
+                            })
+                    ));
+            dispatcher.replaceRegister(literal("viewrecipe")
+                    .then(argument("itemid", SkyblockRecipeArgumentType.itemidtype())
+                            .executes(context -> {
+                                BBsentials.sender.addImmediateSendTask("/viewrecipe " + SkyblockRecipeArgumentType.getItemId(context, "itemid"));
+                                return 1;
+                            })
+                    ));
+            dispatcher.replaceRegister(literal("gfs")
+                    .then(argument("itemid", SackMaterialArgumentType.materialidtype())
+                            .then(argument("count", IntegerArgumentType.integer(0))
+                                    .executes(context -> {
+                                        BBsentials.sender.addImmediateSendTask("/gfs " + SackMaterialArgumentType.getItemId(context, "itemid") + IntegerArgumentType.getInteger(context, "count"));
+                                        return 1;
+                                    }))
+                    ));
+            dispatcher.replaceRegister(literal("wiki")
+                    .then(argument("itemid", SkyblockItemIdArgumentType.itemidtype())
+                            .executes(context -> {
+                                BBsentials.sender.addImmediateSendTask("/wiki " + SkyblockItemIdArgumentType.getItemId(context, "itemid"));
+                                return 1;
+                            })
+                    ));
+            dispatcher.register(literal("getLobbyTime")
+                    .executes((context) -> {
+                        Chat.sendPrivateMessageToSelfSuccess("Day: " + EnvironmentCore.utils.getLobbyDay());
+                        return 1;
+                    }));
+        });
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("bbi")
                             .then(ClientCommandManager.literal("reconnect")

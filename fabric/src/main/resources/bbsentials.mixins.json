@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "ChestLidMixin",
+    "CommandNodeAccessMixin",
     "LiteralCommandNodeMixin",
+    "RootCommandNodeAccessMixin",
     "SignaturePropertyErrorIgnoreMixin"
   ],
   "client": [

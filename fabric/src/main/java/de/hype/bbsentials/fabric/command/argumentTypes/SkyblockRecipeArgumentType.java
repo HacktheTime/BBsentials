@@ -6,7 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import de.hype.bbsentials.fabric.NeuRepoManager;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.NeuRepoManager;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class SkyblockRecipeArgumentType implements ArgumentType<String> {
-    private final static List<String> skyblockItemIds = NeuRepoManager.getRepository().getItems().getItems().entrySet().stream().filter(e->e.getValue().getRecipes().isEmpty()).map(Map.Entry::getKey).toList();
+    private final static List<String> skyblockItemIds = BBsentials.neuRepoManager.getRepository().getItems().getItems().entrySet().stream().filter(e->e.getValue().getRecipes().isEmpty() && !e.getKey().contains(";")).map(Map.Entry::getKey).toList();
 
     private SkyblockRecipeArgumentType() {
     }
@@ -35,11 +36,20 @@ public class SkyblockRecipeArgumentType implements ArgumentType<String> {
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         String current = builder.getRemainingLowerCase();
-        if (current.length() <= 2) return builder.buildFuture(); //So less resources are required;
-        skyblockItemIds.parallelStream().forEach(v -> {
-            if (v.startsWith(current)) builder.suggest(v);
-        });
-        return builder.buildFuture();
+        if (!current.isEmpty()) {
+            skyblockItemIds.parallelStream().forEach(v -> {
+                if (v.toLowerCase().contains(current)) builder.suggest(v);
+            });
+        }else {
+            for (String materialId : skyblockItemIds) {
+                builder.suggest(materialId);
+            }
+        }
+        try {
+            return builder.buildFuture();
+        } catch (Exception e) {
+            return Suggestions.empty();
+        }
     }
 
     @Override

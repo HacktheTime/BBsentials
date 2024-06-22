@@ -28,6 +28,7 @@ repositories {
     maven { url = uri("https://maven.shedaniel.me/") }
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://repo.hypixel.net/repository/Hypixel/") }
+    maven { url = uri("https://repo.nea.moe/releases") }
 }
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
@@ -42,6 +43,8 @@ dependencies {
     implementation("me.nullicorn:Nedit:latest.release")
     implementation("net.hypixel:mod-api:latest.release")
     implementation("com.github.JnCrMx:discord-game-sdk4j:latest.release")
+    implementation("moe.nea:neurepoparser:latest.release")
+    implementation('org.eclipse.jgit:org.eclipse.jgit:latest.release')
 }
 
 configurations {

@@ -13,10 +13,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.generalConfig;
 
@@ -24,7 +21,7 @@ import static de.hype.bbsentials.client.common.client.BBsentials.generalConfig;
 public class GeneralConfig extends BBsentialsConfig {
 
     public transient int apiVersion = 1;
-    public String[] bbsentialsRoles = {""};
+    public List<String> bbsentialsRoles = new ArrayList<>();
     public boolean useNumCodes = true;
     public boolean doGuildChatCustomMenu = true;
     public boolean doAllChatCustomMenu = true;

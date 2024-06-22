@@ -43,7 +43,7 @@ public class PunishmentData {
     public enum Type {
         BAN,
         BLACKLIST,
-        MUTE,
+        MUTE, WARN,
     }
 
     public static Date getTillDateFromDurationString(String duration) throws Exception {

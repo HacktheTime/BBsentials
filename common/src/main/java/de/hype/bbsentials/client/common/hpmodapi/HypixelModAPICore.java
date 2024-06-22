@@ -45,24 +45,20 @@ public class HypixelModAPICore implements ClientboundPacketHandler {
         if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Rec" + packet);
     }
 
-    @Override
     public void onPingPacket(ClientboundPingPacket packet) {
         handlePacketDebug(packet);
         completeGoal(packet, HPModAPIPacket.PING.getType());
     }
 
-    @Override
     public void onLocationEvent(ClientboundLocationPacket packet) {
         handlePacketDebug(packet);
         BBsentials.dataStorage = new BBDataStorage(packet);
     }
 
-    @Override
     public void onHelloEvent(ClientboundHelloPacket packet) {
         handlePacketDebug(packet);
     }
 
-    @Override
     public void onPartyInfoPacket(ClientboundPartyInfoPacket packet) {
         handlePacketDebug(packet);
         completeGoal(packet, HPModAPIPacket.PARTYINFO.getType());
@@ -73,10 +69,20 @@ public class HypixelModAPICore implements ClientboundPacketHandler {
         }
     }
 
-    @Override
+
+
     public void onPlayerInfoPacket(ClientboundPlayerInfoPacket packet) {
         handlePacketDebug(packet);
         completeGoal(packet, HPModAPIPacket.PLAYER_INFO.getType());
+    }
+
+    @Override
+    public void handle(ClientboundHypixelPacket p) {
+        if (p instanceof ClientboundHelloPacket) onHelloEvent((ClientboundHelloPacket) p);
+        if (p instanceof ClientboundLocationPacket) onLocationEvent((ClientboundLocationPacket) p);
+        if (p instanceof ClientboundPingPacket) onPingPacket((ClientboundPingPacket) p);
+        if (p instanceof ClientboundPlayerInfoPacket) onPlayerInfoPacket((ClientboundPlayerInfoPacket) p);
+        if (p instanceof ClientboundPartyInfoPacket) onPartyInfoPacket((ClientboundPartyInfoPacket) p);
     }
 
     public static class HPModPacketAssociation<T extends VersionedPacket> {

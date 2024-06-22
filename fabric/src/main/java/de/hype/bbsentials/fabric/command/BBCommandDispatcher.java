@@ -8,9 +8,9 @@ import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import de.hype.bbsentials.fabric.mixins.mixin.BBsentialsCommandSource;
+import de.hype.bbsentials.fabric.mixins.mixin.RootCommandNodeAccessMixin;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.IBBsentialsCommandSource;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.IRootCommandNodeMixinAccess;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
@@ -25,7 +25,7 @@ import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class BBCommandDispatcher extends CommandDispatcher<IBBsentialsCommandSource> {
     private static BBCommandDispatcher INSTANCE;
-    private static List<LiteralCommandNode<IBBsentialsCommandSource>> replaceChilds = new ArrayList<>();
+    private final List<LiteralArgumentBuilder<IBBsentialsCommandSource>> replaceChilds = new ArrayList<LiteralArgumentBuilder<IBBsentialsCommandSource>>();
 
 
     public BBCommandDispatcher() {
@@ -89,23 +89,13 @@ public class BBCommandDispatcher extends CommandDispatcher<IBBsentialsCommandSou
         }
     }
 
-    public LiteralCommandNode<IBBsentialsCommandSource> replaceRegister(LiteralArgumentBuilder<IBBsentialsCommandSource> command) {
-        LiteralCommandNode<IBBsentialsCommandSource> toReturn = command.build();
-        replaceChilds.add(toReturn);
-        return toReturn;
-    }
-
-    public void addCommands(CommandDispatcher<CommandSource> target, CommandSource source) {
-        Map<CommandNode<CommandSource>, CommandNode<CommandSource>> originalToCopy = new HashMap<>();
-        originalToCopy.put((CommandNode<CommandSource>) (Object) getRoot(), target.getRoot());
-        copyChildren((CommandNode<CommandSource>) (Object) getRoot(), target.getRoot(), source, originalToCopy);
-    }
     private static Text getErrorMessage(CommandSyntaxException e) {
         Text message = Texts.toText(e.getRawMessage());
         String context = e.getContext();
 
         return context != null ? Text.translatable("command.context.parse_error", message, e.getCursor(), context) : message;
     }
+
     private static boolean isIgnoredException(CommandExceptionType type) {
         BuiltInExceptionProvider builtins = CommandSyntaxException.BUILT_IN_EXCEPTIONS;
 
@@ -113,5 +103,19 @@ public class BBCommandDispatcher extends CommandDispatcher<IBBsentialsCommandSou
         // The argument-related dispatcher exceptions are not ignored because
         // they will only happen if the user enters a correct command.
         return type == builtins.dispatcherUnknownCommand() || type == builtins.dispatcherParseException();
+    }
+
+    public LiteralCommandNode<IBBsentialsCommandSource> replaceRegister(LiteralArgumentBuilder<IBBsentialsCommandSource> command) {
+        LiteralArgumentBuilder<IBBsentialsCommandSource> toReturn = command;
+        replaceChilds.add(toReturn);
+        return toReturn.build();
+    }
+
+    public void addCommands(CommandDispatcher<CommandSource> target, CommandSource source) {
+        IRootCommandNodeMixinAccess<CommandSource> parsedTarget = (IRootCommandNodeMixinAccess) (Object) target.getRoot();
+        parsedTarget.BBsentials$replaceNodes(replaceChilds);
+        Map<CommandNode<CommandSource>, CommandNode<CommandSource>> originalToCopy = new HashMap<>();
+        originalToCopy.put((CommandNode<CommandSource>) (Object) getRoot(), target.getRoot());
+        copyChildren((CommandNode<CommandSource>) (Object) getRoot(), target.getRoot(), source, originalToCopy);
     }
 }

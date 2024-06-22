@@ -15,6 +15,7 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
+import de.hype.bbsentials.fabric.command.ClientCommandManager;
 import de.hype.bbsentials.fabric.command.Commands;
 import de.hype.bbsentials.fabric.command.argumentTypes.SackMaterialArgumentType;
 import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockItemIdArgumentType;
@@ -30,8 +31,7 @@ import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import de.hype.bbsentials.fabric.command.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -66,7 +66,7 @@ public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
 
     {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
                     .then(ClientCommandManager.argument("playername", StringArgumentType.greedyString())
                             .executes((context) -> {
@@ -152,7 +152,7 @@ public class ModInitialiser implements ClientModInitializer {
                         return 1;
                     }));
         });
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
             dispatcher.register(ClientCommandManager.literal("bbi")
                             .then(ClientCommandManager.literal("reconnect")
                                     .executes((context) -> {

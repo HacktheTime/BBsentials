@@ -16,6 +16,7 @@ import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.RenderInformation;
+import io.github.moulberry.repo.NEURepositoryException;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -66,6 +67,16 @@ public class BBsentials {
     public static HypixelModAPICore hpModAPICore;
     public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
+    public static NeuRepoManager neuRepoManager;
+
+    static {
+        try {
+            neuRepoManager = new NeuRepoManager();
+        } catch (NEURepositoryException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static volatile ScheduledFuture<?> futureServerJoin;
     private static volatile boolean futureServerJoinRunning;
 

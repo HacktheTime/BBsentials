@@ -3,6 +3,8 @@ package de.hype.bbsentials.shared.packets.network;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.shared.constants.InternalReasonConstants;
 
+import java.util.List;
+
 /**
  * Gives the User feedback that the command had a problem.
  */
@@ -15,7 +17,7 @@ public class InvalidCommandFeedbackPacket extends AbstractPacket {
      * @param permissionNeeded permission required for that command / argument
      * @param userPermissions  permissions the user has.
      */
-    public InvalidCommandFeedbackPacket(InternalReasonConstants internalReason, String command, String displayMessage, String argument, String permissionNeeded, String[] userPermissions) {
+    public InvalidCommandFeedbackPacket(InternalReasonConstants internalReason, String command, String displayMessage, String argument, String permissionNeeded, List<String> userPermissions) {
         super(1, 1); //Min and Max supportet Version
         this.internalReason = internalReason;
         this.argument = argument;
@@ -28,7 +30,7 @@ public class InvalidCommandFeedbackPacket extends AbstractPacket {
     public final InternalReasonConstants internalReason;
     public final String argument;
     public final String permissionNeeded;
-    public final String[] userPermissions;
+    public final List<String> userPermissions;
     public final String command;
     public final String displayMessage;
 

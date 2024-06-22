@@ -22,7 +22,7 @@ public class DummyDataStorage {
         else if (positioning.position == null && comGoalDataPacketInstance != null) {
             comGoalDataPacketSendFuture.get().cancel(false);
             comGoalDataPacketSendFuture.set(BBsentials.executionService.schedule(() -> {
-                if (BBsentials.connection != null) BBsentials.connection.sendPacket(comGoalDataPacketInstance.get());
+                if (BBsentials.connection != null && BBsentials.connection.isConnected()) BBsentials.connection.sendPacket(comGoalDataPacketInstance.get());
                 comGoalDataPacketInstance = null;
                 comGoalDataPacketSendFuture = null;
             }, 50, TimeUnit.MILLISECONDS));
@@ -37,7 +37,7 @@ public class DummyDataStorage {
             comGoalDataPacketSendFuture.get().cancel(false);
             comGoalDataPacketInstance.get().positions.add(positioning);
             comGoalDataPacketSendFuture.set(BBsentials.executionService.schedule(() -> {
-                if (BBsentials.connection != null) BBsentials.connection.sendPacket(comGoalDataPacketInstance.get());
+                if (BBsentials.connection != null && BBsentials.connection.isConnected()) BBsentials.connection.sendPacket(comGoalDataPacketInstance.get());
                 comGoalDataPacketInstance = null;
                 comGoalDataPacketSendFuture = null;
             }, 50, TimeUnit.MILLISECONDS));

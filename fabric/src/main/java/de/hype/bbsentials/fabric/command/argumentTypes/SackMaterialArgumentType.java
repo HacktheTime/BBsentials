@@ -18,12 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class SackMaterialArgumentType implements ArgumentType<String> {
 
-    public static List<String> materialIds;
-    private SackMaterialArgumentType() {
-        if (materialIds==null){
-            materialIds = getAllSackContents();
-        }
-    }
+    public static List<String> materialIds = getAllSackContents();
 
     public static SackMaterialArgumentType materialidtype() {
         return new SackMaterialArgumentType();
@@ -33,24 +28,6 @@ public class SackMaterialArgumentType implements ArgumentType<String> {
         return context.getArgument(name, String.class);
     }
 
-    @Override
-    public String parse(final StringReader reader) throws CommandSyntaxException {
-        return reader.readString();
-    }
-
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
-        String current = builder.getRemainingLowerCase();
-        materialIds.parallelStream().forEach(v->{
-            if (v.startsWith(current)) builder.suggest(v);
-        });
-        return builder.buildFuture();
-    }
-
-    @Override
-    public Collection<String> getExamples() {
-        return List.of("WHEAT","ENCHANTED_HAY_BALE");
-    }
     public static List<String> getAllSackContents() {
         List<String> combinedContents = new ArrayList<>();
 
@@ -78,5 +55,34 @@ public class SackMaterialArgumentType implements ArgumentType<String> {
         }
 
         return combinedContents;
+    }
+
+    @Override
+    public String parse(final StringReader reader) throws CommandSyntaxException {
+        return reader.readString();
+    }
+
+    @Override
+    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
+        String current = builder.getRemainingLowerCase();
+        if (!current.isEmpty()) {
+            materialIds.parallelStream().forEach(v -> {
+                if (v.toLowerCase().contains(current)) builder.suggest(v);
+            });
+        }else {
+            for (String materialId : materialIds) {
+                builder.suggest(materialId);
+            }
+        }
+        try {
+            return builder.buildFuture();
+        } catch (Exception e) {
+            return Suggestions.empty();
+        }
+    }
+
+    @Override
+    public Collection<String> getExamples() {
+        return List.of("WHEAT", "ENCHANTED_HAY_BALE");
     }
 }

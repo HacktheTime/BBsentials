@@ -50,9 +50,13 @@ dependencies {
     add("transitiveInclude", modImplementation("me.nullicorn:Nedit:latest.release"))
     modImplementation("moe.nea:neurepoparser:latest.release")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    add("transitiveInclude", modImplementation('org.eclipse.jgit:org.eclipse.jgit:latest.release'))
+    include(implementation('org.eclipse.jgit:org.eclipse.jgit:latest.release'))
+    implementation('org.eclipse.jgit:org.eclipse.jgit:latest.release')
 
     configurations.transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
-        include(it.moduleVersion.id.toString())
+        modImplementation(it.moduleVersion.id.toString())
+//        include(it.moduleVersion.id.toString())
     }
 }
 

@@ -64,7 +64,7 @@ import static de.hype.bbsentials.fabric.command.ClientCommandManager.literal;
 
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
-
+    public static KeyBinding openWikiKeybind;
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
@@ -432,14 +432,14 @@ public class ModInitialiser implements ClientModInitializer {
             );
 
         }); //bbi
-        KeyBinding devKeyBind = new KeyBinding("Open Mod Menu ConfigManager", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
+        KeyBinding devKeyBind = new KeyBinding("Open Mod Menu Config", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_MULTIPLY, "BBsentials: Developing Tools");
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (devKeyBind.wasPressed()) {
-//              executionService.schedule(() -> MinecraftClient.getInstance().execute(() ->
                 MinecraftClient.getInstance().setScreen(BBsentialsConfigScreenFactory.create(MinecraftClient.getInstance().currentScreen));
-//              ),3, TimeUnit.SECONDS);
             }
         });
+        openWikiKeybind = new KeyBinding("Lookup Hovered Item in Wiki", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_U, "BBsentials");
+        KeyBindingHelper.registerKeyBinding(openWikiKeybind);
 
         KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
         KeyBindingHelper.registerKeyBinding(promptKeyBind);

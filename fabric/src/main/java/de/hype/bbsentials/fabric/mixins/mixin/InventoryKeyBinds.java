@@ -1,41 +1,71 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import com.google.gson.JsonParser;
+import de.hype.bbsentials.fabric.ModInitialiser;
+import de.hype.bbsentials.fabric.SystemUtils;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Items;
-import net.minecraft.screen.GenericContainerScreenHandler;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Intrinsic;
+import org.apache.commons.text.WordUtils;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(GenericContainerScreen.class)
-public abstract class InventoryKeyBinds extends HandledScreen<GenericContainerScreenHandler> implements ScreenHandlerProvider<GenericContainerScreenHandler> {
+import java.util.ArrayList;
 
+@Mixin(HandledScreen.class)
+public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
 
-    public InventoryKeyBinds(GenericContainerScreenHandler handler, PlayerInventory inventory, Text title) {
-        super(handler, inventory, title);
+    @Nullable
+    @Shadow
+    protected Slot focusedSlot;
+
+    protected InventoryKeyBinds(Text title) {
+        super(title);
     }
 
-    @Shadow
-    @Override
-    protected abstract void drawBackground(DrawContext context, float delta, int mouseX, int mouseY);
-
-    @Intrinsic(displace = true)
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (focusedSlot != null && keyCode == 258 && focusedSlot.getStack().getItem() != Items.AIR)
-            onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);
+        if (focusedSlot != null && focusedSlot.getStack().getItem() != Items.AIR) {
+            if (keyCode == 258) onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);
+            else if (keyCode == KeyBindingHelper.getBoundKeyOf(ModInitialiser.openWikiKeybind).getCode()) {
+                NbtComponent customData = focusedSlot.getStack().get(DataComponentTypes.CUSTOM_DATA);
+                if (customData == null) return super.keyPressed(keyCode, scanCode, modifiers);
+                NbtCompound data = customData.copyNbt();
+                String id = data.getString("id");
+                String lowercaseID = id.toLowerCase();
+                String path = "";
+                if (lowercaseID.equals("enchanted_book")) {
+                    path = WordUtils.capitalize((new ArrayList<>(data.getCompound("enchantments").getKeys()).get(0).replace("ultimate_", "") + "_Enchantment").replace("_", " ")).replace(" ", "_");
+                }
+                else if (lowercaseID.equals("pet")) {
+                    path = WordUtils.capitalize((JsonParser.parseString(data.getString("petInfo")).getAsJsonObject().get("type").getAsString().toLowerCase() + "_Pet").replace("_", " ")).replace(" ", "_");
+                }
+                else if (lowercaseID.equals("potion")) {
+                    path = WordUtils.capitalize((data.getString("potion").toLowerCase().replace("xp","XP") + "_Potion").replace("_", " ")).replace(" ", "_");
+                }
+                else if (lowercaseID.equals("rune")) {
+                    path = WordUtils.capitalize((new ArrayList<>(data.getCompound("runes").getKeys()).get(0).toLowerCase() + "_Rune").replace("_", " ")).replace(" ", "_");
+                }
+                else {
+                    path = id;
+                }
+                SystemUtils.openInBrowser("https://wiki.hypixel.net/%s".formatted(path));
+            }
+            else return super.keyPressed(keyCode, scanCode, modifiers);
+        }
         else return super.keyPressed(keyCode, scanCode, modifiers);
         return true;
     }
 
-    @Intrinsic(displace = true)
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
+    @Shadow
+    protected abstract void onMouseClick(Slot focusedSlot, int id, int i, SlotActionType slotActionType);
 }

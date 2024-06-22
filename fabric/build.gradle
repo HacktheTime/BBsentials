@@ -54,6 +54,7 @@ dependencies {
     add("transitiveInclude", modImplementation('org.eclipse.jgit:org.eclipse.jgit:latest.release'))
     include(implementation('org.eclipse.jgit:org.eclipse.jgit:latest.release'))
     implementation('org.eclipse.jgit:org.eclipse.jgit:latest.release')
+    implementation("org.apache.commons:commons-text:latest.release")
 
     configurations.transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
         modImplementation(it.moduleVersion.id.toString())

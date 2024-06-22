@@ -15,16 +15,16 @@ import java.util.Map;
 @Mixin(CommandNode.class)
 public abstract class CommandNodeAccessMixin<S> implements ICommandNodeMixinAccess<S> {
     @Final
-    @Shadow
+    @Shadow(remap = false)
     private Map<String, CommandNode<S>> children;
     @Final
-    @Shadow
+    @Shadow(remap = false)
     private Map<String, LiteralCommandNode<S>> literals = new LinkedHashMap<>();
     @Final
-    @Shadow
+    @Shadow(remap = false)
     private Map<String, ArgumentCommandNode<S, ?>> arguments = new LinkedHashMap<>();
 
-    @Shadow
+    @Shadow(remap = false)
     public abstract void addChild(CommandNode<S> node);
 
     @Unique

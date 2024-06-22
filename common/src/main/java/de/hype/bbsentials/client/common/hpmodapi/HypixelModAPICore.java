@@ -3,7 +3,7 @@ package de.hype.bbsentials.client.common.hpmodapi;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBDataStorage;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import net.hypixel.modapi.handler.ClientboundPacketHandler;
+import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.ClientboundHypixelPacket;
 import net.hypixel.modapi.packet.impl.VersionedPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
 import static de.hype.bbsentials.client.common.client.BBsentials.generalConfig;
 
-public class HypixelModAPICore implements ClientboundPacketHandler {
+public class HypixelModAPICore {
     private Map<HPModAPIPacketEnum, List<HPModPacketAssociation>> waiting = new HashMap<>();
 
     public <T extends VersionedPacket> void addToWaiting(HPModAPIPacketEnum type, CompletableFuture<T> future) {
@@ -70,19 +70,19 @@ public class HypixelModAPICore implements ClientboundPacketHandler {
     }
 
 
-
     public void onPlayerInfoPacket(ClientboundPlayerInfoPacket packet) {
         handlePacketDebug(packet);
         completeGoal(packet, HPModAPIPacket.PLAYER_INFO.getType());
     }
 
-    @Override
-    public void handle(ClientboundHypixelPacket p) {
-        if (p instanceof ClientboundHelloPacket) onHelloEvent((ClientboundHelloPacket) p);
-        if (p instanceof ClientboundLocationPacket) onLocationEvent((ClientboundLocationPacket) p);
-        if (p instanceof ClientboundPingPacket) onPingPacket((ClientboundPingPacket) p);
-        if (p instanceof ClientboundPlayerInfoPacket) onPlayerInfoPacket((ClientboundPlayerInfoPacket) p);
-        if (p instanceof ClientboundPartyInfoPacket) onPartyInfoPacket((ClientboundPartyInfoPacket) p);
+    public void register() {
+        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
+        HypixelModAPI.getInstance().registerHandler(ClientboundHelloPacket.class, this::onHelloEvent);
+        HypixelModAPI.getInstance().registerHandler(ClientboundLocationPacket.class, this::onLocationEvent);
+        HypixelModAPI.getInstance().registerHandler(ClientboundPingPacket.class, this::onPingPacket);
+        HypixelModAPI.getInstance().registerHandler(ClientboundPlayerInfoPacket.class, this::onPlayerInfoPacket);
+        HypixelModAPI.getInstance().registerHandler(ClientboundPartyInfoPacket.class, this::onPartyInfoPacket);
+        HypixelModAPI.getInstance().registerHandler(ClientboundLocationPacket.class, this::onLocationEvent);
     }
 
     public static class HPModPacketAssociation<T extends VersionedPacket> {

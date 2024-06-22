@@ -33,12 +33,13 @@ configurations {
 }
 
 dependencies {
+    //TODO I am aware of this mess with the dependencies. It is on the thing todo but it launches with IntelliJ
     minecraft "com.mojang:minecraft:${libs.versions.modern.minecraft.get()}"
     mappings "net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2"
     modRuntimeOnly(libs.modern.devauth)
     modImplementation(include("dev.xpple:clientarguments:1.8.2"))
     add("transitiveInclude", modImplementation("com.github.JnCrMx:discord-game-sdk4j:latest.release"))
-    modImplementation(include("net.hypixel:mod-api:latest.release"))
+    modImplementation("net.hypixel:mod-api:latest.release")
     modImplementation(libs.modmenu)
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${libs.versions.cloth.get()}") {
         exclude(group: "net.fabricmc.fabric-api")

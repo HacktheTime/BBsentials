@@ -22,6 +22,7 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.HypixelPacket;
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
@@ -67,6 +68,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
+import static de.hype.bbsentials.client.common.client.BBsentials.hpModAPICore;
 
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
     ModContainer self = FabricLoader.getInstance().getAllMods().stream().filter(modContainer -> modContainer.getMetadata().getId().equals("bbsentials")).toList().get(0);
@@ -619,9 +621,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public void registerNetworkHandlers() {
-//        HypixelModAPI.getInstance().registerHandler(hpModAPICore);
-//        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
-
+        hpModAPICore.register();
     }
 
     @Override

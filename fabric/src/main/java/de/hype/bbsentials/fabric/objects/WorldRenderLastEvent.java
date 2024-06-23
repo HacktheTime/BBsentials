@@ -1,5 +1,5 @@
 package de.hype.bbsentials.fabric.objects;
-// Credits go to nea89 for this (Firmanent)!
+// Credits go to nea89o for this (Firmanent)!
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -34,21 +34,19 @@ public class WorldRenderLastEvent
     public final Camera camera;
     public final GameRenderer gameRenderer;
     public final LightmapTextureManager lightmapTextureManager;
-    public final Matrix4f positionMatrix;
     public final VertexConsumerProvider.Immediate vertexConsumers;
 
     public final List<TextRenderCall> toRender = new ArrayList<>();
 
     public WorldRenderLastEvent(MatrixStack matrices, float tickDelta, boolean renderBlockOutline, Camera camera,
                                 GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
-                                Matrix4f positionMatrix, VertexConsumerProvider.Immediate vertexConsumers) {
+                                VertexConsumerProvider.Immediate vertexConsumers) {
         this.matrices = matrices;
         this.tickDelta = tickDelta;
         this.renderBlockOutline = renderBlockOutline;
         this.camera = camera;
         this.gameRenderer = gameRenderer;
         this.lightmapTextureManager = lightmapTextureManager;
-        this.positionMatrix = positionMatrix;
         this.vertexConsumers = vertexConsumers;
     }
 }

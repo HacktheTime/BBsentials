@@ -1,13 +1,11 @@
 package de.hype.bbsentials.shared.objects;
 
 import de.hype.bbsentials.shared.constants.StatusConstants;
-import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 public class ChestLobbyData {
@@ -31,11 +29,6 @@ public class ChestLobbyData {
         setStatusNoOverride(status);
     }
 
-
-    public ChChestPacket getAsPacket() {
-        return new ChChestPacket(this);
-    }
-
     public String getStatus() {
         return status;
     }
@@ -45,6 +38,10 @@ public class ChestLobbyData {
      * @throws IllegalArgumentException if Object is not a {@link String} or {@link StatusConstants}
      */
     public void setStatus(Object statusBase) throws SQLException {
+        setStatusNoOverride(statusBase);
+    }
+
+    public void setStatus(StatusConstants statusBase) throws SQLException {
         setStatusNoOverride(statusBase);
     }
 
@@ -84,9 +81,29 @@ public class ChestLobbyData {
         // need to be overridden
     }
 
+    public List<String> getPlayersStillIn() {
+        return playersStillIn;
+    }
+
+    public Long getClosingTime() {
+        return closingTime;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ChestLobbyData)) return false;
         return ((ChestLobbyData) obj).lobbyId == lobbyId;
+    }
+
+    protected void updateLobby(ChestLobbyData lobby) {
+        bbcommand = lobby.bbcommand;
+        extraMessage = lobby.extraMessage;
+        status = lobby.getStatus();
+        contactMan = lobby.contactMan;
+        chests = lobby.chests;
+        try {
+            setLobbyMetaData(lobby.getPlayersStillIn(), lobby.getClosingTime());
+        } catch (SQLException ignored) {
+        }
     }
 }

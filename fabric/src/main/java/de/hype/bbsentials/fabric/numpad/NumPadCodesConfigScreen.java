@@ -165,7 +165,7 @@ public class NumPadCodesConfigScreen extends Screen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        return BBsentials.developerConfig.devMode;
+        return true;
     }
 
     @Override

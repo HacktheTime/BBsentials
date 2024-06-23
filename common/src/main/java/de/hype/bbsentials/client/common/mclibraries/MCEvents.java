@@ -9,13 +9,10 @@ public interface MCEvents {
     }
 
     default void registerOffline() {
-        registerWaypoints();
     }
 
     void registerOverlays();
 
     void registerUseClick();
-
-    void registerWaypoints();
 
 }

@@ -1,133 +1,53 @@
 package de.hype.bbsentials.client.common.chat;
 
+import com.google.gson.JsonObject;
 import de.hype.bbsentials.client.common.client.BBsentials;
 
-public class Message {
-    public boolean actionBar = false;
-    Boolean guild = null;
-    Boolean party = null;
-    Boolean msg = null;
-    Boolean server = null;
-    private String text;
-    private String unformattedString = null;
-    private String playerName = null;
-    private String string;
-    private String noRanks;
+import static de.hype.bbsentials.shared.objects.Message.MessageSource.PRIVATE_MESSAGE_RECEIVE;
+import static de.hype.bbsentials.shared.objects.Message.MessageSource.SELFCREATED;
+
+
+public class Message extends de.hype.bbsentials.shared.objects.Message {
+    protected Boolean isFromReportedUser;
 
     public Message(String textJson, String string) {
-        this.text = textJson;
-        if (string == null) string = "";
-        this.string = string;
+        this(textJson, string, false);
     }
 
     public Message(String textJson, String string, boolean actionbar) {
-        this.text = textJson;
-        if (string == null) string = "";
-        this.string = string;
-        this.actionBar = actionbar;
+        super(textJson, string, actionbar);
+        isFromReportedUser = isFromReportedUser();
     }
 
     public static Message of(String string) {
-        String escapedString = string.replace("\\", "\\\\").replace("\"", "\\\"");
-        String json = "{\"text\":\"" + escapedString + "\"}";
-        return new Message(json, string);
+        JsonObject obj = new JsonObject();
+        obj.addProperty("text", string);
+        Message message = new Message(obj.toString(), string);
+        message.source = SELFCREATED;
+        return message;
     }
 
     public static Message tellraw(String json) {
-        json = json.replace("@username", BBsentials.generalConfig.getUsername());
-        return new Message(json, "");
+        Message message = new Message(json, "");
+        message.source = SELFCREATED;
+        return message;
     }
 
-    //
-    public String getJson() {
-        return text;
-    }
-
-    public String getString() {
-        return string;
-    }
-
-    public String getUnformattedString() {
-        if (unformattedString != null) return unformattedString;
-        unformattedString = string.replaceAll("§.", "").trim();
-        return unformattedString;
-    }
-
-    public String getMessageContent() {
-        if (isServerMessage()) return unformattedString;
-        return getUnformattedString().split(":", 2)[1].trim();
-    }
-
-    public boolean isFromGuild() {
-        if (guild != null) return guild;
-        guild = getUnformattedString().startsWith("Guild >");
-        return guild;
-    }
-
-    public boolean isFromParty() {
-        if (party != null) return party;
-        party = getUnformattedString().startsWith("Party >");
-        return party;
-    }
-
-    public boolean isMsg() {
-        if (msg != null) return msg;
-        msg = getUnformattedString().startsWith("From") || getUnformattedString().startsWith("To");
-        return msg;
-    }
-
-    public boolean isServerMessage() {
-        if (server != null) return server;
-        return !(isFromParty() || isFromGuild() || isMsg());
-    }
-
-    public String getPlayerName() {
-        if (playerName != null) return playerName;
-        playerName = getUnformattedString();
-        if (!playerName.contains(":")) {
-            playerName = "";
-            return "";
-        }
-        playerName = playerName.split(":", 2)[0];
-        if (isMsg()) {
-            playerName = playerName.replaceFirst("From", "").replace("To", "").trim();
-        }
-        if (playerName.contains(">")) {
-            playerName = playerName.split(">", 2)[1];
-        }
-//        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?[^\\x00-\\x7F]+\\s*?\\s?\\[[^\\]]*\\])*", "").trim()// replaces every [] and unicode character before a asci character.
-        playerName = playerName.replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim();
-        if (playerName.matches("[^a-zA-Z0-9_-]+")) playerName = "";
-        return playerName;
-    }
-
-    public String getNoRanks() {
-        if (noRanks != null) return noRanks;
-        return getUnformattedString().replaceAll("[^\\x00-\\x7F]+\\s*","").replaceAll("\\[[^\\]]*\\]","").trim();
-    }
-
-    public void replaceInJson(String replace, String replaceWith) {
-        text = text.replaceFirst(replace, replaceWith);
+    @Override
+    public String getSelfUsername() {
+        return BBsentials.generalConfig.getUsername();
     }
 
     public boolean isFromReportedUser() {
         return BBsentials.temporaryConfig.alreadyReported.contains(getPlayerName()) && !getPlayerName().isEmpty();
     }
 
-    public boolean contains(String string) {
-        return getUnformattedString().contains(string);
-    }
-
-    public boolean startsWith(String string) {
-        return getUnformattedString().startsWith(string);
-    }
-
-    public boolean endsWith(String string) {
-        return getUnformattedString().endsWith(string);
-    }
-
-    @Override
-    public String toString() {
-        return getUnformattedString();
+    public void replyToUser(String message) {
+        String commandStart = source.replyCommandStart;
+        if (commandStart == null) return;
+        if (source != PRIVATE_MESSAGE_RECEIVE)
+            BBsentials.sender.addImmediateSendTask(commandStart + getPlayerName() + " " + message);
+        else
+            BBsentials.sender.addImmediateSendTask("/r " + getPlayerName() + " " + message);
     }
 }

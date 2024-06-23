@@ -2,13 +2,16 @@ package de.hype.bbsentials.fabric
 
 import com.mojang.blaze3d.systems.RenderSystem
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent
+import de.hype.bbsentials.shared.objects.RenderInformation
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gl.VertexBuffer
 import net.minecraft.client.render.*
+import net.minecraft.client.texture.Sprite
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.client.util.math.MatrixStack.Entry
 import net.minecraft.text.Text
+import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import org.joml.Matrix4f
@@ -27,6 +30,10 @@ class RenderInWorldContext private constructor(
     private val buffer = tesselator.buffer
 //    val effectiveFov = (MinecraftClient.getInstance().gameRenderer as AccessorGameRenderer).getFov_firmament(camera, tickDelta, true)
 //    val effectiveFovScaleFactor = 1 / tan(toRadians(effectiveFov) / 2)
+
+    fun color(color: me.shedaniel.math.Color) {
+        color(color.red / 255F, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+    }
 
     fun color(red: Float, green: Float, blue: Float, alpha: Float) {
         RenderSystem.setShaderColor(red, green, blue, alpha)
@@ -57,9 +64,7 @@ class RenderInWorldContext private constructor(
 
     fun waypoint(position: BlockPos, label: Text) {
         text(
-            position.toCenterPos(),
-            label,
-            Text.literal(
+            position.toCenterPos(), label, Text.literal(
                 "§e${
                     formatDistance(
                         MinecraftClient.getInstance().player?.pos?.distanceTo(
@@ -72,8 +77,7 @@ class RenderInWorldContext private constructor(
     }
 
     fun formatDistance(distance: Double): String {
-        if (distance < 10)
-            return "%.1fm".format(distance)
+        if (distance < 10) return "%.1fm".format(distance)
         return "%dm".format(distance.toInt())
     }
 
@@ -146,12 +150,16 @@ class RenderInWorldContext private constructor(
     }
 
     fun line(vararg points: Vec3d, lineWidth: Float = 10F) {
+        line(points.toList(), lineWidth)
+    }
+
+    fun line(points: List<Vec3d>, lineWidth: Float = 10F) {
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
         RenderSystem.lineWidth(lineWidth / pow(camera.pos.squaredDistanceTo(points.first()), 0.25).toFloat())
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
         buffer.fixedColor(255, 255, 255, 255)
 
-        points.toList().zipWithNext().forEach { (a, b) ->
+        points.zipWithNext().forEach { (a, b) ->
             doLine(matrixStack.peek(), buffer, a.x, a.y, a.z, b.x, b.y, b.z)
         }
         buffer.unfixColor()
@@ -161,16 +169,28 @@ class RenderInWorldContext private constructor(
 
     companion object {
         private fun doLine(
-            matrix: Entry, buf: BufferBuilder, i: Number, j: Number, k: Number, x: Number, y: Number, z: Number
+            matrix: Entry,
+            buf: BufferBuilder,
+            i: Number,
+            j: Number,
+            k: Number,
+            x: Number,
+            y: Number,
+            z: Number
         ) {
             val normal =
-                Vector3f(x.toFloat(), y.toFloat(), z.toFloat()).sub(i.toFloat(), j.toFloat(), k.toFloat()).mul(-1F)
+                Vector3f(x.toFloat(), y.toFloat(), z.toFloat()).sub(i.toFloat(), j.toFloat(), k.toFloat()).normalize()
             buf.vertex(matrix.positionMatrix, i.toFloat(), j.toFloat(), k.toFloat())
-                .normal(matrix.normalMatrix, normal.x, normal.y, normal.z).next()
+                .normal(matrix, normal.x, normal.y, normal.z).next()
             buf.vertex(matrix.positionMatrix, x.toFloat(), y.toFloat(), z.toFloat())
-                .normal(matrix.normalMatrix, normal.x, normal.y, normal.z).next()
+                .normal(matrix, normal.x, normal.y, normal.z).next()
         }
 
+        private fun doTracer(
+            matrix: Entry, buf: BufferBuilder, i: Number, j: Number, k: Number, x: Number, y: Number, z: Number
+        ) {
+            doLine(matrix, buf, i, j, k, x, y, z)
+        }
 
         private fun buildWireFrameCube(matrix: MatrixStack.Entry, buf: BufferBuilder) {
             buf.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
@@ -256,6 +276,98 @@ class RenderInWorldContext private constructor(
             RenderSystem.enableCull()
             RenderSystem.disableBlend()
         }
+    }
+
+    fun sprite(position: Vec3d, sprite: Sprite, width: Int, height: Int) {
+        texture(
+            position, sprite.atlasId, width, height, sprite.minU, sprite.minV, sprite.maxU, sprite.maxV
+        )
+    }
+    fun withFacingThePlayer(position: Vec3d, block: () -> Unit) {
+        matrixStack.push()
+        matrixStack.translate(position.x, position.y, position.z)
+        val actualCameraDistance = position.distanceTo(camera.pos)
+        val distanceToMoveTowardsCamera = if (actualCameraDistance < 10) 0.0 else -(actualCameraDistance - 10.0)
+        val vec = position.subtract(camera.pos).multiply(distanceToMoveTowardsCamera / actualCameraDistance)
+        matrixStack.translate(vec.x, vec.y, vec.z)
+        matrixStack.multiply(camera.rotation)
+        matrixStack.scale(-0.025F, -0.025F, -1F)
+
+        block()
+
+        matrixStack.pop()
+        vertexConsumers.drawCurrentLayer()
+    }
+
+    fun texture(
+        position: Vec3d, texture: Identifier, width: Int, height: Int,
+        u1: Float, v1: Float,
+        u2: Float, v2: Float,
+    ) {
+        val backupColor = RenderSystem.getShaderColor()
+        color(1f, 1f, 1f, 1f)
+        withFacingThePlayer(position) {
+            RenderSystem.setShaderTexture(0, texture)
+            RenderSystem.setShader(GameRenderer::getPositionColorTexProgram)
+            val hw = width / 2F
+            val hh = height / 2F
+            val matrix4f: Matrix4f = matrixStack.peek().positionMatrix
+            val buf = Tessellator.getInstance().buffer
+            buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE)
+            buf.fixedColor(255, 255, 255, 255)
+            buf.vertex(matrix4f, -hw, -hh, 0F)
+                .texture(u1, v1).next()
+            buf.vertex(matrix4f, -hw, +hh, 0F)
+                .texture(u1, v2).next()
+            buf.vertex(matrix4f, +hw, +hh, 0F)
+                .texture(u2, v2).next()
+            buf.vertex(matrix4f, +hw, -hh, 0F)
+                .texture(u2, v1).next()
+            buf.unfixColor()
+            BufferRenderer.drawWithGlobalProgram(buf.end())
+        }
+        RenderSystem.setShaderColor(backupColor[0], backupColor[1], backupColor[2], backupColor[3])
+    }
+
+    fun doWaypointIcon(position: Vec3d, textures: List<RenderInformation>, width: Int, height: Int) {
+        val xStartPosition = -((textures.dropLast(1).sumOf { it.spaceToNext }) / 2).toFloat()
+        var xmodifer = xStartPosition
+        for ((index, value) in textures.withIndex()) {
+            if (value.pathToFile.isEmpty()) continue
+            waypointIcon(position, value, width, height, xmodifer)
+            xmodifer += width
+        }
+
+    }
+    fun waypointIcon(
+        position: Vec3d, textures: RenderInformation, width: Int, height: Int, xmodifier: Float
+    ) {
+        val backupColor = RenderSystem.getShaderColor()
+        color(1f, 1f, 1f, 1f)
+        withFacingThePlayer(position) {
+            matrixStack.push()
+            matrixStack.translate(xmodifier, -25f, 0f)
+            RenderSystem.setShaderTexture(0, Identifier(textures.namespace, textures.pathToFile))
+            RenderSystem.setShader(GameRenderer::getPositionColorTexProgram)
+            val hw = width / 2F
+            val hh = height / 2F
+            val matrix4f: Matrix4f = matrixStack.peek().positionMatrix
+            val buf = Tessellator.getInstance().buffer
+            buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE)
+            buf.fixedColor(255, 255, 255, 255)
+            buf.vertex(matrix4f, -hw, -hh, 0F)
+                .texture(0f, 0f).next()
+            buf.vertex(matrix4f, -hw, +hh, 0F)
+                .texture(0f, 1f).next()
+            buf.vertex(matrix4f, +hw, +hh, 0F)
+                .texture(1f, 1f).next()
+            buf.vertex(matrix4f, +hw, -hh, 0F)
+                .texture(1f, 0f).next()
+            buf.unfixColor()
+            BufferRenderer.drawWithGlobalProgram(buf.end())
+            matrixStack.pop()
+        }
+        RenderSystem.setShaderColor(backupColor[0], backupColor[1], backupColor[2], backupColor[3])
     }
 }
 

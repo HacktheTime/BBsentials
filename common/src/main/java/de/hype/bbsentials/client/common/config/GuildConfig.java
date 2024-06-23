@@ -7,7 +7,6 @@ public class GuildConfig extends BBsentialsConfig {
     public GuildConfig() {
         super(1);
         doInit();
-        doInit();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package de.hype.bbsentials.shared.objects;
 
 public class Position {
-    public final int x;
-    public final int y;
-    public final int z;
+    public int x;
+    public int y;
+    public int z;
 
 
     public Position(int x, int y, int z) {
@@ -36,5 +36,16 @@ public class Position {
         if (!(obj instanceof Position)) return false;
         Position pos2 = ((Position) obj);
         return (pos2.x == x && pos2.y == y && pos2.z == z);
+    }
+
+    public Double getDistanceBetween(Position pos) {
+        Integer x = pos.x - this.x;
+        Integer y = pos.y - this.y;
+        Integer z = pos.z - this.z;
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    public boolean isInRange(Position otherPos, int range) {
+        return getDistanceBetween(otherPos) < range;
     }
 }

@@ -20,13 +20,13 @@ public class CommandBBI extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/bbi <reconnect|configManager>";
+        return "/bbi <reconnect|config>";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length == 0) {
-            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi <reconnect|configManager|set-key>"));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi <reconnect|config|set-key>"));
             return;
         }
 
@@ -38,7 +38,7 @@ public class CommandBBI extends CommandBase {
 
             case "configManager":
                 if (args.length < 2) {
-                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi configManager <category>"));
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bbi config <category>"));
                     return;
                 }
 
@@ -46,7 +46,7 @@ public class CommandBBI extends CommandBase {
                 switch (category) {
                     case "saveAll":
                         ConfigManager.saveAll();
-                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Saved configManager successfully"));
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Saved config successfully"));
                         break;
 
                     case "load":

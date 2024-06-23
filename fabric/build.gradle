@@ -1,0 +1,100 @@
+plugins {
+    id 'multiloader-loader'
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+repositories {
+    mavenCentral()
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    maven { url = uri("https://maven.architectury.dev/") }
+    maven { url = uri("https://maven.notenoughupdates.org/releases/") }
+    maven { url = uri("https://maven.fabricmc.net") }
+    maven { url = uri("https://maven.minecraftforge.net/") }
+    maven { url = uri("https://repo.spongepowered.org/maven/") }
+    maven { url = uri("https://repo.sk1er.club/repository/maven-releases/") }
+    maven { url = uri("https://maven.wagyourtail.xyz/releases") }
+    maven { url = uri("https://maven.wagyourtail.xyz/snapshots") }
+    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
+    maven { url = uri("https://maven.xpple.dev/maven2") }
+    maven { url = uri("https://maven.terraformersmc.com/releases") }
+    maven { url = uri("https://maven.shedaniel.me/") }
+    maven { url = uri("https://repo.nea.moe/releases") }
+    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://repo.hypixel.net/repository/Hypixel/") }
+}
+
+configurations {
+    transitiveInclude {
+        exclude group: "com.mojang"
+//        exclude group: "org.jetbrains.kotlin"
+//        exclude group: "org.jetbrains.kotlinx"
+    }
+}
+
+dependencies {
+    //TODO I am aware of this mess with the dependencies. It is on the thing todo but it launches with IntelliJ
+    //Fabric / Minecraft
+    minecraft libs.modern.minecraft.get()
+    mappings "net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2"
+    modImplementation libs.modern.fabric.loader.get()
+    modImplementation libs.modern.fabric.api.get()
+    //Dev Env
+    modRuntimeOnly(libs.modern.devauth)
+
+    //Dependencies
+    //Basic Dependencies
+    modImplementation(libs.modmenu) // Mod Config
+    modImplementation(libs.clothConfig.get()) {
+        exclude(group: "net.fabricmc.fabric-api")
+    } // Mod Config
+    implementation libs.kotlinStdlib
+    modImplementation(include(libs.appleClientCommands.get())) // Commands
+    include(implementation(libs.git.get())) //Git versioning for Neu REPO without downloading fully each time
+    include(modImplementation(libs.commonsText.get()))
+
+    //Hypixel Related Dependencies
+    modImplementation(libs.hypixelModApi.get())// Mod API (Official)
+    include(modImplementation(libs.neurepoparser.get())) //Neu REPO
+    transitiveInclude(modImplementation(libs.neditNBT.get())) //NBT Parser
+
+    //Discord Related Dependencies
+    transitiveInclude(modImplementation(libs.discordGameSDK.get())) // Discord Game SDK
+    transitiveInclude(modImplementation(libs.discordJDA.get())) //Discord Bot
+
+    //Other Dependencies
+    transitiveInclude(modImplementation(libs.javazoom.get())) // Music Player
+
+
+    configurations.transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
+        modImplementation(it.moduleVersion.id.toString())
+        include(it.moduleVersion.id.toString())
+    }
+}
+
+loom {
+    def aw = project(":common").file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
+
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            vmArg("--javaagent ~/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/*/*/*.jar")
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("runs/server")
+        }
+    }
+    log4jConfigs.from(project.rootProject.file("log4j2.xml"))
+}

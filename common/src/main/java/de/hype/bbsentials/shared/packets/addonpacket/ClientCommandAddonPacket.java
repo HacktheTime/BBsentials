@@ -12,4 +12,5 @@ public class ClientCommandAddonPacket extends AbstractAddonPacket {
         super(1, 1); //Min and Max supported Version
         this.command = command;
     }
+
 }

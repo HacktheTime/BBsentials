@@ -1,15 +1,27 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "de.hype.bbsentials.fabric.mixins",
+  "package": "de.hype.bbsentials.fabric.mixins.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
+  "mixins": [
+    "ChestLidMixin",
+    "CommandNodeAccessMixin",
+    "LiteralCommandNodeMixin",
+    "RootCommandNodeAccessMixin",
+    "SignaturePropertyErrorIgnoreMixin"
+  ],
   "client": [
+    "BBsentialsCommandSource",
+    "ChestMixin",
     "ClientCommandSourceMixin",
+    "CustomItemData",
     "CustomItemTextures",
-    "ScreenMixin",
-    "WorldRenderLastEventPatch",
-    "SimpleOptionMixin"
+    "CustomItemTooltip",
+    "IncomingPacketListenerPatches",
+    "InventoryKeyBinds",
+    "ItemRendererMixin",
+    "SimpleOptionMixin",
+    "WorldRenderLastEventPatch"
   ],
   "injectors": {
     "defaultRequire": 1

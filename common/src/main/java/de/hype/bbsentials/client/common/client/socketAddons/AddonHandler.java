@@ -138,4 +138,7 @@ public class AddonHandler implements Runnable {
             Chat.sendPrivateMessageToSelfError("BB: Couldn't send a " + packetName + "! did you get disconnected?");
         }
     }
+
+    public void onStatusUpdateAddonPacket(StatusUpdateAddonPacket packet) {
+    }
 }

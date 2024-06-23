@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "id": "bbsentials",
-  "version": "${version}",
+  "version": "${mod_version}",
   "name": "BBsentials",
   "icon": "logo.png",
   "description": "Mod to connect to the BBsentials Network for Splashes and more",
   "authors": [
     "Hype_the_Time/hackthetime"
   ],
-  "contributors": ["hannibal2"],
+  "contributors": ["hannibal2","nea89"],
   "contact": {
     "homepage": "https://github.com/HacktheTime/BBsentials1.20",
     "issues": "https://github.com/HacktheTime/BBsentials1.20/issues",
@@ -22,13 +22,14 @@
       "de.hype.bbsentials.fabric.ModInitialiser"
     ],
     "modmenu": [
-      "de.hype.bbsentials.fabric.ModMenueScreen"
+      "de.hype.bbsentials.fabric.screens.ModMenueScreen"
     ]
   },
   "depends": {
-    "fabricloader": ">=${loader_version}",
+    "fabricloader": ">=${fabric_loader_version}",
+    "hypixel-mod-api": ">=0.5.0",
     "fabric": ">=${fabric_api_version}",
-    "minecraft": "${minecraft_versionSupported}"
+    "minecraft": "${minecraft_versionsSupported}"
   },
   "mixins": [
     "bbsentials.mixins.json"

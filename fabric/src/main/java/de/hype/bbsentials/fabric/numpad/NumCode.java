@@ -94,7 +94,7 @@ public class NumCode {
     public String toString() {
         String toReturn = code;
         if (commands != null) {
-            if (commands.isEmpty()) {
+            if (!commands.isEmpty()) {
                 toReturn += ": " + String.join(", ", commands);
             }
         }

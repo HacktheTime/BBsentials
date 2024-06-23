@@ -36,6 +36,7 @@ public class AddonPacketManager {
         addonPackets.add(new AddonPacket<>(GetWaypointsAddonPacket.class, connection::onGetWaypointsAddonPacket));
         addonPackets.add(new AddonPacket<>(ClientCommandAddonPacket.class, connection::onClientCommandAddonPacket));
 //        addonPackets.add(new AddonPacket<>(ReceivedPublicChatMessageAddonPacket.class, connection::onReceivedPublicChatMessageAddonPacket));
+        addonPackets.add(new AddonPacket<>(StatusUpdateAddonPacket.class, connection::onStatusUpdateAddonPacket));
 
 
     }

@@ -39,6 +39,6 @@ public class AddonManager {
     }
 
     public void notifyAllAddonsReceievedMessage(Message message) {
-        broadcastToAllAddons(new ReceivedPublicChatMessageAddonPacket(message.getJson(), message.getUnformattedString()));
+        broadcastToAllAddons(new ReceivedPublicChatMessageAddonPacket(message));
     }
 }

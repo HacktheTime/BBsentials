@@ -6,10 +6,13 @@ import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.shared.packets.network.InvalidCommandFeedbackPacket;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 
 public class AbstractPacket {
     public final int apiVersionMin;
     public final int apiVersionMax;
+    public long packetDate = new Date().getTime();
+    public long replyDate = -1;
 
     protected AbstractPacket(int apiVersionMin, int apiVersionMax) {
         this.apiVersionMax = apiVersionMax;
@@ -62,5 +65,10 @@ public class AbstractPacket {
             }
         }
         return false;
+    }
+
+    public <T extends AbstractPacket> T preparePacketToReplyToThis(T packet) {
+        packet.replyDate = packetDate;
+        return packet;
     }
 }

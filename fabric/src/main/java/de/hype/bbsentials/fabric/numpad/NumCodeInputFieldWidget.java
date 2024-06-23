@@ -2,7 +2,7 @@ package de.hype.bbsentials.fabric.numpad;
 
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.fabric.IntegerFieldWidget;
+import de.hype.bbsentials.fabric.screens.components.IntegerFieldWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;

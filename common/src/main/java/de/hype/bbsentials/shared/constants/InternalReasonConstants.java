@@ -34,5 +34,6 @@ public enum InternalReasonConstants {
     SERVER_RESTART,
     NOT_REGISTERED,
     ON_COOLDOWN,
+    SYSTEM,
     OTHER
 }

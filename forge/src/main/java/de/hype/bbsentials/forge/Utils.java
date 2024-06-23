@@ -10,17 +10,19 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.Position;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -88,7 +90,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     }
 
     public void playsound(String eventName) {
-        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation(eventName), 1.0F, 1.0F, 0.0F));
+        if (eventName.isEmpty()) Minecraft.getMinecraft().getSoundHandler().stopSounds();
+        else
+            Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation(eventName), 1.0F, 1.0F, 0.0F));
     }
 
     public int getPotTime() {
@@ -197,15 +201,48 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         try {
             IChatComponent.Serializer.jsonToComponent(json);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
     @Override
     public String stringToTextJson(String string) {
-        if (isJsonParseableToText(string))return string;
+        if (isJsonParseableToText(string)) return string;
         return IChatComponent.Serializer.componentToJson(new ChatComponentText(string));
+    }
+
+    @Override
+    public Position getPlayersPosition() {
+        BlockPos pos = Minecraft.getMinecraft().thePlayer.getPosition();
+        return new Position(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    @Override
+    public void systemExit(int id) {
+        FMLCommonHandler.instance().exitJava(id, false);
+    }
+
+    @Override
+    public boolean isInGame() {
+        return Minecraft.getMinecraft().thePlayer != null;
+    }
+
+    @Override
+    public void showErrorScreen(String s) {
+
+    }
+
+    @Override
+    public boolean isSelfBingo() {
+        return Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText().contains("Ⓑ");
+    }
+
+    @Override
+    public String getServerConnectedAddress() {
+        String s = Minecraft.getMinecraft().getNetHandler().getNetworkManager().getRemoteAddress().toString();
+        if (s == null) return "";
+        return s.split("/")[0];
     }
 
     @Override
@@ -228,7 +265,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
             List<IChatComponent> toDisplay = new ArrayList<>();
             toDisplay.add(new ChatComponentText("§6Total: " + allParticipants.size() + " | Bingos: " + (allParticipants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.hudConfig.showMusicPants;
+            boolean doPants = BBsentials.splashConfig.showMusicPantsUsers;
             for (EntityPlayer participant : allParticipants) {
                 if (doPants) {
                     boolean hasPants = false;
@@ -281,7 +318,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(new ChatComponentText("§6Status: §0" + status + "§6 | Slots: " + warpInfo + "§6"));
-                Date warpClosingDate = new Date(360000 - (EnvironmentCore.utils.getLobbyTime() * 50));
+                Date warpClosingDate = new Date(408000 - (EnvironmentCore.utils.getLobbyTime() * 50));
                 toRender.add(new ChatComponentText("§6Closing in " + warpClosingDate.getHours() + "h ," + warpClosingDate.getMinutes() + "m"));
             }
             else {

@@ -8,42 +8,71 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.RouteNode;
 import de.hype.bbsentials.client.common.objects.Waypoints;
+import de.hype.bbsentials.fabric.command.BBCommandDispatcher;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
+import de.hype.bbsentials.shared.objects.Position;
 import kotlin.Unit;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.impl.FabricLoaderImpl;
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.packet.HypixelPacket;
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.NoticeScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.toast.Toast;
+import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
+import static de.hype.bbsentials.client.common.client.BBsentials.hpModAPICore;
+
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
+    ModContainer self = FabricLoader.getInstance().getAllMods().stream().filter(modContainer -> modContainer.getMetadata().getId().equals("bbsentials")).toList().get(0);
+
     public static boolean isBingo(PlayerEntity player) {
         try {
             return player.getDisplayName().getString().contains("Ⓑ");
@@ -64,28 +93,38 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
         List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
         if (!waypoints.isEmpty()) {
-            RenderInWorldContext.renderInWorld(event, (it) -> {
-                for (Waypoints waypoint : waypoints) {
-                    BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
-                    if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
-                    it.color(0f, 1f, 0f, 0.2f);
-                    it.block(pos);
-                    it.color(1f, 0f, 0f, 1f);
-                    it.waypoint(pos, Text.Serialization.fromJson(waypoint.jsonToRenderText));
-                }
-                return Unit.INSTANCE;
-            });
+            try {
+                RenderInWorldContext.renderInWorld(event, (it) -> {
+                    for (Waypoints waypoint : waypoints) {
+                        BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
+                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 0.2f);
+                        it.block(pos);
+                        it.color(waypoint.color.getRed(), waypoint.color.getGreen(), waypoint.color.getBlue(), 1f);
+                        it.waypoint(pos, FabricTextUtils.jsonToText(waypoint.jsonToRenderText));
+                        if (waypoint.doTracer) {
+                            Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
+                            it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                        }
+                        it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 25, 25);
+
+                    }
+                    return Unit.INSTANCE;
+                });
+            } catch (Exception e) {
+
+            }
         }
         try {
             if (BBsentials.temporaryConfig.route != null) {
                 RenderInWorldContext.renderInWorld(event, (it) -> {
                     RouteNode node = BBsentials.temporaryConfig.route.getCurrentNode();
-                        BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
-                        BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
-                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
-                        it.block(pos);
-                        it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
-                        it.waypoint(pos, Text.of(node.name));
+                    BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
+                    BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
+                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 0.2f);
+                    it.block(pos);
+                    it.color(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), 1f);
+                    it.waypoint(pos, Text.of(node.name));
 
                     return Unit.INSTANCE;
                 });
@@ -93,6 +132,48 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         } catch (Exception ignored) {
         }
 //        WorldRenderLastEvent.Companion.publish(event);
+    }
+
+    public static void doBingoRankManipulations(ItemStack stack) {
+//        try {
+//            NbtCompound nbt = stack.getOrCreateNbt();
+//            NbtCompound displayTag = nbt.getCompound("display");
+//
+//            if (displayTag.contains("Lore")) {
+//
+//                NbtList loreList = displayTag.getList("Lore", NbtList.STRING_TYPE);
+//                for (int i = 0; i < loreList.size(); i++) {
+//                    String lineJson = loreList.getString(i);
+//                    String lineContentString = Text.Serialization.fromLenientJson(lineJson).getString();
+//                    if (lineContentString.matches("  #(\\d+) contributor")) {
+//                        loreList.remove(i);
+//                    }
+//                    if (lineContentString.matches("  Top \\d+(\\.\\d+)%$") || lineContentString.matches("  Top \\d+%$")) {
+//                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("  §8 Top §a0%"))));
+//                        loreList.add(i + 1, NbtString.of(Text.Serialization.toJsonString(Text.of("  §6§l#1§r §fcontributor"))));
+//                        i += 1;
+//                        continue;
+//                    }
+//                    if (lineContentString.contains("Playtime: ")){
+////                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("§7Playtime: §a0m 10s"))));
+//                        continue;
+//                    }
+//                    if (lineContentString.contains("Contribution: ")){
+//                        loreList.set(i, NbtString.of(Text.Serialization.toJsonString(Text.of("§7Contribution: §a2,147,483,647 experience"))));
+//                        continue;
+//                    }
+//
+//                }
+//                if (!loreList.get(loreList.size() - 1).asString().contains("This is faked!")) {
+////                    loreList.add(NbtString.of(Text.Serialization.toJsonString(Text.of("§4This is faked!"))));
+//                }
+//
+//                displayTag.put("Lore", loreList);
+//                stack.getNbt().put("display", displayTag);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public boolean isWindowFocused() {
@@ -123,8 +204,24 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return MinecraftClient.getInstance().getSession().getUuidOrNull().toString();
     }
 
+    public UUID getMCUUIDID() {
+        return MinecraftClient.getInstance().getSession().getUuidOrNull();
+    }
+
+    @Override
+    public String getModVersion() {
+        return self.getMetadata().getVersion().getFriendlyString();
+    }
+
+    @Override
+    public String getGameVersion() {
+        return ((FabricLoaderImpl) FabricLoader.getInstance()).getGameProvider().getRawGameVersion();
+    }
+
     public void playsound(String eventName) {
-        MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
+        if (eventName.isEmpty()) MinecraftClient.getInstance().getSoundManager().stopAll();
+        else
+            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
     }
 
     public int getPotTime() {
@@ -166,7 +263,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         // Iterate through all players and check their distance from the source player
         for (PlayerEntity player : MinecraftClient.getInstance().player.getEntityWorld().getPlayers()) {
             if (!player.getDisplayName().getString().startsWith("!")) {
-                if (Pattern.compile("\"color\":\"(?!white)\\w+\"").matcher(Text.Serialization.toJsonString(player.getDisplayName())).find()) {
+                if (Pattern.compile("\"color\":\"(?!white)\\w+\"").matcher(FabricTextUtils.textToJson(player.getDisplayName())).find()) {
                     players.add(player);
                 }
             }
@@ -183,6 +280,78 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return players.stream().filter(predicate).toList();
     }
 
+    public List<String> toDisplayStringLeecherOverlay() {
+        List<String> stringList = new ArrayList();
+        boolean doPants = BBsentials.splashConfig.showMusicPantsUsers;
+        for (PlayerEntity player : getAllPlayers()) {
+            String prefix = "";
+            boolean display = false;
+            if (!isBingo(player)) {
+                display = true;
+            }
+            if (!isInRadius(MinecraftClient.getInstance().player, player, 5)) continue;
+            if (doPants) {
+                for (ItemStack armorItem : player.getArmorItems()) {
+                    try {
+                        NbtComponent customData = armorItem.get(DataComponentTypes.CUSTOM_DATA);
+                        if (customData == null) continue;
+                        String hypixelId = customData.copyNbt().getString("id");
+                        if (hypixelId != null && hypixelId.equals("MUSIC_PANTS")) {
+                            prefix = "§4[♪]§r ";
+                            display = true;
+                        }
+                    } catch (Exception ignored) {
+                        continue;
+                    }
+                }
+            }
+
+            Integer leechPotions = 0;
+            for (Map.Entry<RegistryEntry<StatusEffect>, StatusEffectInstance> entry : player.getActiveStatusEffects().entrySet()) {
+                StatusEffect effect = entry.getKey().value();
+                Integer amplifier = entry.getValue().getAmplifier();
+                if (effect == StatusEffects.STRENGTH && amplifier >= 7) {
+                    if (entry.getValue().getDuration() >= 60000) {
+                        leechPotions++;
+                    }
+                }
+                else if (effect == StatusEffects.JUMP_BOOST && amplifier >= 5) {
+                    if (entry.getValue().getDuration() >= 60000) {
+                        leechPotions++;
+                    }
+                }
+            }
+            if (leechPotions >= 2) {
+                prefix += "§4[⏳] §r";
+                display = true;
+            }
+            //32min left
+            //Potion: Night VisionAmplifier: 0 Duration: 2147473747
+            //Potion: StrengthAmplifier: 7 Duration: 39353
+            //Potion: Jump BoostAmplifier: 5 Duration: 39520
+            //Potion: HasteAmplifier: 3 Duration: 39379
+            //Potion: AbsorptionAmplifier: 0 Duration: 39368
+            if (display) {
+                if (prefix.isEmpty()) stringList.add(FabricTextUtils.opposite(player.getDisplayName()));
+                else {
+                    String prefixAddition = FabricTextUtils.opposite(Text.of(prefix));
+                    String normal = FabricTextUtils.opposite(player.getDisplayName());
+                    stringList.add("[" + prefixAddition + "," + normal + "]");
+                }
+            }
+        }
+        return stringList;
+    }
+
+    public boolean isSelfBingo() {
+        assert MinecraftClient.getInstance().player != null;
+        return Objects.requireNonNull(MinecraftClient.getInstance().player.getDisplayName()).getString().contains("Ⓑ");
+    }
+
+    public void displayToast(BBToast toast) {
+        MinecraftClient.getInstance().getToastManager().add(toast);
+    }
+
     private List<PlayerEntity> getSplashLeechingPlayersPlayerEntity() {
         List<PlayerEntity> players = getAllPlayers();
         players.remove(MinecraftClient.getInstance().player);
@@ -193,11 +362,11 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return getSplashLeechingPlayersPlayerEntity().stream().map((player -> player.getDisplayName().getString())).toList();
     }
 
-    @Override
     public InputStream makeScreenshot() {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
         AtomicReferenceArray<InputStream> screenshotInputStream = new AtomicReferenceArray<>(new InputStream[1]);
+        AtomicBoolean isWaiting = new AtomicBoolean(true);
 
         // Execute the screenshot task on the main thread
         minecraftClient.execute(() -> {
@@ -207,19 +376,35 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 byte[] byteArray = new byte[buffer.capacity()];
                 buffer.get(byteArray);
 
-                screenshotInputStream.set(0, new ByteArrayInputStream(byteArray));
+                synchronized (screenshotInputStream) {
+                    screenshotInputStream.set(0, new ByteArrayInputStream(byteArray));
+                    isWaiting.set(false);
+                    screenshotInputStream.notifyAll();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
+        synchronized (screenshotInputStream) {
+            // Wait for the task to be completed or a timeout if needed
+            while (isWaiting.get()) {
+                try {
+                    screenshotInputStream.wait();
+                } catch (InterruptedException e) {
+                    return null;
+                }
+            }
+        }
+
         return screenshotInputStream.get(0);
     }
+
 
     @Override
     public String getStringFromTextJson(String textJSon) throws Exception {
         try {
-            return Text.Serialization.fromJson(textJSon).getString();
+            return FabricTextUtils.opposite(textJSon).getString();
         } catch (Exception e) {
             throw e;
         }
@@ -227,13 +412,13 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     @Override
     public boolean executeClientCommand(String command) {
-        return ClientCommandInternals.executeCommand(command);
+        return ClientCommandInternals.executeCommand(command) || BBCommandDispatcher.executeCommand(command);
     }
 
     @Override
     public boolean isJsonParseableToText(String json) {
         try {
-            Text.Serialization.fromJson(json);
+            FabricTextUtils.opposite(json);
             return true;
         } catch (Exception ignored) {
             return false;
@@ -243,12 +428,18 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     @Override
     public String stringToTextJson(String string) {
         if (isJsonParseableToText(string)) return string;
-        return Text.Serialization.toJsonString(Text.of(string));
+        return FabricTextUtils.opposite(Text.of(string));
+    }
+
+    @Override
+    public Position getPlayersPosition() {
+        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+        return new Position(pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
     public List<String> getPlayers() {
-        return getAllPlayers().stream().map((playerEntity) -> playerEntity.getDisplayName().getString()).toList();
+        return new ArrayList<>(MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().stream().toList());
     }
 
     public void renderOverlays(DrawContext drawContext, float v) {
@@ -258,40 +449,18 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             int y = 10;
 
             // Render each string in the list
-            List<PlayerEntity> splashLeechers = getSplashLeechingPlayersPlayerEntity();
+            List<String> splashLeechers = toDisplayStringLeecherOverlay();
             List<PlayerEntity> allParticipiants = filterOut(getAllPlayers(), (player) -> isInRadius(MinecraftClient.getInstance().player, player, 5));
-            List<PlayerEntity> musicPants = new ArrayList<>();
             List<Text> toDisplay = new ArrayList<>();
             toDisplay.add(Text.of("§6Total: " + allParticipiants.size() + " | Bingos: " + (allParticipiants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.hudConfig.showMusicPants;
-            for (PlayerEntity participiant : allParticipiants) {
-                if (doPants) {
 
-                    boolean hasPants = false;
-                    for (ItemStack armorItem : participiant.getArmorItems()) {
-                        try {
-                            if (armorItem.getNbt().get("ExtraAttributes").asString().contains("MUSIC_PANTS")) {
-                                musicPants.add(participiant);
-                                hasPants = true;
-                            }
-                        } catch (Exception ignored) {
-                            continue;
-                        }
-                    }
-                    if (hasPants) {
-                        String pantsAddition = Text.Serialization.toJsonString(Text.of("§4[♪]§ "));
-                        String normal = Text.Serialization.toJsonString(participiant.getDisplayName());
-                        toDisplay.add(Text.Serialization.fromJson("[" + pantsAddition + "," + normal + "]"));
-                    }
-                }
-            }
-            toDisplay.addAll(splashLeechers.stream().map(PlayerEntity::getDisplayName).toList());
+            toDisplay.addAll(splashLeechers.stream().map(FabricTextUtils::opposite).toList());
             for (Text text : toDisplay) {
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
+        else if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
             ChChestUpdateListener listener = UpdateListenerManager.chChestUpdateListener;
 
             int x = 10;
@@ -317,7 +486,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                long closingTimeInMinutes = ((360000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
+                long closingTimeInMinutes = ((408000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
                 if (closingTimeInMinutes <= 0) {
                     toRender.add(Text.of("§4Lobby Closed"));
                 }
@@ -331,7 +500,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                     String author = "";
                     if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder)) author = " [" + chest.finder + "]";
                     toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
-                    Arrays.stream(chest.items).map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
+                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
             }
             for (Text text : toRender) {
@@ -339,15 +508,34 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
+        else if (BBsentials.funConfig.lowPlayTimeHelpers && BBsentials.funConfig.lowPlaytimeHelperJoinDate != null) {
+            long differece = ((Instant.now().getEpochSecond() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
+            String colorCode = "§a";
+            if (differece > 50) colorCode = "§4§l";
+            else if (differece > 45) colorCode = "§4";
+            else if (differece > 40) colorCode = "§6";
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
+        }
     }
 
     public Islands getCurrentIsland() {
         try {
-            String string = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-b").getDisplayName().getString();
-            if (!string.startsWith("Area: ")) {
+            ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+            if (t == null) return null;
+            String string;
+            if (isSecondRowInfoRow()) {
+                //Its in Second Row
+                string = t.getPlayerListEntry("!B-b").getDisplayName().getString();
+            }
+            else {
+                //Its 3 row. default from before
+                string = t.getPlayerListEntry("!C-b").getDisplayName().getString();
+            }
+            if (!string.startsWith("Area: ") && !string.startsWith("Dungeon: ")) {
                 Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
             }
             else {
+                if (string.startsWith("Dungeon: ")) return Islands.DUNGEON;
                 return EnumUtils.getEnumByValue(Islands.class, string.replace("Area: ", "").trim());
             }
         } catch (Exception e) {
@@ -355,12 +543,30 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return null;
     }
 
+    private boolean isSecondRowInfoRow() {
+        ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+        if (t == null) return false;
+        PlayerListEntry entry = t.getPlayerListEntry("!B-a");
+        if (entry == null) return false;
+        return entry.getDisplayName().getString().trim().startsWith("Info");
+    }
+
     public int getPlayerCount() {
-        return Integer.parseInt(MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!B-a").getDisplayName().getString().trim().replaceAll("[^0-9]", ""));
+        ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+        if (t == null) return 0;
+        return t.getCommandSource().getPlayerNames().size();
     }
 
     public String getServerId() {
-        PlayerListEntry entry = MinecraftClient.getInstance().player.networkHandler.getPlayerListEntry("!C-c");
+        ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+        if (t == null) return "";
+        PlayerListEntry entry;
+        if (isSecondRowInfoRow()) {
+            entry = t.getPlayerListEntry("!B-c");
+        }
+        else {
+            entry = t.getPlayerListEntry("!C-c");
+        }
         if (entry == null) return null;
         return entry.getDisplayName().getString().replace("Server:", "").trim();
     }
@@ -384,7 +590,162 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return 24;
     }
 
+    @Override
+    public void systemExit(int id) {
+        System.exit(id);
+    }
+
+    @Override
+    public boolean isInGame() {
+        return MinecraftClient.getInstance().player != null;
+    }
+
+    @Override
+    public void showErrorScreen(String message) {
+        Screen screen = MinecraftClient.getInstance().currentScreen;
+        MinecraftClient.getInstance().execute((() -> MinecraftClient.getInstance().setScreen(new NoticeScreen(() -> MinecraftClient.getInstance().setScreen(screen), Text.of("§cBBsentials"), Text.of(message)))));
+    }
+
     public long getLobbyTime() {
         return MinecraftClient.getInstance().world.getLevelProperties().getTimeOfDay();
+    }
+
+    @Override
+    public String getServerConnectedAddress() {
+        try {
+            return MinecraftClient.getInstance().getNetworkHandler().getConnection().getAddress().toString().split("/")[0];
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public void registerNetworkHandlers() {
+        hpModAPICore.register();
+    }
+
+    @Override
+    public void sendPacket(HypixelPacket packet) {
+        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Send: " + packet.getIdentifier());
+        HypixelModAPI.getInstance().sendPacket(packet);
+    }
+
+    public List<String> getScoreboardEntries() {
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler == null) return null;
+        Scoreboard scoreboard = handler.getWorld().getScoreboard();
+        if (scoreboard == null) return new ArrayList<>();
+        return new ArrayList<>(scoreboard.getScoreboardEntries(scoreboard.getObjectives().stream().toList().get(0)).stream().filter(s -> !s.hidden()).sorted(Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER)).limit(15L).map(ScoreboardEntry::display).filter(e -> e != null).map(d -> d.getString()).toList());
+    }
+
+    public List<String> getScoreboardEntriesJson() {
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler == null) return null;
+        Scoreboard scoreboard = handler.getWorld().getScoreboard();
+        if (scoreboard == null) return new ArrayList<>();
+        return new ArrayList<>(scoreboard.getScoreboardEntries(scoreboard.getObjectives().stream().toList().get(0)).stream().filter(s -> !s.hidden()).sorted(Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER)).limit(15L).map(ScoreboardEntry::display).filter(e -> e != null).map(FabricTextUtils::textToJson).toList());
+    }
+
+    public List<Text> getScoreboardEntriesText() {
+        ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+        if (handler == null) return null;
+        Scoreboard scoreboard = handler.getWorld().getScoreboard();
+        if (scoreboard == null) return new ArrayList<>();
+        return new ArrayList<>(scoreboard.getScoreboardEntries(scoreboard.getObjectives().stream().toList().get(0)).stream().filter(s -> !s.hidden()).sorted(Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER)).limit(15L).map(ScoreboardEntry::display).filter(e -> e != null).toList());
+    }
+
+    public static class BBToast implements Toast {
+        public static final int DEFAULT_DURATION_MS = 5000;
+        private static final Identifier TEXTURE = new Identifier("toast/advancement");
+        //        private static final Identifier TEXTURE = new Identifier("toast/system");
+        String title;
+        String description;
+        Integer displayTime = DEFAULT_DURATION_MS;
+        Identifier sound = SoundEvents.UI_TOAST_CHALLENGE_COMPLETE.getId();
+        Identifier icon;
+        Integer width;
+        Integer height;
+        Integer imageSize = 16;
+        Integer integerToWrap = getWidth() - imageSize * 3;
+        private boolean soundPlayed;
+
+        public BBToast(String title, String description, Identifier sound, Identifier icon) {
+            this.title = title;
+            this.description = description;
+            if (sound != null) this.sound = sound;
+            if (icon != null) this.icon = icon;
+        }
+
+        public void setHeight() {
+            height = MinecraftClient.getInstance().textRenderer.wrapLines(Text.of(description), integerToWrap).size() * (MinecraftClient.getInstance().textRenderer.fontHeight + 2) + 40;
+        }
+
+        @Override
+        public int getWidth() {
+            return Toast.super.getWidth() * 2;
+        }
+
+        @Override
+        public int getHeight() {
+            if (height == null) setHeight();
+            return height;
+        }
+
+        public Toast.Visibility draw(DrawContext context, ToastManager manager, long startTime) {
+            int boxWidth = getWidth();
+            int boxHeight = getHeight();
+            int imageSize = 16;
+            context.drawGuiTexture(TEXTURE, 0, 0, boxWidth, boxHeight);
+
+            List<OrderedText> list = manager.getClient().textRenderer.wrapLines(Text.of(description), integerToWrap);
+            int textColor = 0xFFFFFF;
+
+            if (list.size() == 1) {
+                int titleY = (boxHeight - 18) / 2; // Center vertically
+                context.drawText(manager.getClient().textRenderer, Text.of(title), imageSize * 2, titleY, textColor | -16777216, false);
+                context.drawText(manager.getClient().textRenderer, list.get(0), imageSize * 2, titleY + 11, -1, false);
+            }
+            else {
+                int titleColor = 0xFFFFFF;
+                int fadeInColor = 67108864;
+                int fadeOutColor = 67108864;
+
+                if (startTime < 1500L) {
+                    int k = MathHelper.floor(MathHelper.clamp((float) (1500L - startTime) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | fadeInColor;
+                    int titleY = (boxHeight - 18) / 2; // Center vertically
+                    context.drawText(manager.getClient().textRenderer, Text.of(title), imageSize * 2, titleY, textColor | k, false);
+                }
+                else {
+                    int k = MathHelper.floor(MathHelper.clamp((float) (startTime - 1500L) / 300.0F, 0.0F, 1.0F) * 252.0F) << 24 | fadeOutColor;
+                    int centerY = (boxHeight - list.size() * 9) / 2;
+
+                    for (OrderedText orderedText : list) {
+                        context.drawText(manager.getClient().textRenderer, orderedText, imageSize * 2, centerY, 16777215 | k, false);
+                        centerY += 9;
+                    }
+                }
+            }
+
+            if (!this.soundPlayed && startTime > 0L) {
+                this.soundPlayed = true;
+                manager.getClient().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(sound), 1.0F, 1.0F));
+            }
+
+            context.drawItemWithoutEntity(Items.DIAMOND.getDefaultStack(), 1, 8, 8);
+            return (double) startTime >= displayTime * manager.getNotificationDisplayTimeMultiplier() ? Visibility.HIDE : Visibility.SHOW;
+        }
+
+        public enum ToastType {
+            ADVANCEMENT(new Identifier("toast/advancement")),
+            SYSTEM(new Identifier("toast/system")),
+            TUTORIAL(new Identifier("toast/tutorial")),
+            RECIPE(new Identifier("toast/recipe")),
+            ;
+            private final Identifier id;
+
+            ToastType(Identifier id) {
+                this.id = id;
+            }
+        }
     }
 }

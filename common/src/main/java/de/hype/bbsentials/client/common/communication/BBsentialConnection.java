@@ -6,16 +6,16 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.mclibraries.CustomItemTexture;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
 import de.hype.bbsentials.environment.packetconfig.PacketUtils;
 import de.hype.bbsentials.shared.constants.*;
-import de.hype.bbsentials.shared.objects.SplashData;
-import de.hype.bbsentials.shared.packets.function.PartyPacket;
-import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
-import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
+import de.hype.bbsentials.shared.objects.ClientWaypointData;
+import de.hype.bbsentials.shared.objects.PunishmentData;
+import de.hype.bbsentials.shared.packets.function.*;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
 
@@ -25,6 +25,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -33,7 +34,9 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +46,7 @@ import java.util.stream.Collectors;
 public class BBsentialConnection {
     public Thread messageReceiverThread;
     public Thread messageSenderThread;
+    public List<InterceptPacketInfo> packetIntercepts = new ArrayList();
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
@@ -72,72 +76,81 @@ public class BBsentialConnection {
         System.setProperty("javax.net.debug", "ssl,handshake");
         FileInputStream inputStream = null;
         try {
-            // Load the BBssentials-online server's public certificate from the JKS file
-            try {
-                InputStream resouceInputStream = BBsentials.class.getResourceAsStream("/assets/public_bbsentials_cert.crt");
+            if (!serverIP.equals("localhost")) {
+                // Load the BBssentials-online server's public certificate from the JKS file
+                try {
+                    InputStream resouceInputStream = BBsentials.class.getResourceAsStream("/assets/public_bbsentials_cert.crt");
 
-                // Check if the resource exists
-                if (resouceInputStream == null) {
-                    System.out.println("The resource '/assets/public_bbsentials_cert.crt' was not found.");
-                    return;
+                    // Check if the resource exists
+                    if (resouceInputStream == null) {
+                        System.out.println("The resource '/assets/public_bbsentials_cert.crt' was not found.");
+                        return;
+                    }
+
+                    File tempFile = File.createTempFile("public_bbsentials_cert", ".crt");
+                    tempFile.deleteOnExit();
+
+                    FileOutputStream outputStream = new FileOutputStream(tempFile);
+
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = resouceInputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+
+                    outputStream.close();
+                    resouceInputStream.close();
+
+                    // Now you have the .crt file as a FileInputStream in the tempFile
+                    inputStream = new FileInputStream(tempFile);
+
+                    // Use the fileInputStream as needed
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+                X509Certificate serverCertificate = (X509Certificate) certFactory.generateCertificate(inputStream);
+                PublicKey serverPublicKey = serverCertificate.getPublicKey();
 
-                File tempFile = File.createTempFile("public_bbsentials_cert", ".crt");
-                tempFile.deleteOnExit();
+                // Create a TrustManager that trusts only the server's public key
+                TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null; // We don't need to check the client's certificates
+                    }
 
-                FileOutputStream outputStream = new FileOutputStream(tempFile);
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+                        // Do nothing, client certificate validation not required
+                    }
 
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = resouceInputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-
-                outputStream.close();
-                resouceInputStream.close();
-
-                // Now you have the .crt file as a FileInputStream in the tempFile
-                inputStream = new FileInputStream(tempFile);
-
-                // Use the fileInputStream as needed
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-            X509Certificate serverCertificate = (X509Certificate) certFactory.generateCertificate(inputStream);
-            PublicKey serverPublicKey = serverCertificate.getPublicKey();
-
-            // Create a TrustManager that trusts only the server's public key
-            TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null; // We don't need to check the client's certificates
-                }
-
-                public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-                    // Do nothing, client certificate validation not required
-                }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-                    // Check if the server certificate matches the expected one
-                    if (certs.length == 1) {
-                        PublicKey publicKey = certs[0].getPublicKey();
-                        if (!publicKey.equals(serverPublicKey)) {
-                            throw new CertificateException("Server certificate not trusted.");
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+                        // Check if the server certificate matches the expected one
+                        if (certs.length == 1) {
+                            PublicKey publicKey = certs[0].getPublicKey();
+                            if (!publicKey.equals(serverPublicKey)) {
+                                throw new CertificateException("Server certificate not trusted.");
+                            }
+                        }
+                        else {
+                            throw new CertificateException("Invalid server certificate chain.");
                         }
                     }
-                    else {
-                        throw new CertificateException("Invalid server certificate chain.");
-                    }
-                }
-            }};
+                }};
 
-            // Create an SSL context with the custom TrustManager
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustManagers, new SecureRandom());
-            // Create an SSL socket factory
-            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-            socket = sslSocketFactory.createSocket(serverIP, serverPort);
+                // Create an SSL context with the custom TrustManager
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, trustManagers, new SecureRandom());
+                // Create an SSL socket factory
+                SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+                socket = sslSocketFactory.createSocket(serverIP, serverPort);
+            }
+            else {
+                try {
+                    socket = new Socket(serverIP, serverPort);
+                } catch (Exception e) {
+                    Chat.sendPrivateMessageToSelfError("You are connected to the LocalTest Server!");
+                }
+            }
             socket.setKeepAlive(true); // Enable Keep-Alive
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
@@ -153,6 +166,11 @@ public class BBsentialConnection {
                         }
                         else {
                             Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected.");
+                            try {
+                                Thread.sleep(10000);
+                            } catch (Exception e) {
+
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -177,6 +195,9 @@ public class BBsentialConnection {
             messageSenderThread.setName("bb sender thread");
 
         } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
+            if (e instanceof ConnectException){
+                System.out.println("Error trying to connect to %s on port %s".formatted(serverIP,serverPort));
+            }
             e.printStackTrace();
         } catch (CertificateException e) {
             throw new RuntimeException(e);
@@ -222,18 +243,6 @@ public class BBsentialConnection {
 
     public <T extends AbstractPacket> void dummy(T o) {
         //this does absolutely nothing. dummy for packet in packt manager
-    }
-
-    public void splashHighlightItem(SplashData splash, long displayTimeInMilliseconds) {
-        CustomItemTexture toHighlightHub = new CustomItemTexture("customitems/splash_hub") {
-            @Override
-            public boolean isItem(String itemName, String tooltip, String nbt, Object item) {
-                return itemName.endsWith("Hub #" + splash.hubNumber);
-            }
-        };
-        BBsentials.executionService.schedule(() -> {
-            toHighlightHub.removeFromPool();
-        }, displayTimeInMilliseconds, TimeUnit.MILLISECONDS);
     }
 
 
@@ -284,29 +293,6 @@ public class BBsentialConnection {
         }
     }
 
-    public void onChChestPacket(ChChestPacket packet) {
-        UpdateListenerManager.registerChest(packet.lobby);
-        if (isCommandSafe(packet.lobby.bbcommand)) {
-            if (showChChest(packet.lobby.chests.get(0).items)) {
-                String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-                tellrawText = tellrawText.replace("@username", packet.lobby.contactMan);
-                tellrawText = tellrawText.replace("@item", Arrays.stream(packet.lobby.chests.get(0).items)
-                        .map(ChChestItem::getDisplayName)
-                        .collect(Collectors.toList())
-                        .toString());
-                tellrawText = tellrawText.replace("@coords", packet.lobby.chests.get(0).coords.toString());
-                tellrawText = tellrawText.replace("@inviteCommand", packet.lobby.bbcommand);
-                if (!(packet.lobby.extraMessage == null || packet.lobby.extraMessage.isEmpty())) {
-                    tellrawText = tellrawText.replace("@extramessage", " : " + packet.lobby.extraMessage);
-                }
-                Chat.sendPrivateMessageToSelfText(Message.tellraw(tellrawText));
-            }
-        }
-        else {
-            Chat.sendPrivateMessageToSelfFatal("Potentially dangerous packet detected: " + PacketUtils.parsePacketToJson(packet));
-        }
-    }
-
     public void onMiningEventPacket(MiningEventPacket packet) {
         if (BBsentials.miningEventConfig.blockChEvents && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
             return;
@@ -350,6 +336,8 @@ public class BBsentialConnection {
         if (packet.success) {
             BBsentials.generalConfig.bbsentialsRoles = packet.roles;
             Chat.sendPrivateMessageToSelfSuccess("Login Success");
+            if (socket.getRemoteSocketAddress().toString().startsWith("localhost"))
+                Chat.sendPrivateMessageToSelfError("You are connected to the Local Test Server!");
             if (!packet.motd.isEmpty()) {
                 Chat.sendPrivateMessageToSelfImportantInfo(packet.motd);
             }
@@ -360,18 +348,28 @@ public class BBsentialConnection {
     }
 
     public void onDisconnectPacket(DisconnectPacket packet) {
-        Chat.sendPrivateMessageToSelfError(packet.displayMessage);
-        BBsentials.connection.close();
-        for (int i = 0; i < packet.waitBeforeReconnect.length; i++) {
-            int finalI = i;
-            BBsentials.executionService.schedule(() -> {
-                if (finalI == 1) {
-                    BBsentials.connectToBBserver();
-                }
-                else {
-                    BBsentials.conditionalReconnectToBBserver();
-                }
-            }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)), TimeUnit.SECONDS);
+        if (EnvironmentCore.utils.isInGame()) {
+            Chat.sendPrivateMessageToSelfError(packet.displayMessage);
+            try {
+                BBsentials.connection.close();
+            } catch (Exception ignored) {
+            }
+            for (int i = 0; i < packet.waitBeforeReconnect.length; i++) {
+                int finalI = i;
+                BBsentials.executionService.schedule(() -> {
+                    if (finalI == 0) {
+                        BBsentials.connectToBBserver();
+                    }
+                    else {
+                        BBsentials.conditionalReconnectToBBserver();
+                    }
+                }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)), TimeUnit.SECONDS);
+            }
+        }
+        else {
+            if (packet.internalReason.equals(InternalReasonConstants.NOT_REGISTERED))
+                EnvironmentCore.utils.showErrorScreen("Could not connect to the network. Reason: \n" + packet.displayMessage);
+            else EnvironmentCore.utils.showErrorScreen(packet.displayMessage);
         }
     }
 
@@ -405,13 +403,13 @@ public class BBsentialConnection {
             BBsentials.sender.addImmediateSendTask("/hub");
         }
         else if (packet.command.equals(InternalCommandPacket.PRIVATE_ISLAND)) {
-           BBsentials.sender.addImmediateSendTask("/is");
+            BBsentials.sender.addImmediateSendTask("/is");
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_HUB)) {
-           BBsentials.sender.addHiddenSendTask("/hub", 0);
+            BBsentials.sender.addHiddenSendTask("/hub", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.HIDDEN_PRIVATE_ISLAND)) {
-           BBsentials.sender.addHiddenSendTask("/is", 0);
+            BBsentials.sender.addHiddenSendTask("/is", 0);
         }
         else if (packet.command.equals(InternalCommandPacket.CRASH)) {
             Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
@@ -425,13 +423,13 @@ public class BBsentialConnection {
                     } catch (InterruptedException ignored) {
                     }
                 }
-                System.exit(69);
+                EnvironmentCore.utils.systemExit(69);
             });
             crashThread.start();
         }
         else if (packet.command.equals(InternalCommandPacket.INSTACRASH)) {
             System.out.println("BBsentials: InstaCrash triggered");
-            System.exit(69);
+            EnvironmentCore.utils.systemExit(69);
         }
     }
 
@@ -462,7 +460,13 @@ public class BBsentialConnection {
     }
 
     public void onRequestAuthentication(RequestAuthentication packet) {
-        Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
+        if (socket.getPort() == 5011) {
+            Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online (Beta Development Server)");
+            Chat.sendPrivateMessageToSelfImportantInfo("You may test here but do NOT Spam unless you have very good reasons. Spamming may still be punished");
+        }
+        else {
+            Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
+        }
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -476,40 +480,17 @@ public class BBsentialConnection {
         String clientRandom = serverBi.toString(16);
 
         String serverId = clientRandom + packet.serverIdSuffix;
+
         if (BBsentials.bbServerConfig.useMojangAuth) {
             EnvironmentCore.utils.mojangAuth(serverId);
-            RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), clientRandom, BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.MOJANG);
+            RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), clientRandom, EnvironmentCore.utils.getModVersion(), EnvironmentCore.utils.getGameVersion(), BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.MOJANG);
             sendPacket(connectPacket);
         }
         else {
-            sendPacket(new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), BBsentials.bbServerConfig.apiKey, BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.DATABASE));
+            sendPacket(new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), BBsentials.bbServerConfig.apiKey, EnvironmentCore.utils.getModVersion(), EnvironmentCore.utils.getGameVersion(), BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.DATABASE));
         }
     }
 
-    public boolean showChChest(ChChestItem[] items) {
-        if (BBsentials.chChestConfig.allChChestItem) return true;
-        for (ChChestItem item : items) {
-            if (BBsentials.chChestConfig.customChChestItem && item.isCustom()) return true;
-            if (BBsentials.chChestConfig.allRoboPart && item.isRoboPart()) return true;
-            if (BBsentials.chChestConfig.prehistoricEgg && item.equals(ChChestItems.PrehistoricEgg))
-                return true;
-            if (BBsentials.chChestConfig.pickonimbus2000 && item.equals(ChChestItems.Pickonimbus2000))
-                return true;
-            if (BBsentials.chChestConfig.controlSwitch && item.equals(ChChestItems.ControlSwitch)) return true;
-            if (BBsentials.chChestConfig.electronTransmitter && item.equals(ChChestItems.ElectronTransmitter))
-                return true;
-            if (BBsentials.chChestConfig.robotronReflector && item.equals(ChChestItems.RobotronReflector))
-                return true;
-            if (BBsentials.chChestConfig.superliteMotor && item.equals(ChChestItems.SuperliteMotor))
-                return true;
-            if (BBsentials.chChestConfig.syntheticHeart && item.equals(ChChestItems.SyntheticHeart))
-                return true;
-            if (BBsentials.chChestConfig.flawlessGemstone && item.equals(ChChestItems.FlawlessGemstone))
-                return true;
-            if (BBsentials.chChestConfig.jungleHeart && item.equals(ChChestItems.JungleHeart)) return true;
-        }
-        return false;
-    }
 
     public boolean isConnected() {
         try {
@@ -554,10 +535,10 @@ public class BBsentialConnection {
             if (BBsentials.bbthread != null) {
                 BBsentials.bbthread.interrupt();
             }
-            writer.close();
-            reader.close();
-            socket.close();
-            messageQueue.clear();
+            if (writer != null) writer.close();
+            if (reader != null) reader.close();
+            if (socket != null) socket.close();
+            if (messageQueue != null) messageQueue.clear();
             if (BBsentials.bbthread != null) {
                 BBsentials.bbthread.join();
                 BBsentials.bbthread = null;
@@ -576,6 +557,80 @@ public class BBsentialConnection {
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public void onWaypointPacket(WaypointPacket packet) {
+        if (packet.operation.equals(WaypointPacket.Operation.ADD)) {
+            new Waypoints(packet.waypoint);
+        }
+        else if (packet.operation.equals(WaypointPacket.Operation.REMOVE)) {
+            try {
+                Waypoints.waypoints.get(packet.waypointId).removeFromPool();
+            } catch (Exception ignored) {
+
+            }
+        }
+        else if (packet.operation.equals(WaypointPacket.Operation.EDIT)) {
+            try {
+                Waypoints oldWaypoint = Waypoints.waypoints.get(packet.waypointId);
+                oldWaypoint.replaceWithNewWaypoint(packet.waypoint, packet.waypointId);
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    public void onGetWaypointsPacket(GetWaypointsPacket packet) {
+        sendPacket(new GetWaypointsPacket(Waypoints.waypoints.values().stream().map((waypoint -> ((ClientWaypointData) waypoint))).collect(Collectors.toList())));
+    }
+
+    public void onCompletedGoalPacket(CompletedGoalPacket packet) {
+        if (!BBsentials.visualConfig.showCardCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.CARD))
+            Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username \",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"just completed the \",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"Bingo\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"!\",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}}]".replace("@username", packet.username).replace("@lore", packet.lore)));
+            //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"@username "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"just completed the "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"Bingo"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"!"}],"command":"%s","jtemplate":"tellraw"}
+        else if (!BBsentials.visualConfig.showGoalCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.GOAL))
+            Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username \",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"just completed the Goal \",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"@name\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"!\",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}}]".replace("@username", packet.username).replace("@lore", packet.lore).replace("@name", packet.name)));
+        //["",{"text":"@username ","color":"gold","hoverEvent":{"action":"show_text","contents":["@lore"]}},{"text":"just completed the Goal ","color":"gray","hoverEvent":{"action":"show_text","contents":["@lore"]}},{"text":"@name","color":"gold","hoverEvent":{"action":"show_text","contents":["@lore"]}},{"text":"!","color":"gray","hoverEvent":{"action":"show_text","contents":["@lore"]}}]
+    }
+
+    public void onPlaySoundPacket(PlaySoundPacket packet) {
+        if (packet.streamFromUrl) EnvironmentCore.utils.streamCustomSound(packet.soundId, packet.durationInSeconds);
+        else EnvironmentCore.utils.playsound(packet.soundId);
+    }
+
+    public void onWantedSearchPacket(WantedSearchPacket packet) {
+        if (packet.serverId != null && !packet.serverId.equals(EnvironmentCore.utils.getServerId())) return;
+        if (packet.mega != null && packet.mega != EnvironmentCore.utils.isOnMegaServer()) return;
+        List<String> playerCount = EnvironmentCore.utils.getPlayers();
+        if (packet.maximumPlayerCount != null && packet.maximumPlayerCount > playerCount.size()) return;
+        if (packet.minimumPlayerCount != null && packet.minimumPlayerCount < playerCount.size()) return;
+        if (packet.username != null && !playerCount.contains(packet.username)) return;
+        sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket.WantedSearchPacketReply(BBsentials.generalConfig.getUsername(), EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.isOnMegaServer(), EnvironmentCore.utils.getServerId())));
+    }
+
+
+    public void onSkyblockLobbyDataPacket(SkyblockLobbyDataPacket packet) {
+        packet.preparePacketToReplyToThis(new SkyblockLobbyDataPacket(EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.getLobbyTime(), EnvironmentCore.utils.getServerId(), EnvironmentCore.utils.getCurrentIsland()));
+    }
+
+    public void onPunishedPacket(PunishedPacket packet) {
+        for (PunishmentData data : packet.data) {
+            if (!data.isActive()) continue;
+            if (data.disconnectFromNetworkOnLoad) close();
+            if (data.modSelfRemove) selfDestruct();
+            if (!data.silent) {
+                Chat.sendPrivateMessageToSelfFatal("You have been " + data.type + " in the BBsentials Network! Reason: " + data.reason);
+                Chat.sendPrivateMessageToSelfFatal("Punishment Expiration Date: " + new Timestamp(data.till.getTime()).toLocalDateTime().toString());
+                if (data.modSelfRemove)
+                    Chat.sendPrivateMessageToSelfFatal("You have been disallowed to use the mod, which is the reason it is automatically self removing itself!");
+            }
+            if (data.shouldModCrash) {
+                for (int i = 0; i < data.warningTimeBeforeCrash; i++) {
+                    if (!data.silent) Chat.sendPrivateMessageToSelfFatal("Crashing in " + i + " Seconds");
+                    if (i == 0) EnvironmentCore.utils.systemExit(data.exitCodeOnCrash);
+                }
+            }
         }
     }
 

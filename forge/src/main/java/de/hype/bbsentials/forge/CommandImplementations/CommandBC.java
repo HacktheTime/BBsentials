@@ -28,8 +28,8 @@ public class CommandBC extends CommandBase {
             return;
         }
 
-        String message = args[0];
-        connection.sendPacket(new BingoChatMessagePacket("","",message,0));
+        String message = String.join(" ",args);
+        connection.sendPacket(new BingoChatMessagePacket("", "", message, 0));
     }
 
     @Override

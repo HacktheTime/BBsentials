@@ -1,0 +1,71 @@
+plugins {
+    id 'multiloader-common'
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+minecraft {
+    version(libs.versions.modern.minecraft.get())
+    def aw = file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWideners(aw)
+    }
+}
+repositories {
+    mavenCentral()
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    maven { url = uri("https://maven.architectury.dev/") }
+    maven { url = uri("https://maven.notenoughupdates.org/releases/") }
+    maven { url = uri("https://maven.fabricmc.net") }
+    maven { url = uri("https://maven.minecraftforge.net/") }
+    maven { url = uri("https://repo.spongepowered.org/maven/") }
+    maven { url = uri("https://repo.sk1er.club/repository/maven-releases/") }
+    maven { url = uri("https://maven.wagyourtail.xyz/releases") }
+    maven { url = uri("https://maven.wagyourtail.xyz/snapshots") }
+    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
+    maven { url = uri("https://maven.xpple.dev/maven2") }
+    maven { url = uri("https://maven.terraformersmc.com/releases") }
+    maven { url = uri("https://maven.shedaniel.me/") }
+    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://repo.hypixel.net/repository/Hypixel/") }
+    maven { url = uri("https://repo.nea.moe/releases") }
+}
+dependencies {
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    //Basic Dependencies
+    implementation(libs.apache.httpclient)
+    implementation(libs.gson)
+    implementation(libs.guava)
+    implementation(libs.commonsLang)
+    implementation(libs.commonsText)
+    implementation(libs.kotlinStdlib)
+
+    //Hypixel Related Dependencies
+    implementation(libs.hypixelModApi) // Offical Hypixel Mod API
+    implementation(libs.neditNBT) //NBT Parser
+    implementation(libs.neurepoparser) //Neu REPO Manager
+    implementation(libs.git)
+
+    //Discord Related Dependencies
+    implementation(libs.discordJDA)
+    implementation(libs.discordGameSDK)
+
+    //Other Dependencies
+    implementation(libs.javazoom)
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}

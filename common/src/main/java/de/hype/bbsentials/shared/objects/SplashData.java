@@ -3,17 +3,19 @@ package de.hype.bbsentials.shared.objects;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 
-public abstract class SplashData {
+public class SplashData {
     public String announcer;
     public StatusConstants status;
     public int splashId;
     public int hubNumber;
-    public String locationInHub;
+    public SplashLocation locationInHub;
     public Islands hubType;
     public String extraMessage;
     public boolean lessWaste;
+    public String serverID;
 
-    public SplashData(String user, int hubNumber, String locationInHub, Islands hubType, String extraMessage, boolean lessWaste) throws Exception {
+    public SplashData(String user, int hubNumber, SplashLocation locationInHub, Islands hubType, String extraMessage, boolean lessWaste, String serverID) throws Exception {
+        this.serverID = serverID;
         this.announcer = user;
         this.hubNumber = hubNumber;
         this.locationInHub = locationInHub;
@@ -26,7 +28,7 @@ public abstract class SplashData {
         this.status = StatusConstants.WAITING;
     }
 
-    public SplashData(String user, int splashId, int hubNumber, String locationInHub, Islands hubType, String extraMessage, boolean lessWaste, StatusConstants status) throws Exception {
+    public SplashData(String user, int splashId, int hubNumber, SplashLocation locationInHub, Islands hubType, String extraMessage, boolean lessWaste, StatusConstants status, String serverID) throws Exception {
         this.splashId = splashId;
         this.announcer = user;
         this.hubNumber = hubNumber;
@@ -37,32 +39,7 @@ public abstract class SplashData {
         if (!(hubType.equals(Islands.HUB) || hubType.equals(Islands.DUNGEON_HUB))) {
             throw new Exception("§cInvalid hub type specified. Please only use the Suggestions!");
         }
+        this.serverID = serverID;
         this.status = status;
-    }
-
-    public abstract void statusUpdate(StatusConstants newStatus);
-
-    public void setWaiting() {
-        statusUpdate(StatusConstants.WAITING);
-    }
-
-    public void setFull() {
-        statusUpdate(StatusConstants.FULL);
-    }
-
-    public void setSplashing() {
-        statusUpdate(StatusConstants.SPLASHING);
-    }
-
-    public void setDone() {
-        statusUpdate(StatusConstants.DONEBAD);
-    }
-
-    public void setCanceled() {
-        statusUpdate(StatusConstants.CANCELED);
-    }
-
-    public boolean stillAnnounce() {
-        return status.equals(StatusConstants.WAITING);
     }
 }

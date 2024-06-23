@@ -68,8 +68,7 @@ dependencies {
 
     configurations.transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
         modImplementation(it.moduleVersion.id.toString())
-        println it.name
-        if (!it.name.contains("jna")) include(it.moduleVersion.id.toString())
+        include(it.moduleVersion.id.toString())
     }
 }
 

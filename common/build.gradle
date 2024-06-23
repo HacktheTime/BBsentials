@@ -32,20 +32,26 @@ repositories {
 }
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    implementation(libs.apache.httpclient.get())
-    implementation(libs.legacyGson.get())
-    implementation("org.apache.commons:commons-lang3:latest.release")
-    implementation("org.apache.commons:commons-text:latest.release")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
-    implementation("com.google.guava:guava:33.0.0-jre")
-    implementation("javazoom:jlayer:1.0.1")
-    implementation("net.dv8tion:JDA:5.0.0-beta.23")
-//    implementation(libs.discordJDA)
-    implementation("me.nullicorn:Nedit:latest.release")
-    implementation("net.hypixel:mod-api:latest.release")
-    implementation("com.github.JnCrMx:discord-game-sdk4j:latest.release")
-    implementation("moe.nea:neurepoparser:latest.release")
-    implementation('org.eclipse.jgit:org.eclipse.jgit:latest.release')
+    //Basic Dependencies
+    implementation(libs.apache.httpclient)
+    implementation(libs.gson)
+    implementation(libs.guava)
+    implementation(libs.commonsLang)
+    implementation(libs.commonsText)
+    implementation(libs.kotlinStdlib)
+
+    //Hypixel Related Dependencies
+    implementation(libs.hypixelModApi) // Offical Hypixel Mod API
+    implementation(libs.neditNBT) //NBT Parser
+    implementation(libs.neurepoparser) //Neu REPO Manager
+    implementation(libs.git)
+
+    //Discord Related Dependencies
+    implementation(libs.discordJDA)
+    implementation(libs.discordGameSDK)
+
+    //Other Dependencies
+    implementation(libs.javazoom)
 }
 
 configurations {

@@ -34,28 +34,37 @@ configurations {
 
 dependencies {
     //TODO I am aware of this mess with the dependencies. It is on the thing todo but it launches with IntelliJ
-    minecraft "com.mojang:minecraft:${libs.versions.modern.minecraft.get()}"
+    //Fabric / Minecraft
+    minecraft libs.modern.minecraft.get()
     mappings "net.fabricmc:yarn:${libs.versions.modern.yarn.get()}:v2"
+    modImplementation libs.modern.fabric.loader.get()
+    modImplementation libs.modern.fabric.api.get()
+    //Dev Env
     modRuntimeOnly(libs.modern.devauth)
-    modImplementation(include("dev.xpple:clientarguments:1.8.2"))
-    add("transitiveInclude", modImplementation("com.github.JnCrMx:discord-game-sdk4j:latest.release"))
-    modImplementation("net.hypixel:mod-api:latest.release")
-    modImplementation(libs.modmenu)
-    modImplementation("me.shedaniel.cloth:cloth-config-fabric:${libs.versions.cloth.get()}") {
+
+    //Dependencies
+    //Basic Dependencies
+    modImplementation(libs.modmenu) // Mod Config
+    modImplementation(libs.clothConfig.get()) {
         exclude(group: "net.fabricmc.fabric-api")
-    }
-    add("transitiveInclude", modImplementation("javazoom:jlayer:1.0.1"))
-    modImplementation "net.fabricmc:fabric-loader:${libs.versions.modern.fabric.loader.get()}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${libs.versions.modern.fabric.api.get()}"
-    add("transitiveInclude", modImplementation("net.dv8tion:JDA:5.0.0-beta.23"))
-    add("transitiveInclude", modImplementation("me.nullicorn:Nedit:latest.release"))
-    modImplementation("moe.nea:neurepoparser:latest.release")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    add("transitiveInclude", modImplementation('org.eclipse.jgit:org.eclipse.jgit:latest.release'))
-    include(implementation('org.eclipse.jgit:org.eclipse.jgit:latest.release'))
-    modImplementation('org.eclipse.jgit:org.eclipse.jgit:latest.release')
-    include(modImplementation("org.apache.commons:commons-text:latest.release"))
-    include(modImplementation("moe.nea:neurepoparser:latest.release"))
+    } // Mod Config
+    implementation libs.kotlinStdlib
+    modImplementation(include(libs.appleClientCommands.get())) // Commands
+    include(implementation(libs.git.get())) //Git versioning for Neu REPO without downloading fully each time
+    include(modImplementation(libs.commonsText.get()))
+
+    //Hypixel Related Dependencies
+    modImplementation(libs.hypixelModApi.get())// Mod API (Official)
+    include(modImplementation(libs.neurepoparser.get())) //Neu REPO
+    transitiveInclude(modImplementation(libs.neditNBT.get())) //NBT Parser
+
+    //Discord Related Dependencies
+    transitiveInclude(modImplementation(libs.discordGameSDK.get())) // Discord Game SDK
+    transitiveInclude(modImplementation(libs.discordJDA.get())) //Discord Bot
+
+    //Other Dependencies
+    transitiveInclude(modImplementation(libs.javazoom.get())) // Music Player
+
 
     configurations.transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
         modImplementation(it.moduleVersion.id.toString())

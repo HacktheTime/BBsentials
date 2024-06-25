@@ -19,6 +19,9 @@ import org.apache.commons.text.WordUtils;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 
@@ -33,12 +36,13 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
         super(title);
     }
 
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Inject(method = "keyPressed",at=@At("HEAD"))
+    public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (focusedSlot != null && focusedSlot.getStack().getItem() != Items.AIR) {
             if (keyCode == 258) onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);
             else if (keyCode == KeyBindingHelper.getBoundKeyOf(ModInitialiser.openWikiKeybind).getCode()) {
                 NbtComponent customData = focusedSlot.getStack().get(DataComponentTypes.CUSTOM_DATA);
-                if (customData == null) return super.keyPressed(keyCode, scanCode, modifiers);
+                if (customData == null) return;
                 NbtCompound data = customData.copyNbt();
                 String id = data.getString("id");
                 String lowercaseID = id.toLowerCase();
@@ -60,10 +64,7 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
                 }
                 SystemUtils.openInBrowser("https://wiki.hypixel.net/%s".formatted(path));
             }
-            else return super.keyPressed(keyCode, scanCode, modifiers);
         }
-        else return super.keyPressed(keyCode, scanCode, modifiers);
-        return true;
     }
 
     @Shadow

@@ -10,11 +10,11 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.ChChestItems;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.ChestLobbyData;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class UpdateListenerManager {
     public static BBsentialConnection connection;
@@ -53,14 +53,14 @@ public class UpdateListenerManager {
                 if (showChChest(data.chests.get(0).items)) {
                     String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
                     tellrawText = tellrawText.replace("@username", data.contactMan);
-                    tellrawText = tellrawText.replace("@item", data.chests.get(0).items.stream()
+                    tellrawText = tellrawText.replace("@item", StringEscapeUtils.escapeJson(data.chests.get(0).items.stream()
                             .map(ChChestItem::getDisplayName)
-                            .collect(Collectors.toList())
-                            .toString());
+                            .toList()
+                            .toString()));
                     tellrawText = tellrawText.replace("@coords", data.chests.get(0).coords.toString());
-                    tellrawText = tellrawText.replace("@inviteCommand", data.bbcommand);
+                    tellrawText = tellrawText.replace("@inviteCommand", StringEscapeUtils.escapeJson(data.bbcommand));
                     if (!(data.extraMessage == null || data.extraMessage.isEmpty())) {
-                        tellrawText = tellrawText.replace("@extramessage", " : " + data.extraMessage);
+                        tellrawText = tellrawText.replace("@extramessage", " : " + StringEscapeUtils.escapeJson(data.extraMessage));
                     }
                     Chat.sendPrivateMessageToSelfText(Message.tellraw(tellrawText));
                 }

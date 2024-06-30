@@ -5,12 +5,16 @@ import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.DebugThread;
+import de.hype.bbsentials.fabric.FabricTextUtils;
 import de.hype.bbsentials.fabric.screens.RoutesConfigScreen;
 import de.hype.bbsentials.fabric.screens.TrustedPartyMembersConfigScreen;
 import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
+import de.hype.bbsentials.shared.objects.Position;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.*;
@@ -125,8 +129,25 @@ public class NumPadCodes {
         defaultCodes.add((new NumCode("040", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new RoutesConfigScreen(null))))));
         defaultCodes.add((new NumCode("041", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen(null))))));
         defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, "debug", () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
+        defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, "debug", () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
         defaultCodes.add(new NumCode("043", Formatting.GREEN, "", TrustedPartyMembersConfigScreen::openFromNothing));
         defaultCodes.add((new NumCode("04", "/visit portal_hub")));
+        defaultCodes.add((new NumCode("002", Formatting.DARK_BLUE, "", () -> {
+            new Waypoints( new Position(-94, 201, -30), FabricTextUtils.textToJson(Text.of("mono1")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(-91, 221, -53), FabricTextUtils.textToJson(Text.of("mono2")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(-64, 206, -63), FabricTextUtils.textToJson(Text.of("mono3")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(-15, 236, -92), FabricTextUtils.textToJson(Text.of("mono4")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(-10, 162, 109), FabricTextUtils.textToJson(Text.of("mono5")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(1, 170, 0), FabricTextUtils.textToJson(Text.of("mono6")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(1, 183, 25), FabricTextUtils.textToJson(Text.of("mono7")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(49, 202, -162), FabricTextUtils.textToJson(Text.of("mono8")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(56, 214, -25), FabricTextUtils.textToJson(Text.of("mono9")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(61, 204, 181), FabricTextUtils.textToJson(Text.of("mono10")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(77, 160, 162), FabricTextUtils.textToJson(Text.of("mono11")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(91, 187, 131), FabricTextUtils.textToJson(Text.of("mono12")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(128, 187, 58), FabricTextUtils.textToJson(Text.of("mono13")), 1000, true, true, new ArrayList<>());
+            new Waypoints( new Position(150, 196, 190), FabricTextUtils.textToJson(Text.of("mono14")), 1000, true, true, new ArrayList<>());
+        })));
         defaultCodes.add((new NumCode("11", "/l")));
         if (all) {
             numCodes.addAll(defaultCodes);

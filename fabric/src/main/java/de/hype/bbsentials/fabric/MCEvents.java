@@ -1,28 +1,21 @@
 package de.hype.bbsentials.fabric;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.config.constants.ClickableArmorStand;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.IChestBlockEntityMixinAccess;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.Position;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
@@ -31,19 +24,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -58,16 +45,20 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
 
     @Override
     public void registerUseClick() {
-        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            return onBlockClickInteraction(player, world, hand, hitResult);
-        });
+        UseBlockCallback.EVENT.register(this::onBlockClickInteraction);
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
                     BBsentials.executionService.execute(() -> {
-                        onArmorstandInteraction(player, world, hand, entity, hitResult);
+                        onArmorstandInteraction(player, world, hand, entity, hitResult, true);
                     });
                     return ActionResult.PASS;
                 }
         );
+        AttackEntityCallback.EVENT.register(((player, world, hand, entity, hitResult) -> {
+            BBsentials.executionService.execute(() -> {
+                onArmorstandInteraction(player, world, hand, entity, hitResult, false);
+            });
+            return ActionResult.PASS;
+        }));
     }
 
     private ActionResult onBlockClickInteraction(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
@@ -113,12 +104,21 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
         return ActionResult.PASS;
     }
 
-    public void onArmorstandInteraction(PlayerEntity player, World world, Hand hand, Entity entity, @Nullable EntityHitResult hitResult) {
+    /**
+     * @param player
+     * @param world
+     * @param hand
+     * @param entity
+     * @param hitResult
+     * @param use whether it is a punch or an use on the entity. if true it is an right click (use)
+     */
+    public void onArmorstandInteraction(PlayerEntity player, World world, Hand hand, Entity entity, @Nullable EntityHitResult hitResult, boolean use) {
+        ModInitialiser.tutorialManager.clickedEntity(entity,use);
         if (entity instanceof ArmorStandEntity) {
             ((ArmorStandEntity) entity).getArmorItems().forEach(itemStack -> {
                 if (itemStack.getItem() == Items.PLAYER_HEAD) {
-                    ProfileComponent profileComponent =itemStack.get(DataComponentTypes.PROFILE);
-                    if (profileComponent==null) return;
+                    ProfileComponent profileComponent = itemStack.get(DataComponentTypes.PROFILE);
+                    if (profileComponent == null) return;
                     String texture = profileComponent.properties().get("textures").stream().toList().getFirst().value();
                     ClickableArmorStand armorStand = ClickableArmorStand.getFromTexture(texture);
 //                    if (armorStand != null) Chat.sendPrivateMessageToSelfSuccess(armorStand.toString()+" was clicked");

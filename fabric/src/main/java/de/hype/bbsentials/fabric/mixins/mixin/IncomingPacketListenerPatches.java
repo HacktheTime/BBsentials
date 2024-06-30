@@ -4,16 +4,21 @@ package de.hype.bbsentials.fabric.mixins.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.ParseResults;
+import de.hype.bbsentials.fabric.ModInitialiser;
 import de.hype.bbsentials.fabric.command.BBCommandDispatcher;
 import de.hype.bbsentials.fabric.command.ClientCommandRegistrationCallback;
 import de.hype.bbsentials.fabric.command.CommandOverrideCallback;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.IBBsentialsCommandSource;
+import de.hype.bbsentials.fabric.tutorial.TutorialManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.packet.s2c.play.LightData;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,8 +42,10 @@ public abstract class IncomingPacketListenerPatches {
     @Shadow
     protected abstract void readLightData(int x, int z, LightData data);
 
+    @Shadow protected abstract ParseResults<CommandSource> parse(String command);
+
     @ModifyExpressionValue(method = "onCommandTree", at = @At(value = "NEW", target = "(Lcom/mojang/brigadier/tree/RootCommandNode;)Lcom/mojang/brigadier/CommandDispatcher;", remap = false))
-    public CommandDispatcher<CommandSource> onOnCommandTree(CommandDispatcher<CommandSource> dispatcher) {
+    public CommandDispatcher<CommandSource> BBsentials$onOnCommandTree(CommandDispatcher<CommandSource> dispatcher) {
         List<String> allCommands = dispatcher.getRoot().getChildren().stream().map(c -> c.getName()).toList();
         BBCommandDispatcher bbdispatcher = new BBCommandDispatcher();
         ClientCommandRegistrationCallback.EVENT.invoker().register(bbdispatcher);
@@ -53,16 +60,21 @@ public abstract class IncomingPacketListenerPatches {
 //    }
 
     @Inject(method = "sendCommand", at = @At("HEAD"), cancellable = true)
-    private void onSendCommand(String command, CallbackInfoReturnable<Boolean> cir) {
+    private void BBsentials$onSendCommand(String command, CallbackInfoReturnable<Boolean> cir) {
         if (BBCommandDispatcher.executeCommand(command)) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "sendChatCommand", at = @At("HEAD"), cancellable = true)
-    private void onSendCommand(String command, CallbackInfo info) {
+    private void BBsentials$onSendCommand(String command, CallbackInfo info) {
         if (BBCommandDispatcher.executeCommand(command)) {
             info.cancel();
         }
+    }
+
+    @Inject(method = "onScreenHandlerSlotUpdate", at = @At("HEAD"))
+    public void BBsentials$slotUpdate(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci){
+        ModInitialiser.tutorialManager.obtainItem(packet.getStack());
     }
 }

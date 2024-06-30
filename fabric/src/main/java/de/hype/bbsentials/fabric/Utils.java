@@ -10,8 +10,11 @@ import de.hype.bbsentials.client.common.objects.RouteNode;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.command.BBCommandDispatcher;
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent;
+import de.hype.bbsentials.fabric.tutorial.AbstractTutorialNode;
+import de.hype.bbsentials.fabric.tutorial.Tutorial;
+import de.hype.bbsentials.fabric.tutorial.TutorialManager;
+import de.hype.bbsentials.fabric.tutorial.nodes.CoordinateNode;
 import de.hype.bbsentials.shared.constants.ChChestItem;
-import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.Position;
@@ -22,7 +25,6 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.HypixelPacket;
-import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
@@ -55,12 +57,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -92,9 +96,25 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public static void renderWaypoints(WorldRenderLastEvent event) {
         BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
         List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
-        if (!waypoints.isEmpty()) {
+
+        if (!waypoints.isEmpty() || ModInitialiser.tutorialManager.current != null) {
             try {
                 RenderInWorldContext.renderInWorld(event, (it) -> {
+                    Color defaultColor = BBsentials.visualConfig.waypointDefaultColor;
+                    if (ModInitialiser.tutorialManager.current != null) {
+                        List<CoordinateNode> nodes = ModInitialiser.tutorialManager.current.getCoordinateNodesToRender();
+                        for (int i = 0; i < nodes.size(); i++) {
+                            BlockPos pos = new BlockPos(nodes.get(i).getPositionBlockPos());
+                            it.color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), 0.2f);
+                            it.block(pos);
+                            it.color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), 1f);
+                            if (i == 0 && !ModInitialiser.tutorialManager.recording) {
+                                Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
+                                it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                            }
+                            it.doWaypointIcon(pos.toCenterPos(), new ArrayList<>(), 25, 25);
+                        }
+                    }
                     for (Waypoints waypoint : waypoints) {
                         BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
                         if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
@@ -516,31 +536,49 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             else if (differece > 40) colorCode = "§6";
             drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
         }
+        if (ModInitialiser.tutorialManager.current != null) {
+            TutorialManager manager = ModInitialiser.tutorialManager;
+            Tutorial current = manager.current;
+            AbstractTutorialNode node = current.getNextNode();
+            if (node != null) {
+                if (ModInitialiser.tutorialManager.recording) {
+                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Tutorial (§cRecording§r): "), 10, 30, 0xFFFFFF, true);
+                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(node.getDescriptionString()), 10, 40, 0xFFFFFF, true);
+
+                }
+                else {
+                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Tutorial: "), 10, 30, 0xFFFFFF, true);
+                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(node.getDescriptionString()), 10, 40, 0xFFFFFF, true);
+                }
+            }
+        }
     }
 
     public Islands getCurrentIsland() {
-        try {
-            ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
-            if (t == null) return null;
-            String string;
-            if (isSecondRowInfoRow()) {
-                //Its in Second Row
-                string = t.getPlayerListEntry("!B-b").getDisplayName().getString();
-            }
-            else {
-                //Its 3 row. default from before
-                string = t.getPlayerListEntry("!C-b").getDisplayName().getString();
-            }
-            if (!string.startsWith("Area: ") && !string.startsWith("Dungeon: ")) {
-                Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
-            }
-            else {
-                if (string.startsWith("Dungeon: ")) return Islands.DUNGEON;
-                return EnumUtils.getEnumByValue(Islands.class, string.replace("Area: ", "").trim());
-            }
-        } catch (Exception e) {
-        }
-        return null;
+        if (BBsentials.dataStorage == null) return null;
+        return BBsentials.dataStorage.getIsland();
+//        try {
+//            ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
+//            if (t == null) return null;
+//            String string;
+//            if (isSecondRowInfoRow()) {
+//                //Its in Second Row
+//                string = t.getPlayerListEntry("!B-b").getDisplayName().getString();
+//            }
+//            else {
+//                //Its 3 row. default from before
+//                string = t.getPlayerListEntry("!C-b").getDisplayName().getString();
+//            }
+//            if (!string.startsWith("Area: ") && !string.startsWith("Dungeon: ")) {
+//                Chat.sendPrivateMessageToSelfError("Could not get Area data. Are you in Skyblock?");
+//            }
+//            else {
+//                if (string.startsWith("Dungeon: ")) return Islands.DUNGEON;
+//                return EnumUtils.getEnumByValue(Islands.class, string.replace("Area: ", "").trim());
+//            }
+//        } catch (Exception e) {
+//        }
+//        return null;
     }
 
     private boolean isSecondRowInfoRow() {

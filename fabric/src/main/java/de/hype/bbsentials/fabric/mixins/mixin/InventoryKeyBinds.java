@@ -36,7 +36,7 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
         super(title);
     }
 
-    @Inject(method = "keyPressed",at=@At("HEAD"))
+    @Inject(method = "keyPressed",at=@At("RETURN"))
     public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (focusedSlot != null && focusedSlot.getStack().getItem() != Items.AIR) {
             if (keyCode == 258) onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);

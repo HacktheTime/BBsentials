@@ -136,6 +136,15 @@ public abstract class RenderingDefinitions {
                 }
             };
         }
+        new RenderingDefinitions() {
+            @Override
+            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
+                if (itemName.equals("Water Bottle")) {
+                    check.renderAsItem(Items.RED_CONCRETE);
+                }
+                return false;
+            }
+        };
         new RenderingDefinitions(false) {
             @Override
             public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {

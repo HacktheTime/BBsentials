@@ -1,22 +1,31 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.fabric.ModInitialiser;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +33,14 @@ import java.util.concurrent.TimeUnit;
 @Mixin(HandledScreen.class)
 public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
 
+
+    @Shadow
+    @Nullable
+    protected Slot focusedSlot;
+
+    @Shadow
+    @Final
+    protected T handler;
 
     protected CustomItemTooltip(Text title) {
         super(title);
@@ -83,10 +100,23 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
                 ((ICusomItemDataAccess) ((Object) lowestYetHub)).BBsentialsAll$reevaluate();
             }, 30, TimeUnit.MILLISECONDS);
         }
+        BBsentials.executionService.schedule(() -> {
+            ModInitialiser.tutorialManager.openedInventory((HandledScreen<T>) (Object) this);
+        }, 40, TimeUnit.MILLISECONDS);
+    }
+
+    @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("RETURN"))
+    public void BBsentials$mouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
+        if (slot == null) {
+            return;
+        }
+        ItemStack stack = slot.getStack();
+        ModInitialiser.tutorialManager.clickedItemInInventory(stack, slotId, title.getString());
     }
 
     @Inject(method = "close", at = @At("HEAD"))
     private void BBsentials$onClose(CallbackInfo ci) {
         BBsentials.splashConfig.smallestHubName = null;
     }
+
 }

@@ -4,11 +4,6 @@
   "package": "de.hype.bbsentials.fabric.mixins.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ChestLidMixin",
-    "CommandNodeAccessMixin",
-    "LiteralCommandNodeMixin",
-    "RootCommandNodeAccessMixin",
-    "SignaturePropertyErrorIgnoreMixin"
   ],
   "client": [
     "BBsentialsCommandSource",
@@ -21,7 +16,13 @@
     "InventoryKeyBinds",
     "ItemRendererMixin",
     "SimpleOptionMixin",
-    "WorldRenderLastEventPatch"
+    "WorldRenderLastEventPatch",
+    "ChestLidMixin",
+    "CommandNodeAccessMixin",
+    "LiteralCommandNodeMixin",
+    "RootCommandNodeAccessMixin",
+    "ScreenHandlerMixin",
+    "SignaturePropertyErrorIgnoreMixin"
   ],
   "injectors": {
     "defaultRequire": 1

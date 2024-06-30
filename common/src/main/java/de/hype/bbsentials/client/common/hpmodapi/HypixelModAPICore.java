@@ -42,7 +42,7 @@ public class HypixelModAPICore {
     }
 
     private void handlePacketDebug(ClientboundHypixelPacket packet) {
-        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Rec" + packet);
+        if (developerConfig.devMode) Chat.sendPrivateMessageToSelfDebug("HP-Mod-API-Rec: " + packet);
     }
 
     public void onPingPacket(ClientboundPingPacket packet) {
@@ -57,6 +57,7 @@ public class HypixelModAPICore {
 
     public void onHelloEvent(ClientboundHelloPacket packet) {
         handlePacketDebug(packet);
+        BBsentials.dataStorage= new BBDataStorage(packet);
     }
 
     public void onPartyInfoPacket(ClientboundPartyInfoPacket packet) {
@@ -78,7 +79,6 @@ public class HypixelModAPICore {
     public void register() {
         HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
         HypixelModAPI.getInstance().registerHandler(ClientboundHelloPacket.class, this::onHelloEvent);
-        HypixelModAPI.getInstance().registerHandler(ClientboundLocationPacket.class, this::onLocationEvent);
         HypixelModAPI.getInstance().registerHandler(ClientboundPingPacket.class, this::onPingPacket);
         HypixelModAPI.getInstance().registerHandler(ClientboundPlayerInfoPacket.class, this::onPlayerInfoPacket);
         HypixelModAPI.getInstance().registerHandler(ClientboundPartyInfoPacket.class, this::onPartyInfoPacket);

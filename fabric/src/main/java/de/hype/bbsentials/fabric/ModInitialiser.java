@@ -16,6 +16,7 @@ import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.fabric.command.ClientCommandManager;
+import de.hype.bbsentials.fabric.command.ClientCommandRegistrationCallback;
 import de.hype.bbsentials.fabric.command.Commands;
 import de.hype.bbsentials.fabric.command.argumentTypes.SackMaterialArgumentType;
 import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockItemIdArgumentType;
@@ -27,11 +28,13 @@ import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
 import de.hype.bbsentials.fabric.screens.RouteConfigScreen;
 import de.hype.bbsentials.fabric.screens.RoutesConfigScreen;
 import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
+import de.hype.bbsentials.fabric.tutorial.Tutorial;
+import de.hype.bbsentials.fabric.tutorial.TutorialManager;
+import de.hype.bbsentials.fabric.tutorial.nodes.ObtainItemNode;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.api.ClientModInitializer;
-import de.hype.bbsentials.fabric.command.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -65,6 +68,8 @@ import static de.hype.bbsentials.fabric.command.ClientCommandManager.literal;
 public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
     public static KeyBinding openWikiKeybind;
+    public static TutorialManager tutorialManager;
+
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
@@ -121,6 +126,7 @@ public class ModInitialiser implements ClientModInitializer {
                     .then(argument("warp", SkyblockWarpArgumentType.warptype())
                             .executes(context -> {
                                 BBsentials.sender.addImmediateSendTask("/warp " + SkyblockWarpArgumentType.getWarpString(context, "warp"));
+                                ModInitialiser.tutorialManager.onTravel(SkyblockWarpArgumentType.getWarpString(context, "warp"));
                                 return 1;
                             })
                     ));
@@ -153,29 +159,29 @@ public class ModInitialiser implements ClientModInitializer {
                     }));
         });
         ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
-            dispatcher.register(ClientCommandManager.literal("bbi")
-                            .then(ClientCommandManager.literal("reconnect")
+            dispatcher.register(literal("bbi")
+                            .then(literal("reconnect")
                                     .executes((context) -> {
                                         connectToBBserver();
                                         return 1;
                                     }))
-                            .then(ClientCommandManager.literal("disconnect")
+                            .then(literal("disconnect")
                                     .executes((context) -> {
                                         connection.close();
                                         Chat.sendPrivateMessageToSelfInfo("Disconnected");
                                         return 1;
                                     }))
-                            .then(ClientCommandManager.literal("reconnect-stable-server")
+                            .then(literal("reconnect-stable-server")
                                     .executes((context) -> {
                                         connectToBBserver(false);
                                         return 1;
                                     }))
-                            .then(ClientCommandManager.literal("reconnect-test-server")
+                            .then(literal("reconnect-test-server")
                                     .executes((context) -> {
                                         connectToBBserver(true);
                                         return 1;
                                     }))
-                            .then(ClientCommandManager.literal("reconnect-local-test-server")
+                            .then(literal("reconnect-local-test-server")
                                     .executes((context) -> {
                                         executionService.execute(() -> {
                                             try {
@@ -199,12 +205,119 @@ public class ModInitialiser implements ClientModInitializer {
                                         });
                                         return 1;
                                     }))
-                            .then(ClientCommandManager.literal("config")
-                                    .then(ClientCommandManager.argument("category", StringArgumentType.string())
+                            .then(literal("tutorial")
+                                    .then(literal("unload")
+                                            .executes((context -> {
+                                                ModInitialiser.tutorialManager.current = null;
+                                                return 1;
+                                            })))
+                                    .then(literal("load")
+                                            .then(argument("name", StringArgumentType.greedyString())
+                                                    .suggests((context, builder) -> {
+                                                        for (Tutorial allTutorial : ModInitialiser.tutorialManager.getAllTutorials()) {
+                                                            builder.suggest(allTutorial.tutorialName);
+                                                        }
+                                                        return builder.buildFuture();
+                                                    })
+                                                    .executes((context -> {
+                                                        for (Tutorial tutorial : ModInitialiser.tutorialManager.getAllTutorials()) {
+                                                            if (tutorial.tutorialName.equals(StringArgumentType.getString(context, "name"))) {
+                                                                ModInitialiser.tutorialManager.loadTutorial(tutorial);
+                                                                return 1;
+                                                            }
+                                                        }
+                                                        return 0;
+                                                    }))))
+                                    .then(literal("record-start")
+                                            .requires(req -> !tutorialManager.recording)
+                                            .then(argument("name", StringArgumentType.greedyString())
+                                                    .executes((context -> {
+                                                        tutorialManager.startRecording(StringArgumentType.getString(context, "name"));
+                                                        return 1;
+                                                    }))))
+                                    .then(literal("record-stop")
+                                            .requires(req -> tutorialManager.recording)
+                                            .executes((context -> {
+                                                tutorialManager.stopRecording();
+                                                return 1;
+                                            })))
+                                    .then(literal("record-playback").requires(req -> developerConfig.devMode)
+                                            .executes((context -> {
+                                                tutorialManager.stopRecording();
+                                                tutorialManager.loadTutorial(tutorialManager.current);
+                                                return 1;
+                                            }))
+                                    ).then(literal("node-options")
+                                            .then(literal("deleteLast")
+                                                    .executes(context -> {
+                                                        tutorialManager.deleteLastNode();
+                                                        return 1;
+                                                    })
+                                                    .requires(req -> tutorialManager.recording && tutorialManager.current != null)
+                                            ).then(literal("obtainItemHeld").then(argument("count", IntegerArgumentType.integer(1))
+                                                    .executes((context -> {
+                                                        ObtainItemNode itemNode = new ObtainItemNode(MinecraftClient.getInstance().player.getInventory().getMainHandStack(), IntegerArgumentType.getInteger(context, "count"));
+                                                        if (itemNode.stackMap.isEmpty()) {
+                                                            Chat.sendPrivateMessageToSelfError("This Item does not have a Skyblock Id and thereby can not be added to the List!");
+                                                            return 0;
+                                                        }
+                                                        tutorialManager.current.addNode(itemNode);
+                                                        return 1;
+                                                    }))
+                                                    .requires(req -> tutorialManager.recording && tutorialManager.current != null)
+                                            ))
+                                            .then(literal("skip")
+                                                    .then(argument("count", IntegerArgumentType.integer())
+                                                            .executes(context -> {
+                                                                        tutorialManager.skipNode(IntegerArgumentType.getInteger(context, "count"));
+                                                                        return 1;
+                                                                    }
+                                                            )
+                                                    )
+                                                    .executes(context -> {
+                                                        tutorialManager.skipNode(1);
+                                                        return 1;
+                                                    })
+                                                    .requires(req -> !tutorialManager.recording && tutorialManager.current != null)
+                                            ).then(literal("go back")
+                                                    .then(argument("count", IntegerArgumentType.integer())
+                                                            .executes(context -> {
+                                                                        tutorialManager.goBackNode(IntegerArgumentType.getInteger(context, "count"));
+                                                                        return 1;
+                                                                    }
+                                                            )
+                                                    )
+                                                    .executes(context -> {
+                                                        tutorialManager.goBackNode(1);
+                                                        return 1;
+                                                    })
+                                                    .requires(req -> !tutorialManager.recording && tutorialManager.current != null)
+                                            )
+                                            .then(literal("reset")
+                                                    .executes(context -> {
+                                                        tutorialManager.current.reset(false);
+                                                        return 1;
+                                                    })
+                                            ).then(literal("hard-reset")
+                                                    .executes(context -> {
+                                                        tutorialManager.current.reset(true);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+                                    .then(literal("record-options")).requires(req -> developerConfig.devMode).executes((context -> {
+                                        tutorialManager.stopRecording();
+                                        tutorialManager.loadTutorial(tutorialManager.current);
+                                        return 1;
+                                    }))
+                            )
+                            .then(literal("config")
+                                    .then(argument("category", StringArgumentType.string())
                                             .suggests((context, builder) -> {
                                                 // Provide tab-completion options for configManager subfolder
                                                 return CommandSource.suggestMatching(new String[]{"saveAll", "reset", "load"}, builder);
-                                            }).executes((context) -> {
+                                            })
+                                            .executes((context) -> {
                                                 String category = StringArgumentType.getString(context, "category");
                                                 switch (category) {
                                                     case "saveAll":
@@ -220,15 +333,15 @@ public class ModInitialiser implements ClientModInitializer {
                                                 }
                                                 return 1;
                                             }))
-                                    .then(ClientCommandManager.literal("set-value")
-                                            .then(ClientCommandManager.argument("className", StringArgumentType.string())
+                                    .then(literal("set-value")
+                                            .then(argument("className", StringArgumentType.string())
                                                     .suggests((context, builder) -> {
                                                         // Provide tab-completion options for classes
                                                         List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
                                                         // Replace with your own logic to retrieve class names
                                                         return CommandSource.suggestMatching(classNames, builder);
                                                     })
-                                                    .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
+                                                    .then(argument("variableName", StringArgumentType.string())
                                                             .suggests((context, builder) -> {
                                                                 // Provide tab-completion options for variable names
                                                                 List<String> variableNames = new ArrayList<>();
@@ -239,7 +352,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                                 }
                                                                 return CommandSource.suggestMatching(variableNames, builder);
                                                             })
-                                                            .then(ClientCommandManager.argument("variableValue", StringArgumentType.string())
+                                                            .then(argument("variableValue", StringArgumentType.string())
                                                                     .executes((context) -> {
                                                                         // Handle "variableName" and "variableValue" logic here
                                                                         String variableName = StringArgumentType.getString(context, "variableName");
@@ -259,15 +372,15 @@ public class ModInitialiser implements ClientModInitializer {
                                                                         }
                                                                         return 1;
                                                                     })))))
-                                    .then(ClientCommandManager.literal("get-value")
-                                            .then(ClientCommandManager.argument("className", StringArgumentType.string())
+                                    .then(literal("get-value")
+                                            .then(argument("className", StringArgumentType.string())
                                                     .suggests((context, builder) -> {
                                                         // Provide tab-completion options for classes
                                                         List<String> classNames = ConfigManager.getLoadedConfigClasses().stream().map(Class::getSimpleName).toList();
                                                         // Replace with your own logic to retrieve class names
                                                         return CommandSource.suggestMatching(classNames, builder);
                                                     })
-                                                    .then(ClientCommandManager.argument("variableName", StringArgumentType.string())
+                                                    .then(argument("variableName", StringArgumentType.string())
                                                             .suggests((context, builder) -> {
                                                                 // Provide tab-completion options for variable names
                                                                 List<String> variableNames;
@@ -289,14 +402,14 @@ public class ModInitialiser implements ClientModInitializer {
                                             })
                                     )
                             )
-                            .then(ClientCommandManager.literal("waypoint")
-                                            .then(ClientCommandManager.literal("add")
-                                                    .then(ClientCommandManager.argument("name", StringArgumentType.string())
-                                                            .then(ClientCommandManager.argument("position", CBlockPosArgument.blockPos())
-                                                                    .then(ClientCommandManager.argument("deleteonserverswap", BoolArgumentType.bool())
-                                                                            .then(ClientCommandManager.argument("visible", BoolArgumentType.bool())
-                                                                                    .then(ClientCommandManager.argument("maxrenderdistance", IntegerArgumentType.integer())
-                                                                                            .then(ClientCommandManager.argument("customtexture", StringArgumentType.string())
+                            .then(literal("waypoint")
+                                            .then(literal("add")
+                                                    .then(argument("name", StringArgumentType.string())
+                                                            .then(argument("position", CBlockPosArgument.blockPos())
+                                                                    .then(argument("deleteonserverswap", BoolArgumentType.bool())
+                                                                            .then(argument("visible", BoolArgumentType.bool())
+                                                                                    .then(argument("maxrenderdistance", IntegerArgumentType.integer())
+                                                                                            .then(argument("customtexture", StringArgumentType.string())
                                                                                                     .executes(this::createWaypointFromCommandContext)
                                                                                             )
                                                                                             .executes(this::createWaypointFromCommandContext)
@@ -307,7 +420,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                             )
                                                     )
                                             )
-                                            .then(ClientCommandManager.literal("remove")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
+                                            .then(literal("remove")).then(argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
                                                 int wpId = IntegerArgumentType.getInteger(context, "waypointid");
                                                 return (Waypoints.waypoints.remove(wpId) != null) ? 1 : 0;
                                             })))
@@ -315,8 +428,8 @@ public class ModInitialiser implements ClientModInitializer {
 //                                 Waypoints.waypoints.clear();
 //                                 return 1;
 //                            })))
-                                            .then(ClientCommandManager.literal("setvisibility")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer())
-                                                    .then(ClientCommandManager.argument("visible", BoolArgumentType.bool()).executes((context -> {
+                                            .then(literal("setvisibility")).then(argument("waypointid", IntegerArgumentType.integer())
+                                                    .then(argument("visible", BoolArgumentType.bool()).executes((context -> {
                                                         int wpId = IntegerArgumentType.getInteger(context, "waypointid");
                                                         boolean visible = BoolArgumentType.getBool(context, "setvisibility");
                                                         Waypoints waypoint = Waypoints.waypoints.get(wpId);
@@ -334,7 +447,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                             return 1;
                                                         }
                                                     })))
-                                                    .then(ClientCommandManager.literal("info")).then(ClientCommandManager.argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
+                                                    .then(literal("info")).then(argument("waypointid", IntegerArgumentType.integer()).executes((context -> {
                                                         int wpId = IntegerArgumentType.getInteger(context, "waypointid");
                                                         try {
                                                             Chat.sendPrivateMessageToSelfInfo(Waypoints.waypoints.get(wpId).getFullInfoString());
@@ -343,7 +456,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                             return 0;
                                                         }
                                                     })))
-                                                    .then(ClientCommandManager.literal("list").executes((context -> {
+                                                    .then(literal("list").executes((context -> {
                                                                 Waypoints.waypoints.forEach(((integer, waypoint) -> {
                                                                     Chat.sendPrivateMessageToSelfInfo(waypoint.getMinimalInfoString());
                                                                 }));
@@ -499,6 +612,7 @@ public class ModInitialiser implements ClientModInitializer {
         EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new FabricTextUtils());
         codes = new NumPadCodes();
         BBsentials.init();
+        tutorialManager = new TutorialManager();
         if (developerConfig.quickLaunch) {
             executionService.execute(() -> {
                 while (!MinecraftClient.getInstance().isFinishedLoading()) {
@@ -516,6 +630,11 @@ public class ModInitialiser implements ClientModInitializer {
             ServerSwitchTask.onServerJoinTask(() -> EnvironmentCore.debug.onServerJoin(), true);
             ServerSwitchTask.onServerLeaveTask(() -> EnvironmentCore.debug.onServerLeave(), true);
         }
+        ServerSwitchTask.onServerJoinTask(() -> ModInitialiser.tutorialManager.onTravel(dataStorage.getIsland()), true);
+        ServerSwitchTask.onServerLeaveTask(() -> {
+            if (dataStorage != null) dataStorage.island = null;
+            if (ModInitialiser.tutorialManager.current != null) ModInitialiser.tutorialManager.current.resetTravel();
+        });
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
             BBsentials.onServerJoin();
         });
@@ -586,5 +705,6 @@ public class ModInitialiser implements ClientModInitializer {
         ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
 
         ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
+        sender.addSendTask("/skyblock", 3.5);
     }
 }

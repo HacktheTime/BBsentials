@@ -634,7 +634,7 @@ public class ModInitialiser implements ClientModInitializer {
         ServerSwitchTask.onServerLeaveTask(() -> {
             if (dataStorage != null) dataStorage.island = null;
             if (ModInitialiser.tutorialManager.current != null) ModInitialiser.tutorialManager.current.resetTravel();
-        });
+        }, true);
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
             BBsentials.onServerJoin();
         });

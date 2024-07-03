@@ -20,12 +20,7 @@ public class Waypoints extends ClientWaypointData {
 
 
     public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render, Color color, boolean doTracer) {
-        super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, color, doTracer);
-        ServerSwitchTask.onServerLeaveTask(() -> {
-            if (this.deleteOnServerSwap)
-                this.removeFromPool();
-        });
-        waypoints.put(waypointId, this);
+        this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, List.of(render), color, doTracer);
     }
 
     public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render) {
@@ -56,12 +51,7 @@ public class Waypoints extends ClientWaypointData {
     }
 
     public Waypoints(WaypointData data) {
-        super(data.position, data.jsonToRenderText, data.renderDistance, data.visible, data.deleteOnServerSwap, data.render, data.color, data.doTracer);
-        ServerSwitchTask.onServerLeaveTask(() -> {
-            if (this.deleteOnServerSwap)
-                this.removeFromPool();
-        });
-        waypoints.put(waypointId, this);
+        this(data.position, data.jsonToRenderText, data.renderDistance, data.visible, data.deleteOnServerSwap, data.render, data.color, data.doTracer);
     }
 
     public Waypoints removeFromPool() {

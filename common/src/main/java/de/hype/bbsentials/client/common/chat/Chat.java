@@ -1,5 +1,9 @@
 package de.hype.bbsentials.client.common.chat;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
@@ -244,9 +248,6 @@ public class Chat {
         if (message.getString() != null) {
             String messageUnformatted = message.getUnformattedString();
             String username = message.getPlayerName();
-            if (messageUnformatted.startsWith("[NPC]")) {
-                lastNPCMessage=new Date();
-            }
             if (!EnvironmentCore.utils.isWindowFocused()) {
                 if (BBsentials.generalConfig.doDesktopNotifications) {
                     if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.generalConfig.doDesktopNotifications) {
@@ -275,7 +276,10 @@ public class Chat {
                 }
             }
             else if (message.isServerMessage()) {
-                if (messageUnformatted.contains("disbanded the party")) {
+                if (messageUnformatted.startsWith("Select an option:")){
+                    setChatCommand(getFirstGreenSelectOption(message.getJson()),10);
+                }
+                else if (messageUnformatted.contains("disbanded the party")) {
                     lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
                     partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());
                 }
@@ -381,10 +385,6 @@ public class Chat {
                     setChatCommand("/warp trapper", 10);
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp back to the trapper\",\"color\":\"green\"}]"));
                 }
-                else if (message.getUnformattedString().endsWith("animal near the Desert Settlement.") || message.getUnformattedString().endsWith("animal near the Oasis.")) {
-                    setChatCommand("/warp desert", 10);
-                    Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp to the \",\"color\":\"green\"},{\"text\":\"Desert Settelment\",\"color\":\"gold\"}]"));
-                }
                 else if (messageUnformatted.startsWith("BINGO GOAL COMPLETE! ")) {
                     BBsentials.connection.sendPacket(new CompletedGoalPacket("", messageUnformatted.replace("BINGO GOAL COMPLETE!", "").trim(), "", "", CompletedGoalPacket.CompletionType.GOAL, -1, BBsentials.visualConfig.broadcastGoalAndCardCompletion));
                 }
@@ -412,6 +412,13 @@ public class Chat {
 
             else if (message.isFromGuild()) {
 
+            }
+            else if (message.source == de.hype.bbsentials.shared.objects.Message.MessageSource.NPC) {
+                if (message.getUnformattedString().endsWith("animal near the Desert Settlement.") || message.getUnformattedString().endsWith("animal near the Oasis.")) {
+                    setChatCommand("/warp desert", 10);
+                    Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"Press (\",\"color\":\"green\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},{\"text\":\") to warp to the \",\"color\":\"green\"},{\"text\":\"Desert Settelment\",\"color\":\"gold\"}]"));
+                }
+                lastNPCMessage = new Date();
             }
             else if (message.isFromParty()) {
                 if (message.getMessageContent().equalsIgnoreCase("@" + BBsentials.generalConfig.getUsername().toLowerCase() + " bb:dev getlog") && username.equals("Hype_the_Time")) {
@@ -660,5 +667,24 @@ public class Chat {
             updatedTargetName = "themself";
         }
         return "/pc " + username + " " + updatedActionParamter + " " + updatedTargetName;
+    }
+    public static String getFirstGreenSelectOption(String jsonString) {
+        JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+        JsonArray extraArray = jsonObject.getAsJsonArray("extra");
+
+        for (JsonElement element : extraArray) {
+            JsonObject extraObject = element.getAsJsonObject();
+            String text = extraObject.get("text").getAsString();
+
+            // Check if the text contains green color code
+            if (text.contains("§a")) {
+                JsonObject clickEvent = extraObject.getAsJsonObject("clickEvent");
+                if (clickEvent != null && "run_command".equals(clickEvent.get("action").getAsString())) {
+                    return clickEvent.get("value").getAsString();
+                }
+            }
+        }
+
+        return null;
     }
 }

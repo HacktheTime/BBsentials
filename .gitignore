@@ -27,3 +27,4 @@ logs
 /run/servers.dat_old
 /runforge/configManager/splash.properties
 /temp.txt
+/temp.json

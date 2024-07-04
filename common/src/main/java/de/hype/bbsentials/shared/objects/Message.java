@@ -83,7 +83,8 @@ public abstract class Message {
     public String getPlayerName() {
         if (playerName != null) return playerName;
         playerName = getUnformattedString();
-        if (!playerName.contains(":")) {
+        int columnIndex = playerName.indexOf(":");
+        if (columnIndex==-1) {
             playerName = "";
             return "";
         }
@@ -96,6 +97,7 @@ public abstract class Message {
         }
 //        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?[^\\x00-\\x7F]+\\s*?\\s?\\[[^\\]]*\\])*", "").trim()// replaces every [] and unicode character before a asci character.
         playerName = playerName.replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim();
+        if (playerName.contains(" ")) playerName="";
         if (playerName.matches("[^a-zA-Z0-9_-]+")) playerName = "";
         return playerName;
     }

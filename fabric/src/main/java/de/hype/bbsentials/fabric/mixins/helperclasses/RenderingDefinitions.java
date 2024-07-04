@@ -202,7 +202,7 @@ public abstract class RenderingDefinitions {
                                 topPos = Double.parseDouble(line.replaceAll("[^0-9.]", ""));
                             }
                         }
-                        PositionCommunityFeedback.ComGoalPosition positioning = new PositionCommunityFeedback.ComGoalPosition(stackItem.getName().getString(), contribution, topPos, position);
+                        PositionCommunityFeedback.ComGoalPosition positioning = new PositionCommunityFeedback.ComGoalPosition(stack.getName().getString(), contribution, topPos, position);
                         DummyDataStorage.addComGoalDataToPacket(positioning);
 
                         if (!display) return false;

@@ -13,34 +13,21 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class DummyDataStorage {
     @Expose(serialize = false, deserialize = false)
-    public static volatile AtomicReference<PositionCommunityFeedback> comGoalDataPacketInstance;
+    public static volatile AtomicReference<PositionCommunityFeedback> comGoalDataPacketInstance = new AtomicReference<>();
     @Expose(serialize = false, deserialize = false)
-    public static volatile AtomicReference<ScheduledFuture<?>> comGoalDataPacketSendFuture;
+    public static volatile AtomicReference<ScheduledFuture<?>> comGoalDataPacketSendFuture = new AtomicReference<>();
 
     public static void addComGoalDataToPacket(PositionCommunityFeedback.ComGoalPosition positioning) {
         if (positioning.position == null && comGoalDataPacketInstance == null) return;
-        else if (positioning.position == null && comGoalDataPacketInstance != null) {
-            comGoalDataPacketSendFuture.get().cancel(false);
-            comGoalDataPacketSendFuture.set(BBsentials.executionService.schedule(() -> {
-                if (BBsentials.connection != null && BBsentials.connection.isConnected()) BBsentials.connection.sendPacket(comGoalDataPacketInstance.get());
-                comGoalDataPacketInstance = null;
-                comGoalDataPacketSendFuture = null;
-            }, 50, TimeUnit.MILLISECONDS));
-            return;
-        }
-        if (comGoalDataPacketInstance == null) {
-            ArrayList<PositionCommunityFeedback.ComGoalPosition> positionings = new ArrayList<>();
-            positionings.add(positioning);
-            comGoalDataPacketInstance.set(new PositionCommunityFeedback(positionings));
-        }
-        else {
-            comGoalDataPacketSendFuture.get().cancel(false);
-            comGoalDataPacketInstance.get().positions.add(positioning);
-            comGoalDataPacketSendFuture.set(BBsentials.executionService.schedule(() -> {
-                if (BBsentials.connection != null && BBsentials.connection.isConnected()) BBsentials.connection.sendPacket(comGoalDataPacketInstance.get());
-                comGoalDataPacketInstance = null;
-                comGoalDataPacketSendFuture = null;
-            }, 50, TimeUnit.MILLISECONDS));
-        }
+        if (comGoalDataPacketSendFuture.get() != null) comGoalDataPacketSendFuture.get().cancel(false);
+        comGoalDataPacketSendFuture.set(BBsentials.executionService.schedule(() -> {
+            if (BBsentials.connection != null && BBsentials.connection.isConnected())
+                BBsentials.connection.sendPacket(comGoalDataPacketInstance.get());
+            comGoalDataPacketInstance.set(null);
+            comGoalDataPacketSendFuture.set(null);
+        }, 1, TimeUnit.SECONDS));
+        if (comGoalDataPacketInstance.get() == null)
+            comGoalDataPacketInstance.set(new PositionCommunityFeedback(new ArrayList<>()));
+        comGoalDataPacketInstance.get().positions.add(positioning);
     }
 }

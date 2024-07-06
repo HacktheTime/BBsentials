@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import de.hype.bbsentials.shared.packets.function.PositionCommunityFeedback;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,7 +18,7 @@ public class DummyDataStorage {
     @Expose(serialize = false, deserialize = false)
     public static volatile AtomicReference<ScheduledFuture<?>> comGoalDataPacketSendFuture = new AtomicReference<>();
 
-    public static void addComGoalDataToPacket(PositionCommunityFeedback.ComGoalPosition positioning) {
+    public static synchronized void addComGoalDataToPacket(PositionCommunityFeedback.ComGoalPosition positioning) {
         if (positioning.position == null && comGoalDataPacketInstance == null) return;
         if (comGoalDataPacketSendFuture.get() != null) comGoalDataPacketSendFuture.get().cancel(false);
         comGoalDataPacketSendFuture.set(BBsentials.executionService.schedule(() -> {
@@ -27,7 +28,7 @@ public class DummyDataStorage {
             comGoalDataPacketSendFuture.set(null);
         }, 1, TimeUnit.SECONDS));
         if (comGoalDataPacketInstance.get() == null)
-            comGoalDataPacketInstance.set(new PositionCommunityFeedback(new ArrayList<>()));
+            comGoalDataPacketInstance.set(new PositionCommunityFeedback(new HashSet<>()));
         comGoalDataPacketInstance.get().positions.add(positioning);
     }
 }

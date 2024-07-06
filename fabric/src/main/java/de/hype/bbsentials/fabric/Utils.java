@@ -1,6 +1,7 @@
 package de.hype.bbsentials.fabric;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
+import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
@@ -263,7 +264,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             try {
                 MinecraftClient.getInstance().getSessionService().joinServer(MinecraftClient.getInstance().getGameProfile().getId(), MinecraftClient.getInstance().getSession().getAccessToken(), serverId);
                 success = true;
-            } catch (AuthenticationException e) {
+            }catch (InvalidCredentialsException e){
+                Chat.sendPrivateMessageToSelfError("BB: Error trying to authenticate with Mojang. Either use Key login or restart your game. Session servers may be down too!");
+            }catch (AuthenticationException e) {
                 try {
                     Thread.sleep(1000);
                 } catch (Exception ignored) {

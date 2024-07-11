@@ -5,6 +5,7 @@ import de.hype.bbsentials.shared.objects.Message;
 
 import java.awt.*;
 import java.lang.reflect.Type;
+import java.time.Instant;
 
 public class CustomGson {
     public static Gson ownSerializer = new GsonBuilder().create();
@@ -21,6 +22,7 @@ public class CustomGson {
         return new GsonBuilder()
                 .registerTypeAdapter(Color.class, new ColorSerializer())
                 .registerTypeAdapter(Message.class, new MessageSerializer())
+                .registerTypeAdapter(Instant.class,new InstantSerializer())
                 ;
     }
 
@@ -52,6 +54,17 @@ public class CustomGson {
         @Override
         public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             return ownSerializer.fromJson(json, de.hype.bbsentials.client.common.chat.Message.class);
+        }
+    }
+    private static class InstantSerializer implements JsonSerializer<Instant>, JsonDeserializer<Instant> {
+        @Override
+        public Instant deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return Instant.ofEpochMilli(json.getAsLong());
+        }
+
+        @Override
+        public JsonElement serialize(Instant src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.toEpochMilli());
         }
     }
 

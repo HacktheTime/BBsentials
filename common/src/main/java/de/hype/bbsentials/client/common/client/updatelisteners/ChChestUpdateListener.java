@@ -135,4 +135,13 @@ public class ChChestUpdateListener extends UpdateListener {
             e.printStackTrace();
         }
     }
+
+    public boolean currentlyInChLobby() {
+        return lobby != null && lobby.serverId.equals(BBsentials.dataStorage.serverId);
+    }
+
+    public void addChestAndUpdate(Position coords, List<ChChestItem> items) {
+        lobby.addChest(new ChChestData(BBsentials.generalConfig.getUsername(), coords, items));
+        sendUpdatePacket();
+    }
 }

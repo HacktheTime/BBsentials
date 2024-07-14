@@ -1,8 +1,10 @@
 package de.hype.bbsentials.fabric.tutorial.nodes;
 
+import de.hype.bbsentials.fabric.Text;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import de.hype.bbsentials.fabric.tutorial.AbstractTutorialNode;
+import de.hype.bbsentials.shared.constants.VanillaItems;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.DataComponentTypes;
@@ -12,7 +14,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
-import net.minecraft.text.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,9 +70,9 @@ public class ClickItemNode extends AbstractTutorialNode {
         try {
             if (!sc.getTitle().getString().equals(title)) return;
             ItemStack stack = sc.getScreenHandler().getSlot(slot).getStack();
-            RenderingDefinitions.RenderStackItemCheck data = new RenderingDefinitions.RenderStackItemCheck(stack);
-            data.renderAsItem(Items.EMERALD_BLOCK);
-            data.getTextTooltip().add(1, Text.of("§aThis is the Next Click in your current Tutorial"));
+            RenderingDefinitions.RenderStackItemCheck data = new RenderingDefinitions.RenderStackItemCheck(new de.hype.bbsentials.fabric.ItemStack(stack));
+            data.renderAsItem(VanillaItems.EMERALD_BLOCK);
+            data.getTextTooltip().add(1, new Text(net.minecraft.text.Text.of("§aThis is the Next Click in your current Tutorial")));
             ((ICusomItemDataAccess) (Object) stack).BBsentialsAll$setRenderingDefinition(data, true);
         } catch (Exception e) {
             e.printStackTrace();

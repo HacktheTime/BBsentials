@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.commonsLang)
     implementation(libs.commonsText)
     implementation(libs.kotlinStdlib)
+    implementation(libs.reflection)
 
     //Hypixel Related Dependencies
     implementation(libs.hypixelModApi) // Offical Hypixel Mod API

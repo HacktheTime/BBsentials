@@ -52,6 +52,7 @@ guava = { module = "com.google.guava:guava", version = "latest.release" }
 commonsLang = { module = "org.apache.commons:commons-lang3", version = "latest.release" }
 commonsText = { module = "org.apache.commons:commons-text", version = "latest.release" }
 kotlinStdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version = "latest.release" }
+reflection = {module = "org.reflections:reflections", version = "latest.release"}
 javazoom = { module = "javazoom:jlayer", version = "latest.release" }
 #Hypixel Related Dependencies
 hypixelModApi = { module = "net.hypixel:mod-api", version = "latest.release" }

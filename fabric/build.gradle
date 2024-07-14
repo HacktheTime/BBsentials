@@ -64,6 +64,7 @@ dependencies {
 
     //Other Dependencies
     transitiveInclude(modImplementation(libs.javazoom.get())) // Music Player
+    transitiveInclude(modImplementation(libs.reflection.get())) // Music Player
 
     configurations.transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
         modImplementation(it.moduleVersion.id.toString())

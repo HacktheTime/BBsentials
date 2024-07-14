@@ -3,6 +3,7 @@ package de.hype.bbsentials.fabric.mixins.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.ModInitialiser;
+import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.FabricICusomItemDataAccess;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -67,7 +68,7 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
                     if (stack.getItem() == Items.BLACK_STAINED_GLASS_PANE) continue;
                     if (!stack.getName().getString().startsWith("SkyBlock Hub")) continue;
                     try {
-                        ICusomItemDataAccess access = (ICusomItemDataAccess) (Object) stack;
+                        FabricICusomItemDataAccess access = (FabricICusomItemDataAccess) (Object) stack;
                         List<Text> texts = access.BBsentialsAll$getItemRenderTooltip();
                         String serverid = "";
                         int playerCount = -1;

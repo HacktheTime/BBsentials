@@ -22,6 +22,7 @@ public class ChChestConfig extends BBsentialsConfig {
     public boolean superliteMotor = false;
     public boolean syntheticHeart = false;
     public boolean flawlessGemstone = false;
+    public boolean hideLootChestUnimportant = false;
 
 
     public ChChestConfig() {

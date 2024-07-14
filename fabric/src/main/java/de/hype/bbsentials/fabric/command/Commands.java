@@ -11,10 +11,12 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
-import de.hype.bbsentials.shared.constants.*;
+import de.hype.bbsentials.shared.constants.ChChestItem;
+import de.hype.bbsentials.shared.constants.ChChestItems;
+import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.constants.MiningEvents;
 import de.hype.bbsentials.shared.objects.*;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
-import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.BingoChatMessagePacket;
 import de.hype.bbsentials.shared.packets.network.BroadcastMessagePacket;
@@ -131,7 +133,7 @@ public class Commands implements MCCommand {
                                                                     BBsentials.partyConfig.allowBBinviteMe = true;
                                                                     ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
                                                                 }
-                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
+                                                                BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, extraMessage);
                                                                 return 1;
                                                             }
                                                     )
@@ -144,7 +146,12 @@ public class Commands implements MCCommand {
                                                             context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
                                                             return 1;
                                                         }
-                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
+                                                        if (!BBsentials.partyConfig.allowBBinviteMe && contactWay.contains("bb:party me")) {
+                                                            Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap");
+                                                            BBsentials.partyConfig.allowBBinviteMe = true;
+                                                            ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
+                                                        }
+                                                        BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, "");
                                                         return 1;
                                                     }
                                             )

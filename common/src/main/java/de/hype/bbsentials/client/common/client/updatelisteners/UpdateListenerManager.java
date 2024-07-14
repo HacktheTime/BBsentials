@@ -110,4 +110,8 @@ public class UpdateListenerManager {
         return false;
     }
 
+    public static void resetListeners() {
+        splashStatusUpdateListener = new SplashStatusUpdateListener(null);
+        chChestUpdateListener = new ChChestUpdateListener(null);
+    }
 }

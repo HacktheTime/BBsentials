@@ -2,6 +2,7 @@ package de.hype.bbsentials.fabric;
 
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
+import de.hype.bbsentials.client.common.chat.MessageEvent;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.MCChat;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -22,7 +23,11 @@ public class FabricChat implements MCChat {
 //            chat.onEvent(new Message(Text.Serialization.toJsonString(message), message.getString()));
 //        });
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, isActionBar) -> {
-            boolean block = (BBsentials.chat.processNotThreaded(new Message(FabricTextUtils.opposite(message), message.getString()), isActionBar) == null);
+            Message bbMessage = new Message(FabricTextUtils.opposite(message), message.getString());
+            boolean block = (BBsentials.chat.processNotThreaded(bbMessage, isActionBar) == null);
+            MessageEvent event = new FabricMessageEvent(bbMessage);
+            BBsentials.annotationProcessor.triggerEvent(event);
+            if (event.isCanceled()) return !event.isCanceled();
             return !block;
         });
         ClientReceiveMessageEvents.MODIFY_GAME.register(this::prepareOnEvent);
@@ -51,7 +56,6 @@ public class FabricChat implements MCChat {
             else {
                 sendClientSideMessage(message);
             }
-            return null;
         }
         return toReturn;
     }

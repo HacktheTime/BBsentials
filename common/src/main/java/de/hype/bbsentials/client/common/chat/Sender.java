@@ -1,6 +1,6 @@
 package de.hype.bbsentials.client.common.chat;
 
-import de.hype.bbsentials.client.common.api.Formatting;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
 import java.util.ArrayList;

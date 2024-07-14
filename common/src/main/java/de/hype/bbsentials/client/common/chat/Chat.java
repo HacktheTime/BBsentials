@@ -4,7 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import de.hype.bbsentials.client.common.api.Formatting;
+import de.hype.bbsentials.client.common.SystemUtils;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
@@ -191,6 +192,16 @@ public class Chat {
             Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + command + "\"");
         }
     }
+    /**
+     * @param task          the command to be executed
+     * @param timeBeforePerish in seconds before its reset to nothing
+     */
+    public static void setChatCommand(Runnable task, int timeBeforePerish) {
+        BBsentials.temporaryConfig.lastChatPromptAnswer = new ChatPrompt(task, timeBeforePerish);
+        if (BBsentials.developerConfig.isDevModeEnabled()) {
+            Chat.sendPrivateMessageToSelfDebug("set a Chat Prompt Task");
+        }
+    }
 
     public Message onEvent(Message text, boolean actionbar) {
         if (!actionbar && !isSpam(text.getString())) {
@@ -250,7 +261,7 @@ public class Chat {
             String username = message.getPlayerName();
             if (!EnvironmentCore.utils.isWindowFocused()) {
                 if (BBsentials.generalConfig.doDesktopNotifications) {
-                    if ((messageUnformatted.endsWith("is visiting Your Garden !") || messageUnformatted.endsWith("is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.generalConfig.doDesktopNotifications) {
+                    if ((messageUnformatted.matches(".*is visiting Your Garden !") || messageUnformatted.endsWith(".*is visiting Your Island !")) && !EnvironmentCore.utils.isWindowFocused() && BBsentials.generalConfig.doDesktopNotifications) {
                         sendNotification("BBsentials Visit-Watcher", messageUnformatted);
                     }
                     else if (message.isMsg()) {
@@ -279,11 +290,11 @@ public class Chat {
                 if (messageUnformatted.startsWith("Select an option:")){
                     setChatCommand(getFirstGreenSelectOption(message.getJson()),10);
                 }
-                else if (messageUnformatted.contains("disbanded the party")) {
+                else if (messageUnformatted.contains(".*disbanded the party")) {
                     lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
                     partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());
                 }
-                else if (message.contains("invited you to join their party")) {
+                else if (message.contains(".*invited you to join their party")) {
                     username = message.getNoRanks().replace("-", "").replace("\n", "").trim().split(" ")[0];
                     if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
                         Instant lastDisbandedInstant = partyDisbandedMap.get(lastPartyDisbandedUsername);
@@ -363,9 +374,6 @@ public class Chat {
 //                        BBsentials.partyConfig.isPartyLeader = true;
 //                    }
                 }
-                else if (message.getUnformattedString().equals("Please type /report confirm to log your report for staff review.")) {
-                    sendCommand("/report confirm");
-                }
                 else if (messageUnformatted.startsWith("BUFF! You splashed yourself with")) {
                     if (UpdateListenerManager.splashStatusUpdateListener != null) {
                         UpdateListenerManager.splashStatusUpdateListener.setStatus(StatusConstants.SPLASHING);
@@ -397,16 +405,6 @@ public class Chat {
                     String id = messageUnformatted.replace("Profile ID: ", "").trim();
                     BBsentials.generalConfig.profileIds.add(id);
                     BBsentials.dataStorage.currentProfileID = id;
-                }
-                else if (messageUnformatted.startsWith("You received")) {
-                    String itemName = messageUnformatted.replace("You received", "").replace(".", "").trim();
-                    if (itemName.contains("Flawless") && itemName.contains("Gemstone"))
-                        BBsentials.temporaryConfig.chestParts.add(ChChestItems.FlawlessGemstone);
-                    for (ChChestItem item : ChChestItems.getAllItems()) {
-                        if (itemName.endsWith(item.getDisplayName())) {
-                            BBsentials.temporaryConfig.chestParts.add(item);
-                        }
-                    }
                 }
             }
 
@@ -628,7 +626,7 @@ public class Chat {
     }
 
     public void sendNotification(String title, String text) {
-        sendNotification(title, text, 1);
+        SystemUtils.sendNotification(title,text);
     }
 
     public void sendNotification(String title, String text, float volume) {

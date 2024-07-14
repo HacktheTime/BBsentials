@@ -1,5 +1,6 @@
 package de.hype.bbsentials.client.common.client;
 
+import de.hype.bbsentials.client.common.annotations.AnnotationProcessor;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Sender;
 import de.hype.bbsentials.client.common.client.commands.Commands;
@@ -68,6 +69,7 @@ public class BBsentials {
     public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
     public static NeuRepoManager neuRepoManager;
+    public static AnnotationProcessor annotationProcessor = new AnnotationProcessor();
 
     static {
         try {

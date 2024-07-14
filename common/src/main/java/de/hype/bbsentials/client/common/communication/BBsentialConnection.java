@@ -4,6 +4,7 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.SplashManager;
+import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
@@ -13,9 +14,9 @@ import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.environment.packetconfig.PacketManager;
 import de.hype.bbsentials.environment.packetconfig.PacketUtils;
 import de.hype.bbsentials.shared.constants.*;
-import de.hype.bbsentials.shared.objects.ClientWaypointData;
-import de.hype.bbsentials.shared.objects.PunishmentData;
+import de.hype.bbsentials.shared.objects.*;
 import de.hype.bbsentials.shared.packets.function.*;
+import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
 
@@ -54,6 +55,7 @@ public class BBsentialConnection {
     private PacketManager packetManager;
 
     public BBsentialConnection() {
+        UpdateListenerManager.resetListeners();
         packetManager = new PacketManager(this);
     }
 
@@ -195,8 +197,8 @@ public class BBsentialConnection {
             messageSenderThread.setName("bb sender thread");
 
         } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
-            if (e instanceof ConnectException){
-                System.out.println("Error trying to connect to %s on port %s".formatted(serverIP,serverPort));
+            if (e instanceof ConnectException) {
+                System.out.println("Error trying to connect to %s on port %s".formatted(serverIP, serverPort));
             }
             e.printStackTrace();
         } catch (CertificateException e) {
@@ -634,7 +636,20 @@ public class BBsentialConnection {
         }
     }
 
-    public interface MessageReceivedCallback {
-        void onMessageReceived(String message);
+    public void annonceChChest(Position coords, List<ChChestItem> items, String command, String extraMessage) {
+        if (UpdateListenerManager.chChestUpdateListener.currentlyInChLobby()) {
+            UpdateListenerManager.chChestUpdateListener.addChestAndUpdate(coords, items);
+            return;
+        }
+        if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
+            Chat.sendPrivateMessageToSelfError("The Lobby is already Closed (Day Count too high) → No one can be warped in!");
+            return;
+        }
+        if (!BBsentials.partyConfig.allowBBinviteMe && command.trim().equals("/msg " + BBsentials.generalConfig.getUsername() + " bb:party me")) {
+            Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap!");
+            BBsentials.partyConfig.allowBBinviteMe = true;
+            ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
+        }
+        BBsentials.connection.sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", coords, items)), EnvironmentCore.utils.getServerId(), command, extraMessage, StatusConstants.OPEN)));
     }
 }

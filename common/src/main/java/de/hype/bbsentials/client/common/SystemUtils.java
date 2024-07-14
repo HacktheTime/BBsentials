@@ -1,11 +1,13 @@
-package de.hype.bbsentials.fabric;
+package de.hype.bbsentials.client.common;
 
 import de.hype.bbsentials.client.common.chat.Chat;
-import dev.xpple.clientarguments.arguments.CTestClassNameArgument;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class SystemUtils {
@@ -73,5 +75,32 @@ public class SystemUtils {
             Chat.sendPrivateMessageToSelfError("Error Occur trying to copy the following Text into the clipboard: \n"+ text);
         }
 
+    }
+
+    public static void sendNotification(String title, String text) {
+        sendNotification(title, text, 1);
+    }
+
+    public static void sendNotification(String title, String text, float volume) {
+        BBsentials.executionService.execute(() -> {
+            EnvironmentCore.utils.playCustomSound("/sounds/mixkit-sci-fi-confirmation-914.wav", 0);
+        });
+        List<String> argsList = new ArrayList<>();
+        argsList.add("--title");
+        argsList.add(title);
+        argsList.add("--passivepopup");
+        argsList.add(text);
+        argsList.add("5");
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command("kdialog");
+            processBuilder.command().addAll(argsList);
+
+            Process process = processBuilder.start();
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -13,6 +13,7 @@ public class VisualConfig extends BBsentialsConfig {
     public boolean broadcastGoalAndCardCompletion = true;
     public boolean showContributorPositionInCount = true;
     public boolean addSplashWaypoint = true;
+    public boolean infiniteChatHistory = true;
 
 
     public VisualConfig() {

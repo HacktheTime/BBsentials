@@ -23,6 +23,7 @@ import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockItemIdArgumentTyp
 import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockRecipeArgumentType;
 import de.hype.bbsentials.fabric.command.argumentTypes.SkyblockWarpArgumentType;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
+import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.FabricICusomItemDataAccess;
 import de.hype.bbsentials.fabric.numpad.NumPadCodes;
 import de.hype.bbsentials.fabric.screens.BBsentialsConfigScreenFactory;
 import de.hype.bbsentials.fabric.screens.RouteConfigScreen;
@@ -36,18 +37,21 @@ import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
+import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
@@ -560,11 +564,15 @@ public class ModInitialiser implements ClientModInitializer {
             if (promptKeyBind.wasPressed()) {
                 ChatPrompt prompt = temporaryConfig.lastChatPromptAnswer;
                 if (prompt != null) {
-                    if (prompt.isAvailibel()) {
-                        if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
+                    if (prompt.isAvailable()) {
+                        if (BBsentials.developerConfig.isDetailedDevModeEnabled() && prompt.isCommand()) {
                             Chat.sendPrivateMessageToSelfDebug(prompt.command);
                         }
-                        MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(prompt.getCommandAndCancel());
+                        if (prompt.isCommand()){
+                            MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(prompt.getCommandAndCancel());
+                        }else {
+                            prompt.execute();
+                        }
                     }
                 }
             }
@@ -606,6 +614,21 @@ public class ModInitialiser implements ClientModInitializer {
 //        }
     } // KeyBinds
 
+    public void modifyItemTooltip(net.minecraft.item.ItemStack stack, Item.TooltipContext context, TooltipType type, List<Text> lines) {
+        if (type.isAdvanced()) {
+            for (int i = lines.size() - 1; i >= 0; i--) {
+                if (lines.get(i).getString().matches("NBT: \\d+ tag\\(s\\)")) {
+                    lines.remove(i);
+                }
+            }
+        }
+        //This is subject to change soon this is temporary
+        List<Text> texts = (((FabricICusomItemDataAccess) (Object) stack)).BBsentialsAll$getItemRenderTooltip();
+        if (texts == null) return;
+        lines.clear();
+        lines.addAll(texts);
+    }
+
     @Override
     public void onInitializeClient() {
         System.out.println("BBsentials : onInit called");
@@ -626,6 +649,7 @@ public class ModInitialiser implements ClientModInitializer {
             });
         }
         RenderingDefinitions.clearAndInitDefaults();
+        ItemTooltipCallback.EVENT.register(this::modifyItemTooltip);
         if (generalConfig.hasBBRoles("dev")) {
             ServerSwitchTask.onServerJoinTask(() -> EnvironmentCore.debug.onServerJoin(), true);
             ServerSwitchTask.onServerLeaveTask(() -> EnvironmentCore.debug.onServerLeave(), true);

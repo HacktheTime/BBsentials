@@ -1,10 +1,9 @@
 package de.hype.bbsentials.fabric.numpad;
 
-import de.hype.bbsentials.client.common.api.Formatting;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,21 +1,15 @@
 package de.hype.bbsentials.fabric.mixins.helperclasses;
 
-import de.hype.bbsentials.client.common.api.Formatting;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.DummyDataStorage;
 import de.hype.bbsentials.client.common.client.SplashManager;
-import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.mclibraries.interfaces.ItemStack;
+import de.hype.bbsentials.client.common.mclibraries.interfaces.NBTCompound;
+import de.hype.bbsentials.client.common.mclibraries.interfaces.Text;
+import de.hype.bbsentials.shared.constants.VanillaItems;
 import de.hype.bbsentials.shared.packets.function.PositionCommunityFeedback;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.minecraft.client.item.TooltipType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -50,10 +44,9 @@ public abstract class RenderingDefinitions {
     public static void clearAndInitDefaults() {
         defsBlocking.clear();
         defsNonBlocking.clear();
-        ItemTooltipCallback.EVENT.register(RenderingDefinitions::modifyItemTooltip);
         new RenderingDefinitions() {
             @Override
-            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
+            public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 {
                     if (!itemName.startsWith("SkyBlock Hub")) return false;
                     String serverid = "";
@@ -98,12 +91,12 @@ public abstract class RenderingDefinitions {
                         }
                     }
                     if (BBsentials.funConfig.hub29Troll) {
-                        check.setItemStackName(Text.translatable("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
+                        check.setItemStackName(EnvironmentCore.textutils.createText("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
                         check.setItemCount(29);
                     }
                     else if (BBsentials.funConfig.hub17To29Troll) {
                         if (hubNumber == 17) {
-                            check.setItemStackName(Text.translatable("§aSkyBlock Hub #29"));
+                            check.setItemStackName(EnvironmentCore.textutils.createText("§aSkyBlock Hub #29"));
                             check.setItemCount(29);
                         }
                     }
@@ -114,7 +107,7 @@ public abstract class RenderingDefinitions {
         if (BBsentials.generalConfig.hasBBRoles("splasher")) {
             new RenderingDefinitions() {
                 @Override
-                public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
+                public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                     if (!BBsentials.splashConfig.xpBoostHighlight) return false;
                     if (itemName.endsWith("Potion")) {
                         if (itemName.contains("XP Boost")) {
@@ -122,13 +115,13 @@ public abstract class RenderingDefinitions {
                             int potionLevel = extraNbt.getInt("potion_level");
                             String countString = "T" + potionLevel;
                             check.setItemCount(countString);
-                            if (itemName.startsWith("Farming")) check.renderAsItem(Items.STONE_HOE);
-                            if (itemName.startsWith("Foraging")) check.renderAsItem(Items.STONE_AXE);
-                            if (itemName.startsWith("Fishing")) check.renderAsItem(Items.FISHING_ROD);
-                            if (itemName.startsWith("Mining")) check.renderAsItem(Items.EMERALD_BLOCK);
-                            if (itemName.startsWith("Alchemy")) check.renderAsItem(Items.BREWING_STAND);
-                            if (itemName.startsWith("Enchanting")) check.renderAsItem(Items.ENCHANTING_TABLE);
-                            if (itemName.startsWith("Combat")) check.renderAsItem(Items.STONE_SWORD);
+                            if (itemName.startsWith("Farming")) check.renderAsItem(VanillaItems.STONE_HOE);
+                            if (itemName.startsWith("Foraging")) check.renderAsItem(VanillaItems.STONE_AXE);
+                            if (itemName.startsWith("Fishing")) check.renderAsItem(VanillaItems.FISHING_ROD);
+                            if (itemName.startsWith("Mining")) check.renderAsItem(VanillaItems.STONE_PICKAXE);
+                            if (itemName.startsWith("Alchemy")) check.renderAsItem(VanillaItems.BREWING_STAND);
+                            if (itemName.startsWith("Enchanting")) check.renderAsItem(VanillaItems.ENCHANTING_TABLE);
+                            if (itemName.startsWith("Combat")) check.renderAsItem(VanillaItems.STONE_SWORD);
                             return false;
                         }
                     }
@@ -138,38 +131,37 @@ public abstract class RenderingDefinitions {
         }
         new RenderingDefinitions() {
             @Override
-            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
+            public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (itemName.equals("Water Bottle")) {
-                    check.renderAsItem(Items.RED_CONCRETE);
+                    check.renderAsItem(VanillaItems.RED_CONCRETE);
                 }
                 return false;
             }
         };
         new RenderingDefinitions(false) {
             @Override
-            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
+            public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (!BBsentials.developerConfig.hypixelItemInfo) return false;
-                NbtComponent customComponent = stack.get(DataComponentTypes.CUSTOM_DATA);
-                if (customComponent == null) return false;
-                NbtCompound compound = customComponent.copyNbt();
+                NBTCompound compound = stack.getCustomData();
+                if (compound==null) return false;
                 List<Text> lore = check.getTextTooltip();
                 for (String key : compound.getKeys()) {
                     if (key.equals("enchantments")) continue;
                     if (key.equals("timestamp")) {
                         Long stamp = compound.getLong(key);
-                        lore.add(Text.of("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"));
+                        lore.add(EnvironmentCore.textutils.createText("timestamp(Creation Date): " + stamp + "(" + Instant.ofEpochMilli(stamp) + ")"));
                         continue;
                     }
-                    lore.add(Text.of(key + ": " + compound.get(key)));
+                    lore.add(EnvironmentCore.textutils.createText(key + ": " + compound.get(key)));
                 }
                 return false;
             }
         };
         new RenderingDefinitions() {
             @Override
-            public boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName) {
-                Item stackItem = stack.getItem();
-                if ((stackItem == Items.EMERALD_BLOCK || stackItem == Items.IRON_BLOCK)) {
+            public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
+                VanillaItems stackItem = stack.getItem();
+                if ((stackItem == VanillaItems.EMERALD_BLOCK || stackItem == VanillaItems.IRON_BLOCK)) {
                     List<Text> text = check.getTextTooltip();
                     boolean display = BBsentials.visualConfig.showContributorPositionInCount;
                     if (text.size() >= 20) {
@@ -179,12 +171,12 @@ public abstract class RenderingDefinitions {
                         String tierString = temp[temp.length - 1];
                         if (display) {
                             switch (tierString) {
-                                case "V", "5" -> check.renderAsItem(Items.NETHERITE_BLOCK);
-                                case "IV", "4" -> check.renderAsItem(Items.DIAMOND_BLOCK);
-                                case "III", "3" -> check.renderAsItem(Items.GOLD_BLOCK);
-                                case "II", "2" -> check.renderAsItem(Items.IRON_BLOCK);
-                                case "I", "1" -> check.renderAsItem(Items.COPPER_BLOCK);
-                                default -> check.renderAsItem(Items.REDSTONE_BLOCK);
+                                case "V", "5" -> check.renderAsItem(VanillaItems.NETHERITE_BLOCK);
+                                case "IV", "4" -> check.renderAsItem(VanillaItems.DIAMOND_BLOCK);
+                                case "III", "3" -> check.renderAsItem(VanillaItems.GOLD_BLOCK);
+                                case "II", "2" -> check.renderAsItem(VanillaItems.IRON_BLOCK);
+                                case "I", "1" -> check.renderAsItem(VanillaItems.COPPER_BLOCK);
+                                default -> check.renderAsItem(VanillaItems.REDSTONE_BLOCK);
                             }
                         }
                         Integer position = null;
@@ -250,21 +242,6 @@ public abstract class RenderingDefinitions {
 
     }
 
-    private static void modifyItemTooltip(ItemStack stack, Item.TooltipContext context, TooltipType type, List<Text> lines) {
-        if (type.isAdvanced()) {
-            for (int i = lines.size() - 1; i >= 0; i--) {
-                if (lines.get(i).getString().matches("NBT: \\d+ tag\\(s\\)")) {
-                    lines.remove(i);
-                }
-            }
-        }
-        //This is subject to change soon this is temporary
-        List<Text> texts = (((ICusomItemDataAccess) (Object) stack)).BBsentialsAll$getItemRenderTooltip();
-        if (texts == null) return;
-        lines.clear();
-        lines.addAll(texts);
-    }
-
     public boolean isRegistered() {
         return defsBlocking.get(renderDefId) != null || defsNonBlocking.get(renderDefId) != null;
     }
@@ -283,23 +260,22 @@ public abstract class RenderingDefinitions {
      *
      * @return return value defines whether you want to stop after the check
      */
-    public abstract boolean modifyItem(ItemStack stack, NbtCompound extraNbt, RenderStackItemCheck check, String itemName);
+    public abstract boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName);
 
     public static class RenderStackItemCheck {
-        private final ItemStack stack;
+        private final de.hype.bbsentials.client.common.mclibraries.interfaces.ItemStack stack;
         private String texturePath = null;
         private String itemCount = null;
-        private List<Text> texts = null;
-        private List<Text> itemLore = null;
-        private Item renderAsItem = null;
+        private List<de.hype.bbsentials.client.common.mclibraries.interfaces.Text> texts = null;
+        private List<de.hype.bbsentials.client.common.mclibraries.interfaces.Text> itemLore = null;
+        private VanillaItems renderAsItem = null;
 
-        public RenderStackItemCheck(ItemStack stack) {
+
+        public RenderStackItemCheck(de.hype.bbsentials.client.common.mclibraries.interfaces.ItemStack stack) {
             this.stack = stack;
             renderAsItem = stack.getItem();
             String itemName = stack.getName().getString();
-            NbtCompound nbt = null;
-            NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
-            if (customData != null) nbt = customData.copyNbt();
+            NBTCompound nbt = stack.getCustomData();
             for (RenderingDefinitions def : defsNonBlocking.values()) {
                 def.modifyItem(stack, nbt, this, itemName);
             }
@@ -312,21 +288,12 @@ public abstract class RenderingDefinitions {
         }
 
         public List<Text> getTextTooltip() {
-            if (texts != null) return texts;
-            LoreComponent loreComponent = stack.get(DataComponentTypes.LORE);
-            if (loreComponent == null) return new ArrayList<>();
-            List<Text> text = new ArrayList<>();
-            text.add(stack.getName());
-            text.addAll(loreComponent.lines());
-            texts = text;
-            return text;
+            if (texts == null) texts = stack.getTooltip();
+            return texts;
         }
 
         public List<Text> getItemLore() {
-            if (itemLore != null) return itemLore;
-            LoreComponent loreComponent = stack.get(DataComponentTypes.LORE);
-            if (loreComponent == null) return new ArrayList<>();
-            itemLore = new ArrayList<>(loreComponent.lines());
+            if (itemLore == null) itemLore=stack.getItemLore();
             return itemLore;
         }
 
@@ -359,11 +326,10 @@ public abstract class RenderingDefinitions {
             this.texts = texts;
         }
 
-        public void renderAsItem(Item renderAsItem) {
+        public void renderAsItem(VanillaItems renderAsItem) {
             texturePath = null;
             this.renderAsItem = renderAsItem;
         }
-
         public Text getItemStackName() {
             return getTextTooltip().get(0);
         }
@@ -373,7 +339,7 @@ public abstract class RenderingDefinitions {
             texts.set(0, itemStackName);
         }
 
-        public Item getRenderAsItem() {
+        public VanillaItems getRenderAsItem() {
             return renderAsItem;
         }
     }

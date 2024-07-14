@@ -100,7 +100,7 @@ public class ChestLobbyData {
         extraMessage = lobby.extraMessage;
         status = lobby.getStatus();
         contactMan = lobby.contactMan;
-        chests = lobby.chests;
+        chests = new ArrayList<>(lobby.chests);
         try {
             setLobbyMetaData(lobby.getPlayersStillIn(), lobby.getClosingTime());
         } catch (SQLException ignored) {

@@ -39,6 +39,8 @@ public class ChChestItems {
     public static final ChChestItem SuperliteMotor = new ChChestItem("Superlite Motor", "superlite_motor");
     public static final ChChestItem SyntheticHeart = new ChChestItem("Synthetic Heart", "synthetic_heart");
     public static final ChChestItem FlawlessGemstone = new ChChestItem("Flawless Gemstone", "flawless_gemstone");
+    public static final ChChestItem GEMSTONE_POWDER = new ChChestItem("1,200-4,800 %sGemstone Powder".formatted(Formatting.LIGHT_PURPLE), "legendary_gemstone_powder");
+    public static final ChChestItem MITHRIL_POWDER = new ChChestItem("1,200-4,800 %sMithril Powder".formatted(Formatting.GREEN), "legendary_mithril_powder");
     private static final List<ChChestItem> items = new ArrayList<>();
 
     // Automatically populate predefined items using reflection
@@ -66,9 +68,25 @@ public class ChChestItems {
         return customItem;
     }
 
-    private static ChChestItem getPredefinedItem(String displayName) {
+    public static ChChestItem getPredefinedItem(String displayName) {
         for (ChChestItem item : items) {
-            if (item.getDisplayName().equals(displayName)) {
+            int amount = 1;
+            String countString = displayName.replaceAll("\\D", "");
+            if (!countString.isEmpty()) amount = Integer.parseInt(countString);
+            //TODO use count?
+            if (item.isPowder()) {
+                if (displayName.matches(".*Powder")) {
+                    if (amount >= 1200) {
+                        return item;
+                    }
+                }
+                else continue;
+            }
+
+            if (item == FlawlessGemstone) {
+                if (displayName.matches(".*Flawless.*Gemstone.*")) return item;
+            }
+            else if (item.getDisplayName().contains(displayName)) {
                 return item;
             }
         }

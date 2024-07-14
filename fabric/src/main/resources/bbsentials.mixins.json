@@ -7,22 +7,23 @@
   ],
   "client": [
     "BBsentialsCommandSource",
+    "ChatHudMixin",
+    "ChestLidMixin",
     "ChestMixin",
     "ClientCommandSourceMixin",
+    "CommandNodeAccessMixin",
     "CustomItemData",
     "CustomItemTextures",
     "CustomItemTooltip",
     "IncomingPacketListenerPatches",
     "InventoryKeyBinds",
     "ItemRendererMixin",
-    "SimpleOptionMixin",
-    "WorldRenderLastEventPatch",
-    "ChestLidMixin",
-    "CommandNodeAccessMixin",
     "LiteralCommandNodeMixin",
     "RootCommandNodeAccessMixin",
     "ScreenHandlerMixin",
-    "SignaturePropertyErrorIgnoreMixin"
+    "SignaturePropertyErrorIgnoreMixin",
+    "SimpleOptionMixin",
+    "WorldRenderLastEventPatch"
   ],
   "injectors": {
     "defaultRequire": 1

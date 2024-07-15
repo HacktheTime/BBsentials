@@ -1,4 +1,5 @@
 package de.hype.bbsentials.fabric
+// Credits go to nea89 for this (Firmanent)! Just slightly adapted by me
 
 import com.mojang.blaze3d.systems.RenderSystem
 import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent
@@ -9,7 +10,6 @@ import net.minecraft.client.gl.VertexBuffer
 import net.minecraft.client.render.*
 import net.minecraft.client.texture.Sprite
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.client.util.math.MatrixStack.Entry
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
@@ -18,18 +18,16 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.lang.Math.pow
 
-// Credits go to nea89 for this (Firmanent)! Just slightly adapted by me
-
-class RenderInWorldContext private constructor(
+/**
+ * @author nea89o in Firmanent
+ */
+class RenderInWorldContext(
     private val tesselator: Tessellator,
-    private val matrixStack: MatrixStack,
+    val matrixStack: MatrixStack,
     private val camera: Camera,
-    private val tickDelta: Float,
-    private val vertexConsumers: VertexConsumerProvider.Immediate,
+    private val tickCounter: RenderTickCounter,
+    val vertexConsumers: VertexConsumerProvider.Immediate,
 ) {
-    private val buffer = tesselator.buffer
-//    val effectiveFov = (MinecraftClient.getInstance().gameRenderer as AccessorGameRenderer).getFov_firmament(camera, tickDelta, true)
-//    val effectiveFovScaleFactor = 1 / tan(toRadians(effectiveFov) / 2)
 
     fun color(color: me.shedaniel.math.Color) {
         color(color.red / 255F, color.green / 255f, color.blue / 255f, color.alpha / 255f)
@@ -43,8 +41,7 @@ class RenderInWorldContext private constructor(
         RenderSystem.setShader(GameRenderer::getPositionColorProgram)
         matrixStack.push()
         matrixStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
-        buildCube(matrixStack.peek().positionMatrix, buffer)
-        tesselator.draw()
+        buildCube(matrixStack.peek().positionMatrix, tesselator)
         matrixStack.pop()
     }
 
@@ -58,21 +55,13 @@ class RenderInWorldContext private constructor(
                 TOP -> (index) * (1 + getFontHeight())
             }
         }
-
     }
-
 
     fun waypoint(position: BlockPos, label: Text) {
         text(
-            position.toCenterPos(), label, Text.literal(
-                "§e${
-                    formatDistance(
-                        MinecraftClient.getInstance().player?.pos?.distanceTo(
-                            position.toCenterPos()
-                        ) ?: 42069.0
-                    )
-                }"
-            )
+            position.toCenterPos(),
+            label,
+            Text.literal("§e${formatDistance(MinecraftClient.getInstance().player?.pos?.distanceTo(position.toCenterPos()) ?: 42069.0)}")
         )
     }
 
@@ -81,10 +70,7 @@ class RenderInWorldContext private constructor(
         return "%dm".format(distance.toInt())
     }
 
-    fun text(position: Vec3d, vararg texts: Text, verticalAlign: VerticalAlign = VerticalAlign.CENTER) {
-        if (texts.isEmpty()) {
-            return
-        }
+    fun withFacingThePlayer(position: Vec3d, block: FacingThePlayerContext.() -> Unit) {
         matrixStack.push()
         matrixStack.translate(position.x, position.y, position.z)
         val actualCameraDistance = position.distanceTo(camera.pos)
@@ -94,38 +80,32 @@ class RenderInWorldContext private constructor(
         matrixStack.multiply(camera.rotation)
         matrixStack.scale(-0.025F, -0.025F, -1F)
 
-        for ((index, text) in texts.withIndex()) {
-            matrixStack.push()
-            val width = MinecraftClient.getInstance().textRenderer.getWidth(text)
-            matrixStack.translate(-width / 2F, verticalAlign.align(index, texts.size), 0F)
-            val vertexConsumer: VertexConsumer = vertexConsumers.getBuffer(RenderLayer.getTextBackgroundSeeThrough())
-            val matrix4f = matrixStack.peek().positionMatrix
-            vertexConsumer.vertex(matrix4f, -1.0f, -1.0f, 0.0f).color(0x70808080)
-                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
-            vertexConsumer.vertex(matrix4f, -1.0f, getFontHeight(), 0.0f).color(0x70808080)
-                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
-            vertexConsumer.vertex(matrix4f, width.toFloat(), getFontHeight(), 0.0f).color(0x70808080)
-                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
-            vertexConsumer.vertex(matrix4f, width.toFloat(), -1.0f, 0.0f).color(0x70808080)
-                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
-            matrixStack.translate(0F, 0F, 0.01F)
+        FacingThePlayerContext(this).run(block)
 
-            MinecraftClient.getInstance().textRenderer.draw(
-                text,
-                0F,
-                0F,
-                -1,
-                false,
-                matrixStack.peek().positionMatrix,
-                vertexConsumers,
-                TextRenderer.TextLayerType.SEE_THROUGH,
-                0,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE
-            )
-            matrixStack.pop()
-        }
         matrixStack.pop()
         vertexConsumers.drawCurrentLayer()
+    }
+
+    fun sprite(position: Vec3d, sprite: Sprite, width: Int, height: Int) {
+        texture(
+            position, sprite.atlasId, width, height, sprite.minU, sprite.minV, sprite.maxU, sprite.maxV
+        )
+    }
+
+    fun texture(
+        position: Vec3d, texture: Identifier, width: Int, height: Int,
+        u1: Float, v1: Float,
+        u2: Float, v2: Float,
+    ) {
+        withFacingThePlayer(position) {
+            texture(texture, width, height, u1, v1, u2, v2)
+        }
+    }
+
+    fun text(position: Vec3d, vararg texts: Text, verticalAlign: VerticalAlign = VerticalAlign.CENTER) {
+        withFacingThePlayer(position) {
+            text(*texts, verticalAlign = verticalAlign)
+        }
     }
 
     fun tinyBlock(vec3d: Vec3d, size: Float) {
@@ -134,8 +114,7 @@ class RenderInWorldContext private constructor(
         matrixStack.translate(vec3d.x, vec3d.y, vec3d.z)
         matrixStack.scale(size, size, size)
         matrixStack.translate(-.5, -.5, -.5)
-        buildCube(matrixStack.peek().positionMatrix, buffer)
-        tesselator.draw()
+        buildCube(matrixStack.peek().positionMatrix, tesselator)
         matrixStack.pop()
     }
 
@@ -144,8 +123,7 @@ class RenderInWorldContext private constructor(
         matrixStack.push()
         RenderSystem.lineWidth(lineWidth / pow(camera.pos.squaredDistanceTo(blockPos.toCenterPos()), 0.25).toFloat())
         matrixStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
-        buildWireFrameCube(matrixStack.peek(), buffer)
-        tesselator.draw()
+        buildWireFrameCube(matrixStack.peek(), tesselator)
         matrixStack.pop()
     }
 
@@ -153,62 +131,60 @@ class RenderInWorldContext private constructor(
         line(points.toList(), lineWidth)
     }
 
+    fun tracer(toWhere: Vec3d, lineWidth: Float = 3f) {
+        val cameraForward = Vector3f(0f, 0f, 1f).rotate(camera.rotation)
+        line(camera.pos.add(Vec3d(cameraForward)), toWhere, lineWidth = lineWidth)
+    }
+
     fun line(points: List<Vec3d>, lineWidth: Float = 10F) {
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
-        RenderSystem.lineWidth(lineWidth / pow(camera.pos.squaredDistanceTo(points.first()), 0.25).toFloat())
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
-        buffer.fixedColor(255, 255, 255, 255)
+        RenderSystem.lineWidth(lineWidth)
+        val buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
 
+        val matrix = matrixStack.peek()
+        var lastNormal: Vector3f? = null
         points.zipWithNext().forEach { (a, b) ->
-            doLine(matrixStack.peek(), buffer, a.x, a.y, a.z, b.x, b.y, b.z)
+            val normal =
+                Vector3f(b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).sub(a.x.toFloat(), a.y.toFloat(), a.z.toFloat())
+                    .normalize()
+            val lastNormal0 = lastNormal ?: normal
+            lastNormal = normal
+            buffer.vertex(matrix.positionMatrix, a.x.toFloat(), a.y.toFloat(), a.z.toFloat()).color(-1)
+                .normal(matrix, lastNormal0.x, lastNormal0.y, lastNormal0.z).next()
+            buffer.vertex(matrix.positionMatrix, b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).color(-1)
+                .normal(matrix, normal.x, normal.y, normal.z).next()
         }
-        buffer.unfixColor()
 
-        tesselator.draw()
+        BufferRenderer.drawWithGlobalProgram(buffer.end())
     }
 
     companion object {
         private fun doLine(
-            matrix: Entry,
-            buf: BufferBuilder,
-            i: Number,
-            j: Number,
-            k: Number,
-            x: Number,
-            y: Number,
-            z: Number
+            matrix: MatrixStack.Entry, buf: BufferBuilder, i: Float, j: Float, k: Float, x: Float, y: Float, z: Float
         ) {
-            val normal =
-                Vector3f(x.toFloat(), y.toFloat(), z.toFloat()).sub(i.toFloat(), j.toFloat(), k.toFloat()).normalize()
-            buf.vertex(matrix.positionMatrix, i.toFloat(), j.toFloat(), k.toFloat())
-                .normal(matrix, normal.x, normal.y, normal.z).next()
-            buf.vertex(matrix.positionMatrix, x.toFloat(), y.toFloat(), z.toFloat())
-                .normal(matrix, normal.x, normal.y, normal.z).next()
+            val normal = Vector3f(x, y, z).sub(i, j, k).normalize()
+            buf.vertex(matrix.positionMatrix, i, j, k).normal(matrix, normal.x, normal.y, normal.z).color(-1).next()
+            buf.vertex(matrix.positionMatrix, x, y, z).normal(matrix, normal.x, normal.y, normal.z).color(-1).next()
         }
 
-        private fun doTracer(
-            matrix: Entry, buf: BufferBuilder, i: Number, j: Number, k: Number, x: Number, y: Number, z: Number
-        ) {
-            doLine(matrix, buf, i, j, k, x, y, z)
-        }
 
-        private fun buildWireFrameCube(matrix: MatrixStack.Entry, buf: BufferBuilder) {
-            buf.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
-            buf.fixedColor(255, 255, 255, 255)
+        private fun buildWireFrameCube(matrix: MatrixStack.Entry, tessellator: Tessellator) {
+            val buf = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
 
             for (i in 0..1) {
                 for (j in 0..1) {
-                    doLine(matrix, buf, 0, i, j, 1, i, j)
-                    doLine(matrix, buf, i, 0, j, i, 1, j)
-                    doLine(matrix, buf, i, j, 0, i, j, 1)
+                    val i = i.toFloat()
+                    val j = j.toFloat()
+                    doLine(matrix, buf, 0F, i, j, 1F, i, j)
+                    doLine(matrix, buf, i, 0F, j, i, 1F, j)
+                    doLine(matrix, buf, i, j, 0F, i, j, 1F)
                 }
             }
-            buf.unfixColor()
+            BufferRenderer.drawWithGlobalProgram(buf.end())
         }
 
-        private fun buildCube(matrix: Matrix4f, buf: BufferBuilder) {
-            buf.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR)
-            buf.fixedColor(255, 255, 255, 255)
+        private fun buildCube(matrix: Matrix4f, tessellator: Tessellator) {
+            val buf = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION)
             buf.vertex(matrix, 0.0F, 0.0F, 0.0F).next()
             buf.vertex(matrix, 0.0F, 0.0F, 1.0F).next()
             buf.vertex(matrix, 0.0F, 1.0F, 1.0F).next()
@@ -245,10 +221,10 @@ class RenderInWorldContext private constructor(
             buf.vertex(matrix, 1.0F, 1.0F, 1.0F).next()
             buf.vertex(matrix, 0.0F, 1.0F, 1.0F).next()
             buf.vertex(matrix, 1.0F, 0.0F, 1.0F).next()
-            buf.unfixColor()
+            BufferRenderer.drawWithGlobalProgram(buf.end())
         }
 
-        @JvmStatic
+
         fun renderInWorld(event: WorldRenderLastEvent, block: RenderInWorldContext. () -> Unit) {
             RenderSystem.disableDepthTest()
             RenderSystem.enableBlend()
@@ -262,7 +238,7 @@ class RenderInWorldContext private constructor(
                 RenderSystem.renderThreadTesselator(),
                 event.matrices,
                 event.camera,
-                event.tickDelta,
+                event.tickCounter,
                 event.vertexConsumers
             )
 
@@ -278,52 +254,30 @@ class RenderInWorldContext private constructor(
         }
     }
 
-    fun sprite(position: Vec3d, sprite: Sprite, width: Int, height: Int) {
-        texture(
-            position, sprite.atlasId, width, height, sprite.minU, sprite.minV, sprite.maxU, sprite.maxV
-        )
-    }
-    fun withFacingThePlayer(position: Vec3d, block: () -> Unit) {
-        matrixStack.push()
-        matrixStack.translate(position.x, position.y, position.z)
-        val actualCameraDistance = position.distanceTo(camera.pos)
-        val distanceToMoveTowardsCamera = if (actualCameraDistance < 10) 0.0 else -(actualCameraDistance - 10.0)
-        val vec = position.subtract(camera.pos).multiply(distanceToMoveTowardsCamera / actualCameraDistance)
-        matrixStack.translate(vec.x, vec.y, vec.z)
-        matrixStack.multiply(camera.rotation)
-        matrixStack.scale(-0.025F, -0.025F, -1F)
-
-        block()
-
-        matrixStack.pop()
-        vertexConsumers.drawCurrentLayer()
-    }
-
-    fun texture(
-        position: Vec3d, texture: Identifier, width: Int, height: Int,
-        u1: Float, v1: Float,
-        u2: Float, v2: Float,
+    fun waypointIcon(
+        position: Vec3d, textures: RenderInformation, width: Int, height: Int, xmodifier: Float
     ) {
         val backupColor = RenderSystem.getShaderColor()
         color(1f, 1f, 1f, 1f)
         withFacingThePlayer(position) {
-            RenderSystem.setShaderTexture(0, texture)
-            RenderSystem.setShader(GameRenderer::getPositionColorTexProgram)
+            matrixStack.push()
+            matrixStack.translate(xmodifier, -25f, 0f)
+            RenderSystem.setShaderTexture(
+                0, Identifier.of(textures.namespace, textures.pathToFile)
+            )
+            RenderSystem.setShader(net.minecraft.client.render.GameRenderer::getPositionTexColorProgram)
             val hw = width / 2F
             val hh = height / 2F
             val matrix4f: Matrix4f = matrixStack.peek().positionMatrix
-            val buf = Tessellator.getInstance().buffer
-            buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE)
-            buf.fixedColor(255, 255, 255, 255)
-            buf.vertex(matrix4f, -hw, -hh, 0F)
-                .texture(u1, v1).next()
-            buf.vertex(matrix4f, -hw, +hh, 0F)
-                .texture(u1, v2).next()
-            buf.vertex(matrix4f, +hw, +hh, 0F)
-                .texture(u2, v2).next()
-            buf.vertex(matrix4f, +hw, -hh, 0F)
-                .texture(u2, v1).next()
-            buf.unfixColor()
+            val buf = tesselator.begin(
+                net.minecraft.client.render.VertexFormat.DrawMode.QUADS,
+                VertexFormats.POSITION_TEXTURE_COLOR
+            )
+            buf.color(255, 255, 255, 255)
+            buf.vertex(matrix4f, -hw, -hh, 0F).texture(0f, 0f).next()
+            buf.vertex(matrix4f, -hw, +hh, 0F).texture(0f, 1f).next()
+            buf.vertex(matrix4f, +hw, +hh, 0F).texture(1f, 1f).next()
+            buf.vertex(matrix4f, +hw, -hh, 0F).texture(1f, 0f).next()
             BufferRenderer.drawWithGlobalProgram(buf.end())
         }
         RenderSystem.setShaderColor(backupColor[0], backupColor[1], backupColor[2], backupColor[3])
@@ -339,39 +293,86 @@ class RenderInWorldContext private constructor(
         }
 
     }
-    fun waypointIcon(
-        position: Vec3d, textures: RenderInformation, width: Int, height: Int, xmodifier: Float
-    ) {
-        val backupColor = RenderSystem.getShaderColor()
-        color(1f, 1f, 1f, 1f)
-        withFacingThePlayer(position) {
-            matrixStack.push()
-            matrixStack.translate(xmodifier, -25f, 0f)
-            RenderSystem.setShaderTexture(0, Identifier(textures.namespace, textures.pathToFile))
-            RenderSystem.setShader(GameRenderer::getPositionColorTexProgram)
-            val hw = width / 2F
-            val hh = height / 2F
-            val matrix4f: Matrix4f = matrixStack.peek().positionMatrix
-            val buf = Tessellator.getInstance().buffer
-            buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE)
-            buf.fixedColor(255, 255, 255, 255)
-            buf.vertex(matrix4f, -hw, -hh, 0F)
-                .texture(0f, 0f).next()
-            buf.vertex(matrix4f, -hw, +hh, 0F)
-                .texture(0f, 1f).next()
-            buf.vertex(matrix4f, +hw, +hh, 0F)
-                .texture(1f, 1f).next()
-            buf.vertex(matrix4f, +hw, -hh, 0F)
-                .texture(1f, 0f).next()
-            buf.unfixColor()
-            BufferRenderer.drawWithGlobalProgram(buf.end())
-            matrixStack.pop()
-        }
-        RenderSystem.setShaderColor(backupColor[0], backupColor[1], backupColor[2], backupColor[3])
-    }
 }
+
+/**
+ * @author nea89o in Firmanent
+ */
+class FacingThePlayerContext(val worldContext: RenderInWorldContext) {
+    val matrixStack by worldContext::matrixStack
+    fun waypoint(position: BlockPos, label: Text) {
+        text(
+            label,
+            Text.literal("§e${formatDistance(MinecraftClient.getInstance().player?.pos?.distanceTo(position.toCenterPos()) ?: 42069.0)}")
+        )
+    }
+
+    fun formatDistance(distance: Double): String {
+        if (distance < 10) return "%.1fm".format(distance)
+        return "%dm".format(distance.toInt())
+    }
+
+    fun text(
+        vararg texts: Text,
+        verticalAlign: RenderInWorldContext.VerticalAlign = RenderInWorldContext.VerticalAlign.CENTER
+    ) {
+        for ((index, text) in texts.withIndex()) {
+            worldContext.matrixStack.push()
+            val width = MinecraftClient.getInstance().textRenderer.getWidth(text)
+            worldContext.matrixStack.translate(-width / 2F, verticalAlign.align(index, texts.size), 0F)
+            val vertexConsumer: VertexConsumer =
+                worldContext.vertexConsumers.getBuffer(RenderLayer.getTextBackgroundSeeThrough())
+            val matrix4f = worldContext.matrixStack.peek().positionMatrix
+            vertexConsumer.vertex(matrix4f, -1.0f, -1.0f, 0.0f).color(0x70808080)
+                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
+            vertexConsumer.vertex(matrix4f, -1.0f, getFontHeight(), 0.0f).color(0x70808080)
+                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
+            vertexConsumer.vertex(matrix4f, width.toFloat(), getFontHeight(), 0.0f).color(0x70808080)
+                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
+            vertexConsumer.vertex(matrix4f, width.toFloat(), -1.0f, 0.0f).color(0x70808080)
+                .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
+            worldContext.matrixStack.translate(0F, 0F, 0.01F)
+
+            MinecraftClient.getInstance().textRenderer.draw(
+                text,
+                0F,
+                0F,
+                -1,
+                false,
+                worldContext.matrixStack.peek().positionMatrix,
+                worldContext.vertexConsumers,
+                TextRenderer.TextLayerType.SEE_THROUGH,
+                0,
+                LightmapTextureManager.MAX_LIGHT_COORDINATE
+            )
+            worldContext.matrixStack.pop()
+        }
+    }
+
+
+    fun texture(
+        texture: Identifier, width: Int, height: Int,
+        u1: Float, v1: Float,
+        u2: Float, v2: Float,
+    ) {
+        RenderSystem.setShaderTexture(0, texture)
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram)
+        val hw = width / 2F
+        val hh = height / 2F
+        val matrix4f: Matrix4f = worldContext.matrixStack.peek().positionMatrix
+        val buf = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR)
+        buf.vertex(matrix4f, -hw, -hh, 0F).color(-1).texture(u1, v1).next()
+        buf.vertex(matrix4f, -hw, +hh, 0F).color(-1).texture(u1, v2).next()
+        buf.vertex(matrix4f, +hw, +hh, 0F).color(-1).texture(u2, v2).next()
+        buf.vertex(matrix4f, +hw, -hh, 0F).color(-1).texture(u2, v1).next()
+        BufferRenderer.drawWithGlobalProgram(buf.end())
+    }
+
+}
+
+fun VertexConsumer.next() = this
 
 
 fun getFontHeight(): Float {
-    return MinecraftClient.getInstance().textRenderer.fontHeight.toFloat();
+    return MinecraftClient.getInstance().textRenderer.fontHeight.toFloat()
 }

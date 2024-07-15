@@ -33,6 +33,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
@@ -101,7 +102,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
         if (!waypoints.isEmpty() || ModInitialiser.tutorialManager.current != null) {
             try {
-                RenderInWorldContext.renderInWorld(event, (it) -> {
+                RenderInWorldContext.Companion.renderInWorld(event, (it) -> {
                     Color defaultColor = BBsentials.visualConfig.waypointDefaultColor;
                     if (ModInitialiser.tutorialManager.current != null) {
                         List<CoordinateNode> nodes = ModInitialiser.tutorialManager.current.getCoordinateNodesToRender();
@@ -139,7 +140,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
         try {
             if (BBsentials.temporaryConfig.route != null) {
-                RenderInWorldContext.renderInWorld(event, (it) -> {
+                RenderInWorldContext.Companion.renderInWorld(event, (it) -> {
                     RouteNode node = BBsentials.temporaryConfig.route.getCurrentNode();
                     BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
                     BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
@@ -252,7 +253,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
     public void playsound(String eventName) {
         if (eventName.isEmpty()) MinecraftClient.getInstance().getSoundManager().stopAll();
         else
-            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
+            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(Identifier.of(eventName)), 1.0F, 1.0F));
     }
 
     public int getPotTime() {
@@ -475,7 +476,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return new ArrayList<>(MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().stream().toList());
     }
 
-    public void renderOverlays(DrawContext drawContext, float v) {
+    public void renderOverlays(DrawContext drawContext, RenderTickCounter v) {
         if (UpdateListenerManager.splashStatusUpdateListener.showOverlay()) {
             // Set the starting position for the overlay
             int x = 10;
@@ -712,8 +713,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public static class BBToast implements Toast {
         public static final int DEFAULT_DURATION_MS = 5000;
-        private static final Identifier TEXTURE = new Identifier("toast/advancement");
-        //        private static final Identifier TEXTURE = new Identifier("toast/system");
+        private static final Identifier TEXTURE = Identifier.of("toast/advancement");
+        //        private static final Identifier TEXTURE = Identifier.of("toast/system");
         String title;
         String description;
         Integer displayTime = DEFAULT_DURATION_MS;
@@ -792,10 +793,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
 
         public enum ToastType {
-            ADVANCEMENT(new Identifier("toast/advancement")),
-            SYSTEM(new Identifier("toast/system")),
-            TUTORIAL(new Identifier("toast/tutorial")),
-            RECIPE(new Identifier("toast/recipe")),
+            ADVANCEMENT(Identifier.of("toast/advancement")),
+            SYSTEM(Identifier.of("toast/system")),
+            TUTORIAL(Identifier.of("toast/tutorial")),
+            RECIPE(Identifier.of("toast/recipe")),
             ;
             private final Identifier id;
 

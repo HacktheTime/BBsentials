@@ -40,7 +40,7 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
 
     public void registerOverlays() {
         utils = (Utils) EnvironmentCore.utils;
-        HudRenderCallback.EVENT.register((obj1, obj2) -> utils.renderOverlays(obj1, obj2));
+        HudRenderCallback.EVENT.register((matrixStack, delta) -> utils.renderOverlays(matrixStack, delta));
     }
 
     @Override

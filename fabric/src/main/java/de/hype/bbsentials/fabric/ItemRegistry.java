@@ -5,7 +5,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ItemRegistry {
@@ -22,15 +24,23 @@ public class ItemRegistry {
     }
 
     public static void init(){
+        List<String> missingEnums = new ArrayList<>();
         for (Field declaredField : Items.class.getDeclaredFields()) {
             declaredField.setAccessible(true);
             try {
                 Item value = (Item) declaredField.get(null);
-                VanillaItems vanilla = VanillaItems.valueOf(declaredField.getName());
-                itemsMap.put(vanilla,value);
-                mcitemsMap.put(value,vanilla);
+                try {
+                    VanillaItems vanilla = VanillaItems.valueOf(declaredField.getName());
+                    itemsMap.put(vanilla,value);
+                    mcitemsMap.put(value,vanilla);
+                }catch (Exception e){
+                    missingEnums.add(declaredField.getName());
+                }
             } catch (IllegalAccessException e) {
             }
+        }
+        if (!missingEnums.isEmpty()) {
+            System.err.println("Missing the following new Vanilla Enums: "+missingEnums);
         }
     }
 }

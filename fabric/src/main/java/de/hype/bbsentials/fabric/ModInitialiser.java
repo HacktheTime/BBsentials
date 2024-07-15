@@ -44,7 +44,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.item.TooltipType;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
@@ -52,6 +51,7 @@ import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.Item;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
@@ -568,9 +568,10 @@ public class ModInitialiser implements ClientModInitializer {
                         if (BBsentials.developerConfig.isDetailedDevModeEnabled() && prompt.isCommand()) {
                             Chat.sendPrivateMessageToSelfDebug(prompt.command);
                         }
-                        if (prompt.isCommand()){
+                        if (prompt.isCommand()) {
                             MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(prompt.getCommandAndCancel());
-                        }else {
+                        }
+                        else {
                             prompt.execute();
                         }
                     }

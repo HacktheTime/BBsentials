@@ -64,6 +64,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
@@ -239,6 +240,15 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return ((FabricLoaderImpl) FabricLoader.getInstance()).getGameProvider().getRawGameVersion();
     }
 
+    @Override
+    public Instant getLobbyClosingTime() {
+        //(17mc days * 20 min day * 60 to seconds * 20 to ticks) -> 408000 | 1s 1000ms 1000/20 for ms for 1 tick.
+        //(17×20×60×20×50)÷1000 → seconds
+        if (EnvironmentCore.utils.getCurrentIsland() != Islands.CRYSTAL_HOLLOWS) return null;
+        long diffTime = 20400 - ((EnvironmentCore.utils.getLobbyTime() * 50) / 1000);
+        return Instant.now().plusSeconds(diffTime);
+    }
+
     public void playsound(String eventName) {
         if (eventName.isEmpty()) MinecraftClient.getInstance().getSoundManager().stopAll();
         else
@@ -264,9 +274,9 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             try {
                 MinecraftClient.getInstance().getSessionService().joinServer(MinecraftClient.getInstance().getGameProfile().getId(), MinecraftClient.getInstance().getSession().getAccessToken(), serverId);
                 success = true;
-            }catch (InvalidCredentialsException e){
+            } catch (InvalidCredentialsException e) {
                 Chat.sendPrivateMessageToSelfError("BB: Error trying to authenticate with Mojang. Either use Key login or restart your game. Session servers may be down too!");
-            }catch (AuthenticationException e) {
+            } catch (AuthenticationException e) {
                 try {
                     Thread.sleep(1000);
                 } catch (Exception ignored) {
@@ -509,12 +519,17 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                long closingTimeInMinutes = ((408000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
+                long closingTimeInMinutes = Duration.between(Instant.now(),getLobbyClosingTime()).toMinutes();
                 if (closingTimeInMinutes <= 0) {
                     toRender.add(Text.of("§4Lobby Closed"));
                 }
                 else {
                     toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
+                }
+                for (ChChestData chest : listener.getUnopenedChests()) {
+                    if (chest.finder.equals(BBsentials.generalConfig.getUsername())) continue;
+                    toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.finder)));
+                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
             }
             else {
@@ -625,10 +640,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         Islands island = getCurrentIsland();
         if (island == null) return 100;
         if (island.equals(Islands.HUB)) {
-            if (mega) return 80;
-            else return 24;
+            if (mega) return 81;
+            else return 25;
         }
-        return 24;
+        return 25;
     }
 
     @Override

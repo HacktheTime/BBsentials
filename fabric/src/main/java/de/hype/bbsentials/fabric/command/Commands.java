@@ -118,21 +118,6 @@ public class Commands implements MCCommand {
                                                                 BlockPos pos = CBlockPosArgument.getBlockPos((CommandContext<FabricClientCommandSource>) (Object) context, "coordinates");
                                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                 String extraMessage = StringArgumentType.getString(context, "extraMessage");
-
-                                                                if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
-                                                                    context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
-                                                                    return 1;
-                                                                }
-                                                                if (!BBsentials.partyConfig.allowServerPartyInvite) {
-                                                                    Chat.sendPrivateMessageToSelfImportantInfo("Enabled Server Party invites temporarily. Will be disabled on Server swap");
-                                                                    BBsentials.partyConfig.allowServerPartyInvite = true;
-                                                                    ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowServerPartyInvite = false);
-                                                                }
-                                                                if (!BBsentials.partyConfig.allowBBinviteMe && contactWay.contains("bb:party me")) {
-                                                                    Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap");
-                                                                    BBsentials.partyConfig.allowBBinviteMe = true;
-                                                                    ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
-                                                                }
                                                                 BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, extraMessage);
                                                                 return 1;
                                                             }
@@ -142,15 +127,6 @@ public class Commands implements MCCommand {
                                                         String item = StringArgumentType.getString(context, "Item");
                                                         BlockPos pos = CBlockPosArgument.getBlockPos((CommandContext<FabricClientCommandSource>) (Object) context, "coordinates");
                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
-                                                        if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
-                                                            context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
-                                                            return 1;
-                                                        }
-                                                        if (!BBsentials.partyConfig.allowBBinviteMe && contactWay.contains("bb:party me")) {
-                                                            Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap");
-                                                            BBsentials.partyConfig.allowBBinviteMe = true;
-                                                            ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
-                                                        }
                                                         BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, "");
                                                         return 1;
                                                     }

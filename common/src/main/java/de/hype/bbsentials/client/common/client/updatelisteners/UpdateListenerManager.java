@@ -111,7 +111,9 @@ public class UpdateListenerManager {
     }
 
     public static void resetListeners() {
+        splashStatusUpdateListener.isInLobby.set(false);
         splashStatusUpdateListener = new SplashStatusUpdateListener(null);
+        chChestUpdateListener.isInLobby.set(false);
         chChestUpdateListener = new ChChestUpdateListener(null);
     }
 }

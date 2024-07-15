@@ -36,6 +36,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -641,7 +642,7 @@ public class BBsentialConnection {
             UpdateListenerManager.chChestUpdateListener.addChestAndUpdate(coords, items);
             return;
         }
-        if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
+        if (Instant.now().isAfter(EnvironmentCore.utils.getLobbyClosingTime())) {
             Chat.sendPrivateMessageToSelfError("The Lobby is already Closed (Day Count too high) → No one can be warped in!");
             return;
         }

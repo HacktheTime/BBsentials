@@ -4,6 +4,7 @@ import de.hype.bbsentials.shared.constants.StatusConstants;
 
 import java.awt.*;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +19,7 @@ public class ChestLobbyData {
     public String serverId;
     protected String status;
     protected List<String> playersStillIn = new ArrayList<>();
-    protected Long closingTime;
+    protected Instant closingTime;
 
     public ChestLobbyData(Collection<ChChestData> chest, String serverId, String bbcommand, String extraMessage, Object status) {
         chests.addAll(chest);
@@ -67,7 +68,7 @@ public class ChestLobbyData {
         contactMan = newContactMan;
     }
 
-    public void setLobbyMetaData(List<String> playersStillIn, Long closingTime) throws SQLException {
+    public void setLobbyMetaData(List<String> playersStillIn, Instant closingTime) throws SQLException {
         if (playersStillIn != null) {
             this.playersStillIn = playersStillIn;
         }
@@ -85,7 +86,7 @@ public class ChestLobbyData {
         return playersStillIn;
     }
 
-    public Long getClosingTime() {
+    public Instant getClosingTime() {
         return closingTime;
     }
 

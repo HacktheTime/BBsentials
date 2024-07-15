@@ -14,7 +14,11 @@ import de.hype.bbsentials.shared.objects.RenderInformation;
 import de.hype.bbsentials.shared.packets.mining.ChestLobbyUpdatePacket;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ChChestUpdateListener extends UpdateListener {
@@ -63,12 +67,13 @@ public class ChChestUpdateListener extends UpdateListener {
         setWaypoints();
         //(15mc days * 20 min day * 60 to seconds * 20 to ticks) -> 408000 | 1s 1000ms 1000/20 for ms for 1 tick.
         try {
-            lobby.setLobbyMetaData(null, ((408000 - EnvironmentCore.utils.getLobbyTime()) * 50));
+            lobby.setLobbyMetaData(null, EnvironmentCore.utils.getLobbyClosingTime());
         } catch (Exception ignored) {
             //never thrown lol
         }
         while (isInLobby.get()) {
-            if ((EnvironmentCore.utils.getPlayerCount() >= maxPlayerCount)) {
+            List<String> players = EnvironmentCore.utils.getPlayers();
+            if ((players.size() >= maxPlayerCount)) {
                 setStatus(StatusConstants.FULL);
             }
             else if ((EnvironmentCore.utils.getPlayerCount() < maxPlayerCount - 3) && lobby.getStatus().equals(StatusConstants.FULL.getDisplayName())) {
@@ -124,12 +129,11 @@ public class ChChestUpdateListener extends UpdateListener {
 
     public void updateMetaData() {
         try {
-            long timeTillCloseMili = ((360_000 - EnvironmentCore.utils.getLobbyTime()) * 50);
-            long timeMiliClosingDate = new Date().getTime() + timeTillCloseMili;
-            if (timeTillCloseMili <= 0) setStatusNoUpdate(StatusConstants.CLOSED);
+            Instant closingTime = EnvironmentCore.utils.getLobbyClosingTime();
+            if (Instant.now().isAfter(closingTime)) setStatusNoUpdate(StatusConstants.CLOSED);
             List<String> players = EnvironmentCore.utils.getPlayers();
             players = players.stream().map(username -> username.replaceAll("\\[\\S+]", "").trim()).filter(userName -> !userName.equals(lobby.contactMan)).collect(Collectors.toList());
-            lobby.setLobbyMetaData(players, timeMiliClosingDate);
+            lobby.setLobbyMetaData(players, closingTime);
         } catch (SQLException e) {
             Chat.sendPrivateMessageToSelfError("Uhm how did this happen: " + e.getMessage());
             e.printStackTrace();

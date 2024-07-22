@@ -624,7 +624,7 @@ public class BBsentialConnection {
             if (data.modSelfRemove) selfDestruct();
             if (!data.silent) {
                 Chat.sendPrivateMessageToSelfFatal("You have been " + data.type + " in the BBsentials Network! Reason: " + data.reason);
-                Chat.sendPrivateMessageToSelfFatal("Punishment Expiration Date: " + new Timestamp(data.till.getTime()).toLocalDateTime().toString());
+                Chat.sendPrivateMessageToSelfFatal("Punishment Expiration Date: " + new Timestamp(data.till.getEpochSecond()).toLocalDateTime().toString());
                 if (data.modSelfRemove)
                     Chat.sendPrivateMessageToSelfFatal("You have been disallowed to use the mod, which is the reason it is automatically self removing itself!");
             }

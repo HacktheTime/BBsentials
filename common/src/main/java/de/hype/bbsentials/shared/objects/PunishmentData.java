@@ -1,31 +1,50 @@
 package de.hype.bbsentials.shared.objects;
+import de.hype.bbsentials.environment.packetconfig.DefaultPunishment;
 
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.Instant;
 
 public class PunishmentData {
     public Integer punishmentId;
     public Integer punishedUserId;
+    public DefaultPunishment defaultPunishment;
     public Type type;
+    /**
+     * -1 resets to 0;
+     * null/0 is none
+     */
+    public Integer pointPunishment;
     public String mcUuid;
-    public Date from;
-    public Date till;
+    public Instant from;
+    public Instant till;
+    public Instant appealUnlockDate;
+    public boolean appealAccepted;
     public String reason;
-    public Boolean silent;
-    public Integer bannerUserId;
-    public Boolean modSelfRemove;
-    public Boolean shouldModCrash;
-    public Integer warningTimeBeforeCrash;
-    public Boolean disconnectFromNetworkOnLoad;
-    public Integer exitCodeOnCrash;
-    public Boolean canBeAppealed;
-    public Integer invalidatingUserid = -1;
+    public boolean silent;
+    public int bannerUserId;
+    public boolean modSelfRemove;
+    public boolean shouldModCrash;
+    public int warningTimeBeforeCrash;
+    public boolean disconnectFromNetworkOnLoad;
+    public int exitCodeOnCrash;
+    public boolean canBeInvalidationAppealed;
+    public boolean invalidationAppealed;
+    public int invalidatingUserid;
 
-    public PunishmentData(Integer punishmentId, Integer punishedUserId, Type type, String mcUuid, Date from, Date till, String reason, Boolean silent, Integer bannerUserId, Boolean modSelfRemove, Boolean shouldModCrash, Integer warningTimeBeforeCrash, Boolean disconnectFromNetworkOnLoad, Integer exitCodeOnCrash, Boolean canBeAppealed) {
+    public PunishmentData(PunishmentData data) {
+        this(data.punishmentId, data.punishedUserId, data.type, data.pointPunishment, data.mcUuid, data.from, data.till, data.appealAccepted, data.reason, data.silent, data.bannerUserId, data.modSelfRemove, data.shouldModCrash, data.warningTimeBeforeCrash, data.disconnectFromNetworkOnLoad, data.exitCodeOnCrash, data.appealUnlockDate, data.canBeInvalidationAppealed, data.defaultPunishment,-1, data.invalidationAppealed);
+    }
+
+    public PunishmentData(Integer punishmentId, Integer punishedUserId, Type type, Integer pointPunishment, String mcUuid, Instant till, String reason, Boolean silent, Integer bannerUserId, Boolean modSelfRemove, Boolean shouldModCrash, Integer warningTimeBeforeCrash, Boolean disconnectFromNetworkOnLoad, Integer exitCodeOnCrash, Instant appealUnlockDate, boolean canBeInvalidationAppealed, DefaultPunishment defaultPunishment) {
+        this(punishmentId, punishedUserId, type, pointPunishment, mcUuid, Instant.now(), till, false, reason, silent, bannerUserId, modSelfRemove, shouldModCrash, warningTimeBeforeCrash, disconnectFromNetworkOnLoad, exitCodeOnCrash, appealUnlockDate, canBeInvalidationAppealed, defaultPunishment, -1,false);
+    }
+
+    public PunishmentData(Integer punishmentId, Integer punishedUserId, Type type, Integer pointPunishment, String mcUuid, Instant from, Instant till, boolean appealAccepted, String reason, Boolean silent, Integer bannerUserId, Boolean modSelfRemove, Boolean shouldModCrash, Integer warningTimeBeforeCrash, Boolean disconnectFromNetworkOnLoad, Integer exitCodeOnCrash, Instant appealUnlockDate, boolean canBeInvalidationAppealed, DefaultPunishment defaultPunishment, int invalidatingUserid, boolean invalidationAppealed) {
         this.punishmentId = punishmentId;
         this.punishedUserId = punishedUserId;
         this.type = type;
+        this.appealAccepted = appealAccepted;
+        this.defaultPunishment = defaultPunishment;
+        this.pointPunishment = pointPunishment;
         this.mcUuid = mcUuid;
         this.from = from;
         this.till = till;
@@ -37,66 +56,44 @@ public class PunishmentData {
         this.warningTimeBeforeCrash = warningTimeBeforeCrash;
         this.disconnectFromNetworkOnLoad = disconnectFromNetworkOnLoad;
         this.exitCodeOnCrash = exitCodeOnCrash;
-        this.canBeAppealed = canBeAppealed;
+        this.canBeInvalidationAppealed = canBeInvalidationAppealed;
+        this.invalidatingUserid=invalidatingUserid;
+        this.invalidationAppealed = invalidationAppealed;
+        this.appealUnlockDate = appealUnlockDate;
+    }
+
+    public boolean isActive() {
+        if (!isValid()) return false;
+        if (appealAccepted) return false;
+        return (till != null && Instant.now().isBefore(till));
+    }
+
+    public boolean isValid() {
+        return invalidatingUserid == -1;
     }
 
     public enum Type {
-        BAN,
-        BLACKLIST,
-        MUTE, WARN,
-    }
+        BAN(true, 69, true, true, false, true, 10),
+        BLACKLIST(true, 69, true, true, false, true, 10),
+        MUTE(false, 69, false, false, false, true, 10),
+        WARN(false, 69, false, false, false, true, 10);
 
-    public static Date getTillDateFromDurationString(String duration) throws Exception {
-        int days = 0;
-        int hours = 0;
-        int minutes = 0;
-        int seconds = 0;
+        public final boolean disconnect;
+        public final int crashExitCode;
+        public final boolean crash;
+        public final boolean selfRemove;
+        public final boolean silent;
+        public final boolean appealable;
+        public final int warnTime;
 
-        Pattern durationPattern = Pattern.compile("(\\d+)([dhms])");
-        Matcher durationMatcher = durationPattern.matcher(duration);
-
-        while (durationMatcher.find()) {
-            int amount = Integer.parseInt(durationMatcher.group(1));
-            String unit = durationMatcher.group(2);
-
-            switch (unit) {
-                case "d":
-                    days = amount;
-                    break;
-                case "h":
-                    hours = amount;
-                    break;
-                case "m":
-                    minutes = amount;
-                    break;
-                case "s":
-                    seconds = amount;
-                    break;
-                default:
-                    throw new Exception("§cInvalid Duration Parameter: " + unit);
-            }
-
+        Type(boolean disconnect, int crashExitCode, boolean crash, boolean selfRemove, boolean silent, boolean appealable, int warnTime) {
+            this.disconnect = disconnect;
+            this.crashExitCode = crashExitCode;
+            this.crash = crash;
+            this.selfRemove = selfRemove;
+            this.silent = silent;
+            this.appealable = appealable;
+            this.warnTime = warnTime;
         }
-
-        // Calculate the ban duration in milliseconds
-        long durationMillis = (((days * 24L + hours) * 60 + minutes) * 60 + seconds) * 1000;
-        Date from = new java.sql.Date(new Date().getTime());
-        Date till = new java.sql.Date(from.getTime() + durationMillis);
-        if (durationMillis == 0) {
-            till = new Date(0L);
-        }
-        return till;
-    }
-
-    public static PunishmentData clientDefaultSetup(Type type, Integer userId, String mcUuid, Date till, String reason) {
-        boolean selfRemove = type.equals(Type.BAN) || type.equals(Type.BLACKLIST);
-        boolean crash = type.equals(Type.BAN) || type.equals(Type.BLACKLIST);
-        boolean disconnect = type.equals(Type.BAN) || type.equals(Type.BLACKLIST);
-        return new PunishmentData(-1, userId, type, mcUuid, new Date(), till, reason, false, -1, selfRemove, crash, 10, disconnect, 69, true);
-    }
-    public boolean isActive() {
-        if (invalidatingUserid != -1) return false;
-        Date currentDate = new Date();
-        return (till != null && currentDate.before(till));
     }
 }

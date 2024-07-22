@@ -6,6 +6,9 @@ import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent
 import de.hype.bbsentials.shared.objects.RenderInformation
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
+import java.lang.Math.pow
+import org.joml.Matrix4f
+import org.joml.Vector3f
 import net.minecraft.client.gl.VertexBuffer
 import net.minecraft.client.render.*
 import net.minecraft.client.texture.Sprite
@@ -14,9 +17,6 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
-import org.joml.Matrix4f
-import org.joml.Vector3f
-import java.lang.Math.pow
 
 /**
  * @author nea89o in Firmanent
@@ -28,6 +28,9 @@ class RenderInWorldContext(
     private val tickCounter: RenderTickCounter,
     val vertexConsumers: VertexConsumerProvider.Immediate,
 ) {
+    object RenderLayers {
+        val TRANSLUCENT_TRIS = FirmanentWaypointRenderingCircumVention.tryTest();
+    }
 
     fun color(color: me.shedaniel.math.Color) {
         color(color.red / 255F, color.green / 255f, color.blue / 255f, color.alpha / 255f)
@@ -38,7 +41,6 @@ class RenderInWorldContext(
     }
 
     fun block(blockPos: BlockPos) {
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram)
         matrixStack.push()
         matrixStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
         buildCube(matrixStack.peek().positionMatrix, tesselator)
@@ -78,7 +80,7 @@ class RenderInWorldContext(
         val vec = position.subtract(camera.pos).multiply(distanceToMoveTowardsCamera / actualCameraDistance)
         matrixStack.translate(vec.x, vec.y, vec.z)
         matrixStack.multiply(camera.rotation)
-        matrixStack.scale(-0.025F, -0.025F, -1F)
+        matrixStack.scale(0.025F, -0.025F, 1F)
 
         FacingThePlayerContext(this).run(block)
 
@@ -184,44 +186,44 @@ class RenderInWorldContext(
         }
 
         private fun buildCube(matrix: Matrix4f, tessellator: Tessellator) {
-            val buf = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION)
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).next()
-            BufferRenderer.drawWithGlobalProgram(buf.end())
+            val buf = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR)
+            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
+            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
+            RenderLayers.TRANSLUCENT_TRIS.draw(buf.end())
         }
 
 
@@ -367,9 +369,7 @@ class FacingThePlayerContext(val worldContext: RenderInWorldContext) {
         buf.vertex(matrix4f, +hw, -hh, 0F).color(-1).texture(u2, v1).next()
         BufferRenderer.drawWithGlobalProgram(buf.end())
     }
-
 }
-
 fun VertexConsumer.next() = this
 
 

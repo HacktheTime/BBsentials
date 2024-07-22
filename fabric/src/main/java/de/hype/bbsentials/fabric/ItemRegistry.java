@@ -30,7 +30,7 @@ public class ItemRegistry {
             try {
                 Item value = (Item) declaredField.get(null);
                 try {
-                    VanillaItems vanilla = VanillaItems.valueOf(declaredField.getName());
+                    VanillaItems vanilla = VanillaItems.valueOf(((Item) declaredField.get(null)).toString().split(":")[1].toUpperCase());
                     itemsMap.put(vanilla,value);
                     mcitemsMap.put(value,vanilla);
                 }catch (Exception e){

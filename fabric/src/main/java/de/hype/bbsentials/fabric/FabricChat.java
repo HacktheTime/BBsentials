@@ -12,7 +12,7 @@ import net.minecraft.text.Text;
 
 public class FabricChat implements MCChat {
     public Chat chat = new Chat();
-
+    MinecraftClient client;
     public FabricChat() {
         init();
     }
@@ -22,7 +22,9 @@ public class FabricChat implements MCChat {
 //        ClientReceiveMessageEvents.CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
 //            chat.onEvent(new Message(Text.Serialization.toJsonString(message), message.getString()));
 //        });
+        client = MinecraftClient.getInstance();
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, isActionBar) -> {
+            if (client.world==null) return true;
             Message bbMessage = new Message(FabricTextUtils.opposite(message), message.getString());
             boolean block = (BBsentials.chat.processNotThreaded(bbMessage, isActionBar) == null);
             MessageEvent event = new FabricMessageEvent(bbMessage);
@@ -35,6 +37,7 @@ public class FabricChat implements MCChat {
     }
 
     public Text prepareOnEvent(Text text, boolean actionbar) {
+        if (MinecraftClient.getInstance().world==null) return text;
         String json = FabricTextUtils.opposite(text);
         Message message = new Message(json, text.getString(), actionbar);
 

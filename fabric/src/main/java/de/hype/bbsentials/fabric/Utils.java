@@ -112,8 +112,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                             it.block(pos);
                             it.color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), 1f);
                             if (i == 0 && !ModInitialiser.tutorialManager.recording) {
-                                Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
-                                it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                                it.tracer(pos.toCenterPos(), 3f);
                             }
                             it.doWaypointIcon(pos.toCenterPos(), new ArrayList<>(), 25, 25);
                         }

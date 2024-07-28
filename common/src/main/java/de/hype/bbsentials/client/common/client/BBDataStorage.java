@@ -1,5 +1,6 @@
 package de.hype.bbsentials.client.common.client;
 
+import com.google.gson.annotations.Expose;
 import de.hype.bbsentials.shared.constants.EnumUtils;
 import de.hype.bbsentials.shared.constants.Islands;
 import net.hypixel.data.region.Environment;
@@ -12,9 +13,9 @@ public class BBDataStorage {
     public final String serverId;
     public final String lobbyName;
     public final String mode;
-    public Islands island;
     public final String map;
     public final ServerType gameType;
+    public Islands island;
     public String currentProfileID = null;
     public String profileType = null;
     public String currentProfileCuteName = null;
@@ -70,7 +71,6 @@ public class BBDataStorage {
     public Islands getIsland() {
         return island;
     }
-
 
     public boolean isInSkyblock() {
         return gameType == GameType.SKYBLOCK;

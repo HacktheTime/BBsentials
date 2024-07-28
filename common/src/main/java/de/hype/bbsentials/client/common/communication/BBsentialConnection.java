@@ -63,7 +63,7 @@ public class BBsentialConnection {
             return true;
         }
         else {
-            String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and DeveloperAbstractConfig Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
+            String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and Developer Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
             System.out.println(emergencyMessage);
             Chat.sendPrivateMessageToSelfFatal("§4" + emergencyMessage + "\n\n");
         }

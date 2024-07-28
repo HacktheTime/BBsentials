@@ -2,9 +2,15 @@ package de.hype.bbsentials.client.common.client;
 
 import com.google.gson.*;
 import de.hype.bbsentials.shared.objects.Message;
+import net.hypixel.data.type.GameType;
+import net.hypixel.data.type.LobbyType;
+import net.hypixel.data.type.ServerType;
 
 import java.awt.*;
 import java.lang.reflect.Type;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomGson {
     public static Gson ownSerializer = new GsonBuilder().create();
@@ -21,6 +27,8 @@ public class CustomGson {
         return new GsonBuilder()
                 .registerTypeAdapter(Color.class, new ColorSerializer())
                 .registerTypeAdapter(Message.class, new MessageSerializer())
+                .registerTypeAdapter(Instant.class, new InstantSerializer())
+                .registerTypeAdapter(ServerType.class, new ServerTypeSerializer())
                 ;
     }
 
@@ -52,6 +60,37 @@ public class CustomGson {
         @Override
         public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             return ownSerializer.fromJson(json, de.hype.bbsentials.client.common.chat.Message.class);
+        }
+    }
+    private static class InstantSerializer implements JsonSerializer<Instant>, JsonDeserializer<Instant> {
+        @Override
+        public Instant deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return Instant.ofEpochMilli(json.getAsLong());
+        }
+
+        @Override
+        public JsonElement serialize(Instant src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.toEpochMilli());
+        }
+    }
+    private static class ServerTypeSerializer implements JsonSerializer<ServerType>, JsonDeserializer<ServerType> {
+        private Map<String, ServerType> types = new HashMap<>();
+        public ServerTypeSerializer(){
+            for (GameType value : GameType.values()) {
+                types.put(value.toString(),value);
+            }
+            for (LobbyType value : LobbyType.values()) {
+                types.put(value.toString(),value);
+            }
+        }
+        @Override
+        public ServerType deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return types.get(json.getAsString());
+        }
+
+        @Override
+        public JsonElement serialize(ServerType src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.toString());
         }
     }
 

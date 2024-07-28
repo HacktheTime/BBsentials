@@ -15,7 +15,7 @@ public class TravelNode extends AbstractTutorialNode {
 
     public TravelNode(Islands island) {
         this.island = island;
-        warpArgument = island.getWarpArgument();
+        warpArgument = island.getWarpCommand();
     }
 
 

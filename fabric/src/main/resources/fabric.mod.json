@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "bbsentials",
   "version": "${mod_version}",
-  "name": "BBsentials",
+  "name": "BBsentials 0PT Playtime",
   "icon": "logo.png",
-  "description": "Mod to connect to the BBsentials Network for Splashes and more",
+  "description": "§4FORK!§r: This Version is for 0PT card\nMod to connect to the BBsentials Network for Splashes and more",
   "authors": [
     "Hype_the_Time/hackthetime"
   ],

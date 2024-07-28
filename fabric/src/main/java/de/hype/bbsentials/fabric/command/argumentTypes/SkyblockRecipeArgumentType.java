@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class SkyblockRecipeArgumentType implements ArgumentType<String> {
-    private final static List<String> skyblockItemIds = BBsentials.neuRepoManager.getRepository().getItems().getItems().entrySet().stream().filter(e->e.getValue().getRecipes().isEmpty() && !e.getKey().contains(";")).map(Map.Entry::getKey).toList();
+    private final static List<String> skyblockItemIds = BBsentials.neuRepoManager.getRepository().getItems().getItems().entrySet().stream().filter(e->!e.getValue().getRecipes().isEmpty() && !e.getKey().contains(";")).map(Map.Entry::getKey).toList();
 
     private SkyblockRecipeArgumentType() {
     }

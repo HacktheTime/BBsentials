@@ -15,6 +15,8 @@ public class TemporaryConfig extends BBsentialsConfig {
     public transient Map<String, Integer> serverIdToHubNumber = new HashMap<>();
     public transient Instant lastServerIdUpdateDate = Instant.now();
     public transient Set<ChChestItem> chestParts = new HashSet<>();
+    public transient Long playTimeInMinutes;
+    public transient Instant lastPlaytimeUpdate;
 
     public TemporaryConfig() {
         super(1);

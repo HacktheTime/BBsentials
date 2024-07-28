@@ -4,11 +4,14 @@ import de.hype.bbsentials.client.common.api.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.ChChestItems;
+import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.constants.StatusConstants;
+import de.hype.bbsentials.shared.packets.addonpacket.PlayTimeUpdatedPacket;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -245,7 +248,7 @@ public class Chat {
             String messageUnformatted = message.getUnformattedString();
             String username = message.getPlayerName();
             if (messageUnformatted.startsWith("[NPC]")) {
-                lastNPCMessage=new Date();
+                lastNPCMessage = new Date();
             }
             if (!EnvironmentCore.utils.isWindowFocused()) {
                 if (BBsentials.generalConfig.doDesktopNotifications) {
@@ -274,14 +277,47 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfError("B: " + messageUnformatted);
                 }
             }
+            else if (messageUnformatted.equals("Friend > %s joined.".formatted(BBsentials.generalConfig.getMainName()))) {
+                if (!HPModAPIPacket.PARTYINFO.complete().isInParty()) {
+                    BBsentials.sender.addSendTask("/p %s".formatted(BBsentials.generalConfig.getMainName()));
+                }
+            }
             else if (message.isServerMessage()) {
+                if (message.getUnformattedString().startsWith("[Important] This server will restart soon:")) {
+//                    EnvironmentCore.utils.getCurrentIsland().getExitRunnable().run(); what if just joined too? from is to garden to is for example
+                }
+                else if (message.getUnformattedString().equals("You were kicked while joining that server!") || message.getUnformattedString().equals("Couldn't warp you! Try again later. (DYNAMIC_POOL_ERROR)")) {
+                    BBsentials.sender.addImmediateSendTask("/l");
+                }
+                else if (BBsentials.generalConfig.isAlt()) {
+                    if (message.getMessageContent().startsWith("You have ") && message.endsWith("minutes playtime!")) {
+                        String[] split = message.getMessageContent().replaceAll("[^\\d ]", "").replaceAll("\\s+", " ").trim().split(" ");
+                        Long minuteAmount = (Long.parseLong(split[0]) * 60) + (Long.parseLong(split[1]));
+                        if (BBsentials.temporaryConfig.playTimeInMinutes == null) {
+                            BBsentials.temporaryConfig.playTimeInMinutes = minuteAmount;
+                        }
+                        if ((BBsentials.temporaryConfig.playTimeInMinutes + 1) == minuteAmount) {
+                            BBsentials.temporaryConfig.lastPlaytimeUpdate = Instant.now();
+                            if (!BBsentials.pauseWarping) {
+                                if (BBsentials.dataStorage.getIsland().canBeWarpedIn() || BBsentials.dataStorage.getIsland() == Islands.DUNGEON)
+                                    BBsentials.sender.addImmediateSendTask("/p warp");
+                                BBsentials.sender.addSendTask("/pc playtime updated", 2);
+                            }
+                            BBsentials.addonManager.broadcastToAllAddons(new PlayTimeUpdatedPacket(BBsentials.dataStorage.getIsland(), BBsentials.dataStorage.serverId, Instant.now()));
+                            BBsentials.temporaryConfig.playTimeInMinutes = minuteAmount;
+                        }
+                    }
+                }
                 if (messageUnformatted.contains("disbanded the party")) {
                     lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
                     partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());
                 }
                 else if (message.contains("invited you to join their party")) {
                     username = message.getNoRanks().replace("-", "").replace("\n", "").trim().split(" ")[0];
-                    if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
+                    if (username.equals(BBsentials.generalConfig.getAltName())) {
+                        sendCommand("/p accept " + username);
+                    }
+                    else if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
                         Instant lastDisbandedInstant = partyDisbandedMap.get(lastPartyDisbandedUsername);
                         if (BBsentials.partyConfig.acceptReparty) {
                             if (lastDisbandedInstant != null && lastDisbandedInstant.isAfter(Instant.now().minusSeconds(20)) && (username.equals(lastPartyDisbandedUsername))) {

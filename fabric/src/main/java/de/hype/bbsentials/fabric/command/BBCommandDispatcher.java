@@ -8,7 +8,6 @@ import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import de.hype.bbsentials.fabric.mixins.mixin.RootCommandNodeAccessMixin;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.IBBsentialsCommandSource;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.IRootCommandNodeMixinAccess;
 import net.minecraft.client.MinecraftClient;
@@ -112,8 +111,14 @@ public class BBCommandDispatcher extends CommandDispatcher<IBBsentialsCommandSou
     }
 
     public void addCommands(CommandDispatcher<CommandSource> target, CommandSource source) {
-        IRootCommandNodeMixinAccess<CommandSource> parsedTarget = (IRootCommandNodeMixinAccess) (Object) target.getRoot();
-        parsedTarget.BBsentials$replaceNodes(replaceChilds);
+//        IRootCommandNodeMixinAccess<CommandSource> parsedTarget = (IRootCommandNodeMixinAccess) (Object) target.getRoot();
+//        parsedTarget.BBsentials$replaceNodes(replaceChilds);
+        for (LiteralArgumentBuilder<IBBsentialsCommandSource> replaceChild : replaceChilds) {
+            if (target.getRoot().getChildren().removeIf(child -> child.getName().equals(replaceChild.getLiteral()))) {
+                target.register((LiteralArgumentBuilder<CommandSource>) (Object) replaceChild);
+                BBCommandDispatcher.INSTANCE.register(replaceChild);
+            }
+        }
         Map<CommandNode<CommandSource>, CommandNode<CommandSource>> originalToCopy = new HashMap<>();
         originalToCopy.put((CommandNode<CommandSource>) (Object) getRoot(), target.getRoot());
         copyChildren((CommandNode<CommandSource>) (Object) getRoot(), target.getRoot(), source, originalToCopy);

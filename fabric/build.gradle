@@ -82,19 +82,26 @@ loom {
     }
 
     runs {
+//        client {
+//            client()
+//            setConfigName("Fabric Client")
+//            ideConfigGenerated(true)
+//            vmArg("--javaagent ~/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/*/*/*.jar")
+//            runDir("run")
+//        }
         client {
             client()
-            setConfigName("Fabric Client")
+            setConfigName("Fabric Client ALT")
             ideConfigGenerated(true)
-            vmArg("--javaagent ~/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/*/*/*.jar")
+            vmArg("--javaagent ~/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/*/*/*.jar -Ddevauth.account=npcforcommands")
             runDir("run")
         }
-        server {
-            server()
-            setConfigName("Fabric Server")
-            ideConfigGenerated(true)
-            runDir("runs/server")
-        }
+//        server {
+//            server()
+//            setConfigName("Fabric Server")
+//            ideConfigGenerated(true)
+//            runDir("runs/server")
+//        }
     }
     log4jConfigs.from(project.rootProject.file("log4j2.xml"))
 }

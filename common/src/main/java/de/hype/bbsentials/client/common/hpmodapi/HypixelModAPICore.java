@@ -3,6 +3,7 @@ package de.hype.bbsentials.client.common.hpmodapi;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBDataStorage;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.ClientboundHypixelPacket;
 import net.hypixel.modapi.packet.impl.VersionedPacket;
@@ -12,10 +13,7 @@ import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPlayerInfoPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
@@ -57,7 +55,11 @@ public class HypixelModAPICore {
 
     public void onHelloEvent(ClientboundHelloPacket packet) {
         handlePacketDebug(packet);
-        BBsentials.dataStorage= new BBDataStorage(packet);
+        BBsentials.executionService.execute(() -> {
+            ClientboundPartyInfoPacket partyInfoPacket = HPModAPIPacket.PARTYINFO.complete();
+            BBsentials.partyConfig.isPartyLeader = Objects.equals(partyInfoPacket.getLeader().get().toString(), EnvironmentCore.utils.getMCUUID());
+        });
+        BBsentials.dataStorage = new BBDataStorage(packet);
     }
 
     public void onPartyInfoPacket(ClientboundPartyInfoPacket packet) {

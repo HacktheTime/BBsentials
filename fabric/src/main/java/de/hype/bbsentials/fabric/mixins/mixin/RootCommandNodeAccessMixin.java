@@ -16,8 +16,9 @@ public abstract class RootCommandNodeAccessMixin<S> extends CommandNodeAccessMix
     @Override
     public void BBsentials$replaceNodes(List<LiteralArgumentBuilder<IBBsentialsCommandSource>> newNodes) {
         for (LiteralArgumentBuilder<IBBsentialsCommandSource> newNode : newNodes) {
-            if (BBsentials$removeNode(newNode.getLiteral()) != null)
+            if (BBsentials$removeNode(newNode.getLiteral()) != null){
                 addChild((CommandNode<S>) (Object) newNode.build());
+            }
         }
     }
 }

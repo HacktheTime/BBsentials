@@ -31,8 +31,13 @@ import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
 import de.hype.bbsentials.fabric.tutorial.Tutorial;
 import de.hype.bbsentials.fabric.tutorial.TutorialManager;
 import de.hype.bbsentials.fabric.tutorial.nodes.ObtainItemNode;
+import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.constants.TravelEnums;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
+import de.hype.bbsentials.shared.packets.addonpacket.PausePacket;
+import de.hype.bbsentials.shared.packets.addonpacket.SendLobbyData;
+import de.hype.bbsentials.shared.packets.addonpacket.SetGoToIsland;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -48,15 +53,19 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -69,6 +78,7 @@ public class ModInitialiser implements ClientModInitializer {
     public static NumPadCodes codes;
     public static KeyBinding openWikiKeybind;
     public static TutorialManager tutorialManager;
+    ScheduledFuture<?> checkPTUpdateExecution;
 
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
@@ -81,6 +91,7 @@ public class ModInitialiser implements ClientModInitializer {
                                 if (parameters.length >= 3) {
                                     if (parameters[0].equals("sb")) {
                                         tellrawjson = "[\"\",{\"text\":\"\n\n$username\",\"underlined\":true,\"color\":\"blue\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"$username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"Click to copy the username\",\"color\":\"blue\"}]}},\" \",{\"text\":\"[Party]\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/p invite $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to party player\"]}},\" \",{\"text\":\"[Invite]\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/invite $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to invite them to visit your private island/garden\"]}},\" \",{\"text\":\"[Visit]\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/visit $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to open the visit menu for that user\"]}},\" \",{\"text\":\"[creport]\",\"color\":\"dark_red\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/creport $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to report the player for chat (public)\"]}},\" \",{\"text\":\"[Ignore add]\",\"color\":\"red\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/ignore add $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to ignore add the user\"]}},\" \",{\"text\":\"[Copy content]\",\"color\":\"gray\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"$messagecontent\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to copy the message content\"]}},\" \",{\"text\":\"[Copy message]\",\"color\":\"blue\",\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"$message\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to copy the exact message\"]}},\" \",{\"text\":\"[Msg]\",\"color\":\"dark_purple\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/msg $username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to msg the user\"]}},\" \",{\"text\":\"[Sky shiiyu]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"https://sky.shiiyu.moe/stats/$username\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Click to open the users sky shiiyu page.\"]}},\"\\n\"]";
+                                        //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":true,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the username"}],"text":"$username"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"run_command","click_event_value":"/p invite $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to party player"}],"text":"[Party]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"run_command","click_event_value":"/invite $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to invite them to visit your private island/garden"}],"text":"[Invite]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"run_command","click_event_value":"/visit $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to open the visit menu for that user"}],"text":"[Visit]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_red","insertion":"","click_event_type":"suggest_command","click_event_value":"/creport $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to report the player for chat (public)"}],"text":"[creport]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"suggest_command","click_event_value":"/ignore add $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to ignore add the user"}],"text":"[Ignore add]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$messagecontent","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the message content"}],"text":"[Copy content]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$message","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the exact message"}],"text":"[Copy message]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_purple","insertion":"","click_event_type":"suggest_command","click_event_value":"/msg $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to msg the user"}],"text":"[Msg]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"aqua","insertion":"","click_event_type":"open_url","click_event_value":"https://sky.shiiyu.moe/stats/$username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to open the users sky shiiyu page."}],"text":"[Sky shiiyu]"}],"command":"%s","jtemplate":"tellraw"}
                                         //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":true,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the username"}],"text":"$username"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"run_command","click_event_value":"/p invite $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to party player"}],"text":"[Party]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"run_command","click_event_value":"/invite $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to invite them to visit your private island/garden"}],"text":"[Invite]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"run_command","click_event_value":"/visit $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to open the visit menu for that user"}],"text":"[Visit]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_red","insertion":"","click_event_type":"suggest_command","click_event_value":"/creport $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to report the player for chat (public)"}],"text":"[creport]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"red","insertion":"","click_event_type":"suggest_command","click_event_value":"/ignore add $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to ignore add the user"}],"text":"[Ignore add]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$messagecontent","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the message content"}],"text":"[Copy content]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"blue","insertion":"","click_event_type":"copy_to_clipboard","click_event_value":"$message","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to copy the exact message"}],"text":"[Copy message]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_purple","insertion":"","click_event_type":"suggest_command","click_event_value":"/msg $username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to msg the user"}],"text":"[Msg]"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"aqua","insertion":"","click_event_type":"open_url","click_event_value":"https://sky.shiiyu.moe/stats/$username","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Click to open the users sky shiiyu page."}],"text":"[Sky shiiyu]"}],"command":"%s","jtemplate":"tellraw"}
                                     }
                                     else if (parameters[0].equals("guild")) {
@@ -124,12 +135,47 @@ public class ModInitialiser implements ClientModInitializer {
                             })));
             dispatcher.replaceRegister(literal("warp")
                     .then(argument("warp", SkyblockWarpArgumentType.warptype())
-                            .executes(context -> {
-                                BBsentials.sender.addImmediateSendTask("/warp " + SkyblockWarpArgumentType.getWarpString(context, "warp"));
-                                ModInitialiser.tutorialManager.onTravel(SkyblockWarpArgumentType.getWarpString(context, "warp"));
-                                return 1;
+                            .executes((context) -> {
+                                String locString = SkyblockWarpArgumentType.getWarpString(context, "warp").toLowerCase();
+                                for (TravelEnums value : TravelEnums.values()) {
+                                    if (value.getTravelArgument().equalsIgnoreCase(locString)) {
+                                        return warp(value);
+                                    }
+                                }
+                                Chat.sendPrivateMessageToSelfError("Island not found");
+                                return 0;
                             })
                     ));
+            if (!generalConfig.isAlt()) {
+                dispatcher.register(literal("gotogoal")
+                        .then(argument("warp", SkyblockWarpArgumentType.warptype())
+                                .executes((context) -> {
+                                    String locString = SkyblockWarpArgumentType.getWarpString(context, "warp").toLowerCase();
+                                    for (TravelEnums value : TravelEnums.values()) {
+                                        if (value.getTravelArgument().equalsIgnoreCase(locString)) {
+                                            return warp(value);
+                                        }
+                                    }
+                                    Chat.sendPrivateMessageToSelfError("Island not found");
+                                    return 0;
+                                })
+                        ));
+            }
+            dispatcher.replaceRegister(literal("is")
+                    .executes((context) -> {
+                        return warp(TravelEnums.private_island);
+                    })
+            );
+            dispatcher.replaceRegister(literal("hub")
+                    .executes((context) -> {
+                        return warp(TravelEnums.hub);
+                    })
+            );
+            dispatcher.replaceRegister(literal("savethejerrys")
+                    .executes((context) -> {
+                        return warp(TravelEnums.jerry);
+                    })
+            );
             dispatcher.replaceRegister(literal("viewrecipe")
                     .then(argument("itemid", SkyblockRecipeArgumentType.itemidtype())
                             .executes(context -> {
@@ -158,7 +204,52 @@ public class ModInitialiser implements ClientModInitializer {
                         return 1;
                     }));
         });
+        KeyBinding LeaveKeyBind = new KeyBinding("Leave", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_BACKSPACE, "BBsentials");
+        KeyBindingHelper.registerKeyBinding(LeaveKeyBind);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (LeaveKeyBind.wasPressed() && !generalConfig.isAlt()) {
+                if (dataStorage.isInSkyblock()) {
+                    pauseWarping = true;
+                    addonManager.broadcastToAllAddons(new PausePacket(true));
+                    if (EnvironmentCore.utils.getCurrentIsland().equals(Islands.PRIVATE_ISLAND)) {
+                        sender.addImmediateSendTask("/warp garden");
+                    }
+                    else {
+                        sender.addImmediateSendTask("/is");
+                    }
+                    sender.addSendTask("/l", 2);
+                }
+            }
+        });
+        KeyBinding toggleWarpingKeyBind = new KeyBinding("Toggle Warping", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_CONTROL, "BBsentials");
+        KeyBindingHelper.registerKeyBinding(toggleWarpingKeyBind);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (toggleWarpingKeyBind.wasPressed()) {
+                pauseWarping = !pauseWarping;
+                addonManager.broadcastToAllAddons(new PausePacket(pauseWarping));
+            }
+        });
         ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
+            dispatcher.register(literal("ptswaplobby").executes((context) -> {
+                executionService.execute(() -> {
+                    if (!Islands.getFallbackIsland().isTravelSafe()) {
+                        Chat.sendPrivateMessageToSelfError("Canceled Swap because Fallback Island is not unloaded (long enough)");
+                        return;
+                    }
+                    TravelEnums current = goToGoal;
+                    doLeaveTask();
+                    addonManager.broadcastToAllAddons(new SetGoToIsland(TravelEnums.private_island));
+                    sender.addSendTask("/p warp", 5);
+                    try {
+                        Thread.sleep(15_000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                    warp(current);
+                });
+                Chat.sendPrivateMessageToSelfInfo("Scheduled lobby swap.");
+                return 1;
+            }));
             dispatcher.register(literal("bbi")
                             .then(literal("reconnect")
                                     .executes((context) -> {
@@ -608,47 +699,107 @@ public class ModInitialiser implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        MinecraftClient client = MinecraftClient.getInstance();
         System.out.println("BBsentials : onInit called");
         EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new FabricTextUtils());
         codes = new NumPadCodes();
         BBsentials.init();
         tutorialManager = new TutorialManager();
-        if (developerConfig.quickLaunch) {
-            executionService.execute(() -> {
-                while (!MinecraftClient.getInstance().isFinishedLoading()) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-
-                    }
-                }
-                MinecraftClient.getInstance().execute(this::joinHypixel);
-            });
-        }
         RenderingDefinitions.clearAndInitDefaults();
         if (generalConfig.hasBBRoles("dev")) {
             ServerSwitchTask.onServerJoinTask(() -> EnvironmentCore.debug.onServerJoin(), true);
             ServerSwitchTask.onServerLeaveTask(() -> EnvironmentCore.debug.onServerLeave(), true);
         }
-        ServerSwitchTask.onServerJoinTask(() -> ModInitialiser.tutorialManager.onTravel(dataStorage.getIsland()), true);
+        ServerSwitchTask.onServerJoinTask(() -> {
+            ModInitialiser.tutorialManager.onTravel(dataStorage.getIsland());
+            if (dataStorage.getIsland() != null && dataStorage.getIsland().isPersonalIsland())
+                Islands.putPlaytimeUpdate(dataStorage.serverId, funConfig.lowPlaytimeHelperJoinDate);
+        }, true);
         ServerSwitchTask.onServerLeaveTask(() -> {
+            if ( dataStorage!=null && dataStorage.getIsland() != null && dataStorage.getIsland().isPersonalIsland()) {
+                dataStorage.getIsland().setLastLeave(funConfig.lowPlaytimeHelperJoinDate);
+            }
             if (dataStorage != null) dataStorage.island = null;
+            BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
+            if (dataStorage == null) return;
             if (ModInitialiser.tutorialManager.current != null) ModInitialiser.tutorialManager.current.resetTravel();
-        });
+        }, true);
         ClientPlayConnectionEvents.JOIN.register((a, b, c) -> {
             BBsentials.onServerJoin();
         });
         ClientPlayConnectionEvents.DISCONNECT.register((a, b) -> {
             BBsentials.onServerLeave();
         });
-        ServerSwitchTask.onServerJoinTask(() -> {
-            if (visualConfig.doGammaOverride) {
-                new Options().setGamma(10);
+        funConfig.lowPlayTimeHelpers = true;
+        ServerSwitchTask.onServerLeaveTask(() -> {
+            if (BBsentials.futureServerLeave != null) {
+                futureServerLeave.cancel(true);
             }
-            if (EnvironmentCore.utils.getUsername().toLowerCase().equals("p0is")) {
-                funConfig.hub17To29Troll = true;
+            temporaryConfig.playTimeInMinutes = null;
+            temporaryConfig.lastPlaytimeUpdate = null;
+        }, true);
+        if (generalConfig.isAlt()) {
+            ServerSwitchTask.onServerJoinTask(() -> {
+                if (dataStorage != null) {
+                    if (checkPTUpdateExecution != null) checkPTUpdateExecution.cancel(true);
+                    if (dataStorage.isInSkyblock()) {
+                        checkPTUpdateExecution = executionService.scheduleWithFixedDelay(this::checkUpdate, dataStorage.getIsland().getDelayPTCheckTime(), 2, TimeUnit.SECONDS);
+                    }
+                    if (addonManager != null)
+                        addonManager.broadcastToAllAddons(new SendLobbyData(dataStorage, null, funConfig.lowPlaytimeHelperJoinDate));
+                    if (dataStorage.getIsland()!=null && dataStorage.getIsland().isPersonalIsland())
+                        if (Islands.getPlaytimeUpdate(dataStorage.serverId) == null)
+                            Islands.putPlaytimeUpdate(dataStorage.serverId, funConfig.lowPlaytimeHelperJoinDate);
+                }
+            }, true);
+        }
+        else {
+            ServerSwitchTask.onServerJoinTask(() -> {
+                if (dataStorage.isInSkyblock() || EnvironmentCore.utils.getCurrentIsland() != null) {
+                    Instant baseTime = Islands.getPlaytimeUpdate(dataStorage.serverId);
+                    long waitTime;
+                    if (baseTime != null)
+                        waitTime = Duration.between(Instant.now(), baseTime.plusSeconds(53)).getSeconds();
+                    else waitTime = 53L;
+                    futureServerLeave = executionService.schedule(BBsentials::doLeaveTask, waitTime, TimeUnit.SECONDS);
+                }
+            }, true);
+        }
+        executionService.execute(() -> {
+            while (!client.isFinishedLoading()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
             }
+            onFullyLaunched();
         });
+    }
+
+    private void onFullyLaunched() {
+        if (visualConfig.doGammaOverride) {
+            new Options().setGamma(10);
+        }
+        if (developerConfig.quickLaunch) {
+            MinecraftClient.getInstance().execute(this::joinHypixel);
+        }
+        if (EnvironmentCore.utils.getUsername().toLowerCase().equals("p0is")) {
+            funConfig.hub17To29Troll = true;
+        }
+    }
+
+    private void checkUpdate() {
+        if (dataStorage.getIsland() == Islands.DUNGEON) {
+            PlayerAbilities abilities = MinecraftClient.getInstance().player.getAbilities();
+            if (abilities != null && abilities.allowFlying) return;
+        }
+        if (temporaryConfig.playTimeInMinutes == null || temporaryConfig.lastPlaytimeUpdate == null) {
+            sender.addImmediateSendTask("/playtime");
+        }
+        //When a new time is there this will be updated...
+        else if (temporaryConfig.lastPlaytimeUpdate.plusSeconds(55).isBefore(Instant.now())) {
+            sender.addImmediateSendTask("/playtime");
+        }
     }
 
     public int createWaypointFromCommandContext(CommandContext context) {
@@ -705,6 +856,43 @@ public class ModInitialiser implements ClientModInitializer {
         ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
 
         ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
-        sender.addSendTask("/skyblock", 3.5);
     }
+
+    private int warp(TravelEnums value) {
+        TravelEnums currentGoal = BBsentials.goToGoal;
+        if (BBsentials.generalConfig.isAlt()) {
+            Chat.sendPrivateMessageToSelfInfo("Alt Insta Warp");
+            BBsentials.sender.addImmediateSendTask("/warp " + value.getTravelArgument());
+        }
+        else {
+            boolean previousWarpable = false;
+            if (dataStorage.getIsland() != null) previousWarpable = BBsentials.dataStorage.getIsland().canBeWarpedIn();
+            Islands island = Islands.getFromTravel(value);
+            if (dataStorage.getIsland() == value.getIsland()) {
+                Chat.sendPrivateMessageToSelfInfo("island intern warp detected. current: %s".formatted(dataStorage.getIsland().getDisplayName()));
+                BBsentials.sender.addImmediateSendTask("/warp " + value.getTravelArgument());
+                BBsentials.goToGoal = value;
+                Chat.sendPrivateMessageToSelfSuccess("Warping and setting new standard location");
+            }
+            else if (!island.canBeWarpedIn()) {
+                if (!island.isTravelSafe()) {
+                    Chat.sendPrivateMessageToSelfError("Cancelled Travel Since the Island (%s) is not safe to visit since it was not unloaded for long enough to be safe.".formatted(island.getDisplayName()));
+                    return 0;
+                }
+                goToGoal = value;
+                BBsentials.onDoJoinTask();
+                addonManager.broadcastToAllAddons(new SetGoToIsland(value));
+                sender.addSendTask("/p warp", 5.5);
+            }
+            else {
+                if (!previousWarpable && partyConfig.isPartyLeader) sender.addImmediateSendTask("/p transfer " + generalConfig.getAltName());
+                Chat.sendPrivateMessageToSelfInfo("Will warp you too " + value.getTravelArgument() + " as next goal.");
+                BBsentials.goToGoal = value;
+                BBsentials.addonManager.broadcastToAllAddons(new SetGoToIsland(value));
+            }
+        }
+        return 1;
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package de.hype.bbsentials.client.common.client;
 
+import com.google.gson.annotations.Expose;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Sender;
 import de.hype.bbsentials.client.common.client.commands.Commands;
@@ -15,6 +16,7 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.constants.TravelEnums;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import io.github.moulberry.repo.NEURepositoryException;
 
@@ -68,6 +70,15 @@ public class BBsentials {
     public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
     public static NeuRepoManager neuRepoManager;
+    @Expose(serialize = false, deserialize = false)
+    public static TravelEnums goToGoal;
+    public static Runnable leaveTaskLowPlaytime = null;
+    public static boolean pauseWarping;
+    public static BBDataStorage altDataStorage;
+    public static Instant altLastplaytimeUpdate;
+    private static volatile ScheduledFuture<?> futureServerJoin;
+    private static volatile boolean futureServerJoinRunning;
+    public static volatile ScheduledFuture<?> futureServerLeave;
 
     static {
         try {
@@ -76,9 +87,6 @@ public class BBsentials {
             throw new RuntimeException(e);
         }
     }
-
-    private static volatile ScheduledFuture<?> futureServerJoin;
-    private static volatile boolean futureServerJoinRunning;
 
     public static void connectToBBserver() {
         connectToBBserver(bbServerConfig.connectToBeta);
@@ -133,7 +141,7 @@ public class BBsentials {
         futureServerJoin = executionService.schedule(() -> {
             futureServerJoinRunning = true;
             onServerJoin.values().removeIf(value -> {
-                BBsentials.executionService.execute(()->{
+                BBsentials.executionService.execute(() -> {
                     try {
                         value.run();
                     } catch (Exception e) {
@@ -150,7 +158,7 @@ public class BBsentials {
 
     public static void onServerLeave() {
         onServerLeave.values().removeIf(value -> {
-            BBsentials.executionService.execute(()->{
+            BBsentials.executionService.execute(() -> {
                 try {
                     value.run();
                 } catch (Exception e) {
@@ -214,29 +222,6 @@ public class BBsentials {
             ServerSwitchTask.onServerLeaveTask(() -> {
                 BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
             }, true);
-            ServerSwitchTask.onServerJoinTask(() -> {
-                if (funConfig.lowPlaytimeHelperJoinDate == null) return;
-                long baseTimeAlready = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
-                String serverId = EnvironmentCore.utils.getServerId();
-                executionService.schedule(() -> {
-                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
-                        long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
-                        if (currentTimeInLobby < 47 && currentTimeInLobby > 43) {
-                            EnvironmentCore.utils.playsound("entity.horse.death");
-                            Chat.sendPrivateMessageToSelfError("45 Seconds over");
-                        }
-                    }
-                }, 45 - baseTimeAlready, TimeUnit.SECONDS);
-                executionService.schedule(() -> {
-                    if (serverId.equals(EnvironmentCore.utils.getServerId())) {
-                        long currentTimeInLobby = Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond();
-                        if (currentTimeInLobby < 52 && currentTimeInLobby > 48) {
-                            EnvironmentCore.utils.playsound("entity.horse.death");
-                            Chat.sendPrivateMessageToSelfError("50 Seconds over");
-                        }
-                    }
-                }, 50 - baseTimeAlready, TimeUnit.SECONDS);
-            }, true);
         }
         hpModAPICore = new HypixelModAPICore();
         EnvironmentCore.utils.registerNetworkHandlers();
@@ -257,5 +242,56 @@ public class BBsentials {
         }
 
         return result.toString();
+    }
+
+    public static void onDoJoinTask() {
+        try {
+            if (BBsentials.pauseWarping) return;
+            if (!goToGoal.getIsland().canBeWarpedIn()) {
+                if (goToGoal != TravelEnums.dungeon)
+                    sender.addImmediateSendTask("/warp " + goToGoal.getTravelArgument());
+            }
+            if (!goToGoal.isDefaultSpawn()) {
+                sender.addSendTask("/warp " + goToGoal.getTravelArgument(), 2.5);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static void doLeaveTask() {
+        try {
+            if (!BBsentials.dataStorage.isInSkyblock()) return;
+            Islands currentIsland = EnvironmentCore.utils.getCurrentIsland();
+            try {
+                if (goToGoal != null && !goToGoal.getIsland().canBeWarpedIn()) {
+                    if (goToGoal == TravelEnums.dungeon) {
+                        currentIsland.getExitRunnable().run();
+                    }
+                    else if (goToGoal.getIsland() != currentIsland) {
+                        if (!BBsentials.dataStorage.isInSkyblock()) {
+                            Chat.sendPrivateMessageToSelfError("Did not do leave task because not in a Skyblock Lobby");
+                            return;
+                        }
+                        sender.addImmediateSendTask("/warp " + goToGoal.getTravelArgument());
+                        if (futureServerLeave != null) futureServerLeave.cancel(false);
+                        futureServerLeave = executionService.schedule(BBsentials::doLeaveTask, 53, TimeUnit.SECONDS);
+                        sender.addSendTask("/p warp", 5);
+                        if (partyConfig.isPartyLeader) sender.addSendTask("/p transfer " + BBsentials.generalConfig.getAltName(), 5);
+                    }
+                    else {
+                        currentIsland.getExitRunnable().run();
+                    }
+                }
+                else {
+                    currentIsland.getExitRunnable().run();
+                }
+            } catch (Exception e) {
+                Chat.sendPrivateMessageToSelfError("ERROR!");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -20,7 +20,7 @@ legacy_mixin_processor = "0.8.5-SNAPSHOT"
 modmenu = "10.0.0-beta.1"
 cloth = "14.0.126"
 
-devauth = "1.1.2"
+devauth = "latest.release"
 
 moulconfig = "2.5.0"
 javaVersion = "21"

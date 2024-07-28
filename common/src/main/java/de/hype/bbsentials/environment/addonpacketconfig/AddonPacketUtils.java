@@ -5,6 +5,7 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.CustomGson;
 import de.hype.bbsentials.client.common.client.socketAddons.AddonHandler;
+import de.hype.bbsentials.shared.packets.addonpacket.ReceivedPublicChatMessageAddonPacket;
 
 import java.util.function.Consumer;
 
@@ -18,7 +19,7 @@ public class AddonPacketUtils {
 
     public static <T extends AbstractAddonPacket> void tryToProcessPacket(AddonPacket<T> addonPacket, String rawJson) {
         Class<T> clazz = addonPacket.getClazz();
-        Consumer<T> consumer = addonPacket.getConsumer();
+           Consumer<T> consumer = addonPacket.getConsumer();
         T abstractPacket = gson.fromJson(rawJson.replace("/n", "\n"), clazz);
         consumer.accept(abstractPacket);
     }
@@ -75,7 +76,7 @@ public class AddonPacketUtils {
         for (AddonPacket<? extends AbstractAddonPacket> addonPacket : manager.getPackets()) {
             if (!packetName.equals(addonPacket.getClazz().getSimpleName())) continue;
             try {
-                if (BBsentials.socketAddonConfig.addonDebug)
+                if (BBsentials.socketAddonConfig.addonDebug && !packetName.equals(ReceivedPublicChatMessageAddonPacket.class.getSimpleName()))
                     Chat.sendPrivateMessageToSelfDebug(packetName + ":" + rawJson);
                 tryToProcessPacket(addonPacket, rawJson);
                 return true;

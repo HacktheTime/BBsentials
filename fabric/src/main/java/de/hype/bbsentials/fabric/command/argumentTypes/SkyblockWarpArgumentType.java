@@ -10,14 +10,16 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.NeuRepoManager;
 import io.github.moulberry.repo.constants.Islands;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class SkyblockWarpArgumentType implements ArgumentType<String> {
-    private static final List<String> warps = BBsentials.neuRepoManager.getWarps().stream().map(Islands.Warp::getWarp).toList();
+    private static final List<String> warps = new ArrayList<>(BBsentials.neuRepoManager.getWarps().stream().map(Islands.Warp::getWarp).toList());
 
     private SkyblockWarpArgumentType() {
+        warps.add("floordungeon");
     }
 
     public static SkyblockWarpArgumentType warptype() {
@@ -36,14 +38,18 @@ public class SkyblockWarpArgumentType implements ArgumentType<String> {
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         String current = builder.getRemainingLowerCase();
-        if (!current.isEmpty()) {
-            warps.parallelStream().forEach(v -> {
-                if (v.toLowerCase().contains(current)) builder.suggest(v);
-            });
-        }else {
-            for (String materialId : warps) {
-                builder.suggest(materialId);
+        try {
+            if (!current.isEmpty()) {
+                warps.parallelStream().forEach(v -> {
+                    if (v.toLowerCase().contains(current)) builder.suggest(v);
+                });
+            }else {
+                for (String materialId : warps) {
+                    builder.suggest(materialId);
+                }
             }
+        }catch (Exception e){
+
         }
         try {
             return builder.buildFuture();

@@ -63,6 +63,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
@@ -528,13 +529,39 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        else if (BBsentials.funConfig.lowPlayTimeHelpers && BBsentials.funConfig.lowPlaytimeHelperJoinDate != null) {
-            long differece = ((Instant.now().getEpochSecond() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
-            String colorCode = "§a";
-            if (differece > 50) colorCode = "§4§l";
-            else if (differece > 45) colorCode = "§4";
-            else if (differece > 40) colorCode = "§6";
-            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
+        else if (BBsentials.funConfig.lowPlayTimeHelpers) {
+            Instant lastPlaytimeUpdate = BBsentials.temporaryConfig.lastPlaytimeUpdate;
+            Instant serverJoinTime = BBsentials.funConfig.lowPlaytimeHelperJoinDate;
+            if (serverJoinTime != null) {
+                String tillNextUpdate;
+                if (BBsentials.generalConfig.isAlt()) {
+                    if (!BBsentials.dataStorage.isInSkyblock()) {
+                        tillNextUpdate = "";
+                    }
+                    else if (lastPlaytimeUpdate != null)
+                        tillNextUpdate = "§r | EPTU: %s".formatted(String.valueOf(Duration.between(Instant.now(), lastPlaytimeUpdate.plusSeconds(61)).getSeconds()));
+                    else {
+                        tillNextUpdate = "§r | EPTU: <%s".formatted(Duration.between(Instant.now(), BBsentials.funConfig.lowPlaytimeHelperJoinDate.plusSeconds(61)).getSeconds());
+                    }
+                }
+                else {
+                    if (!BBsentials.dataStorage.isInSkyblock()) {
+                        tillNextUpdate = "";
+                    }else {
+                        Instant ptUpdateTimeBase = Islands.getPlaytimeUpdate(BBsentials.dataStorage.serverId);
+                        if (ptUpdateTimeBase != null) ptUpdateTimeBase = ptUpdateTimeBase.plusSeconds(61);
+                        else ptUpdateTimeBase = BBsentials.funConfig.lowPlaytimeHelperJoinDate.plusSeconds(61);
+                        tillNextUpdate = "§r | EPTU: %s".formatted(String.valueOf(Duration.between(Instant.now(), ptUpdateTimeBase).getSeconds()));
+                    }
+                }
+                long differece = Duration.between(serverJoinTime, Instant.now()).getSeconds();
+                String colorCode = "§a";
+                if (differece > 50) colorCode = "§4§l";
+                else if (differece > 45) colorCode = "§4";
+                else if (differece > 40) colorCode = "§6";
+                String eptu;
+                drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("%sTime in Lobby: %s s%s".formatted(colorCode, differece, tillNextUpdate)), 10, 10, 0xFFFFFF, true);
+            }
         }
         if (ModInitialiser.tutorialManager.current != null) {
             TutorialManager manager = ModInitialiser.tutorialManager;
@@ -551,6 +578,19 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                     drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(node.getDescriptionString()), 10, 40, 0xFFFFFF, true);
                 }
             }
+        }
+        try {
+            if (!BBsentials.addonManager.isConnected()) {
+                drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("§4§lWARNING NOT CONNECTED TO ALT!"), 10, 30, 0xFFFFFF, true);
+            }
+        } catch (Exception ignored) {
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("§4§lWARNING NOT CONNECTED TO ALT!"), 10, 30, 0xFFFFFF, true);
+        }
+        if (BBsentials.pauseWarping) {
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("§4§lWARPING IS CURRENTLY PAUSED!"), 10, 40, 0xFFFFFF, true);
+        }
+        if (BBsentials.goToGoal != null) {
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Goto goal: §a%s".formatted(BBsentials.goToGoal.getTravelArgument())), 10, 50, 0xFFFFFF, true);
         }
     }
 

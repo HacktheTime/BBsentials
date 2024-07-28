@@ -35,8 +35,16 @@ public class AddonPacketManager {
         addonPackets.add(new AddonPacket<>(WaypointAddonPacket.class, connection::onWaypointAddonPacket));
         addonPackets.add(new AddonPacket<>(GetWaypointsAddonPacket.class, connection::onGetWaypointsAddonPacket));
         addonPackets.add(new AddonPacket<>(ClientCommandAddonPacket.class, connection::onClientCommandAddonPacket));
-//        addonPackets.add(new AddonPacket<>(ReceivedPublicChatMessageAddonPacket.class, connection::onReceivedPublicChatMessageAddonPacket));
+        addonPackets.add(new AddonPacket<>(ReceivedPublicChatMessageAddonPacket.class, connection::onReceivedPublicChatMessageAddonPacket));
         addonPackets.add(new AddonPacket<>(StatusUpdateAddonPacket.class, connection::onStatusUpdateAddonPacket));
+        addonPackets.add(new AddonPacket<>(ShareUpdateTime.class, connection::onShareUpdateTime));
+        addonPackets.add(new AddonPacket<>(RequestUpdateTime.class, connection::onRequestUpdateTime));
+        addonPackets.add(new AddonPacket<>(RequestLobbyData.class, connection::onRequestLobbyData));
+        addonPackets.add(new AddonPacket<>(SendLobbyData.class, connection::onSendLobbyData));
+        addonPackets.add(new AddonPacket<>(PlayTimeUpdatedPacket.class, connection::onPlayTimeUpdated));
+        addonPackets.add(new AddonPacket<>(SetGoToIsland.class, connection::onSetGoToIsland));
+        addonPackets.add(new AddonPacket<>(PausePacket.class, connection::onPausePacket));
+
 
 
     }

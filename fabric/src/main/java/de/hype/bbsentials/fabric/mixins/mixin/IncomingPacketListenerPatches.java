@@ -63,6 +63,7 @@ public abstract class IncomingPacketListenerPatches {
     private void BBsentials$onSendCommand(String command, CallbackInfoReturnable<Boolean> cir) {
         if (BBCommandDispatcher.executeCommand(command)) {
             cir.setReturnValue(true);
+            cir.cancel();
         }
     }
 

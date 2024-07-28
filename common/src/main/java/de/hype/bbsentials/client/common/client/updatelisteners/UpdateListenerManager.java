@@ -110,4 +110,10 @@ public class UpdateListenerManager {
         return false;
     }
 
+    public static void resetListeners() {
+        if (splashStatusUpdateListener != null) splashStatusUpdateListener.isInLobby.set(false);
+        splashStatusUpdateListener = new SplashStatusUpdateListener(null);
+        if (chChestUpdateListener != null) chChestUpdateListener.isInLobby.set(false);
+        chChestUpdateListener = new ChChestUpdateListener(null);
+    }
 }

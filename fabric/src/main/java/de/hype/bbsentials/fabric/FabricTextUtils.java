@@ -3,40 +3,57 @@ package de.hype.bbsentials.fabric;
 import de.hype.bbsentials.client.common.mclibraries.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 
 public class FabricTextUtils implements TextUtils {
+    public static String textToJson(Text text) {
+        World world = MinecraftClient.getInstance().world;
+        if (world == null) return null;
+        return Text.Serialization.toJsonString(text, world.getRegistryManager());
+    }
+
+    public static Text jsonToText(String textJson) {
+        World world = MinecraftClient.getInstance().world;
+        if (world == null) return null;
+        return Text.Serialization.fromJson(textJson, world.getRegistryManager());
+    }
+
+    /**
+     * The opposite method serializes or deserializes automatically dependent on the input
+     */
+    public static String opposite(Text text) {
+        World world = MinecraftClient.getInstance().world;
+        if (world == null) return null;
+        return Text.Serialization.toJsonString(text, world.getRegistryManager());
+    }
+
+    /**
+     * The opposite method serializes or deserializes automatically dependent on the input
+     */
+    public static Text opposite(String textJson) {
+        World world= MinecraftClient.getInstance().world;
+        if (world==null) return null;
+        return Text.Serialization.fromJson(textJson, world.getRegistryManager());
+    }
+
+    public static String literalJson(String literal) {
+        return textToJson(Text.literal(literal));
+    }
+
+    @Override
+    public de.hype.bbsentials.client.common.mclibraries.interfaces.Text createText(String content) {
+        return new de.hype.bbsentials.fabric.Text(Text.literal(content));
+    }
+
     @Override
     public String getContentFromJson(String json) {
-        return Text.Serialization.fromJson(json, MinecraftClient.getInstance().world.getRegistryManager()).getString();
+        World world= MinecraftClient.getInstance().world;
+        if (world==null) return null;
+        return Text.Serialization.fromJson(json, world.getRegistryManager()).getString();
     }
 
     @Override
     public String getJsonFromContent(String content) {
         return Text.Serialization.toJsonString(Text.of(content), MinecraftClient.getInstance().world.getRegistryManager());
-   }
-
-   public static String textToJson(Text text){
-        return Text.Serialization.toJsonString(text,MinecraftClient.getInstance().world.getRegistryManager());
-   }
-
-    public static Text jsonToText(String textJson){
-        return Text.Serialization.fromJson(textJson,MinecraftClient.getInstance().world.getRegistryManager());
-    }
-
-    /**
-     * The opposite method serializes or deserializes automatically dependent on the input
-     */
-    public static String opposite(Text text){
-        return Text.Serialization.toJsonString(text,MinecraftClient.getInstance().world.getRegistryManager());
-    }
-    /**
-     * The opposite method serializes or deserializes automatically dependent on the input
-     */
-    public static Text opposite(String textJson){
-        return Text.Serialization.fromJson(textJson,MinecraftClient.getInstance().world.getRegistryManager());
-    }
-
-    public static String literalJson(String literal){
-        return textToJson(Text.literal(literal));
     }
 }

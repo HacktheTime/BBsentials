@@ -19,15 +19,13 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 @Mixin(ClientCommandSource.class)
 public abstract class ClientCommandSourceMixin<S> implements CommandSource {
+    @Final
     @Shadow
-    private final ClientPlayNetworkHandler networkHandler;
-    private final MinecraftClient client;
+    private ClientPlayNetworkHandler networkHandler;
     @Final
     private List<PlayerListEntry> playerList;
 
     public ClientCommandSourceMixin(ClientPlayNetworkHandler networkHandler) {
-        this.networkHandler = networkHandler;
-        this.client = MinecraftClient.getInstance();
     }
 
     /**

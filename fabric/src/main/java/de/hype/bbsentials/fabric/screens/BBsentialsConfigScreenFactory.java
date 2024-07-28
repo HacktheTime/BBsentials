@@ -200,6 +200,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Will add a waypoint if you are in a splashlobby of where splash is going to be."))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.addSplashWaypoint = newValue)
                     .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Infinite Chat History"), BBsentials.visualConfig.infiniteChatHistory)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Will remove Minecraft Artificial 100 lines limit."))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.infiniteChatHistory = newValue)
+                    .build());
             visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Position as Item Count"), BBsentials.visualConfig.waypointDefaultWithTracer)
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Will show your leaderboard postion for the community goals as item count"))

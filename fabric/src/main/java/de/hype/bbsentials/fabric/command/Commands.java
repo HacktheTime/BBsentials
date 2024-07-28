@@ -1,5 +1,8 @@
 package de.hype.bbsentials.fabric.command;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -11,10 +14,12 @@ import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerMan
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
-import de.hype.bbsentials.shared.constants.*;
+import de.hype.bbsentials.shared.constants.ChChestItem;
+import de.hype.bbsentials.shared.constants.ChChestItems;
+import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.constants.MiningEvents;
 import de.hype.bbsentials.shared.objects.*;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
-import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.BingoChatMessagePacket;
 import de.hype.bbsentials.shared.packets.network.BroadcastMessagePacket;
@@ -26,6 +31,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -116,22 +122,7 @@ public class Commands implements MCCommand {
                                                                 BlockPos pos = CBlockPosArgument.getBlockPos((CommandContext<FabricClientCommandSource>) (Object) context, "coordinates");
                                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                 String extraMessage = StringArgumentType.getString(context, "extraMessage");
-
-                                                                if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
-                                                                    context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
-                                                                    return 1;
-                                                                }
-                                                                if (!BBsentials.partyConfig.allowServerPartyInvite) {
-                                                                    Chat.sendPrivateMessageToSelfImportantInfo("Enabled Server Party invites temporarily. Will be disabled on Server swap");
-                                                                    BBsentials.partyConfig.allowServerPartyInvite = true;
-                                                                    ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowServerPartyInvite = false);
-                                                                }
-                                                                if (!BBsentials.partyConfig.allowBBinviteMe && contactWay.contains("bb:party me")) {
-                                                                    Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap");
-                                                                    BBsentials.partyConfig.allowBBinviteMe = true;
-                                                                    ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
-                                                                }
-                                                                sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, extraMessage, StatusConstants.OPEN)));
+                                                                BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, extraMessage);
                                                                 return 1;
                                                             }
                                                     )
@@ -140,11 +131,7 @@ public class Commands implements MCCommand {
                                                         String item = StringArgumentType.getString(context, "Item");
                                                         BlockPos pos = CBlockPosArgument.getBlockPos((CommandContext<FabricClientCommandSource>) (Object) context, "coordinates");
                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
-                                                        if (EnvironmentCore.utils.getLobbyTime() >= 408000) {
-                                                            context.getSource().sendError(Text.of("§cThis lobby is already closed and no one can be warped in!"));
-                                                            return 1;
-                                                        }
-                                                        sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")))), EnvironmentCore.utils.getServerId(), contactWay, "", StatusConstants.OPEN)));
+                                                        BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, "");
                                                         return 1;
                                                     }
                                             )
@@ -208,98 +195,98 @@ public class Commands implements MCCommand {
                                         })
                                 )
                 );/*bAnnounce*/
-                dispatcher.register(literal("punish")
-                        .then(literal("ban")
-                                .then(argument("userId/mcusername", StringArgumentType.string())
-                                        .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                                .then(argument("reason", StringArgumentType.greedyString())
-                                                        .executes((context) -> {
-                                                            String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                            String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
-                                                            String reason = StringArgumentType.getString(context, "reason");
-                                                            int userId = -1;
-                                                            String mcusername = "";
-                                                            try {
-                                                                userId = Integer.parseInt(identification);
-                                                            } catch (Exception e) {
-                                                                mcusername = identification;
-                                                            }
-
-                                                            Date till;
-                                                            try {
-                                                                till = PunishmentData.getTillDateFromDurationString(duration);
-                                                            } catch (Exception e) {
-                                                                Chat.sendPrivateMessageToSelfError(e.getMessage());
-                                                                return 0;
-                                                            }
-                                                            sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BAN, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                )
-                        )
-                        .then(literal("mute")
-                                .then(argument("userId/mcusername", StringArgumentType.string())
-                                        .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                                .then(argument("reason", StringArgumentType.greedyString())
-                                                        .executes((context) -> {
-                                                            String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                            String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
-                                                            String reason = StringArgumentType.getString(context, "reason");
-                                                            int userId = -1;
-                                                            String mcusername = "";
-                                                            try {
-                                                                userId = Integer.parseInt(identification);
-                                                            } catch (Exception e) {
-                                                                mcusername = identification;
-                                                            }
-
-                                                            Date till;
-                                                            try {
-                                                                till = PunishmentData.getTillDateFromDurationString(duration);
-                                                            } catch (Exception e) {
-                                                                Chat.sendPrivateMessageToSelfError(e.getMessage());
-                                                                return 0;
-                                                            }
-                                                            sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.MUTE, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                )
-                        )
-                        .then(literal("blacklist")
-                                .then(argument("userId/mcusername", StringArgumentType.string())
-                                        .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
-                                                .then(argument("reason", StringArgumentType.greedyString())
-                                                        .executes((context) -> {
-                                                            String identification = StringArgumentType.getString(context, "userId/mcusername");
-                                                            String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
-                                                            String reason = StringArgumentType.getString(context, "reason");
-                                                            int userId = -1;
-                                                            String mcusername = "";
-                                                            try {
-                                                                userId = Integer.parseInt(identification);
-                                                            } catch (Exception e) {
-                                                                mcusername = identification;
-                                                            }
-
-                                                            Date till;
-                                                            try {
-                                                                till = PunishmentData.getTillDateFromDurationString(duration);
-                                                            } catch (Exception e) {
-                                                                Chat.sendPrivateMessageToSelfError(e.getMessage());
-                                                                return 0;
-                                                            }
-                                                            sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BLACKLIST, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                )
-                        )
-                );/*bpunish*/
+//                dispatcher.register(literal("punish")
+//                        .then(literal("ban")
+//                                .then(argument("userId/mcusername", StringArgumentType.string())
+//                                        .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+//                                                .then(argument("reason", StringArgumentType.greedyString())
+//                                                        .executes((context) -> {
+//                                                            String identification = StringArgumentType.getString(context, "userId/mcusername");
+//                                                            String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
+//                                                            String reason = StringArgumentType.getString(context, "reason");
+//                                                            int userId = -1;
+//                                                            String mcusername = "";
+//                                                            try {
+//                                                                userId = Integer.parseInt(identification);
+//                                                            } catch (Exception e) {
+//                                                                mcusername = identification;
+//                                                            }
+//
+//                                                            Date till;
+//                                                            try {
+//                                                                till = PunishmentData.getTillDateFromDurationString(duration);
+//                                                            } catch (Exception e) {
+//                                                                Chat.sendPrivateMessageToSelfError(e.getMessage());
+//                                                                return 0;
+//                                                            }
+//                                                            sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BAN, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
+//                                                            return 1;
+//                                                        })
+//                                                )
+//                                        )
+//                                )
+//                        )
+//                        .then(literal("mute")
+//                                .then(argument("userId/mcusername", StringArgumentType.string())
+//                                        .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+//                                                .then(argument("reason", StringArgumentType.greedyString())
+//                                                        .executes((context) -> {
+//                                                            String identification = StringArgumentType.getString(context, "userId/mcusername");
+//                                                            String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
+//                                                            String reason = StringArgumentType.getString(context, "reason");
+//                                                            int userId = -1;
+//                                                            String mcusername = "";
+//                                                            try {
+//                                                                userId = Integer.parseInt(identification);
+//                                                            } catch (Exception e) {
+//                                                                mcusername = identification;
+//                                                            }
+//
+//                                                            Date till;
+//                                                            try {
+//                                                                till = PunishmentData.getTillDateFromDurationString(duration);
+//                                                            } catch (Exception e) {
+//                                                                Chat.sendPrivateMessageToSelfError(e.getMessage());
+//                                                                return 0;
+//                                                            }
+//                                                            sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.MUTE, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
+//                                                            return 1;
+//                                                        })
+//                                                )
+//                                        )
+//                                )
+//                        )
+//                        .then(literal("blacklist")
+//                                .then(argument("userId/mcusername", StringArgumentType.string())
+//                                        .then(argument("[Duration(d/h/m/s) | 0 forever]", StringArgumentType.string())
+//                                                .then(argument("reason", StringArgumentType.greedyString())
+//                                                        .executes((context) -> {
+//                                                            String identification = StringArgumentType.getString(context, "userId/mcusername");
+//                                                            String duration = StringArgumentType.getString(context, "[Duration(d/h/m/s) | 0 forever]");
+//                                                            String reason = StringArgumentType.getString(context, "reason");
+//                                                            int userId = -1;
+//                                                            String mcusername = "";
+//                                                            try {
+//                                                                userId = Integer.parseInt(identification);
+//                                                            } catch (Exception e) {
+//                                                                mcusername = identification;
+//                                                            }
+//
+//                                                            Date till;
+//                                                            try {
+//                                                                till = PunishmentData.getTillDateFromDurationString(duration);
+//                                                            } catch (Exception e) {
+//                                                                Chat.sendPrivateMessageToSelfError(e.getMessage());
+//                                                                return 0;
+//                                                            }
+//                                                            sendPacket(new PunishUserPacket(PunishmentData.clientDefaultSetup(PunishmentData.Type.BLACKLIST, userId, APIUtils.getMcUUIDbyUsername(mcusername), till, reason)));
+//                                                            return 1;
+//                                                        })
+//                                                )
+//                                        )
+//                                )
+//                        )
+//                );/*bpunish*/
 
                 dispatcher.register(literal("bgetinfo")
                         .then(argument("userId/mcusername", StringArgumentType.string())

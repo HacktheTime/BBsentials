@@ -2,7 +2,6 @@ package de.hype.bbsentials.fabric;
 
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
@@ -15,13 +14,13 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Collection;
 import java.util.List;
@@ -117,7 +116,7 @@ public class DebugThread extends de.hype.bbsentials.client.common.client.DebugTh
             if (timerSinceLastTick.get() > 20 && MinecraftClient.getInstance().currentScreen == null) {
                 timerSinceLastTick.set(0);
 //                    Chat.sendPrivateMessageToSelfInfo("Cursor unlocked");
-                unlockCursor();
+                GLFW.glfwSetInputMode(MinecraftClient.getInstance().getWindow().getHandle(), 208897, 212993);
             }
 
         }, 100, 100, TimeUnit.MILLISECONDS);

@@ -6,6 +6,8 @@
 THIS MOD IS NOT AFFILIATED WITH BINGO BREWERS ANYMORE since indigo had a problem with me focusing
 on 1.20 and refusing to collaborate with me on request.
 
+If you want to see the Features look at: the FEATURES.md file
+
 The mod is available on modrinth https://modrinth.com/mod/bbsentials
 
 If you want to see the Features look at: the FEATURES.md file

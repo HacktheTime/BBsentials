@@ -1,12 +1,8 @@
 package de.hype.bbsentials.fabric.objects;
 // Credits go to nea89o for this (Firmanent)!
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Position;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +25,7 @@ public class WorldRenderLastEvent
     }
 
     public final MatrixStack matrices;
-    public final float tickDelta;
+    public final RenderTickCounter tickCounter;
     public final boolean renderBlockOutline;
     public final Camera camera;
     public final GameRenderer gameRenderer;
@@ -38,11 +34,11 @@ public class WorldRenderLastEvent
 
     public final List<TextRenderCall> toRender = new ArrayList<>();
 
-    public WorldRenderLastEvent(MatrixStack matrices, float tickDelta, boolean renderBlockOutline, Camera camera,
+    public WorldRenderLastEvent(MatrixStack matrices, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera,
                                 GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
                                 VertexConsumerProvider.Immediate vertexConsumers) {
         this.matrices = matrices;
-        this.tickDelta = tickDelta;
+        this.tickCounter = tickCounter;
         this.renderBlockOutline = renderBlockOutline;
         this.camera = camera;
         this.gameRenderer = gameRenderer;

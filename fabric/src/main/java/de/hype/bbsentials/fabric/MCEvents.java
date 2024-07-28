@@ -40,7 +40,7 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
 
     public void registerOverlays() {
         utils = (Utils) EnvironmentCore.utils;
-        HudRenderCallback.EVENT.register((obj1, obj2) -> utils.renderOverlays(obj1, obj2));
+        HudRenderCallback.EVENT.register((matrixStack, delta) -> utils.renderOverlays(matrixStack, delta));
     }
 
     @Override
@@ -73,24 +73,36 @@ public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MC
                         //is it open already? if so ignore cause not new
                         boolean alreadyOpened = access.BBsentials$isOpen();
                         //schedule to check after processing to allow detecting whether chest is now opened → just opened
+//                        BBsentials.executionService.schedule(() -> {
+//                            if (!(world.getBlockEntity(blockPos) instanceof ChestBlockEntity)) return;
+//                            if (!access.BBsentials$isOpen() || alreadyOpened) return;
+//                            BBsentials.executionService.schedule(() -> {
+//                                //Check whether it still exists → filter for the powder chest with unfortunate timing
+//                                if (!(world.getBlockEntity(blockPos) instanceof ChestBlockEntity)) return;
+//                                Set<ChChestItem> items = BBsentials.temporaryConfig.chestParts;
+//                                items.clear();
+//                                BBsentials.executionService.schedule(() -> {
+////                                    Chat.sendPrivateMessageToSelfDebug("Global Chest Detected");
+//                                    BBsentials.executionService.schedule(() -> {
+//                                        if (BBsentials.temporaryConfig.chestParts.isEmpty()) {
+////                                            Chat.sendPrivateMessageToSelfDebug("Global Chest " + blockPos.toShortString() + ":" + " Nothing of value");
+//                                            return;
+//                                        }
+//                                        Position pos = new Position(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+//                                        Chat.sendPrivateMessageToSelfText(Message.tellraw("{\"text\":\"Global Chest Found ($coords): $items (Click here to announce)\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/chchest \\\"$items\\\" $coords \\\"/msg $username bb:party me\\\" Ⓐ\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"You remain responsible. The detection is not flawless and can be wrong\",\"color\":\"dark_red\"}]}}".replace("$coords", pos.toString()).replace("$username", BBsentials.generalConfig.getUsername()).replace("$items", String.join("2", items.stream().map(ChChestItem::getDisplayName).collect(Collectors.joining(";"))))));
+//                                    }, 2, TimeUnit.SECONDS);
+//                                }, 2, TimeUnit.SECONDS);
+//                            }, 1, TimeUnit.SECONDS);
+//                        }, 1, TimeUnit.SECONDS);
                         BBsentials.executionService.schedule(() -> {
                             if (!(world.getBlockEntity(blockPos) instanceof ChestBlockEntity)) return;
                             if (!access.BBsentials$isOpen() || alreadyOpened) return;
                             BBsentials.executionService.schedule(() -> {
                                 //Check whether it still exists → filter for the powder chest with unfortunate timing
                                 if (!(world.getBlockEntity(blockPos) instanceof ChestBlockEntity)) return;
-                                Set<ChChestItem> items = BBsentials.temporaryConfig.chestParts;
-                                items.clear();
                                 BBsentials.executionService.schedule(() -> {
-//                                    Chat.sendPrivateMessageToSelfDebug("Global Chest Detected");
-                                    BBsentials.executionService.schedule(() -> {
-                                        if (BBsentials.temporaryConfig.chestParts.isEmpty()) {
-//                                            Chat.sendPrivateMessageToSelfDebug("Global Chest " + blockPos.toShortString() + ":" + " Nothing of value");
-                                            return;
-                                        }
-                                        Position pos = new Position(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                                        Chat.sendPrivateMessageToSelfText(Message.tellraw("{\"text\":\"Global Chest Found ($coords): $items (Click here to announce)\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/chchest \\\"$items\\\" $coords \\\"/msg $username bb:party me\\\" Ⓐ\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"You remain responsible. The detection is not flawless and can be wrong\",\"color\":\"dark_red\"}]}}".replace("$coords", pos.toString()).replace("$username", BBsentials.generalConfig.getUsername()).replace("$items", String.join("2", items.stream().map(ChChestItem::getDisplayName).collect(Collectors.joining(";"))))));
-                                    }, 2, TimeUnit.SECONDS);
+                                    if (BBsentials.developerConfig.devMode){Chat.sendPrivateMessageToSelfDebug("Set the Global Chest Blockpos too %s".formatted(blockPos.toString()));}
+                                    BBsentials.temporaryConfig.lastGlobalChchestCoords = new Position(blockPos.getX(),blockPos.getY(),blockPos.getZ());
                                 }, 2, TimeUnit.SECONDS);
                             }, 1, TimeUnit.SECONDS);
                         }, 1, TimeUnit.SECONDS);

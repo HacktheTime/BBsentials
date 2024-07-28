@@ -1,21 +1,16 @@
 package de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces;
 
+import de.hype.bbsentials.client.common.mclibraries.interfaces.Text;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import de.hype.bbsentials.shared.constants.VanillaItems;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 
 public interface ICusomItemDataAccess {
-    List<Text> BBsentialsAll$getItemRenderTooltip();
-
     String BBsentialsAll$getCount();
 
     String BBsentialsAll$getCustomItemTexture();
-
-    Item BBsentialsAll$getRenderAsItem();
 
     void BBsentialsAll$reevaluate();
 
@@ -31,7 +26,34 @@ public interface ICusomItemDataAccess {
     @SuppressWarnings("UnreachableCode")
     void BBsentialsAll$setRenderingDefinition(RenderingDefinitions.RenderStackItemCheck definition, boolean override);
 
-    ItemStack BBsentials$getAsItemStack();
 
     boolean BBsentials$areEqualExtension(ICusomItemDataAccess aRight);
+
+    String getTexturename();
+
+    void setTexturename(String texturename);
+
+    boolean isOverride();
+
+    void setOverride(boolean override);
+
+    boolean isNotInitialised();
+
+    void setNotInitialised(boolean notInitialised);
+
+    List<de.hype.bbsentials.client.common.mclibraries.interfaces.Text> getItemTooltip();
+
+    void setItemTooltip(List<de.hype.bbsentials.client.common.mclibraries.interfaces.Text> value);
+
+    String getItemCountCustom();
+
+    void setItemCountCustom(String itemCountCustom);
+
+    List<Text> getCustomAppliedTooltip();
+
+    VanillaItems getVanillaRenderasItem();
+
+    void setVanillaRenderasItem(VanillaItems renderasItem);
+
 }
+

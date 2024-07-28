@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric.numpad;
 
-import de.hype.bbsentials.client.common.api.Formatting;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.screens.components.IntegerFieldWidget;
 import net.minecraft.client.font.TextRenderer;

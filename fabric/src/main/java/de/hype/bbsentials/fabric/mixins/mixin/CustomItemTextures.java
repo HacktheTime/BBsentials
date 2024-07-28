@@ -27,7 +27,7 @@ public abstract class CustomItemTextures {
         ICusomItemDataAccess data = (((ICusomItemDataAccess) (Object) stack));
         String tpath = data.BBsentialsAll$getCustomItemTexture();
         if (tpath != null) {
-            drawGuiTexture(new Identifier(tpath), x, y, 16, 16);
+            drawGuiTexture(Identifier.of(tpath), x, y, 16, 16);
             ci.cancel();
             return;
         }

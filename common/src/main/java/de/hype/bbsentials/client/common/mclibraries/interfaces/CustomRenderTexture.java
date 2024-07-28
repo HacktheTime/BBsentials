@@ -1,7 +1,5 @@
 package de.hype.bbsentials.client.common.mclibraries.interfaces;
 
-import de.hype.bbsentials.client.common.Text;
-
 import java.util.List;
 import java.util.function.Predicate;
 

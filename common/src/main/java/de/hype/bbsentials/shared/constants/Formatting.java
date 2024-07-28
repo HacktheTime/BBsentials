@@ -1,4 +1,4 @@
-package de.hype.bbsentials.client.common.api;
+package de.hype.bbsentials.shared.constants;
 
 public enum Formatting{
     BLACK("§0"),

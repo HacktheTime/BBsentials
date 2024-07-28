@@ -1,6 +1,6 @@
 package de.hype.bbsentials.client.common.discordintegration;
 
-import de.hype.bbsentials.client.common.api.Formatting;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.LobbyManager;

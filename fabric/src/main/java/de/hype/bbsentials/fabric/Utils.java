@@ -1,6 +1,7 @@
 package de.hype.bbsentials.fabric;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
+import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
@@ -32,6 +33,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
@@ -100,7 +102,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
         if (!waypoints.isEmpty() || ModInitialiser.tutorialManager.current != null) {
             try {
-                RenderInWorldContext.renderInWorld(event, (it) -> {
+                RenderInWorldContext.Companion.renderInWorld(event, (it) -> {
                     Color defaultColor = BBsentials.visualConfig.waypointDefaultColor;
                     if (ModInitialiser.tutorialManager.current != null) {
                         List<CoordinateNode> nodes = ModInitialiser.tutorialManager.current.getCoordinateNodesToRender();
@@ -110,8 +112,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                             it.block(pos);
                             it.color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), 1f);
                             if (i == 0 && !ModInitialiser.tutorialManager.recording) {
-                                Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
-                                it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                                it.tracer(pos.toCenterPos(), 3f);
                             }
                             it.doWaypointIcon(pos.toCenterPos(), new ArrayList<>(), 25, 25);
                         }
@@ -138,7 +139,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
         try {
             if (BBsentials.temporaryConfig.route != null) {
-                RenderInWorldContext.renderInWorld(event, (it) -> {
+                RenderInWorldContext.Companion.renderInWorld(event, (it) -> {
                     RouteNode node = BBsentials.temporaryConfig.route.getCurrentNode();
                     BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
                     BBsentials.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
@@ -239,10 +240,19 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return ((FabricLoaderImpl) FabricLoader.getInstance()).getGameProvider().getRawGameVersion();
     }
 
+    @Override
+    public Instant getLobbyClosingTime() {
+        //(17mc days * 20 min day * 60 to seconds * 20 to ticks) -> 408000 | 1s 1000ms 1000/20 for ms for 1 tick.
+        //(17×20×60×20×50)÷1000 → seconds
+        if (EnvironmentCore.utils.getCurrentIsland() != Islands.CRYSTAL_HOLLOWS) return null;
+        long diffTime = 20400 - ((EnvironmentCore.utils.getLobbyTime() * 50) / 1000);
+        return Instant.now().plusSeconds(diffTime);
+    }
+
     public void playsound(String eventName) {
         if (eventName.isEmpty()) MinecraftClient.getInstance().getSoundManager().stopAll();
         else
-            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(new Identifier(eventName)), 1.0F, 1.0F));
+            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(Identifier.of(eventName)), 1.0F, 1.0F));
     }
 
     public int getPotTime() {
@@ -264,6 +274,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
             try {
                 MinecraftClient.getInstance().getSessionService().joinServer(MinecraftClient.getInstance().getGameProfile().getId(), MinecraftClient.getInstance().getSession().getAccessToken(), serverId);
                 success = true;
+            } catch (InvalidCredentialsException e) {
+                Chat.sendPrivateMessageToSelfError("BB: Error trying to authenticate with Mojang. Either use Key login or restart your game. Session servers may be down too!");
             } catch (AuthenticationException e) {
                 try {
                     Thread.sleep(1000);
@@ -463,7 +475,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         return new ArrayList<>(MinecraftClient.getInstance().getNetworkHandler().getCommandSource().getPlayerNames().stream().toList());
     }
 
-    public void renderOverlays(DrawContext drawContext, float v) {
+    public void renderOverlays(DrawContext drawContext, RenderTickCounter v) {
         if (UpdateListenerManager.splashStatusUpdateListener.showOverlay()) {
             // Set the starting position for the overlay
             int x = 10;
@@ -507,12 +519,17 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                long closingTimeInMinutes = ((408000 - EnvironmentCore.utils.getLobbyTime()) * 50) / 60000;
+                long closingTimeInMinutes = Duration.between(Instant.now(),getLobbyClosingTime()).toMinutes();
                 if (closingTimeInMinutes <= 0) {
                     toRender.add(Text.of("§4Lobby Closed"));
                 }
                 else {
                     toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
+                }
+                for (ChChestData chest : listener.getUnopenedChests()) {
+                    if (chest.finder.equals(BBsentials.generalConfig.getUsername())) continue;
+                    toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.finder)));
+                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
             }
             else {
@@ -662,10 +679,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         Islands island = getCurrentIsland();
         if (island == null) return 100;
         if (island.equals(Islands.HUB)) {
-            if (mega) return 80;
-            else return 24;
+            if (mega) return 81;
+            else return 25;
         }
-        return 24;
+        return 25;
     }
 
     @Override
@@ -734,8 +751,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public static class BBToast implements Toast {
         public static final int DEFAULT_DURATION_MS = 5000;
-        private static final Identifier TEXTURE = new Identifier("toast/advancement");
-        //        private static final Identifier TEXTURE = new Identifier("toast/system");
+        private static final Identifier TEXTURE = Identifier.of("toast/advancement");
+        //        private static final Identifier TEXTURE = Identifier.of("toast/system");
         String title;
         String description;
         Integer displayTime = DEFAULT_DURATION_MS;
@@ -814,10 +831,10 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         }
 
         public enum ToastType {
-            ADVANCEMENT(new Identifier("toast/advancement")),
-            SYSTEM(new Identifier("toast/system")),
-            TUTORIAL(new Identifier("toast/tutorial")),
-            RECIPE(new Identifier("toast/recipe")),
+            ADVANCEMENT(Identifier.of("toast/advancement")),
+            SYSTEM(Identifier.of("toast/system")),
+            TUTORIAL(Identifier.of("toast/tutorial")),
+            RECIPE(Identifier.of("toast/recipe")),
             ;
             private final Identifier id;
 

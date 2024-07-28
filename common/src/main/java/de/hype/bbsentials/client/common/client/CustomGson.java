@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.time.Instant;
 
 public class CustomGson {
     public static Gson ownSerializer = new GsonBuilder().create();
@@ -27,7 +28,7 @@ public class CustomGson {
         return new GsonBuilder()
                 .registerTypeAdapter(Color.class, new ColorSerializer())
                 .registerTypeAdapter(Message.class, new MessageSerializer())
-                .registerTypeAdapter(Instant.class, new InstantSerializer())
+                .registerTypeAdapter(Instant.class,new InstantSerializer())
                 .registerTypeAdapter(ServerType.class, new ServerTypeSerializer())
                 ;
     }

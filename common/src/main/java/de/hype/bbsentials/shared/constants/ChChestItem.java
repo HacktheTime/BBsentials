@@ -57,4 +57,8 @@ public class ChChestItem {
     public boolean hasDisplayPath() {
         return displayPath != null;
     }
+
+    public boolean isPowder() {
+        return displayName.matches(".*Powder");
+    }
 }

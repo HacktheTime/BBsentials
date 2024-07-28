@@ -2,12 +2,12 @@ package de.hype.bbsentials.shared.packets.function;
 
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 
-import java.util.List;
+import java.util.Set;
 
 public class PositionCommunityFeedback extends AbstractPacket {
-    public List<ComGoalPosition> positions;
+    public Set<ComGoalPosition> positions;
 
-    public PositionCommunityFeedback(List<ComGoalPosition> positions) {
+    public PositionCommunityFeedback(Set<ComGoalPosition> positions) {
         super(1, 1);
         this.positions = positions;
     }
@@ -23,6 +23,11 @@ public class PositionCommunityFeedback extends AbstractPacket {
             this.contribution = contribution;
             this.topPercentage = topPercentage;
             this.position = position;
+        }
+
+        @Override
+        public int hashCode() {
+            return goalName.hashCode();
         }
     }
 }

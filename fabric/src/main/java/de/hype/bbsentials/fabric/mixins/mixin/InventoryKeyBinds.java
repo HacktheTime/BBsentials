@@ -2,7 +2,7 @@ package de.hype.bbsentials.fabric.mixins.mixin;
 
 import com.google.gson.JsonParser;
 import de.hype.bbsentials.fabric.ModInitialiser;
-import de.hype.bbsentials.fabric.SystemUtils;
+import de.hype.bbsentials.client.common.SystemUtils;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;

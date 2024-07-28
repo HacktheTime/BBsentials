@@ -1,5 +1,6 @@
 package de.hype.bbsentials.client.common.client;
 
+import de.hype.bbsentials.client.common.annotations.AnnotationProcessor;
 import com.google.gson.annotations.Expose;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Sender;
@@ -70,6 +71,7 @@ public class BBsentials {
     public static DummyDataStorage dummyDataStorage = new DummyDataStorage();
     public static BBDataStorage dataStorage;
     public static NeuRepoManager neuRepoManager;
+    public static AnnotationProcessor annotationProcessor = new AnnotationProcessor();
     @Expose(serialize = false, deserialize = false)
     public static TravelEnums goToGoal;
     public static Runnable leaveTaskLowPlaytime = null;

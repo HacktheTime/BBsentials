@@ -3,6 +3,7 @@ package de.hype.bbsentials.client.common.config;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.WaypointRoute;
 import de.hype.bbsentials.shared.constants.ChChestItem;
+import de.hype.bbsentials.shared.objects.Position;
 
 import java.time.Instant;
 import java.util.*;
@@ -17,6 +18,7 @@ public class TemporaryConfig extends BBsentialsConfig {
     public transient Set<ChChestItem> chestParts = new HashSet<>();
     public transient Long playTimeInMinutes;
     public transient Instant lastPlaytimeUpdate;
+    public Position lastGlobalChchestCoords;
 
     public TemporaryConfig() {
         super(1);

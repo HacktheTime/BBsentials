@@ -21,7 +21,6 @@
     "LiteralCommandNodeMixin",
     "RootCommandNodeAccessMixin",
     "ScreenHandlerMixin",
-    "SignaturePropertyErrorIgnoreMixin",
     "SimpleOptionMixin",
     "WorldRenderLastEventPatch"
   ],

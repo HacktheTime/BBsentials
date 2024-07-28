@@ -32,7 +32,8 @@
     "minecraft": "${minecraft_versionsSupported}"
   },
   "mixins": [
-    "bbsentials.mixins.json"
+    "bbsentials.main.mixins.json",
+    "bbsentials.errorpatches.mixins.json"
   ],
   "custom": {
     "modmenu": {

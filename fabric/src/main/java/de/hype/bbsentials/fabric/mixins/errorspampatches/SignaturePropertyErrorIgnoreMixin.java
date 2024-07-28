@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins.mixin;
+package de.hype.bbsentials.fabric.mixins.errorspampatches;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(YggdrasilServicesKeyInfo.class)
 public class SignaturePropertyErrorIgnoreMixin {
     @Inject(method = "validateProperty", at = @At("HEAD"), cancellable = true, remap = false)
-    public void validateProperty(Property property, CallbackInfoReturnable<Boolean> cir) {
+    public void BBsentials$validateProperty(Property property, CallbackInfoReturnable<Boolean> cir) {
         if (property.signature() == null) return;
         if (property.signature().isEmpty()) {
             cir.setReturnValue(false);

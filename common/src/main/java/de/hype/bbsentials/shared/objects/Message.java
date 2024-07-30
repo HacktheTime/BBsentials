@@ -1,7 +1,7 @@
 package de.hype.bbsentials.shared.objects;
 
 import com.google.gson.JsonObject;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.function.Predicate;
 
@@ -108,7 +108,12 @@ public abstract class Message {
     }
 
     public void replaceInJson(String replace, String replaceWith) {
-        text = text.replaceFirst(replace, StringEscapeUtils.escapeJson(replaceWith));
+        try {
+            text = text.replaceFirst(replace, StringEscapeUtils.escapeJson(replaceWith));
+        } catch (Exception e) {
+            System.err.println("String that caused the problems: Replace: %s | Replace With: %s | Test: %s".formatted(replace, StringEscapeUtils.escapeJson(replaceWith), text));
+            e.printStackTrace();
+        }
     }
 
     public boolean contains(String string) {

@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class HypixelLoggerSpamPatcherClientPlayNetworkListener {
-    @Inject(method = "onEntityPassengersSet",at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;)V"), cancellable = true, remap = false)
+    @Inject(method = "onEntityPassengersSet",at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;)V"), remap = false)
     public void BBsentials$passengerEntityUnknownPatch(EntityPassengersSetS2CPacket packet, CallbackInfo ci){
-        ci.cancel();
+        //Exactly doing nothing. Exactly what is wanted.
     }
 }

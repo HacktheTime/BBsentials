@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric.mixins.helperclasses;
 
-import de.hype.bbsentials.shared.constants.Formatting;
+import de.hype.bbsentials.client.common.SystemUtils;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.DummyDataStorage;
 import de.hype.bbsentials.client.common.client.SplashManager;
@@ -8,8 +8,10 @@ import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.interfaces.ItemStack;
 import de.hype.bbsentials.client.common.mclibraries.interfaces.NBTCompound;
 import de.hype.bbsentials.client.common.mclibraries.interfaces.Text;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.shared.constants.VanillaItems;
 import de.hype.bbsentials.shared.packets.function.PositionCommunityFeedback;
+import net.minecraft.client.MinecraftClient;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -138,12 +140,25 @@ public abstract class RenderingDefinitions {
                 return false;
             }
         };
+        new RenderingDefinitions() {
+            @Override
+            public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
+                if (itemName.equals("CLICK ME!")) {
+                    if (MinecraftClient.getInstance().currentScreen != null) {
+                        if (MinecraftClient.getInstance().currentScreen.getTitle().getString().equals("Chocolate Factory") && !MinecraftClient.getInstance().isWindowFocused()) {
+                            SystemUtils.sendNotification("Chocolate Factory","A Stray / Golden Rabbit appeared!");
+                        }
+                    }
+                }
+                return false;
+            }
+        };
         new RenderingDefinitions(false) {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (!BBsentials.developerConfig.hypixelItemInfo) return false;
                 NBTCompound compound = stack.getCustomData();
-                if (compound==null) return false;
+                if (compound == null) return false;
                 List<Text> lore = check.getTextTooltip();
                 for (String key : compound.getKeys()) {
                     if (key.equals("enchantments")) continue;
@@ -293,7 +308,7 @@ public abstract class RenderingDefinitions {
         }
 
         public List<Text> getItemLore() {
-            if (itemLore == null) itemLore=stack.getItemLore();
+            if (itemLore == null) itemLore = stack.getItemLore();
             return itemLore;
         }
 
@@ -330,6 +345,7 @@ public abstract class RenderingDefinitions {
             texturePath = null;
             this.renderAsItem = renderAsItem;
         }
+
         public Text getItemStackName() {
             return getTextTooltip().get(0);
         }

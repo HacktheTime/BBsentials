@@ -146,7 +146,14 @@ public abstract class RenderingDefinitions {
                 if (itemName.equals("CLICK ME!")) {
                     if (MinecraftClient.getInstance().currentScreen != null) {
                         if (MinecraftClient.getInstance().currentScreen.getTitle().getString().equals("Chocolate Factory") && !MinecraftClient.getInstance().isWindowFocused()) {
-                            SystemUtils.sendNotification("Chocolate Factory","A Stray / Golden Rabbit appeared!");
+                            SystemUtils.sendNotification("Chocolate Factory","A Stray Rabbit appeared!");
+                        }
+                    }
+                }
+                if (itemName.startsWith("Golden Rabbit -")) {
+                    if (MinecraftClient.getInstance().currentScreen != null) {
+                        if (MinecraftClient.getInstance().currentScreen.getTitle().getString().equals("Chocolate Factory") && !MinecraftClient.getInstance().isWindowFocused()) {
+                            SystemUtils.sendNotification("Chocolate Factory","A Golden Rabbit appeared!");
                         }
                     }
                 }

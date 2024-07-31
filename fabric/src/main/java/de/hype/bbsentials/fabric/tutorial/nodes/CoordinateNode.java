@@ -5,6 +5,7 @@ import de.hype.bbsentials.fabric.tutorial.AbstractTutorialNode;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.Position;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 import java.util.List;

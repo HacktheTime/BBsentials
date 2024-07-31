@@ -8,6 +8,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.CrystalMetalDetectorSolver;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.ConfigManager;
@@ -50,6 +51,8 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
@@ -632,8 +635,9 @@ public class ModInitialiser implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+
         System.out.println("BBsentials : onInit called");
-        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new FabricTextUtils());
+        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new FabricTextUtils(), new FabricWorldUtils());
         codes = new NumPadCodes();
         BBsentials.init();
         tutorialManager = new TutorialManager();
@@ -673,6 +677,7 @@ public class ModInitialiser implements ClientModInitializer {
             if (EnvironmentCore.utils.getUsername().toLowerCase().equals("p0is")) {
                 funConfig.hub17To29Troll = true;
             }
+            CrystalMetalDetectorSolver.initWorld();
         });
     }
 

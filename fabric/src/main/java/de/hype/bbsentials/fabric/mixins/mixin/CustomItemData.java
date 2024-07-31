@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
-import de.hype.bbsentials.fabric.ItemRegistry;
+import de.hype.bbsentials.fabric.VanillaRegistry;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.FabricICusomItemDataAccess;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
@@ -95,7 +95,7 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
             this.override = true;
         }
         notInitialised = false;
-        renderasItem = ItemRegistry.getItem(definition.getRenderAsItem());
+        renderasItem = VanillaRegistry.get(definition.getRenderAsItem());
         itemCountCustom = definition.getItemCount();
         texturename = definition.getTexturePath();
         itemTooltip = definition.getTextTooltip().stream().map(v -> (de.hype.bbsentials.fabric.Text) v).toList();
@@ -150,12 +150,12 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
 
     @Override
     public VanillaItems getVanillaRenderasItem() {
-        return ItemRegistry.getItem(renderasItem);
+        return VanillaRegistry.get(renderasItem);
     }
 
     @Override
     public void setVanillaRenderasItem(VanillaItems renderasItem) {
-        this.renderasItem = ItemRegistry.getItem(renderasItem);
+        this.renderasItem = VanillaRegistry.get(renderasItem);
     }
 
 

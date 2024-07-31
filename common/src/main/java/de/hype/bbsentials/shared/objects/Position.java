@@ -1,25 +1,27 @@
 package de.hype.bbsentials.shared.objects;
 
-public class Position {
-    public int x;
-    public int y;
-    public int z;
+import de.hype.bbsentials.client.common.mclibraries.interfaces.Vector3d;
+import de.hype.bbsentials.client.common.mclibraries.interfaces.Vector3i;
 
+public class Position extends Vector3i {
+
+
+    public static final Position ORIGIN = new Position(0,0,0);
 
     public Position(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        super(x, y, z);
+    }
+
+    public Position(Vector3i vector) {
+        super(vector.x, vector.y, vector.z);
     }
 
     /**
      * @param string nneds to be `x y z` formating!
      */
-    public Position(String string) throws Exception {
+    public Position fromString(String string) throws Exception {
         String[] temp = string.split(" ");
-        x = Integer.parseInt(temp[0]);
-        y = Integer.parseInt(temp[1]);
-        z = Integer.parseInt(temp[2]);
+        return new Position( Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
     }
 
     @Override
@@ -39,9 +41,9 @@ public class Position {
     }
 
     public Double getDistanceBetween(Position pos) {
-        Integer x = pos.x - this.x;
-        Integer y = pos.y - this.y;
-        Integer z = pos.z - this.z;
+        int x = pos.x - this.x;
+        int y = pos.y - this.y;
+        int z = pos.z - this.z;
         return Math.sqrt(x * x + y * y + z * z);
     }
 

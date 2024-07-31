@@ -17,6 +17,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
+import java.awt.Color
 
 /**
  * @author nea89o in Firmanent
@@ -34,6 +35,9 @@ class RenderInWorldContext(
 
     fun color(color: me.shedaniel.math.Color) {
         color(color.red / 255F, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+    }
+    fun color(color: Color, alpha: Float) {
+        color(color.red / 255F, color.green / 255f, color.blue / 255f, alpha)
     }
 
     fun color(red: Float, green: Float, blue: Float, alpha: Float) {

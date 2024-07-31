@@ -12,8 +12,9 @@ public class EnvironmentCore {
     public static DebugThread debug;
     public static String versionType;
     public static TextUtils textutils;
+    public static WorldUtils worldUtils;
 
-    private EnvironmentCore(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils, String versionType) {
+    private EnvironmentCore(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils, String versionType,WorldUtils worldUtils) {
         EnvironmentCore.utils = utils;
         EnvironmentCore.textutils = textUtils;
         EnvironmentCore.chat = chat;
@@ -22,15 +23,16 @@ public class EnvironmentCore {
         EnvironmentCore.mcoptions = options;
         EnvironmentCore.debug = debug;
         EnvironmentCore.versionType = versionType;
+        EnvironmentCore.worldUtils = worldUtils;
     }
 
 
-    public static EnvironmentCore fabric(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils) {
-        return new EnvironmentCore(utils, events, chat, commands, options, debug, textUtils, "modern");
+    public static EnvironmentCore fabric(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils, WorldUtils worldUtils) {
+        return new EnvironmentCore(utils, events, chat, commands, options, debug, textUtils, "modern",worldUtils);
     }
 
-    public static EnvironmentCore forge(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils) {
-        return new EnvironmentCore(utils, events, chat, commands, options, debug, textUtils, "1.8.9");
+    public static EnvironmentCore forge(Utils utils, MCEvents events, MCChat chat, MCCommand commands, Options options, DebugThread debug, TextUtils textUtils,WorldUtils worldUtils) {
+        return new EnvironmentCore(utils, events, chat, commands, options, debug, textUtils, "1.8.9",worldUtils);
     }
 
     public static Boolean isFabric() {

@@ -4,6 +4,7 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.chat.MessageEvent;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.client.CrystalMetalDetectorSolver;
 import de.hype.bbsentials.client.common.mclibraries.MCChat;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
@@ -60,7 +61,17 @@ public class FabricChat implements MCChat {
                 sendClientSideMessage(message);
             }
         }
+        if (actionbar) {
+            Message finalMessage = message;
+            BBsentials.executionService.execute(()->{
+                processActionbarThreaded(finalMessage);
+            });
+        }
         return toReturn;
+    }
+
+    private void processActionbarThreaded(Message message) {
+        CrystalMetalDetectorSolver.process(message);
     }
 
     public void sendClientSideMessage(Message message) {

@@ -58,7 +58,7 @@ public class ItemStack implements de.hype.bbsentials.client.common.mclibraries.i
 
     @Override
     public VanillaItems getItem() {
-        return ItemRegistry.getItem(stack.getItem());
+        return VanillaRegistry.get(stack.getItem());
     }
     public Item getMinecraftItem() {
         return stack.getItem();

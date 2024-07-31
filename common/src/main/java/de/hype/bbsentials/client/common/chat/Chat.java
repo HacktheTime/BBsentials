@@ -614,8 +614,8 @@ public class Chat {
 
     public boolean isSpam(String message) {
         if (message == null) return true;
-        if (message.isEmpty()) return true;
-        if (message.contains("Achievement Points")) return true;
+        else if (message.isEmpty()) return true;
+        else if (message.contains("Achievement Points")) return true;
         return false;
     }
 

@@ -1,99 +1,103 @@
 package de.hype.bbsentials.shared.objects;
+
 import de.hype.bbsentials.environment.packetconfig.DefaultPunishment;
 
 import java.time.Instant;
 
 public class PunishmentData {
     public Integer punishmentId;
-    public Integer punishedUserId;
     public DefaultPunishment defaultPunishment;
-    public Type type;
-    /**
-     * -1 resets to 0;
-     * null/0 is none
-     */
-    public Integer pointPunishment;
+    public PunishmentType punishmentType;
+    public String reason;
+    public String description;
+    public String appealMessage;
+    public PunishmentStatus status;
+    public int bannerUserId;
+    public Integer invalidatingUserid;
+    //
+    public PointPunishmentType pointPunishmentType;
+    public Integer pointPunishmentAmount;
+    //
     public String mcUuid;
+    public Instant appealUnlockDate;
+    public boolean appealed;
+    public boolean canBeInvalidationAppealed;
+    public boolean invalidationAppealed;
+    //
     public Instant from;
     public Instant till;
-    public Instant appealUnlockDate;
-    public boolean appealAccepted;
-    public String reason;
-    public boolean silent;
-    public int bannerUserId;
+    //
+    public boolean silentCrash;
+    public int exitCodeOnCrash;
     public boolean modSelfRemove;
     public boolean shouldModCrash;
     public int warningTimeBeforeCrash;
     public boolean disconnectFromNetworkOnLoad;
-    public int exitCodeOnCrash;
-    public boolean canBeInvalidationAppealed;
-    public boolean invalidationAppealed;
-    public int invalidatingUserid;
 
-    public PunishmentData(PunishmentData data) {
-        this(data.punishmentId, data.punishedUserId, data.type, data.pointPunishment, data.mcUuid, data.from, data.till, data.appealAccepted, data.reason, data.silent, data.bannerUserId, data.modSelfRemove, data.shouldModCrash, data.warningTimeBeforeCrash, data.disconnectFromNetworkOnLoad, data.exitCodeOnCrash, data.appealUnlockDate, data.canBeInvalidationAppealed, data.defaultPunishment,-1, data.invalidationAppealed);
-    }
-
-    public PunishmentData(Integer punishmentId, Integer punishedUserId, Type type, Integer pointPunishment, String mcUuid, Instant till, String reason, Boolean silent, Integer bannerUserId, Boolean modSelfRemove, Boolean shouldModCrash, Integer warningTimeBeforeCrash, Boolean disconnectFromNetworkOnLoad, Integer exitCodeOnCrash, Instant appealUnlockDate, boolean canBeInvalidationAppealed, DefaultPunishment defaultPunishment) {
-        this(punishmentId, punishedUserId, type, pointPunishment, mcUuid, Instant.now(), till, false, reason, silent, bannerUserId, modSelfRemove, shouldModCrash, warningTimeBeforeCrash, disconnectFromNetworkOnLoad, exitCodeOnCrash, appealUnlockDate, canBeInvalidationAppealed, defaultPunishment, -1,false);
-    }
-
-    public PunishmentData(Integer punishmentId, Integer punishedUserId, Type type, Integer pointPunishment, String mcUuid, Instant from, Instant till, boolean appealAccepted, String reason, Boolean silent, Integer bannerUserId, Boolean modSelfRemove, Boolean shouldModCrash, Integer warningTimeBeforeCrash, Boolean disconnectFromNetworkOnLoad, Integer exitCodeOnCrash, Instant appealUnlockDate, boolean canBeInvalidationAppealed, DefaultPunishment defaultPunishment, int invalidatingUserid, boolean invalidationAppealed) {
+    public PunishmentData(Integer punishmentId, DefaultPunishment defaultPunishment, PunishmentType punishmentType, String reason, String description, String appealMessage, int bannerUserId, Integer invalidatingUserid, PointPunishmentType pointPunishmentType, Integer pointPunishmentAmount, String mcUuid, Instant appealUnlockDate, boolean appealed, boolean canBeInvalidationAppealed, boolean invalidationAppealed, Instant from, Instant till, boolean silentCrash, int exitCodeOnCrash, boolean modSelfRemove, boolean shouldModCrash, int warningTimeBeforeCrash, boolean disconnectFromNetworkOnLoad, PunishmentStatus status) {
         this.punishmentId = punishmentId;
-        this.punishedUserId = punishedUserId;
-        this.type = type;
-        this.appealAccepted = appealAccepted;
         this.defaultPunishment = defaultPunishment;
-        this.pointPunishment = pointPunishment;
+        this.punishmentType = punishmentType;
+        this.reason = reason;
+        this.appealMessage = appealMessage;
+        this.bannerUserId = bannerUserId;
+        this.invalidatingUserid = invalidatingUserid;
+        this.pointPunishmentType = pointPunishmentType;
+        this.pointPunishmentAmount = pointPunishmentAmount;
         this.mcUuid = mcUuid;
+        this.appealUnlockDate = appealUnlockDate;
+        this.appealed = appealed;
+        this.canBeInvalidationAppealed = canBeInvalidationAppealed;
+        this.invalidationAppealed = invalidationAppealed;
         this.from = from;
         this.till = till;
-        this.reason = reason;
-        this.silent = silent;
-        this.bannerUserId = bannerUserId;
+        this.silentCrash = silentCrash;
+        this.exitCodeOnCrash = exitCodeOnCrash;
         this.modSelfRemove = modSelfRemove;
         this.shouldModCrash = shouldModCrash;
         this.warningTimeBeforeCrash = warningTimeBeforeCrash;
         this.disconnectFromNetworkOnLoad = disconnectFromNetworkOnLoad;
-        this.exitCodeOnCrash = exitCodeOnCrash;
-        this.canBeInvalidationAppealed = canBeInvalidationAppealed;
-        this.invalidatingUserid=invalidatingUserid;
-        this.invalidationAppealed = invalidationAppealed;
-        this.appealUnlockDate = appealUnlockDate;
+        this.status = status;
+        this.description = description;
+    }
+
+    public PunishmentData(DefaultPunishment defaultPunishment, PunishmentType punishmentType, String reason, String description, String appealMessage, Instant till, int bannerUserId, PointPunishmentType pointPunishmentType, Integer pointPunishmentAmount, String targetMCUUID, Instant appealUnlockDate, boolean canBeInvalidationAppealed, boolean shouldModCrash, boolean silentCrash, Integer crashExitCode, Boolean modSelfRemove, Integer warningTimeBeforeCrash, boolean banFromNetwork) {
+        this(null, defaultPunishment, punishmentType, reason, description, appealMessage, bannerUserId, null, pointPunishmentType, pointPunishmentAmount, targetMCUUID, appealUnlockDate, false, canBeInvalidationAppealed, false, Instant.now(), till, silentCrash, crashExitCode, modSelfRemove, shouldModCrash, warningTimeBeforeCrash, banFromNetwork, PunishmentStatus.ACTIVE);
+    }
+
+    public PunishmentData(DefaultPunishment defaultPunishment, PunishmentType punishmentType, String reason, String description, String appealMessage, Instant till, int bannerUserId, PointPunishmentType pointPunishmentType, Integer pointPunishmentAmount, String targetMCUUID, Instant appealUnlockDate, boolean canBeInvalidationAppealed, boolean shouldModCrash, Boolean modSelfRemove, boolean banFromNetwork) {
+        this(defaultPunishment, punishmentType, reason, description, appealMessage, till, bannerUserId, pointPunishmentType, pointPunishmentAmount, targetMCUUID, appealUnlockDate, canBeInvalidationAppealed, shouldModCrash, false, 69, modSelfRemove, 10, banFromNetwork);
+    }
+
+    public PunishmentData(PunishmentData data) {
+        this(data.punishmentId, data.defaultPunishment, data.punishmentType, data.reason, data.description, data.appealMessage, data.bannerUserId, data.invalidatingUserid, data.pointPunishmentType, data.pointPunishmentAmount, data.mcUuid, data.appealUnlockDate, data.appealed, data.canBeInvalidationAppealed, data.invalidationAppealed, data.from, data.till, data.silentCrash, data.exitCodeOnCrash, data.modSelfRemove, data.shouldModCrash, data.warningTimeBeforeCrash, data.disconnectFromNetworkOnLoad, data.status);
     }
 
     public boolean isActive() {
-        if (!isValid()) return false;
-        if (appealAccepted) return false;
+        if (status != PunishmentStatus.ACTIVE) return false;
         return (till != null && Instant.now().isBefore(till));
     }
 
     public boolean isValid() {
-        return invalidatingUserid == -1;
+        return status != PunishmentStatus.INVALID;
     }
 
-    public enum Type {
-        BAN(true, 69, true, true, false, true, 10),
-        BLACKLIST(true, 69, true, true, false, true, 10),
-        MUTE(false, 69, false, false, false, true, 10),
-        WARN(false, 69, false, false, false, true, 10);
-
-        public final boolean disconnect;
-        public final int crashExitCode;
-        public final boolean crash;
-        public final boolean selfRemove;
-        public final boolean silent;
-        public final boolean appealable;
-        public final int warnTime;
-
-        Type(boolean disconnect, int crashExitCode, boolean crash, boolean selfRemove, boolean silent, boolean appealable, int warnTime) {
-            this.disconnect = disconnect;
-            this.crashExitCode = crashExitCode;
-            this.crash = crash;
-            this.selfRemove = selfRemove;
-            this.silent = silent;
-            this.appealable = appealable;
-            this.warnTime = warnTime;
-        }
+    public enum PunishmentType {
+        BAN,
+        BLACKLIST,
+        MUTE,
+        WARN;
     }
+
+    public enum PointPunishmentType {
+        AMOUNT,
+        RESET_TO_0,
+    }
+
+    public enum PunishmentStatus {
+        ACTIVE,
+        APPEALED,
+        INVALID,
+    }
+
 }

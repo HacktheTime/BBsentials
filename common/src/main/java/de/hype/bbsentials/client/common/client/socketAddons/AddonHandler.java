@@ -21,7 +21,6 @@ import java.net.Socket;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class AddonHandler implements Runnable {
@@ -150,12 +149,6 @@ public class AddonHandler implements Runnable {
 
     public void onPlayTimeUpdated(PlayTimeUpdatedPacket packet) {
         Islands.putPlaytimeUpdate(packet.serverID, packet.updateTime);
-        if (BBsentials.futureServerLeave != null) BBsentials.futureServerLeave.cancel(false);
-        long waitTime = Duration.between(Instant.now(), packet.updateTime.plusSeconds(60)).getSeconds() - 8;
-        if (BBsentials.dataStorage.serverId.equals(packet.serverID)) {
-            Chat.sendPrivateMessageToSelfInfo("Scheduled Leave in %s".formatted(waitTime));
-            BBsentials.futureServerLeave = BBsentials.executionService.schedule(BBsentials::doLeaveTask, waitTime, TimeUnit.SECONDS);
-        }
         if (!Objects.equals(BBsentials.goToGoal.getIsland(), packet.islandType)) return;
         BBsentials.onDoJoinTask();
     }
@@ -174,8 +167,7 @@ public class AddonHandler implements Runnable {
                 return;
             }
             else if (!packet.warp.getIsland().canBeWarpedIn()) {
-                if (BBsentials.partyConfig.isPartyLeader)
-                    BBsentials.sender.addSendTask("/p transfer " + BBsentials.generalConfig.getMainName());
+                BBsentials.sender.addSendTask("/p transfer " + BBsentials.generalConfig.getMainName());
             }
             else if (BBsentials.dataStorage.getIsland() != packet.warp.getIsland())
                 BBsentials.sender.addSendTask(packet.warp.getIsland().getWarpCommand());
@@ -202,8 +194,7 @@ public class AddonHandler implements Runnable {
                 Chat.sendPrivateMessageToSelfFatal("WARNING: ERROR DETECTED! YOU JOINED A SERVER THAT WILL UPDATE SOON EMERGENCY LEFT");
             }
             else {
-                BBsentials.futureServerLeave.cancel(false);
-                BBsentials.futureServerLeave = BBsentials.executionService.schedule(BBsentials::doLeaveTask, updateTime - 7, TimeUnit.SECONDS);
+                BBsentials.resetLeaveTask();
             }
         }
     }
@@ -224,5 +215,9 @@ public class AddonHandler implements Runnable {
             Islands.putPlaytimeUpdate(sendLobbyData.dataStorage.serverId, sendLobbyData.lastPlaytimeUpdate);
         BBsentials.altDataStorage = sendLobbyData.dataStorage;
         BBsentials.altLastplaytimeUpdate = sendLobbyData.lastPlaytimeUpdate;
+    }
+
+    public void onEmergencyLeavePacket(EmergencyLeavePacket packet) {
+        BBsentials.emergencyLeave();
     }
 }

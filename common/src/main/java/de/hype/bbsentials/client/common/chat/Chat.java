@@ -12,6 +12,7 @@ import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.*;
+import de.hype.bbsentials.shared.packets.addonpacket.EmergencyLeavePacket;
 import de.hype.bbsentials.shared.packets.addonpacket.PlayTimeUpdatedPacket;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -315,10 +316,19 @@ public class Chat {
             }
             else if (message.isServerMessage()) {
                 if (message.getUnformattedString().startsWith("[Important] This server will restart soon:")) {
-//                    EnvironmentCore.utils.getCurrentIsland().getExitRunnable().run(); what if just joined too? from is to garden to is for example
+                    BBsentials.emergencyLeave();
+                }
+                else if (messageUnformatted.equals("You need to have visited this island at least once before fast traveling to it!")) {
+                    BBsentials.emergencyLeave();
+                }
+                else if (messageUnformatted.equals("You are being transferred to the HUB for being AFK!")) {
+                    BBsentials.addonManager.broadcastToAllAddons(new EmergencyLeavePacket());
+                }
+                else if (messageUnformatted.startsWith("Couldn't warp you! Try again later")) {
+                    BBsentials.emergencyLeave();
                 }
                 else if (message.getUnformattedString().equals("You were kicked while joining that server!") || message.getUnformattedString().equals("Couldn't warp you! Try again later. (DYNAMIC_POOL_ERROR)")) {
-                    BBsentials.sender.addImmediateSendTask("/l");
+                    BBsentials.emergencyLeave();
                 }
                 else if (BBsentials.generalConfig.isAlt()) {
                     if (message.getMessageContent().startsWith("You have ") && message.endsWith("minutes playtime!")) {

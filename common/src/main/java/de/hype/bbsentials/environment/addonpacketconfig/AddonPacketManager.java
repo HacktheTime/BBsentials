@@ -44,6 +44,7 @@ public class AddonPacketManager {
         addonPackets.add(new AddonPacket<>(PlayTimeUpdatedPacket.class, connection::onPlayTimeUpdated));
         addonPackets.add(new AddonPacket<>(SetGoToIsland.class, connection::onSetGoToIsland));
         addonPackets.add(new AddonPacket<>(PausePacket.class, connection::onPausePacket));
+        addonPackets.add(new AddonPacket<>(EmergencyLeavePacket.class, connection::onEmergencyLeavePacket));
 
 
 

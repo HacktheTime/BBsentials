@@ -27,7 +27,7 @@ import java.util.Map;
  * {@link #THE_RIFT}
  */
 public enum Islands implements BBDisplayNameProvider {
-    CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows", Islands::sendFallbackIsland, "/warp ch"),
+    CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows", Islands::sendFallbackIsland, "/warp crystals"),
     CRIMSON_ISLE("crimson_isle", "Crimson Isle", Islands::sendFallbackIsland, "/warp isle"),
     DEEP_CAVERNS("mining_2", "Deep Caverns", Islands::sendFallbackIsland, "/warp deep"),
     DUNGEON("dungeon", "Dungeon", Islands::sendFallbackIsland, null, true, 35),
@@ -89,6 +89,31 @@ public enum Islands implements BBDisplayNameProvider {
     public static void sendFallbackIsland() {
         String warpCommand;
         Islands fallBackIsland = getFallbackIsland();
+        if (!fallBackIsland.isTravelSafe()) {
+            if (fallBackIsland == PRIVATE_ISLAND) {
+                if (GARDEN.isTravelSafe()) {
+                    Chat.sendPrivateMessageToSelfError("Private Island was not unloaded long enough. Sending to Garden Instead.");
+                    fallBackIsland = GARDEN;
+                }
+                else {
+                    sendFallbackIsland("/l");
+                }
+            }
+            else if (fallBackIsland == GARDEN) {
+                if (GARDEN.isTravelSafe()) {
+                    Chat.sendPrivateMessageToSelfError("Garden was not unloaded long enough. Sending to Private Island Instead.");
+                    fallBackIsland = PRIVATE_ISLAND;
+                }
+                else {
+                    sendFallbackIsland("/l");
+                }
+            }
+            else {
+                Chat.sendPrivateMessageToSelfError("Unknown Fallback Island");
+                sendFallbackIsland("/l");
+                return;
+            }
+        }
         if (fallBackIsland == PRIVATE_ISLAND) warpCommand = "/is";
         else if (fallBackIsland == GARDEN) warpCommand = "/warp garden";
         else warpCommand = fallBackIsland.getWarpCommand();
@@ -100,7 +125,7 @@ public enum Islands implements BBDisplayNameProvider {
     }
 
     public static Islands getFallbackIsland() {
-        return PRIVATE_ISLAND;
+        return GARDEN;
     }
 
     public static void sendFallbackIsland(String warp) {
@@ -114,10 +139,6 @@ public enum Islands implements BBDisplayNameProvider {
             }
         }
         return null;
-    }
-
-    public static Long getSafeTime(String serverId) {
-        return Duration.between(Instant.now(), playTimeUpdates.get(serverId)).getSeconds();
     }
 
     private static Islands getPrivateIsland() {

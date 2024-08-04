@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,13 @@ public class ChatHudMixin implements IChatHudDataAccess {
     @Final
     private List<ChatHudLine> messages;
 
-    @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
-    public int BBsentials$noChatRemove(int original) {
+    @ModifyExpressionValue(method = "addVisibleMessage", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I",ordinal = 2))
+    public int BBsentials$noChatRemoveVisibleMessage(int original) {
+        if (BBsentials.visualConfig.infiniteChatHistory) return 0;
+        return original;
+    }
+    @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I",ordinal = 0))
+    public int BBsentials$noChatRemoveMessage(int original) {
         if (BBsentials.visualConfig.infiniteChatHistory) return 0;
         return original;
     }

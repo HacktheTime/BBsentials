@@ -64,7 +64,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -736,16 +735,19 @@ public class ModInitialiser implements ClientModInitializer {
             ServerSwitchTask.onServerLeaveTask(() -> EnvironmentCore.debug.onServerLeave(), true);
         }
         ServerSwitchTask.onServerJoinTask(() -> {
-            ModInitialiser.tutorialManager.onTravel(dataStorage.getIsland());
-            if (dataStorage.getIsland() != null && dataStorage.getIsland().isPersonalIsland())
-                Islands.putPlaytimeUpdate(dataStorage.serverId, funConfig.lowPlaytimeHelperJoinDate);
+            if (dataStorage != null) {
+                ModInitialiser.tutorialManager.onTravel(dataStorage.getIsland());
+                if (dataStorage.getIsland() != null && dataStorage.getIsland().isPersonalIsland())
+                    Islands.putPlaytimeUpdate(dataStorage.serverId, funConfig.lowPlaytimeHelperJoinDate);
+            }
         }, true);
         ServerSwitchTask.onServerLeaveTask(() -> {
-            if ( dataStorage!=null && dataStorage.getIsland() != null && dataStorage.getIsland().isPersonalIsland()) {
-                dataStorage.getIsland().setLastLeave(funConfig.lowPlaytimeHelperJoinDate);
+            if (checkPTUpdateExecution != null) checkPTUpdateExecution.cancel(true);
+            BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
+            if (dataStorage != null && dataStorage.getIsland() != null && dataStorage.getIsland().isPersonalIsland()) {
+                dataStorage.getIsland().setLastLeave(Instant.now());
             }
             if (dataStorage != null) dataStorage.island = null;
-            BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
             if (dataStorage == null) return;
             if (ModInitialiser.tutorialManager.current != null) ModInitialiser.tutorialManager.current.resetTravel();
         }, true);
@@ -772,21 +774,33 @@ public class ModInitialiser implements ClientModInitializer {
                     }
                     if (addonManager != null)
                         addonManager.broadcastToAllAddons(new SendLobbyData(dataStorage, null, funConfig.lowPlaytimeHelperJoinDate));
-                    if (dataStorage.getIsland()!=null && dataStorage.getIsland().isPersonalIsland())
-                        if (Islands.getPlaytimeUpdate(dataStorage.serverId) == null)
-                            Islands.putPlaytimeUpdate(dataStorage.serverId, funConfig.lowPlaytimeHelperJoinDate);
+                    if (dataStorage.getIsland() != null && dataStorage.getIsland().isPersonalIsland())
+                        Islands.putPlaytimeUpdate(dataStorage.serverId, funConfig.lowPlaytimeHelperJoinDate);
                 }
             }, true);
         }
         else {
             ServerSwitchTask.onServerJoinTask(() -> {
-                if (dataStorage.isInSkyblock() || EnvironmentCore.utils.getCurrentIsland() != null) {
-                    Instant baseTime = Islands.getPlaytimeUpdate(dataStorage.serverId);
-                    long waitTime;
-                    if (baseTime != null)
-                        waitTime = Duration.between(Instant.now(), baseTime.plusSeconds(53)).getSeconds();
-                    else waitTime = 53L;
-                    futureServerLeave = executionService.schedule(BBsentials::doLeaveTask, waitTime, TimeUnit.SECONDS);
+                if ((dataStorage.isInSkyblock() || EnvironmentCore.utils.getCurrentIsland() != null) && !generalConfig.isAlt()) {
+                    try {
+                        if (goToGoal.getIsland() == dataStorage.getIsland()) {
+                            if (!goToGoal.isDefaultSpawn()) {
+                                sender.addSendTask("/warp " + goToGoal.getTravelArgument(), 0);
+                            }
+                        }
+                    } catch (Exception ignored) {
+
+                    }
+                    if (!dataStorage.getIsland().isPersonalIsland() && dataStorage.getIsland() != Islands.DUNGEON) {
+                        if (Islands.getPlaytimeUpdate(dataStorage.serverId) == null) {
+                            dataStorage.getIsland().getExitRunnable().run();
+                            sender.addSendTask("/l");
+                            pauseWarping = true;
+                            addonManager.broadcastToAllAddons(new PausePacket(true));
+                            Chat.sendPrivateMessageToSelfFatal("The Lobby you just joined does not have its playtime tracked. Emergency Leaving");
+                        }
+                    }
+                    resetLeaveTask();
                 }
             }, true);
         }
@@ -893,7 +907,13 @@ public class ModInitialiser implements ClientModInitializer {
             boolean previousWarpable = false;
             if (dataStorage.getIsland() != null) previousWarpable = BBsentials.dataStorage.getIsland().canBeWarpedIn();
             Islands island = Islands.getFromTravel(value);
-            if (dataStorage.getIsland() == value.getIsland()) {
+            if (dataStorage.getIsland() == value.getIsland() && goToGoal.getIsland() == value.getIsland()) {
+                Instant lastUpdate = Islands.getPlaytimeUpdate(dataStorage.serverId);
+                if (lastUpdate != null && lastUpdate.plusSeconds(45).isAfter(Instant.now())) {
+                    goToGoal = value;
+                    Chat.sendPrivateMessageToSelfError("Blocked Warp because it is close to the time to leave lobby");
+                    return 0;
+                }
                 Chat.sendPrivateMessageToSelfInfo("island intern warp detected. current: %s".formatted(dataStorage.getIsland().getDisplayName()));
                 BBsentials.sender.addImmediateSendTask("/warp " + value.getTravelArgument());
                 BBsentials.goToGoal = value;
@@ -901,7 +921,7 @@ public class ModInitialiser implements ClientModInitializer {
             }
             else if (!island.canBeWarpedIn()) {
                 if (!island.isTravelSafe()) {
-                    Chat.sendPrivateMessageToSelfError("Cancelled Travel Since the Island (%s) is not safe to visit since it was not unloaded for long enough to be safe.".formatted(island.getDisplayName()));
+                    Chat.sendPrivateMessageToSelfError("Cancelled Travel Since the Island (%s) is not safe to visit since it was not unloaded for long enough.".formatted(island.getDisplayName()));
                     return 0;
                 }
                 goToGoal = value;
@@ -910,7 +930,8 @@ public class ModInitialiser implements ClientModInitializer {
                 sender.addSendTask("/p warp", 5.5);
             }
             else {
-                if (!previousWarpable && partyConfig.isPartyLeader) sender.addImmediateSendTask("/p transfer " + generalConfig.getAltName());
+                if (!previousWarpable && partyConfig.isPartyLeader)
+                    sender.addImmediateSendTask("/p transfer " + generalConfig.getAltName());
                 Chat.sendPrivateMessageToSelfInfo("Will warp you too " + value.getTravelArgument() + " as next goal.");
                 BBsentials.goToGoal = value;
                 BBsentials.addonManager.broadcastToAllAddons(new SetGoToIsland(value));

@@ -1,7 +1,7 @@
 package de.hype.bbsentials.client.common.client;
 
-import de.hype.bbsentials.client.common.annotations.AnnotationProcessor;
 import com.google.gson.annotations.Expose;
+import de.hype.bbsentials.client.common.annotations.AnnotationProcessor;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Sender;
 import de.hype.bbsentials.client.common.client.commands.Commands;
@@ -19,6 +19,7 @@ import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.constants.TravelEnums;
 import de.hype.bbsentials.shared.objects.RenderInformation;
+import de.hype.bbsentials.shared.packets.addonpacket.PausePacket;
 import io.github.moulberry.repo.NEURepositoryException;
 
 import java.awt.*;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,13 +76,12 @@ public class BBsentials {
     public static AnnotationProcessor annotationProcessor = new AnnotationProcessor();
     @Expose(serialize = false, deserialize = false)
     public static TravelEnums goToGoal;
-    public static Runnable leaveTaskLowPlaytime = null;
     public static boolean pauseWarping;
     public static BBDataStorage altDataStorage;
     public static Instant altLastplaytimeUpdate;
+    public static volatile ScheduledFuture<?> futureServerLeave;
     private static volatile ScheduledFuture<?> futureServerJoin;
     private static volatile boolean futureServerJoinRunning;
-    public static volatile ScheduledFuture<?> futureServerLeave;
 
     static {
         try {
@@ -147,6 +148,7 @@ public class BBsentials {
                     try {
                         value.run();
                     } catch (Exception e) {
+                        BBsentials.sender.addImmediateSendTask("/l");
                         Chat.sendPrivateMessageToSelfError("Error Occur during a Server Join Task! Please report this!");
                         e.printStackTrace();
                     }
@@ -164,6 +166,7 @@ public class BBsentials {
                 try {
                     value.run();
                 } catch (Exception e) {
+                    BBsentials.sender.addImmediateSendTask("/l");
                     Chat.sendPrivateMessageToSelfError("Error Occur during a Server Leave Task! Please report this!");
                     e.printStackTrace();
                 }
@@ -220,11 +223,6 @@ public class BBsentials {
 //                Chat.sendPrivateMessageToSelfError("Could not set Discord Rich Presence");
 //            }
 //        }
-        if (funConfig.lowPlayTimeHelpers) {
-            ServerSwitchTask.onServerLeaveTask(() -> {
-                BBsentials.funConfig.lowPlaytimeHelperJoinDate = Instant.now();
-            }, true);
-        }
         hpModAPICore = new HypixelModAPICore();
         EnvironmentCore.utils.registerNetworkHandlers();
 
@@ -253,18 +251,16 @@ public class BBsentials {
                 if (goToGoal != TravelEnums.dungeon)
                     sender.addImmediateSendTask("/warp " + goToGoal.getTravelArgument());
             }
-            if (!goToGoal.isDefaultSpawn()) {
-                sender.addSendTask("/warp " + goToGoal.getTravelArgument(), 2.5);
-            }
         } catch (Exception e) {
 
         }
     }
 
     public static void doLeaveTask() {
+        Chat.sendPrivateMessageToSelfDebug("Leaving");
         try {
             if (!BBsentials.dataStorage.isInSkyblock()) return;
-            Islands currentIsland = EnvironmentCore.utils.getCurrentIsland();
+            Islands currentIsland = BBsentials.dataStorage.getIsland();
             try {
                 if (goToGoal != null && !goToGoal.getIsland().canBeWarpedIn()) {
                     if (goToGoal == TravelEnums.dungeon) {
@@ -276,10 +272,9 @@ public class BBsentials {
                             return;
                         }
                         sender.addImmediateSendTask("/warp " + goToGoal.getTravelArgument());
-                        if (futureServerLeave != null) futureServerLeave.cancel(false);
-                        futureServerLeave = executionService.schedule(BBsentials::doLeaveTask, 53, TimeUnit.SECONDS);
                         sender.addSendTask("/p warp", 5);
-                        if (partyConfig.isPartyLeader) sender.addSendTask("/p transfer " + BBsentials.generalConfig.getAltName(), 5);
+                        if (partyConfig.isPartyLeader)
+                            sender.addSendTask("/p transfer " + BBsentials.generalConfig.getAltName(), 5);
                     }
                     else {
                         currentIsland.getExitRunnable().run();
@@ -295,5 +290,28 @@ public class BBsentials {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void resetLeaveTask() {
+        if (BBsentials.generalConfig.isAlt()) return;
+        if (futureServerLeave != null) futureServerLeave.cancel(true);
+        if (BBsentials.dataStorage == null || !BBsentials.dataStorage.isInSkyblock()) return;
+        Instant baseTime = Islands.getPlaytimeUpdate(dataStorage.serverId);
+        Long waitTime = null;
+        if (baseTime != null)
+            waitTime = Duration.between(Instant.now(), baseTime.plusSeconds(53)).getSeconds();
+        if (waitTime != null && waitTime < 0) waitTime = null;
+        if (waitTime == null)
+            waitTime = Duration.between(Instant.now(), funConfig.lowPlaytimeHelperJoinDate.plusSeconds(53)).getSeconds();
+        Chat.sendPrivateMessageToSelfInfo("Time till swap: " + waitTime);
+        futureServerLeave = executionService.schedule(BBsentials::doLeaveTask, waitTime, TimeUnit.SECONDS);
+    }
+
+    public static void emergencyLeave() {
+        futureServerLeave.cancel(true);
+        BBsentials.sender.addImmediateSendTask("/l");
+        BBsentials.pauseWarping = true;
+        BBsentials.addonManager.broadcastToAllAddons(new PausePacket(true));
+        Chat.sendPrivateMessageToSelfError("Emergency Left!");
     }
 }

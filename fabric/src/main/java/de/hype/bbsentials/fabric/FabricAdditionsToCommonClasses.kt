@@ -1,6 +1,6 @@
 package de.hype.bbsentials.fabric
 
-import de.hype.bbsentials.client.common.mclibraries.interfaces.Vector3d
+import de.hype.bbsentials.shared.objects.Vector3d
 import de.hype.bbsentials.shared.constants.VanillaEntities
 import de.hype.bbsentials.shared.objects.MinecraftEntity
 import de.hype.bbsentials.shared.objects.Position

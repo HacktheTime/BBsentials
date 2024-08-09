@@ -1,8 +1,5 @@
 package de.hype.bbsentials.shared.objects;
 
-import de.hype.bbsentials.client.common.mclibraries.interfaces.Vector3d;
-import de.hype.bbsentials.client.common.mclibraries.interfaces.Vector3i;
-
 public class Position extends Vector3i {
 
 

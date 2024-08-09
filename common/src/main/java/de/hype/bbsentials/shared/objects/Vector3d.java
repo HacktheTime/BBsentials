@@ -1,6 +1,4 @@
-package de.hype.bbsentials.client.common.mclibraries.interfaces;
-
-import de.hype.bbsentials.shared.objects.Position;
+package de.hype.bbsentials.shared.objects;
 
 public class Vector3d implements Comparable<Vector3d> {
 

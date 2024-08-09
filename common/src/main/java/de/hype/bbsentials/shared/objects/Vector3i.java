@@ -1,4 +1,4 @@
-package de.hype.bbsentials.client.common.mclibraries.interfaces;
+package de.hype.bbsentials.shared.objects;
 
 public class Vector3i implements Comparable<Vector3i> {
 

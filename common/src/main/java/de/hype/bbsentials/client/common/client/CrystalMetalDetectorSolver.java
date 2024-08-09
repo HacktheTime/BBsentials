@@ -21,8 +21,8 @@ package de.hype.bbsentials.client.common.client;
 
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.mclibraries.interfaces.Vector3d;
-import de.hype.bbsentials.client.common.mclibraries.interfaces.Vector3i;
+import de.hype.bbsentials.shared.objects.Vector3d;
+import de.hype.bbsentials.shared.objects.Vector3i;
 import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.constants.VanillaBlocks;

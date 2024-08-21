@@ -19,23 +19,23 @@ package de.hype.bbsentials.shared.constants;
  * {@link #THE_RIFT}
  */
 public enum Islands implements BBDisplayNameProvider {
-    CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows","nucleus"),
-    CRIMSON_ISLE("crimson_isle", "Crimson Isle","crimson"),
-    DEEP_CAVERNS("mining_2", "Deep Caverns","deep"),
+    CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows", "nucleus"),
+    CRIMSON_ISLE("crimson_isle", "Crimson Isle", "crimson"),
+    DEEP_CAVERNS("mining_2", "Deep Caverns", "deep"),
     DUNGEON("dungeon", "Dungeon"),
-    DUNGEON_HUB("dungeon_hub", "Dungeon Hub","dhub"),
-    DWARVEN_MINES("mining_3", "Dwarven Mines","mines"),
-    GOLD_MINE("mining_1", "Gold Mine","gold"),
-    HUB("hub", "Hub","hub"),
+    DUNGEON_HUB("dungeon_hub", "Dungeon Hub", "dhub"),
+    DWARVEN_MINES("mining_3", "Dwarven Mines", "mines"),
+    GOLD_MINE("mining_1", "Gold Mine", "gold"),
+    HUB("hub", "Hub", "hub"),
     GLACITE_TUNNEL("mineshaft", "Mineshaft"),
     KUUDRA("kuudra", "Kuudra"),
-    PRIVATE_ISLAND("dynamic", "Private Island","home"),
-    SPIDERS_DEN("combat_1", "Spider's Den","spider"),
-    THE_END("combat_3", "The End","end"),
-    THE_FARMING_ISLANDS("farming_1", "The Farming Islands","barn"),
+    PRIVATE_ISLAND("dynamic", "Private Island", "home"),
+    SPIDERS_DEN("combat_1", "Spider's Den", "spider"),
+    THE_END("combat_3", "The End", "end"),
+    THE_FARMING_ISLANDS("farming_1", "The Farming Islands", "barn"),
     JERRYS_WORKSHOP("winter", "Jerry's Workshop"),
     THE_RIFT("rift", "The Rift"),
-    The_Park("foraging_1", "The Park","park"),
+    The_Park("foraging_1", "The Park", "park"),
     Dark_Auction("dark_auction", "Dark Auction");
     private final String internalName;
     private final String displayName;
@@ -44,10 +44,12 @@ public enum Islands implements BBDisplayNameProvider {
         this.internalName = internalName;
         this.displayName = displayName;
     }
-    Islands(String internalName, String displayName,String warpArgument) {
+
+    Islands(String internalName, String displayName, String warpArgument) {
         this(internalName, displayName);
-        this.warpArgument=warpArgument;
+        this.warpArgument = warpArgument;
     }
+
     private String warpArgument;
 
     public String getWarpArgument() {

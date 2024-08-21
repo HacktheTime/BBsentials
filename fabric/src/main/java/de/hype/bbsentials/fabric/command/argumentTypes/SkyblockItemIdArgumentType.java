@@ -8,12 +8,13 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.hype.bbsentials.client.common.client.BBsentials;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class SkyblockItemIdArgumentType implements ArgumentType<String> {
-    private final static List<String> skyblockItemIds = BBsentials.neuRepoManager.getItemIds().stream().filter(id->!id.contains(";")).toList();
+    private final static List<String> skyblockItemIds = BBsentials.neuRepoManager.getItemIds().stream().filter(id -> !id.contains(";")).toList();
 
     private SkyblockItemIdArgumentType() {
     }
@@ -35,11 +36,12 @@ public class SkyblockItemIdArgumentType implements ArgumentType<String> {
     public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         String current = builder.getRemainingLowerCase();
         if (!current.isEmpty()) {
-            skyblockItemIds.parallelStream().forEach(v -> {
+            new ArrayList<>(skyblockItemIds).forEach(v -> {
                 if (v.toLowerCase().contains(current)) builder.suggest(v);
             });
-        }else {
-            for (String materialId : skyblockItemIds) {
+        }
+        else {
+            for (String materialId : new ArrayList<>(skyblockItemIds)) {
                 builder.suggest(materialId);
             }
         }

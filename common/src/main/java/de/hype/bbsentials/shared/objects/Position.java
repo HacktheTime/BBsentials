@@ -3,7 +3,7 @@ package de.hype.bbsentials.shared.objects;
 public class Position extends Vector3i {
 
 
-    public static final Position ORIGIN = new Position(0,0,0);
+    public static final Position ORIGIN = new Position(0, 0, 0);
 
     public Position(int x, int y, int z) {
         super(x, y, z);
@@ -16,9 +16,9 @@ public class Position extends Vector3i {
     /**
      * @param string nneds to be `x y z` formating!
      */
-    public Position fromString(String string) throws Exception {
+    public static Position fromString(String string) throws Exception {
         String[] temp = string.split(" ");
-        return new Position( Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+        return new Position(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
     }
 
     @Override

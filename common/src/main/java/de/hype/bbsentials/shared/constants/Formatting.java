@@ -1,6 +1,6 @@
 package de.hype.bbsentials.shared.constants;
 
-public enum Formatting{
+public enum Formatting {
     BLACK("§0"),
     DARK_BLUE("§1"),
     DARK_GREEN("§2"),

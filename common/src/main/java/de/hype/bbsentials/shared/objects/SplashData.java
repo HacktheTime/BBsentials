@@ -14,7 +14,7 @@ public class SplashData {
     public boolean lessWaste;
     public String serverID;
 
-    public SplashData(String user, int hubNumber, SplashLocation locationInHub, Islands hubType, String extraMessage, boolean lessWaste, String serverID) throws Exception {
+    public SplashData(String user, int hubNumber, SplashLocation locationInHub, Islands hubType, String extraMessage, boolean lessWaste, String serverID) {
         this.serverID = serverID;
         this.announcer = user;
         this.hubNumber = hubNumber;
@@ -23,12 +23,12 @@ public class SplashData {
         this.extraMessage = extraMessage.replace("&", "§");
         this.lessWaste = lessWaste;
         if (!(hubType.equals(Islands.HUB) || hubType.equals(Islands.DUNGEON_HUB))) {
-            throw new Exception("§cInvalid hub type specified. Please only use the Suggestions!");
+            throw new IllegalArgumentException("§cInvalid hub type specified. Please only use the Suggestions!");
         }
         this.status = StatusConstants.WAITING;
     }
 
-    public SplashData(String user, int splashId, int hubNumber, SplashLocation locationInHub, Islands hubType, String extraMessage, boolean lessWaste, StatusConstants status, String serverID) throws Exception {
+    public SplashData(String user, int splashId, int hubNumber, SplashLocation locationInHub, Islands hubType, String extraMessage, boolean lessWaste, StatusConstants status, String serverID) {
         this.splashId = splashId;
         this.announcer = user;
         this.hubNumber = hubNumber;
@@ -37,7 +37,7 @@ public class SplashData {
         this.extraMessage = extraMessage.replace("&", "§");
         this.lessWaste = lessWaste;
         if (!(hubType.equals(Islands.HUB) || hubType.equals(Islands.DUNGEON_HUB))) {
-            throw new Exception("§cInvalid hub type specified. Please only use the Suggestions!");
+            throw new RuntimeException(new IllegalArgumentException("§cInvalid hub type specified. Please only use the Suggestions!"));
         }
         this.serverID = serverID;
         this.status = status;

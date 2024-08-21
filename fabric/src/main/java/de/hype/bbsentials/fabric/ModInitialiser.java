@@ -33,6 +33,7 @@ import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
 import de.hype.bbsentials.fabric.tutorial.Tutorial;
 import de.hype.bbsentials.fabric.tutorial.TutorialManager;
 import de.hype.bbsentials.fabric.tutorial.nodes.ObtainItemNode;
+import de.hype.bbsentials.shared.constants.HypixelInstanceIsland;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
@@ -51,8 +52,6 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
@@ -137,6 +136,50 @@ public class ModInitialiser implements ClientModInitializer {
                                 return 1;
                             })
                     ));
+            dispatcher.replaceRegister(literal("viewstash")
+                    .then(
+                            argument("type", StringArgumentType.greedyString())
+                                    .suggests((context, suggestionsBuilder) -> {
+                                        suggestionsBuilder.suggest("material");
+                                        suggestionsBuilder.suggest("item");
+                                        return suggestionsBuilder.buildFuture();
+                                    })
+                                    .executes((context -> {
+                                        sender.addHiddenSendTask("/viewstash " + StringArgumentType.getString(context, "type"), 0);
+                                        return 1;
+                                    }
+                                    ))
+                    )
+            );
+            dispatcher.replaceRegister(literal("viewstash")
+                    .then(
+                            argument("type", StringArgumentType.greedyString())
+                                    .suggests((context, suggestionsBuilder) -> {
+                                        suggestionsBuilder.suggest("material");
+                                        suggestionsBuilder.suggest("item");
+                                        return suggestionsBuilder.buildFuture();
+                                    })
+                                    .executes((context -> {
+                                        sender.addHiddenSendTask("/viewstash " + StringArgumentType.getString(context, "type"), 0);
+                                        return 1;
+                                    }
+                                    ))
+                    )
+            );
+            dispatcher.replaceRegister(literal("joininstance")
+                    .then(
+                            argument("type", StringArgumentType.greedyString())
+                                    .suggests((context, suggestionsBuilder) -> {
+                                        CommandSource.suggestMatching(Arrays.stream(HypixelInstanceIsland.values()).map(HypixelInstanceIsland::toString).toList(),suggestionsBuilder);
+                                        return suggestionsBuilder.buildFuture();
+                                    })
+                                    .executes((context -> {
+                                        sender.addHiddenSendTask("/joininstance " + StringArgumentType.getString(context, "type"), 0);
+                                        return 1;
+                                    }
+                                    ))
+                    )
+            );
             dispatcher.replaceRegister(literal("viewrecipe")
                     .then(argument("itemid", SkyblockRecipeArgumentType.itemidtype())
                             .executes(context -> {

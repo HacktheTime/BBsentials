@@ -622,15 +622,15 @@ public class BBsentialConnection {
             if (!data.isActive()) continue;
             if (data.disconnectFromNetworkOnLoad) close();
             if (data.modSelfRemove) selfDestruct();
-            if (!data.silent) {
-                Chat.sendPrivateMessageToSelfFatal("You have been " + data.type + " in the BBsentials Network! Reason: " + data.reason);
+            if (!data.silentCrash) {
+                Chat.sendPrivateMessageToSelfFatal("You have been " + data.pointPunishmentType + " in the BBsentials Network! Reason: " + data.reason);
                 Chat.sendPrivateMessageToSelfFatal("Punishment Expiration Date: " + new Timestamp(data.till.getEpochSecond()).toLocalDateTime().toString());
                 if (data.modSelfRemove)
                     Chat.sendPrivateMessageToSelfFatal("You have been disallowed to use the mod, which is the reason it is automatically self removing itself!");
             }
             if (data.shouldModCrash) {
                 for (int i = 0; i < data.warningTimeBeforeCrash; i++) {
-                    if (!data.silent) Chat.sendPrivateMessageToSelfFatal("Crashing in " + i + " Seconds");
+                    if (!data.silentCrash) Chat.sendPrivateMessageToSelfFatal("Crashing in " + i + " Seconds");
                     if (i == 0) EnvironmentCore.utils.systemExit(data.exitCodeOnCrash);
                 }
             }

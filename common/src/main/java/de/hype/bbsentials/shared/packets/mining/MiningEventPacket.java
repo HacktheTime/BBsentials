@@ -18,15 +18,15 @@ public class MiningEventPacket extends AbstractPacket {
      * @param island   Island Event is happening on. Options: {@link Islands#DWARVEN_MINES} , {@link Islands#CRYSTAL_HOLLOWS}
      * @throws Exception when the Island is invalid. Can be when the island is CH but event can only be in Dwarfen Mines
      */
-    public MiningEventPacket(MiningEvents event, String username, Islands island) throws Exception {
+    public MiningEventPacket(MiningEvents event, String username, Islands island) {
         super(1, 1); //Min and Max supported Version
         this.event = event;
         this.username = username;
         if (island != Islands.CRYSTAL_HOLLOWS && island != Islands.DWARVEN_MINES)
-            throw new Exception("Invalid Island!");
+            throw new IllegalArgumentException("Invalid Island!");
         if (island.equals(Islands.CRYSTAL_HOLLOWS)) {
             if (event.equals(MiningEvents.MITHRIL_GOURMAND) || event.equals(MiningEvents.RAFFLE) || event.equals(MiningEvents.GOBLIN_RAID)) {
-                throw new Exception("The specified event can not happen on this Server");
+                throw new IllegalArgumentException("The specified event can not happen on this Server");
             }
         }
         this.island = island;

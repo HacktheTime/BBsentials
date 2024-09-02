@@ -10,6 +10,7 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.NeuRepoManager;
 import io.github.moulberry.repo.constants.Islands;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -37,7 +38,7 @@ public class SkyblockWarpArgumentType implements ArgumentType<String> {
     public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         String current = builder.getRemainingLowerCase();
         if (!current.isEmpty()) {
-            warps.parallelStream().forEach(v -> {
+            new ArrayList<>(warps).forEach(v -> {
                 if (v.toLowerCase().contains(current)) builder.suggest(v);
             });
         }else {

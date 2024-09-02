@@ -66,7 +66,7 @@ public class SackMaterialArgumentType implements ArgumentType<String> {
     public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         String current = builder.getRemainingLowerCase();
         if (!current.isEmpty()) {
-            new ArrayList<>(materialIds).parallelStream().forEach(v -> {
+            new ArrayList<>(materialIds).forEach(v -> {
                 if (v.toLowerCase().contains(current)) builder.suggest(v);
             });
         }else {

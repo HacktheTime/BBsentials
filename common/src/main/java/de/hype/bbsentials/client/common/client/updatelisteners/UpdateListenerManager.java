@@ -34,6 +34,7 @@ public class UpdateListenerManager {
         String serverId = EnvironmentCore.utils.getServerId();
         for (Map.Entry<Integer, ChestLobbyData> entry : lobbies.entrySet()) {
             if (!entry.getValue().serverId.equals(serverId)) continue;
+            if (!entry.getValue().contactMan.equals(BBsentials.generalConfig.getUsername())) continue;
             chChestUpdateListener = new ChChestUpdateListener(entry.getValue());
             chChestUpdateListener.sendUpdatePacket();
             chChestUpdateListener.run();
@@ -43,6 +44,19 @@ public class UpdateListenerManager {
     public static void onChLobbyDataReceived(ChestLobbyData data) {
         ChestLobbyData oldData = lobbies.get(data.lobbyId);
         if (oldData == null) {
+            if (data.contactMan.equals(BBsentials.generalConfig.getUsername())) {
+                if (!BBsentials.partyConfig.allowBBinviteMe && data.bbcommand.trim().equalsIgnoreCase("/msg " + BBsentials.generalConfig.getUsername() + " bb:party me")) {
+                    Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap!");
+                    BBsentials.partyConfig.allowBBinviteMe = true;
+                    ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
+                }
+                else if (data.bbcommand.trim().equalsIgnoreCase("/p join " + BBsentials.generalConfig.getUsername())) {
+                    if (!BBsentials.partyConfig.isPartyLeader) BBsentials.sender.addImmediateSendTask("/p leave");
+                    BBsentials.sender.addHiddenSendTask("/stream open 23", 1);
+                    BBsentials.sender.addHiddenSendTask("/pl", 2);
+                    Chat.sendPrivateMessageToSelfImportantInfo("Opened Stream Party for you since you announced chchest items");
+                }
+            }
             if (data.getStatus().equalsIgnoreCase("Closed") || data.getStatus().equalsIgnoreCase("Left")) {
                 lobbies.remove(data);
                 return;

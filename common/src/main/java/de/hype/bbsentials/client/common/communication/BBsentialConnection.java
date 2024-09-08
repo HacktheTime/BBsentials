@@ -646,11 +646,18 @@ public class BBsentialConnection {
             Chat.sendPrivateMessageToSelfError("The Lobby is already Closed (Day Count too high) → No one can be warped in!");
             return;
         }
-        if (!BBsentials.partyConfig.allowBBinviteMe && command.trim().equals("/msg " + BBsentials.generalConfig.getUsername() + " bb:party me")) {
+        if (!BBsentials.partyConfig.allowBBinviteMe && command.trim().equalsIgnoreCase("/msg " + BBsentials.generalConfig.getUsername() + " bb:party me")) {
             Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap!");
             BBsentials.partyConfig.allowBBinviteMe = true;
             ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
         }
+        else if (command.trim().equalsIgnoreCase("/p join " + BBsentials.generalConfig.getUsername())) {
+            if (!BBsentials.partyConfig.isPartyLeader) BBsentials.sender.addImmediateSendTask("/p leave");
+            BBsentials.sender.addHiddenSendTask("/stream open 23", 1);
+            BBsentials.sender.addHiddenSendTask("/pl", 2);
+            Chat.sendPrivateMessageToSelfImportantInfo("Opened Stream Party for you since you announced chchest items");
+        }
+
         BBsentials.connection.sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", coords, items)), EnvironmentCore.utils.getServerId(), command, extraMessage, StatusConstants.OPEN)));
     }
 }

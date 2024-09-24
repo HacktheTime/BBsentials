@@ -60,9 +60,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -170,7 +168,7 @@ public class ModInitialiser implements ClientModInitializer {
                     .then(
                             argument("type", StringArgumentType.greedyString())
                                     .suggests((context, suggestionsBuilder) -> {
-                                        CommandSource.suggestMatching(Arrays.stream(HypixelInstanceIsland.values()).map(HypixelInstanceIsland::toString).toList(),suggestionsBuilder);
+                                        CommandSource.suggestMatching(Arrays.stream(HypixelInstanceIsland.values()).map(HypixelInstanceIsland::toString).toList(), suggestionsBuilder);
                                         return suggestionsBuilder.buildFuture();
                                     })
                                     .executes((context -> {
@@ -760,24 +758,8 @@ public class ModInitialiser implements ClientModInitializer {
     }
 
 
-    public void disconnectServer() {
-        MinecraftClient.getInstance().disconnect();
-    }
-
     public void joinHypixel() {
-        String serverAddress = "mc.hypixel.net";
-        MinecraftClient client = MinecraftClient.getInstance();
-        ServerList serverList = new ServerList(client);
-        serverList.loadFile();
-        ServerInfo serverInfo = serverList.get(serverAddress);
-        if (serverInfo == null) {
-            serverInfo = new ServerInfo("Hypixel", serverAddress, ServerInfo.ServerType.OTHER);
-            serverList.add(serverInfo, true);
-            serverList.saveFile();
-        }
-        ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
-
-        ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
-        sender.addSendTask("/skyblock", 3.5);
+        Map<String, Double> commands = Map.of("/skyblock",3.5);
+        EnvironmentCore.utils.connectToServer("mc.hypixel.net",commands);
     }
 }

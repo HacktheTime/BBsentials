@@ -20,6 +20,8 @@ import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.Position;
+import de.hype.bbsentials.shared.objects.minions.Minions;
+import de.hype.bbsentials.shared.packets.function.MinionDataResponse;
 import kotlin.Unit;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 import net.fabricmc.loader.api.FabricLoader;
@@ -31,9 +33,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.network.*;
+import net.minecraft.client.option.ServerList;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.toast.Toast;
@@ -75,8 +79,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
-import static de.hype.bbsentials.client.common.client.BBsentials.hpModAPICore;
+import static de.hype.bbsentials.client.common.client.BBsentials.*;
 
 public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
     ModContainer self = FabricLoader.getInstance().getAllMods().stream().filter(modContainer -> modContainer.getMetadata().getId().equals("bbsentials")).toList().get(0);
@@ -133,8 +136,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
                     }
                     for (Position possibleBlock : CrystalMetalDetectorSolver.possibleBlocks) {
-                        BlockPos pos = new BlockPos(possibleBlock.x,possibleBlock.y,possibleBlock.z);
-                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >=300) continue;
+                        BlockPos pos = new BlockPos(possibleBlock.x, possibleBlock.y, possibleBlock.z);
+                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= 300) continue;
                         it.color(Color.ORANGE, 0.2f);
                         it.block(pos);
                         it.color(Color.ORANGE, 1f);
@@ -256,6 +259,61 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         if (EnvironmentCore.utils.getCurrentIsland() != Islands.CRYSTAL_HOLLOWS) return null;
         long diffTime = 20400 - ((EnvironmentCore.utils.getLobbyTime() * 50) / 1000);
         return Instant.now().plusSeconds(diffTime);
+    }
+
+    @Override
+    public MinionDataResponse getMiniondata() {
+        Map<Minions, Integer> minions = new HashMap<>();
+        if (getCurrentIsland() != Islands.PRIVATE_ISLAND) return new MinionDataResponse(null, null);
+        List<PlayerListEntry> tabList = new ArrayList<>(MinecraftClient.getInstance().getNetworkHandler().getPlayerList());
+        boolean inMinionData = false;
+        Integer slots = null;
+        for (int i = 0; i < tabList.size(); i++) {
+            String string = tabList.get(i).getDisplayName().getString();
+            if (string.startsWith("Minions:")) {
+                inMinionData = true;
+                slots = Integer.parseInt(string.split("/")[1].replaceAll("\\D+", ""));
+            }
+            else if (inMinionData && string.trim().isEmpty()) return new MinionDataResponse(minions, slots);
+            if (!(inMinionData)) continue;
+            try {
+                String[] arguments = string.split(" ");
+                int count = Integer.parseInt(arguments[0].replaceAll("\\D+", ""));
+                String type = String.join(" ", Arrays.stream(arguments).toList().subList(1, arguments.length - 2));
+                String tier = arguments[arguments.length - 3];
+                minions.put(Minions.getMinionFromString(type, tier), count);
+            } catch (Exception e) {
+                return new MinionDataResponse(minions, slots);
+            }
+        }
+        return new MinionDataResponse(minions, slots);
+    }
+
+    @Override
+    public void connectToServer(String serverAddress, Map<String, Double> commands) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        MinecraftClient.getInstance().execute(() -> {
+            ServerList serverList = new ServerList(client);
+            serverList.loadFile();
+            ServerInfo serverInfo = serverList.get(serverAddress);
+            if (serverInfo == null) {
+                serverInfo = new ServerInfo(serverAddress, serverAddress, ServerInfo.ServerType.OTHER);
+                serverList.add(serverInfo, true);
+                serverList.saveFile();
+            }
+            ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
+
+            ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
+            commands.forEach(sender::addSendTask);
+        });
+
+    }
+
+    @Override
+    public void disconnectFromServer() {
+        MinecraftClient.getInstance().execute(() -> {
+            MinecraftClient.getInstance().disconnect();
+        });
     }
 
     public void playsound(String eventName) {
@@ -528,7 +586,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
 
                 toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                long closingTimeInMinutes = Duration.between(Instant.now(),getLobbyClosingTime()).toMinutes();
+                long closingTimeInMinutes = Duration.between(Instant.now(), getLobbyClosingTime()).toMinutes();
                 if (closingTimeInMinutes <= 0) {
                     toRender.add(Text.of("§4Lobby Closed"));
                 }

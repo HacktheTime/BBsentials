@@ -5,14 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.hype.bbsentials.client.common.SystemUtils;
-import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
-import de.hype.bbsentials.shared.constants.ChChestItem;
-import de.hype.bbsentials.shared.constants.ChChestItems;
+import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -192,8 +190,9 @@ public class Chat {
             Chat.sendPrivateMessageToSelfDebug("set the last prompt action too + \"" + command + "\"");
         }
     }
+
     /**
-     * @param task          the command to be executed
+     * @param task             the command to be executed
      * @param timeBeforePerish in seconds before its reset to nothing
      */
     public static void setChatCommand(Runnable task, int timeBeforePerish) {
@@ -201,6 +200,25 @@ public class Chat {
         if (BBsentials.developerConfig.isDevModeEnabled()) {
             Chat.sendPrivateMessageToSelfDebug("set a Chat Prompt Task");
         }
+    }
+
+    public static String getFirstGreenSelectOption(String jsonString) {
+        JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+        JsonArray extraArray = jsonObject.getAsJsonArray("extra");
+
+        for (JsonElement element : extraArray) {
+            JsonObject extraObject = element.getAsJsonObject();
+            String text = extraObject.get("text").getAsString();
+
+            // Check if the text contains green color code
+            if (text.contains("§a")) {
+                JsonObject clickEvent = extraObject.getAsJsonObject("clickEvent");
+                if (clickEvent != null && "run_command".equals(clickEvent.get("action").getAsString())) {
+                    return clickEvent.get("value").getAsString();
+                }
+            }
+        }
+        return null;
     }
 
     public Message onEvent(Message text, boolean actionbar) {
@@ -287,8 +305,8 @@ public class Chat {
                 }
             }
             else if (message.isServerMessage()) {
-                if (messageUnformatted.startsWith("Select an option:")){
-                    setChatCommand(getFirstGreenSelectOption(message.getJson()),10);
+                if (messageUnformatted.startsWith("Select an option:")) {
+                    setChatCommand(getFirstGreenSelectOption(message.getJson()), 10);
                 }
                 else if (messageUnformatted.contains(".*disbanded the party")) {
                     lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
@@ -449,6 +467,10 @@ public class Chat {
                             BBsentials.sender.addSendTask("/p invite " + username, 1);
                         }
                     }
+                    if (messageContent.startsWith("bb:party list")) {
+                        BBsentials.sender.addSendTask("/p list", 1);
+                    }
+
                     else if (BBsentials.partyConfig.isPartyLeader) {
                         TrustedPartyMember person = BBsentials.partyConfig.getTrustedUsername(username);
                         if (person == null) {
@@ -481,6 +503,14 @@ public class Chat {
                             if (person.partyAdmin()) {
                                 BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName));
                                 BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
+                            }
+                            else {
+                                message.replyToUser("Insufficient Privileges");
+                            }
+                        }
+                        if (messageContent.equalsIgnoreCase("bb:party accept")) {
+                            if (person.canInvite()) {
+                                BBsentials.sender.addSendTask("/p accept " + username, 1);
                             }
                             else {
                                 message.replyToUser("Insufficient Privileges");
@@ -626,7 +656,7 @@ public class Chat {
     }
 
     public void sendNotification(String title, String text) {
-        SystemUtils.sendNotification(title,text);
+        SystemUtils.sendNotification(title, text);
     }
 
     public void sendNotification(String title, String text, float volume) {
@@ -666,23 +696,6 @@ public class Chat {
         }
         return "/pc " + username + " " + updatedActionParamter + " " + updatedTargetName;
     }
-    public static String getFirstGreenSelectOption(String jsonString) {
-        JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
-        JsonArray extraArray = jsonObject.getAsJsonArray("extra");
 
-        for (JsonElement element : extraArray) {
-            JsonObject extraObject = element.getAsJsonObject();
-            String text = extraObject.get("text").getAsString();
 
-            // Check if the text contains green color code
-            if (text.contains("§a")) {
-                JsonObject clickEvent = extraObject.getAsJsonObject("clickEvent");
-                if (clickEvent != null && "run_command".equals(clickEvent.get("action").getAsString())) {
-                    return clickEvent.get("value").getAsString();
-                }
-            }
-        }
-
-        return null;
-    }
 }

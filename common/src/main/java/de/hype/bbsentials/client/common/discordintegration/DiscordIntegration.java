@@ -21,13 +21,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.hypixel.data.type.ServerType;
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.handler.ClientboundPacketHandler;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket;
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +56,7 @@ public class DiscordIntegration extends ListenerAdapter {
         // Schedule the message update task
         executorService.scheduleAtFixedRate(this::updateDMs, 0, 30, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> jda.shutdown()));
+        HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, this::onServerUpdate);
     }
 
     public static void reply(GenericCommandInteractionEvent event, String message) {
@@ -220,6 +225,8 @@ public class DiscordIntegration extends ListenerAdapter {
                 Commands.slash("status-enable", "Enable the Output"),
                 Commands.slash("shutdown", "Shuts down your pc"),
                 Commands.slash("suspend", "Puts your pc into sleep"),
+                Commands.slash("connect", "Connect to Hypixel"),
+                Commands.slash("disconnect", "Disconnect from the current Server."),
                 Commands.slash("hibernate", "Puts your pc into hibernation (shutdown but restart with all application data)"),
 
                 Commands.slash("custom", "allows you to specify a custom command to be executed").addOption(OptionType.STRING, "command", "command to be executed", true)
@@ -245,6 +252,14 @@ public class DiscordIntegration extends ListenerAdapter {
             else if (event.getName().equals("hub")) {
                 BBsentials.sender.addSendTask("/hub", 0);
                 reply(event, "Performed");
+            }
+            else if (event.getName().equals("connect")){
+                EnvironmentCore.utils.connectToServer("mc.hypixel.net",new HashMap<>());
+                event.getHook().sendMessage("Done").queue();
+            }
+            else if (event.getName().equals("disconnect")){
+                EnvironmentCore.utils.disconnectFromServer();
+                event.getHook().sendMessage("Done").queue();
             }
             else if (event.getName().equals("warp-garden")) {
                 BBsentials.sender.addSendTask("/warp garden", 0);
@@ -369,5 +384,14 @@ public class DiscordIntegration extends ListenerAdapter {
 
     public void sendEmbed(MessageEmbed embed) {
         dms.sendMessageEmbeds(embed).queue();
+    }
+
+    public void onServerUpdate(ClientboundLocationPacket locationPacket){
+        if (locationPacket.getServerName().equalsIgnoreCase("limbo")){
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.setColor(Color.RED);
+            builder.setDescription("You got limboed!");
+            dms.sendMessageEmbeds(builder.build()).queue();
+        }
     }
 }

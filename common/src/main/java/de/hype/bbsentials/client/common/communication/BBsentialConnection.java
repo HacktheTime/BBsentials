@@ -660,4 +660,8 @@ public class BBsentialConnection {
 
         BBsentials.connection.sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", coords, items)), EnvironmentCore.utils.getServerId(), command, extraMessage, StatusConstants.OPEN)));
     }
+
+    public void onRequestMinionDataPacket(MinionDataResponse.RequestMinionDataPacket packet) {
+        sendPacket(packet.preparePacketToReplyToThis(EnvironmentCore.utils.getMiniondata()));
+    }
 }

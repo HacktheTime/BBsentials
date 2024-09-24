@@ -2,6 +2,7 @@ package de.hype.bbsentials.client.common.mclibraries;
 
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.objects.Position;
 import javazoom.jl.player.advanced.AdvancedPlayer;
@@ -20,6 +21,7 @@ import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -202,4 +204,10 @@ public interface Utils {
     String getGameVersion();
 
     Instant getLobbyClosingTime();
+
+    AbstractPacket getMiniondata();
+
+    void connectToServer(String s, Map<String, Double> commands);
+
+    void disconnectFromServer();
 }

@@ -32,6 +32,7 @@ public class Vector3d implements Comparable<Vector3d> {
         this.y = y;
         this.z = z;
     }
+
     public Vector3d(Position pos) {
         this.x = pos.x;
         this.y = pos.y;

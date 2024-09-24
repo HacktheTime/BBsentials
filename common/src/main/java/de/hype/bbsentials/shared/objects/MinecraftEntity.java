@@ -3,9 +3,9 @@ package de.hype.bbsentials.shared.objects;
 import de.hype.bbsentials.shared.constants.VanillaEntities;
 
 public class MinecraftEntity {
-     public final VanillaEntities type;
-     public final String customName;
-     public final Position position;
+    public final VanillaEntities type;
+    public final String customName;
+    public final Position position;
 
     public MinecraftEntity(VanillaEntities type, String customName, Position position) {
         this.type = type;

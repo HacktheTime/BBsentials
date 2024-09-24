@@ -26,8 +26,6 @@ public class EditDiscordRolesPacket extends AbstractPacket {
         OLDIE("oldie"),
         MOD_MODERN_BETA("1.20 Mod Beta"),
         MOD_MODERN_RELEASE("1.20 Mod Release"),
-        MOD_OLD_BETA("1.8.9 Mod Beta"),
-        MOD_OLD_RELEASE("1.8.9 Mod Release"),
         ALL_CH_CHEST_ITEM("All ChChest Item"),
         ALL_ROBO_PART("All Robo Part"),
         ALL_BETTER_TOGETHER("All-Better Together"),

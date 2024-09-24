@@ -66,6 +66,8 @@ public class PacketManager {
         packets.add(new Packet<>(SkyblockLobbyDataPacket.class, connection::onSkyblockLobbyDataPacket));
         packets.add(new Packet<>(PunishedPacket.class, connection::onPunishedPacket));
         packets.add(new Packet<>(PlaySoundPacket.class, connection::onPlaySoundPacket));
+        packets.add(new Packet<>(MinionDataResponse.RequestMinionDataPacket.class, connection::onRequestMinionDataPacket));
+        packets.add(new Packet<>(MinionDataResponse.class, connection::dummy));
         packets.add(new Packet<>(ChestLobbyUpdatePacket.class, ((packet) -> UpdateListenerManager.onChLobbyDataReceived(packet.lobby))));
     }
 }

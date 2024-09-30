@@ -494,6 +494,11 @@ public class BBsentialsConfigScreenFactory {
                         .setTooltip(Text.of("Will send you a message whenever the Bot starts"))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.doStartupMessage = newValue)
                         .build());
+                discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Do Lobby Change Update Message"), BBsentials.discordConfig.sendLobbyUpdateInfo)
+                        .setDefaultValue(true)
+                        .setTooltip(Text.of("Will send you a message when you get into limbo."))
+                        .setSaveConsumer(newValue -> BBsentials.discordConfig.sendLobbyUpdateInfo = newValue)
+                        .build());
                 discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Use the Discord Game SDK"), BBsentials.discordConfig.sdkMainToggle)
                         .setDefaultValue(false)
                         .setTooltip(Text.of("Main toggle for any usage of the Discord Game SDK."))

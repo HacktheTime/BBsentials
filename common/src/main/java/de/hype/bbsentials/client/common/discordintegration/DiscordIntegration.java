@@ -21,17 +21,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.hypixel.data.type.ServerType;
 import net.hypixel.modapi.HypixelModAPI;
-import net.hypixel.modapi.handler.ClientboundPacketHandler;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +51,7 @@ public class DiscordIntegration extends ListenerAdapter {
         if (!BBsentials.discordConfig.discordIntegration) return;
         if (!BBsentials.discordConfig.useBridgeBot) return;
         jda = start();
-        BBsentials.executionService.scheduleAtFixedRate(() -> updateStatus(), 0, 10, TimeUnit.MINUTES);
+        BBsentials.executionService.scheduleAtFixedRate(this::updateStatus, 0, 10, TimeUnit.MINUTES);
         // Schedule the message update task
         executorService.scheduleAtFixedRate(this::updateDMs, 0, 30, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> jda.shutdown()));
@@ -135,8 +134,7 @@ public class DiscordIntegration extends ListenerAdapter {
             if (isImportant(message)) {
                 updateDMs();
                 dms.sendMessage("**" + message + "**").setSuppressedNotifications(false).queue();
-            }
-            else {
+            } else {
                 // Add silent messages to the buffer
                 silentMessageBuffer.add(message.getUnformattedString());
             }
@@ -178,14 +176,12 @@ public class DiscordIntegration extends ListenerAdapter {
                         combinedMessage.append('\n'); // Add a newline if not the first message
                     }
                     combinedMessage.append(msg);
-                }
-                else {
+                } else {
                     if ((combinedMessage.length() <= 1) && !sendNew) {
                         getLastMessage().editMessage(combinedMessage).queue();
                         combinedMessage = new StringBuilder(msg); // Start a new batch
                         sendNew = true;
-                    }
-                    else {
+                    } else {
                         if ((msg.length() + 2 + combinedMessage.length()) >= 2000) {
                             dms.sendMessage(combinedMessage.toString()).setSuppressedNotifications(true).queue();
                             sendNew = false;
@@ -198,8 +194,7 @@ public class DiscordIntegration extends ListenerAdapter {
             // Send the remaining messages, if any
             if (sendNew) {
                 dms.sendMessage(combinedMessage.toString()).setSuppressedNotifications(true).queue();
-            }
-            else {
+            } else {
                 getLastMessage().editMessage(combinedMessage).queue();
             }
             copiedBuffer.clear();
@@ -240,40 +235,32 @@ public class DiscordIntegration extends ListenerAdapter {
             if (event.getName().equals("lobby")) {
                 BBsentials.sender.addSendTask("/lobby", 0);
                 reply(event, "Performed");
-            }
-            else if (event.getName().equals("skyblock")) {
+            } else if (event.getName().equals("skyblock")) {
                 BBsentials.sender.addSendTask("/skyblock", 0);
                 reply(event, "Performed");
-            }
-            else if (event.getName().equals("is")) {
+            } else if (event.getName().equals("is")) {
                 BBsentials.sender.addSendTask("/is", 0);
                 reply(event, "Performed");
-            }
-            else if (event.getName().equals("hub")) {
+            } else if (event.getName().equals("hub")) {
                 BBsentials.sender.addSendTask("/hub", 0);
                 reply(event, "Performed");
-            }
-            else if (event.getName().equals("connect")){
-                EnvironmentCore.utils.connectToServer("mc.hypixel.net",new HashMap<>());
+            } else if (event.getName().equals("connect")) {
+                EnvironmentCore.utils.connectToServer("mc.hypixel.net", new HashMap<>());
                 event.getHook().sendMessage("Done").queue();
-            }
-            else if (event.getName().equals("disconnect")){
+            } else if (event.getName().equals("disconnect")) {
                 EnvironmentCore.utils.disconnectFromServer();
                 event.getHook().sendMessage("Done").queue();
-            }
-            else if (event.getName().equals("warp-garden")) {
+            } else if (event.getName().equals("warp-garden")) {
                 BBsentials.sender.addSendTask("/warp garden", 0);
                 reply(event, "Performed");
-            }
-            else if (event.getName().equals("screenshot")) {
+            } else if (event.getName().equals("screenshot")) {
                 try {
                     sendScreenshotMessage(event);
                 } catch (Exception e) {
                     reply(event, e.getMessage());
                     e.printStackTrace();
                 }
-            }
-            else if (event.getName().equals("custom")) {
+            } else if (event.getName().equals("custom")) {
                 if (!BBsentials.discordConfig.allowCustomCommands) {
                     reply(event, "Custom Commands are disabled.");
                     return;
@@ -285,48 +272,42 @@ public class DiscordIntegration extends ListenerAdapter {
                 } catch (Exception e) {
                     reply(event, "Invalid command");
                 }
-            }
-            else if (event.getName().equals("clear")) {
+            } else if (event.getName().equals("clear")) {
                 try {
                     event.getChannel().asPrivateChannel().purgeMessages(event.getChannel().asPrivateChannel().getHistory().getRetrievedHistory().stream().filter(message -> message.getAuthor().getId().equals(jda.getSelfUser().getId())).collect(Collectors.toList()));
                     reply(event, "Done");
                 } catch (Exception ignored) {
                     reply(event, "Error Occur");
                 }
-            }
-            else if (event.getName().equals("status-enable")) {
+            } else if (event.getName().equals("status-enable")) {
                 if (!BBsentials.discordConfig.useBridgeBot || !BBsentials.discordConfig.discordIntegration) {
                     reply(event, new EmbedBuilder().setColor(Color.MAGENTA).setTitle("Status: Disabled").setDescription("The Current Configuration does not allow using the Bridge bot please allow it First. This needs to be done in Person!").build());
                     return;
                 }
                 BBsentials.discordConfig.setDisableTemporary(false);
                 reply(event, new EmbedBuilder().setColor(Color.RED).setTitle("Status: Enabled").setDescription("Status is now enabled you may see messages now.").build());
-            }
-            else if (event.getName().equals("status-disable")) {
+            } else if (event.getName().equals("status-disable")) {
                 if (!BBsentials.discordConfig.useBridgeBot || !BBsentials.discordConfig.discordIntegration) {
                     reply(event, new EmbedBuilder().setColor(Color.MAGENTA).setTitle("Status: Disabled").setDescription("The Current Configuration does not allow using the Bridge bot please allow it First. This needs to be done in Person!").build());
                     return;
                 }
                 BBsentials.discordConfig.setDisableTemporary(true);
                 reply(event, new EmbedBuilder().setColor(Color.GREEN).setTitle("Status: Disabled").setDescription("Status you no longer receive messages here").build());
-            }
-            else if (event.getName().equals("shutdown")) {
+            } else if (event.getName().equals("shutdown")) {
                 try {
                     EnvironmentCore.utils.shutdownPC();
                     reply(event, "Shutting down in 20 Seconds");
                 } catch (IOException e) {
                     reply(event, "Error Occcur: " + e.getMessage());
                 }
-            }
-            else if (event.getName().equals("suspend")) {
+            } else if (event.getName().equals("suspend")) {
                 try {
                     EnvironmentCore.utils.suspendPC();
                     reply(event, "Going into sleep in 20 Seconds");
                 } catch (IOException e) {
                     reply(event, "Error Occcur: " + e.getMessage());
                 }
-            }
-            else if (event.getName().equals("hibernate")) {
+            } else if (event.getName().equals("hibernate")) {
                 try {
                     EnvironmentCore.utils.hibernatePC();
                     reply(event, "Going into hibernation in 20 Seconds");
@@ -334,8 +315,7 @@ public class DiscordIntegration extends ListenerAdapter {
                     reply(event, "Error Occcur: " + e.getMessage());
                 }
             }
-        }
-        else {
+        } else {
             reply(event, "Only the Owner may execute Commands");
         }
     }
@@ -386,12 +366,14 @@ public class DiscordIntegration extends ListenerAdapter {
         dms.sendMessageEmbeds(embed).queue();
     }
 
-    public void onServerUpdate(ClientboundLocationPacket locationPacket){
-        if (locationPacket.getServerName().equalsIgnoreCase("limbo")){
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.setColor(Color.RED);
-            builder.setDescription("You got limboed!");
-            dms.sendMessageEmbeds(builder.build()).queue();
+    public void onServerUpdate(ClientboundLocationPacket locationPacket) {
+        if (locationPacket.getServerName().equalsIgnoreCase("limbo")) {
+            if (BBsentials.discordConfig.sendLobbyUpdateInfo) {
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.setColor(Color.RED);
+                builder.setDescription("You got limboed!");
+                dms.sendMessageEmbeds(builder.build()).queue();
+            }
         }
     }
 }

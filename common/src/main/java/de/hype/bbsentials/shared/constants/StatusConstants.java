@@ -33,9 +33,25 @@ public enum StatusConstants implements BBDisplayNameProvider {
         return color;
     }
 
-    @Deprecated
     @Override
     public String toString() {
         return displayName;
+    }
+
+    public String toEnumString() {
+        return super.toString();
+    }
+
+
+    public static StatusConstants getSplashStatus(String string) {
+        for (StatusConstants value : StatusConstants.values()) {
+            if (value == DONEGOOD || value == ONGOING || value == OPEN || value == CLOSING || value == CLOSINGSOON || value == LEAVINGSOON || value == CLOSED || value == LEFT) {
+                continue;
+            }
+            if (value.toEnumString().equalsIgnoreCase(string)) {
+                return value;
+            }
+        }
+        return null;
     }
 }

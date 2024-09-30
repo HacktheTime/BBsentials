@@ -30,5 +30,10 @@ public class SplashLocation {
     public Position getCoords() {
         return coords;
     }
+
+    public String getDisplayString() {
+        if (name.equalsIgnoreCase("bea")) return "bea";
+        return "%s (%d %d %d)".formatted(name, coords.x, coords.y, coords.z);
+    }
 }
 

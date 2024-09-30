@@ -47,7 +47,7 @@ public class SplashManager {
         else {
             where = "Hub";
         }
-        Chat.sendPrivateMessageToSelfImportantInfo(splash.announcer + " is Splashing in " + where + " #" + splash.hubNumber + " at " + splash.locationInHub + ":" + splash.extraMessage);
+        Chat.sendPrivateMessageToSelfImportantInfo(splash.announcer + " is Splashing in " + where + " #" + splash.hubNumber + " at " + splash.locationInHub.getDisplayString() + ":" + splash.extraMessage);
     }
 
     public static class DisplaySplash extends SplashData {

@@ -14,7 +14,7 @@ public class VisualConfig extends BBsentialsConfig {
     public boolean showContributorPositionInCount = true;
     public boolean addSplashWaypoint = true;
     public boolean infiniteChatHistory = true;
-    public boolean showMODSolver = true;
+    public boolean showMODSolver = false;
 
 
     public VisualConfig() {

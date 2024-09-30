@@ -110,6 +110,7 @@ public class CrystalMetalDetectorSolver {
     private static boolean visitKeeperMessagePrinted;
 
     public static void process(Message message) {
+        if (!BBsentials.visualConfig.showMODSolver) return;
         if (BBsentials.dataStorage.getIsland() != Islands.CRYSTAL_HOLLOWS || !message.getUnformattedString().contains("TREASURE: ")) {
             return;
         }

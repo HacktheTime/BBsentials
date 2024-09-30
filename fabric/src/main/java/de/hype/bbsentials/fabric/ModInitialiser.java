@@ -233,7 +233,7 @@ public class ModInitialiser implements ClientModInitializer {
                                     .executes((context) -> {
                                         executionService.execute(() -> {
                                             try {
-                                                Socket test = new Socket("localhost", 5011);
+                                                Socket test = new Socket("localhost", 5012);
                                                 test.close();
                                             } catch (Exception e) {
                                                 Chat.sendPrivateMessageToSelfError("Could not reach a local test Server. Do you have one running?");

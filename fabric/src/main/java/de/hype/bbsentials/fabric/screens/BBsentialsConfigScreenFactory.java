@@ -21,7 +21,7 @@ public class BBsentialsConfigScreenFactory {
     public static Screen create(Screen parent) {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
-                .setTitle(Text.of("BBsentials ConfigManager"));
+                .setTitle(Text.of("BBsentials Config"));
         builder.setSavingRunnable(ConfigManager::saveAll);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         if (BBsentials.developerConfig.doDevDashboardConfig && BBsentials.generalConfig.hasBBRoles("dev")) {

@@ -30,15 +30,19 @@ public abstract class RenderingDefinitions {
 
     private static Integer renderDefIdCounter = 0;
     public final Integer renderDefId = renderDefIdCounter++;
+    public final String name;
 
-    public RenderingDefinitions() {
+    public RenderingDefinitions(String name) {
         defsBlocking.put(renderDefId, this);
+        this.name = name;
     }
 
     /**
      * @param blocking is the information youre modifying final or may it be process from something else as well?
+     * @param name     Name of the Redering. Used only in Debugger.
      */
-    public RenderingDefinitions(boolean blocking) {
+    public RenderingDefinitions(boolean blocking, String name) {
+        this.name = name;
         if (blocking) defsBlocking.put(renderDefId, this);
         else defsNonBlocking.put(renderDefId, this);
     }
@@ -46,7 +50,7 @@ public abstract class RenderingDefinitions {
     public static void clearAndInitDefaults() {
         defsBlocking.clear();
         defsNonBlocking.clear();
-        new RenderingDefinitions() {
+        new RenderingDefinitions("Splash Hub Highlight") {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 {
@@ -107,7 +111,7 @@ public abstract class RenderingDefinitions {
             }
         };
         if (BBsentials.generalConfig.hasBBRoles("splasher")) {
-            new RenderingDefinitions() {
+            new RenderingDefinitions("Splasher Exp Boost Potion Changer") {
                 @Override
                 public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                     if (!BBsentials.splashConfig.xpBoostHighlight) return false;
@@ -131,7 +135,7 @@ public abstract class RenderingDefinitions {
                 }
             };
         }
-        new RenderingDefinitions() {
+        new RenderingDefinitions("Water Bottle to Red Concrete") {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (itemName.equals("Water Bottle")) {
@@ -140,7 +144,7 @@ public abstract class RenderingDefinitions {
                 return false;
             }
         };
-        new RenderingDefinitions() {
+        new RenderingDefinitions("Chocolate Factory Rabbit Notifications") {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (itemName.equals("CLICK ME!")) {
@@ -160,7 +164,7 @@ public abstract class RenderingDefinitions {
                 return false;
             }
         };
-        new RenderingDefinitions(false) {
+        new RenderingDefinitions(false, "Add Item Debug") {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 if (!BBsentials.developerConfig.hypixelItemInfo) return false;
@@ -179,7 +183,7 @@ public abstract class RenderingDefinitions {
                 return false;
             }
         };
-        new RenderingDefinitions() {
+        new RenderingDefinitions("Position Community Goals") {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
                 VanillaItems stackItem = stack.getItem();

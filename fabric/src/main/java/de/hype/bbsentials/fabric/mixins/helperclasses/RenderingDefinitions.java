@@ -66,27 +66,34 @@ public abstract class RenderingDefinitions {
                         if (line.matches("Players: \\d+/\\d+")) {
                             playerCount = Integer.parseInt(line.replace("Players:", "").split("/")[0].trim());
                             if (line.equals("Players: " + playerCount + "/" + playerCount)) full = true;
-                        }
-                        else if (line.matches("Server: .*")) {
-                            serverid = line.replace("Servers: ", "").trim();
+                        } else if (line.matches("Server: .*")) {
+                            serverid = line.replace("Server: ", "").trim();
                         }
                     }
                     hubNumber = stack.getCount();
                     if (!SplashManager.splashPool.isEmpty()) {
                         for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
-                            if (value.serverID.equals(serverid)) {
-                                if (value.receivedTime.isAfter(Instant.now().minusSeconds(20))) {
-                                    if (full) check.texturePath = "customitems/splash_hub_full";
-                                    else check.texturePath = "customitems/splash_hub";
-                                    return true;
+                            if (value.receivedTime.isAfter(Instant.now().minusSeconds(20))) {
+                                if (value.serverID.equalsIgnoreCase(serverid)) {
+                                    if (full) check.texturePath = "bbsentials:customitems/splash_hub_full";
+                                    else check.texturePath = "bbsentials:customitems/splash_hub";
+                                } else if (value.serverID.isEmpty()) {
+                                    if (value.hubNumber == hubNumber) {
+                                        if (full) check.texturePath = "bbsentials:customitems/splash_hub_full";
+                                        else check.texturePath = "bbsentials:customitems/splash_hub";
+                                    }
+                                }else {
+                                    return false;
                                 }
-                            }
-                            else if (value.serverID.isEmpty()) {
-                                if (value.hubNumber == hubNumber) {
-                                    if (full) check.texturePath = "customitems/splash_hub_full";
-                                    else check.texturePath = "customitems/splash_hub";
-                                    return true;
+                                List<Text> textList = check.getTextTooltip();
+                                textList.getFirst().setStringText("%s(Splash) %s".formatted(Formatting.GOLD,check.getItemStackName()));
+                                textList.add(4,EnvironmentCore.textutils.createText("%sSplasher: %s%s".formatted(Formatting.GRAY,Formatting.LIGHT_PURPLE,value.announcer)));
+                                textList.add(5,EnvironmentCore.textutils.createText(""));
+                                if (value.extraMessage != null && !value.extraMessage.isEmpty()) {
+                                    textList.add(5,EnvironmentCore.textutils.createText("%sMessage: %s".formatted(Formatting.GRAY,value.extraMessage)));
                                 }
+                                textList.add(5,EnvironmentCore.textutils.createText("%sLocation: %s".formatted(Formatting.GRAY,value.locationInHub.getDisplayString())));
+                                return true;
                             }
                         }
                     }
@@ -99,8 +106,7 @@ public abstract class RenderingDefinitions {
                     if (BBsentials.funConfig.hub29Troll) {
                         check.setItemStackName(EnvironmentCore.textutils.createText("§aSkyBlock Hub #29 (" + itemName.replaceAll("\\D", "") + ")"));
                         check.setItemCount(29);
-                    }
-                    else if (BBsentials.funConfig.hub17To29Troll) {
+                    } else if (BBsentials.funConfig.hub17To29Troll) {
                         if (hubNumber == 17) {
                             check.setItemStackName(EnvironmentCore.textutils.createText("§aSkyBlock Hub #29"));
                             check.setItemCount(29);
@@ -150,14 +156,14 @@ public abstract class RenderingDefinitions {
                 if (itemName.equals("CLICK ME!")) {
                     if (MinecraftClient.getInstance().currentScreen != null) {
                         if (MinecraftClient.getInstance().currentScreen.getTitle().getString().equals("Chocolate Factory") && !MinecraftClient.getInstance().isWindowFocused()) {
-                            SystemUtils.sendNotification("Chocolate Factory","A Stray Rabbit appeared!");
+                            SystemUtils.sendNotification("Chocolate Factory", "A Stray Rabbit appeared!");
                         }
                     }
                 }
                 if (itemName.startsWith("Golden Rabbit -")) {
                     if (MinecraftClient.getInstance().currentScreen != null) {
                         if (MinecraftClient.getInstance().currentScreen.getTitle().getString().equals("Chocolate Factory") && !MinecraftClient.getInstance().isWindowFocused()) {
-                            SystemUtils.sendNotification("Chocolate Factory","A Golden Rabbit appeared!");
+                            SystemUtils.sendNotification("Chocolate Factory", "A Golden Rabbit appeared!");
                         }
                     }
                 }
@@ -229,32 +235,24 @@ public abstract class RenderingDefinitions {
                                 //Display Position not %
                                 if (position == 1) {
                                     check.setItemCount(Formatting.YELLOW + "#1");
-                                }
-                                else if (position == 2) {
+                                } else if (position == 2) {
                                     check.setItemCount(Formatting.WHITE + "#2");
-                                }
-                                else if (position == 3) {
+                                } else if (position == 3) {
                                     check.setItemCount(Formatting.GOLD + "#3");
-                                }
-                                else {
+                                } else {
                                     check.setItemCount(Formatting.GRAY + "#" + position);
                                 }
-                            }
-                            else {
+                            } else {
                                 //Display Top %
                                 if (topPos <= 1) {
                                     check.setItemCount(Formatting.GREEN + String.valueOf(topPos) + Formatting.GRAY + "%");
-                                }
-                                else if (topPos <= 5) {
+                                } else if (topPos <= 5) {
                                     check.setItemCount(Formatting.GOLD + String.valueOf(topPos) + Formatting.GRAY + "%");
-                                }
-                                else if (topPos <= 10) {
+                                } else if (topPos <= 10) {
                                     check.setItemCount(Formatting.YELLOW + String.valueOf(topPos) + Formatting.GRAY + "%");
-                                }
-                                else if (topPos <= 25) {
+                                } else if (topPos <= 25) {
                                     check.setItemCount(Formatting.RED + String.valueOf(topPos) + Formatting.GRAY + "%");
-                                }
-                                else {
+                                } else {
                                     check.setItemCount(Formatting.DARK_RED + String.valueOf(topPos) + Formatting.GRAY + "%");
                                 }
                             }
@@ -283,7 +281,7 @@ public abstract class RenderingDefinitions {
 
     /**
      * Try to filter out non matching items out as soon as you can before you do the intensive stuff since it takes more performance otherwise!
-     *
+     * <p>
      * MAKE SURE TO NOT ALWAYS RETURN TRUE IF BLOCKING! THIS WILL BLOCK ALL FUTURES IF BLOCKING!
      *
      * @return return value defines whether you want to stop after the check

@@ -246,7 +246,7 @@ public class ModInitialiser implements ClientModInitializer {
                                             bbthread = new Thread(() -> {
                                                 connection = new BBsentialConnection();
                                                 coms = new de.hype.bbsentials.client.common.client.commands.Commands();
-                                                connection.connect("localhost", 5011);
+                                                connection.connect("localhost", 5012);
                                             });
                                             bbthread.start();
 

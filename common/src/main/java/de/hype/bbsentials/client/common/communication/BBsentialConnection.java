@@ -151,7 +151,7 @@ public class BBsentialConnection {
                 try {
                     socket = new Socket(serverIP, serverPort);
                 } catch (Exception e) {
-                    Chat.sendPrivateMessageToSelfError("You are connected to the LocalTest Server!");
+                    Chat.sendPrivateMessageToSelfError("Error trying to connect: %s".formatted(e.getMessage()));
                 }
             }
             socket.setKeepAlive(true); // Enable Keep-Alive

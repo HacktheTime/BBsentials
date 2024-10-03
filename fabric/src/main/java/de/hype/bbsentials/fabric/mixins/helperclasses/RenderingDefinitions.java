@@ -259,10 +259,10 @@ public abstract class RenderingDefinitions {
                                 }
                             }
                         }
+                        return true;
                     }
                 }
-
-                return true;
+                return false;
             }
         };
 
@@ -283,6 +283,8 @@ public abstract class RenderingDefinitions {
 
     /**
      * Try to filter out non matching items out as soon as you can before you do the intensive stuff since it takes more performance otherwise!
+     *
+     * MAKE SURE TO NOT ALWAYS RETURN TRUE IF BLOCKING! THIS WILL BLOCK ALL FUTURES IF BLOCKING!
      *
      * @return return value defines whether you want to stop after the check
      */

@@ -64,7 +64,7 @@ public class BBsentialsConfigScreenFactory {
         {
             if (BBsentials.generalConfig.getUsername().equalsIgnoreCase("Hype_the_Time")) {
                 server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.bbServerConfig.bbServerURL.replaceAll(".", "*"))
-                        .setDefaultValue("static.88-198-149-240.clients.your-server.de")
+                        .setDefaultValue("hackthetime.de")
                         .setTooltip(Text.of("Place the Server URL of the BBsentials Server here"))
                         .setSaveConsumer((newValue) -> {
                             if (newValue.replace("*", "").trim().isEmpty()) {
@@ -78,7 +78,7 @@ public class BBsentialsConfigScreenFactory {
             }
             else {
                 server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BBsentials.bbServerConfig.bbServerURL)
-                        .setDefaultValue("static.88-198-149-240.clients.your-server.de")
+                        .setDefaultValue("hackthetime.de")
                         .setTooltip(Text.of("Place the Server URL of the BBsentials Server here"))
                         .setSaveConsumer(newValue -> BBsentials.bbServerConfig.bbServerURL = newValue)
                         .build());

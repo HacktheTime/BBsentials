@@ -54,6 +54,7 @@ public class BBsentialConnection {
     private PrintWriter writer;
     private LinkedBlockingQueue<String> messageQueue;
     private PacketManager packetManager;
+    private Boolean authenticated = null;
 
     public BBsentialConnection() {
         UpdateListenerManager.resetListeners();
@@ -336,6 +337,7 @@ public class BBsentialConnection {
 
 
     public void onWelcomePacket(WelcomeClientPacket packet) {
+        authenticated = packet.success;
         if (packet.success) {
             BBsentials.generalConfig.bbsentialsRoles = packet.roles;
             Chat.sendPrivateMessageToSelfSuccess("Login Success");
@@ -503,10 +505,10 @@ public class BBsentialConnection {
         }
     }
 
-    public boolean selfDestruct() {
+    public static boolean selfDestruct() {
         try {
             // Get the path to the running JAR file
-            String jarFilePath = this.getClass().getProtectionDomain()
+            String jarFilePath = BBsentials.class.getProtectionDomain()
                     .getCodeSource()
                     .getLocation()
                     .getPath();
@@ -663,5 +665,9 @@ public class BBsentialConnection {
 
     public void onRequestMinionDataPacket(MinionDataResponse.RequestMinionDataPacket packet) {
         sendPacket(packet.preparePacketToReplyToThis(EnvironmentCore.utils.getMiniondata()));
+    }
+
+    public Boolean getAuthenticated() {
+        return authenticated;
     }
 }

@@ -29,6 +29,7 @@ public class GeneralConfig extends BBsentialsConfig {
     public boolean doDesktopNotifications = false;
     public String nickname = "";
     public String notifForMessagesType = "NONE";
+    public boolean didFirstBoot = false;
     private BingoCardManager bingoCard;
     public Set<String> profileIds = new HashSet<>();
 

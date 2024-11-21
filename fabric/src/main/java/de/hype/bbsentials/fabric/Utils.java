@@ -4,7 +4,6 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.CrystalMetalDetectorSolver;
 import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
@@ -104,7 +103,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
         List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
 
-        if (!waypoints.isEmpty() || ModInitialiser.tutorialManager.current != null || !CrystalMetalDetectorSolver.possibleBlocks.isEmpty()) {
+        if (!waypoints.isEmpty() || ModInitialiser.tutorialManager.current != null) {
             try {
                 RenderInWorldContext.Companion.renderInWorld(event, (it) -> {
                     Color defaultColor = BBsentials.visualConfig.waypointDefaultColor;
@@ -134,14 +133,6 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         }
                         it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 25, 25);
 
-                    }
-                    for (Position possibleBlock : CrystalMetalDetectorSolver.possibleBlocks) {
-                        BlockPos pos = new BlockPos(possibleBlock.x, possibleBlock.y, possibleBlock.z);
-                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= 300) continue;
-                        it.color(Color.ORANGE, 0.2f);
-                        it.block(pos);
-                        it.color(Color.ORANGE, 1f);
-                        it.waypoint(pos, Text.literal("Treasure"));
                     }
                     return Unit.INSTANCE;
                 });

@@ -8,7 +8,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.CrystalMetalDetectorSolver;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.config.ConfigManager;
@@ -716,7 +715,6 @@ public class ModInitialiser implements ClientModInitializer {
             if (EnvironmentCore.utils.getUsername().toLowerCase().equals("p0is")) {
                 funConfig.hub17To29Troll = true;
             }
-            CrystalMetalDetectorSolver.initWorld();
         });
     }
 

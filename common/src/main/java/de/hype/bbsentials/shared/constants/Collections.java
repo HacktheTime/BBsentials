@@ -47,20 +47,16 @@ public interface Collections extends MinionResourceItem {
         return 160;
     }
 
-    default String getMinionID() {
-        return "%s_GENERATOR".formatted(this.getId().toLowerCase().replace("item", "").replace("_collection", "")).toUpperCase();
-    }
-
-    ;
+    String getMinionID();
 
     enum Farming implements Collections {
-        Cocoa_Beans("INK_SACK:3", 75, 200, 500, 2000, 5000, 10000, 20000, 50000, 100000),
-        Carrot("CARROT_ITEM", 100, 250, 500, 1750, 5000, 10000, 25000, 50000, 100000),
-        Cactus("CACTUS", 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000),
-        Raw_Chicken("RAW_CHICKEN", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
-        Sugar_Cane("SUGAR_CANE", 100, 250, 500, 1000, 2000, 5000, 10000, 20000, 50000),
-        Pumpkin("PUMPKIN", 40, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000),
-        Wheat("WHEAT", 50, 100, 250, 500, 1000, 2500, 10000, 15000, 25000, 50000, 100000) {
+        Cocoa_Beans("INK_SACK:3", "COCOA_GENERATOR_1", 75, 200, 500, 2000, 5000, 10000, 20000, 50000, 100000),
+        Carrot("CARROT_ITEM", "CARROT_GENERATOR_1", 100, 250, 500, 1750, 5000, 10000, 25000, 50000, 100000),
+        Cactus("CACTUS", "CACTUS_GENERATOR_1", 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000),
+        Raw_Chicken("RAW_CHICKEN", "CHICKEN_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
+        Sugar_Cane("SUGAR_CANE", "SUGAR_CANE_GENERATOR_1", 100, 250, 500, 1000, 2000, 5000, 10000, 20000, 50000),
+        Pumpkin("PUMPKIN", "PUMPKIN_GENERATOR_1", 40, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000),
+        Wheat("WHEAT", "WHEAT_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 10000, 15000, 25000, 50000, 100000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
@@ -71,38 +67,40 @@ public interface Collections extends MinionResourceItem {
                 return 1296;
             }
         },
-        Seeds("SEEDS", 50, 100, 250, 1000, 2500, 5000, 25000),
-        Mushroom("MUSHROOM_COLLECTION", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
+        Seeds("SEEDS", "SEEDS_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 25000),
+        Mushroom("MUSHROOM_COLLECTION", "MUSHROOM_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Raw_Rabbit("RABBIT", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
-        Nether_Wart("NETHER_STALK", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 250000),
-        Mutton("MUTTON", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
-        Melon("MELON", 250, 500, 1250, 5000, 15000, 25000, 50000, 100000, 250000) {
+        Raw_Rabbit("RABBIT", "RABBIT_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        Nether_Wart("NETHER_STALK", "NETHER_WARTS_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 250000),
+        Mutton("MUTTON", "SHEEP_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
+        Melon("MELON", "MELON_GENERATOR_1", 250, 500, 1250, 5000, 15000, 25000, 50000, 100000, 250000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Potato("POTATO_ITEM", 100, 200, 500, 1750, 5000, 10000, 25000, 50000, 100000),
-        Leather("LEATHER", 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000) {
+        Potato("POTATO_ITEM", "POTATO_GENERATOR_1", 100, 200, 500, 1750, 5000, 10000, 25000, 50000, 100000),
+        Leather("LEATHER", "COW_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 576;
             }
         },
-        Raw_Porkchop("PORK", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
-        Feather("FEATHER", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        Raw_Porkchop("PORK", "PIG_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        Feather("FEATHER", "CHICKEN_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
 
         ;
         public final String id;
+        public final String minionID;
         public final int[] tiers;
 
-        Farming(String id, int... tiers) {
+        Farming(String id, String minionID, int... tiers) {
             this.id = id;
+            this.minionID = minionID;
             this.tiers = tiers;
         }
 
@@ -130,104 +128,106 @@ public interface Collections extends MinionResourceItem {
         }
 
         @Override
-        public Integer getCompactorLevel() {
-            return 1;
+        public String getMinionID() {
+            return minionID;
         }
     }
 
     enum Mining implements Collections {
-        Lapis_Lazuli("INK_SACK:4", 250, 500, 1000, 2000, 10000, 25000, 50000, 100000, 150000, 250000) {
+        Lapis_Lazuli("INK_SACK:4", "LAPIS_GENERATOR_1", 250, 500, 1000, 2000, 10000, 25000, 50000, 100000, 150000, 250000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Redstone("REDSTONE", 100, 250, 750, 1500, 3000, 5000, 10000, 25000, 50000, 200000, 400000, 600000, 800000, 1000000, 1200000, 1400000) {
+        Redstone("REDSTONE", "REDSTONE_GENERATOR_1", 100, 250, 750, 1500, 3000, 5000, 10000, 25000, 50000, 200000, 400000, 600000, 800000, 1000000, 1200000, 1400000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Umber("UMBER", 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
-        Coal("COAL", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000) {
+        Umber("UMBER", null, 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
+        Coal("COAL", "COAL_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Mycelium("MYCEL", 50, 500, 750, 1000, 2500, 10000, 15000, 25000, 50000, 100000),
-        End_Stone("ENDER_STONE", 50, 100, 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000),
-        Nether_Quartz("QUARTZ", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
+        Mycelium("MYCEL", "MYCELIUM_GENERATOR_1", 50, 500, 750, 1000, 2500, 10000, 15000, 25000, 50000, 100000),
+        End_Stone("ENDER_STONE", "ENDER_STONE_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000),
+        Nether_Quartz("QUARTZ", "QUARTZ_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
             public Integer getCompactorLevel() {
                 return 4;
             }
         },
-        Sand("SAND", 50, 100, 250, 500, 1000, 2500, 5000),
-        Iron_Ingot("IRON_INGOT", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 200000, 400000) {
+        Sand("SAND", "SAND_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000),
+        Iron_Ingot("IRON_INGOT", "IRON_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 200000, 400000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Gemstone("GEMSTONE_COLLECTION", 100, 250, 1000, 2500, 5000, 25000, 100000, 250000, 500000, 1000000, 2000000) {
+        Gemstone("GEMSTONE_COLLECTION", null, 100, 250, 1000, 2500, 5000, 25000, 100000, 250000, 500000, 1000000, 2000000) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 80;
             }
         },
-        Tungsten("TUNGSTEN", 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
-        Obsidian("OBSIDIAN", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
-        Diamond("DIAMOND", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
+        Tungsten("TUNGSTEN", null, 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
+        Obsidian("OBSIDIAN", "OBSIDIAN_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
+        Diamond("DIAMOND", "DIAMOND_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Cobblestone("COBBLESTONE", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 40000, 70000),
-        Glowstone_Dust("GLOWSTONE_DUST", 50, 100, 1000, 2500, 5000, 10000, 25000) {
+        Cobblestone("COBBLESTONE", "COBBLESTONE_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 40000, 70000),
+        Glowstone_Dust("GLOWSTONE_DUST", "GLOWSTONE_GENERATOR_1", 50, 100, 1000, 2500, 5000, 10000, 25000) {
             @Override
             public Integer getCompactorLevel() {
                 return 4;
             }
         },
-        Gold_Ingot("GOLD_INGOT", 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000) {
+        Gold_Ingot("GOLD_INGOT", "GOLD_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Gravel("GRAVEL", 50, 100, 250, 1000, 2500, 5000, 10000, 15000, 50000),
-        Hard_Stone("HARD_STONE", 50, 1000, 5000, 50000, 150000, 300000, 1000000) {
+        Gravel("GRAVEL", "GRAVEL_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 15000, 50000),
+        Hard_Stone("HARD_STONE", "HARD_STONE_GENERATOR_1", 50, 1000, 5000, 50000, 150000, 300000, 1000000) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 576;
             }
         },
-        Mithril("MITHRIL_ORE", 50, 250, 1000, 2500, 5000, 10000, 250000, 500000, 1000000),
-        Emerald("EMERALD", 50, 100, 250, 1000, 5000, 15000, 30000, 50000, 100000) {
+        Mithril("MITHRIL_ORE", "MITHRIL_GENERATOR_1", 50, 250, 1000, 2500, 5000, 10000, 250000, 500000, 1000000),
+        Emerald("EMERALD", "EMERALD_GENERATOR_1", 50, 100, 250, 1000, 5000, 15000, 30000, 50000, 100000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Red_Sand("SAND:1", 50, 500, 2500, 10000, 15000, 25000, 50000, 100000),
-        Ice("ICE", 50, 100, 250, 500, 1000, 5000, 10000, 50000, 100000, 250000, 500000) {
+        Red_Sand("SAND:1", "RED_SAND_GENERATOR_1", 50, 500, 2500, 10000, 15000, 25000, 50000, 100000),
+        Ice("ICE", "ICE_GENERATOR_1", 50, 100, 250, 500, 1000, 5000, 10000, 50000, 100000, 250000, 500000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Glacite("GLACITE", 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
-        Sulphur("SULPHUR_ORE", 200, 1000, 2500, 5000, 10000, 15000, 25000, 50000, 100000),
-        Netherrack("NETHERRACK", 50, 250, 500, 1000, 5000),
+        Glacite("GLACITE", null, 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
+        Sulphur("SULPHUR_ORE", null, 200, 1000, 2500, 5000, 10000, 15000, 25000, 50000, 100000),
+        Netherrack("NETHERRACK", null, 50, 250, 500, 1000, 5000),
 
         ;
         public final String id;
+        public final String minionID;
         public final int[] tiers;
 
-        Mining(String id, int... tiers) {
+        Mining(String id, String minionID, int... tiers) {
             this.id = id;
+            this.minionID = minionID;
             this.tiers = tiers;
         }
 
@@ -255,45 +255,47 @@ public interface Collections extends MinionResourceItem {
         }
 
         @Override
-        public Integer getCompactorLevel() {
-            return 1;
+        public String getMinionID() {
+            return minionID;
         }
     }
 
     enum Combat implements Collections {
-        Ender_Pearl("ENDER_PEARL", 50, 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000) {
+        Ender_Pearl("ENDER_PEARL", "ENDERMAN_GENERATOR_1", 50, 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 20;
             }
         },
-        Chili_Pepper("CHILI_PEPPER", 10, 25, 75, 250, 1000, 2500, 5000, 10000, 20000),
-        Slimeball("SLIME_BALL", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
+        Chili_Pepper("CHILI_PEPPER", null, 10, 25, 75, 250, 1000, 2500, 5000, 10000, 20000),
+        Slimeball("SLIME_BALL", "SLIME_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
             public Integer getCompactorLevel() {
                 return 9;
             }
         },
-        Magma_Cream("MAGMA_CREAM", 50, 250, 1000, 2500, 5000, 10000, 25000, 50000),
-        Ghast_Tear("GHAST_TEAR", 20, 250, 1000, 2500, 5000, 10000, 25000) {
+        Magma_Cream("MAGMA_CREAM", "MAGMA_CUBE_GENERATOR_1", 50, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        Ghast_Tear("GHAST_TEAR", "GHAST_GENERATOR_1", 20, 250, 1000, 2500, 5000, 10000, 25000) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 5;
             }
         },
-        Gunpowder("SULPHUR", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
-        Rotten_Flesh("ROTTEN_FLESH", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
-        Spider_Eye("SPIDER_EYE", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
-        Bone("BONE", 50, 100, 250, 500, 1000, 5000, 10000, 25000, 50000, 150000),
-        Blaze_Rod("BLAZE_ROD", 50, 250, 1000, 2500, 5000, 10000, 25000, 50000),
-        String("STRING", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        Gunpowder("SULPHUR", "CREEPER_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        Rotten_Flesh("ROTTEN_FLESH", "ZOMBIE_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
+        Spider_Eye("SPIDER_EYE", "SPIDER_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        Bone("BONE", "SKELETON_GENERATOR_1", 50, 100, 250, 500, 1000, 5000, 10000, 25000, 50000, 150000),
+        Blaze_Rod("BLAZE_ROD", "BLAZE_GENERATOR_1", 50, 250, 1000, 2500, 5000, 10000, 25000, 50000),
+        String("STRING", "TARANTULA_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
 
         ;
         public final String id;
+        public final String minionID;
         public final int[] tiers;
 
-        Combat(String id, int... tiers) {
+        Combat(String id, String minionID, int... tiers) {
             this.id = id;
+            this.minionID = minionID;
             this.tiers = tiers;
         }
 
@@ -318,23 +320,30 @@ public interface Collections extends MinionResourceItem {
         @Override
         public int getCollectionForTier(int tier) {
             return tiers[Math.min(tier, tiers.length - 1)];
+        }
+
+        @Override
+        public String getMinionID() {
+            return minionID;
         }
     }
 
     enum Foraging implements Collections {
-        Acacia_Wood("LOG_2", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000),
-        Spruce_Wood("LOG:1", 50, 100, 250, 1000, 2000, 5000, 10000, 25000, 50000),
-        Jungle_Wood("LOG:3", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000),
-        Birch_Wood("LOG:2", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000),
-        Oak_Wood("LOG", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 30000),
-        Dark_Oak_Wood("LOG_2:1", 50, 100, 250, 1000, 2000, 5000, 10000, 15000, 25000),
+        Acacia_Wood("LOG_2", "ACACIA_GENERATOR_1", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000),
+        Spruce_Wood("LOG:1", "SPRUCE_GENERATOR_1", 50, 100, 250, 1000, 2000, 5000, 10000, 25000, 50000),
+        Jungle_Wood("LOG:3", "JUNGLE_GENERATOR_1", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000),
+        Birch_Wood("LOG:2", "BIRCH_GENERATOR_1", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000),
+        Oak_Wood("LOG", "OAK_GENERATOR_1", 50, 100, 250, 500, 1000, 2000, 5000, 10000, 30000),
+        Dark_Oak_Wood("LOG_2:1", "DARK_OAK_GENERATOR_1", 50, 100, 250, 1000, 2000, 5000, 10000, 15000, 25000),
 
         ;
         public final String id;
+        public final String minionID;
         public final int[] tiers;
 
-        Foraging(String id, int... tiers) {
+        Foraging(String id, String minionID, int... tiers) {
             this.id = id;
+            this.minionID = minionID;
             this.tiers = tiers;
         }
 
@@ -360,46 +369,53 @@ public interface Collections extends MinionResourceItem {
         public int getCollectionForTier(int tier) {
             return tiers[Math.min(tier, tiers.length - 1)];
         }
+
+        @Override
+        public String getMinionID() {
+            return minionID;
+        }
     }
 
     enum Fishing implements Collections {
-        Lily_Pad("WATER_LILY", 10, 50, 100, 200, 500, 1500, 3000, 6000, 10000),
-        Prismarine_Shard("PRISMARINE_SHARD", 10, 25, 50, 100, 200, 400, 800) {
+        Lily_Pad("WATER_LILY", null, 10, 50, 100, 200, 500, 1500, 3000, 6000, 10000),
+        Prismarine_Shard("PRISMARINE_SHARD", "FISHING_GENERATOR_1", 10, 25, 50, 100, 200, 400, 800) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 80;
             }
         },
-        Ink_Sac("INK_SACK", 20, 40, 100, 200, 400, 800, 1500, 2500, 4000),
-        Raw_Fish("RAW_FISH", 20, 50, 100, 250, 500, 1000, 2500, 15000, 30000, 45000, 60000),
-        Pufferfish("RAW_FISH:3", 20, 50, 100, 150, 400, 800, 2400, 4800, 9000, 18000),
-        Clownfish("RAW_FISH:2", 10, 25, 50, 100, 200, 400, 800, 1600, 4000),
-        Raw_Salmon("RAW_FISH:1", 20, 50, 100, 250, 500, 1000, 2500, 5000, 10000),
-        Magmafish("MAGMA_FISH", 20, 100, 500, 1000, 5000, 15000, 30000, 50000, 75000, 100000, 250000, 500000),
-        Prismarine_Crystals("PRISMARINE_CRYSTALS", 10, 25, 50, 100, 200, 400, 800) {
+        Ink_Sac("INK_SACK", null, 20, 40, 100, 200, 400, 800, 1500, 2500, 4000),
+        Raw_Fish("RAW_FISH", "FISHING_GENERATOR_1", 20, 50, 100, 250, 500, 1000, 2500, 15000, 30000, 45000, 60000),
+        Clownfish("RAW_FISH:2", "FISHING_GENERATOR_1", 10, 25, 50, 100, 200, 400, 800, 1600, 4000),
+        Raw_Salmon("RAW_FISH:1", "FISHING_GENERATOR_1", 20, 50, 100, 250, 500, 1000, 2500, 5000, 10000),
+        Magmafish("MAGMA_FISH", null, 20, 100, 500, 1000, 5000, 15000, 30000, 50000, 75000, 100000, 250000, 500000),
+        Prismarine_Crystals("PRISMARINE_CRYSTALS", "FISHING_GENERATOR_1", 10, 25, 50, 100, 200, 400, 800) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 80;
             }
         },
-        Clay("CLAY_BALL", 50, 100, 250, 1000, 1500, 2500) {
+        Clay("CLAY_BALL", "CLAY_GENERATOR_1", 50, 100, 250, 1000, 1500, 2500) {
             @Override
             public Integer getCompactorLevel() {
                 return 4;
             }
         },
-        Sponge("SPONGE", 20, 40, 100, 200, 400, 800, 1500, 2500, 4000) {
+        Sponge("SPONGE", "FISHING_GENERATOR_1", 20, 40, 100, 200, 400, 800, 1500, 2500, 4000) {
             @Override
             public Integer getSuperCompactorLevel() {
                 return 40;
             }
         },
+
         ;
         public final String id;
+        public final String minionID;
         public final int[] tiers;
 
-        Fishing(String id, int... tiers) {
+        Fishing(String id, String minionID, int... tiers) {
             this.id = id;
+            this.minionID = minionID;
             this.tiers = tiers;
         }
 
@@ -424,6 +440,11 @@ public interface Collections extends MinionResourceItem {
         @Override
         public int getCollectionForTier(int tier) {
             return tiers[Math.min(tier, tiers.length - 1)];
+        }
+
+        @Override
+        public String getMinionID() {
+            return minionID;
         }
     }
 
@@ -470,6 +491,11 @@ public interface Collections extends MinionResourceItem {
         @Override
         public Integer getSuperCompactorLevel() {
             return 1;
+        }
+
+        @Override
+        public String getMinionID() {
+            return null;
         }
     }
 

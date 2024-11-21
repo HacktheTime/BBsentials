@@ -70,6 +70,9 @@ public class ModInitialiser implements ClientModInitializer {
     public static KeyBinding openWikiKeybind;
     public static TutorialManager tutorialManager;
 
+    public static final KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
+
+
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher) -> {
             dispatcher.register(ClientCommandManager.literal("socialoptions")
@@ -594,7 +597,6 @@ public class ModInitialiser implements ClientModInitializer {
         openWikiKeybind = new KeyBinding("Lookup Hovered Item in Wiki", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_U, "BBsentials");
         KeyBindingHelper.registerKeyBinding(openWikiKeybind);
 
-        KeyBinding promptKeyBind = new KeyBinding("Chat Prompt Yes / Open Menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, "BBsentials");
         KeyBindingHelper.registerKeyBinding(promptKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (promptKeyBind.wasPressed()) {

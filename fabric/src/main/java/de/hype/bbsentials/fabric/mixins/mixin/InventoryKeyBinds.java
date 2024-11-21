@@ -1,8 +1,10 @@
 package de.hype.bbsentials.fabric.mixins.mixin;
 
 import com.google.gson.JsonParser;
-import de.hype.bbsentials.fabric.ModInitialiser;
 import de.hype.bbsentials.client.common.SystemUtils;
+import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.fabric.ModInitialiser;
+import de.hype.bbsentials.shared.constants.Collections;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -36,34 +38,52 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
         super(title);
     }
 
-    @Inject(method = "keyPressed",at=@At("RETURN"))
+    @Inject(method = "keyPressed", at = @At("RETURN"))
     public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (focusedSlot != null && focusedSlot.getStack().getItem() != Items.AIR) {
             if (keyCode == 258) onMouseClick(focusedSlot, focusedSlot.id, 0, SlotActionType.QUICK_MOVE);
-            else if (keyCode == KeyBindingHelper.getBoundKeyOf(ModInitialiser.openWikiKeybind).getCode()) {
-                NbtComponent customData = focusedSlot.getStack().get(DataComponentTypes.CUSTOM_DATA);
-                if (customData == null) return;
-                NbtCompound data = customData.copyNbt();
-                String id = data.getString("id");
-                String lowercaseID = id.toLowerCase();
-                String path = "";
-                if (lowercaseID.equals("enchanted_book")) {
-                    path = WordUtils.capitalize((new ArrayList<>(data.getCompound("enchantments").getKeys()).get(0).replace("ultimate_", "") + "_Enchantment").replace("_", " ")).replace(" ", "_");
+            else
+                if (keyCode == KeyBindingHelper.getBoundKeyOf(ModInitialiser.openWikiKeybind).getCode()) {
+                    NbtComponent customData = focusedSlot.getStack().get(DataComponentTypes.CUSTOM_DATA);
+                    if (customData == null) return;
+                    NbtCompound data = customData.copyNbt();
+                    String id = data.getString("id");
+                    String lowercaseID = id.toLowerCase();
+                    String path = "";
+                    if (lowercaseID.equals("enchanted_book")) {
+                        path = WordUtils.capitalize((new ArrayList<>(data.getCompound("enchantments").getKeys()).get(0).replace("ultimate_", "") + "_Enchantment").replace("_", " ")).replace(" ", "_");
+                    }
+                    else
+                        if (lowercaseID.equals("pet")) {
+                            path = WordUtils.capitalize((JsonParser.parseString(data.getString("petInfo")).getAsJsonObject().get("type").getAsString().toLowerCase() + "_Pet").replace("_", " ")).replace(" ", "_");
+                        }
+                        else
+                            if (lowercaseID.equals("potion")) {
+                                path = WordUtils.capitalize((data.getString("potion").toLowerCase().replace("xp", "XP") + "_Potion").replace("_", " ")).replace(" ", "_");
+                            }
+                            else
+                                if (lowercaseID.equals("rune")) {
+                                    path = WordUtils.capitalize((new ArrayList<>(data.getCompound("runes").getKeys()).get(0).toLowerCase() + "_Rune").replace("_", " ")).replace(" ", "_");
+                                }
+                                else {
+                                    path = id;
+                                }
+                    SystemUtils.openInBrowser("https://wiki.hypixel.net/%s".formatted(path));
                 }
-                else if (lowercaseID.equals("pet")) {
-                    path = WordUtils.capitalize((JsonParser.parseString(data.getString("petInfo")).getAsJsonObject().get("type").getAsString().toLowerCase() + "_Pet").replace("_", " ")).replace(" ", "_");
-                }
-                else if (lowercaseID.equals("potion")) {
-                    path = WordUtils.capitalize((data.getString("potion").toLowerCase().replace("xp","XP") + "_Potion").replace("_", " ")).replace(" ", "_");
-                }
-                else if (lowercaseID.equals("rune")) {
-                    path = WordUtils.capitalize((new ArrayList<>(data.getCompound("runes").getKeys()).get(0).toLowerCase() + "_Rune").replace("_", " ")).replace(" ", "_");
-                }
-                else {
-                    path = id;
-                }
-                SystemUtils.openInBrowser("https://wiki.hypixel.net/%s".formatted(path));
-            }
+                else
+                    if (keyCode == KeyBindingHelper.getBoundKeyOf(ModInitialiser.promptKeyBind).getCode()) {
+                        NbtComponent customData = focusedSlot.getStack().get(DataComponentTypes.CUSTOM_DATA);
+                        if (customData == null) return;
+                        NbtCompound data = customData.copyNbt();
+                        String id = data.getString("id");
+                        BBsentials.executionService.execute(() -> {
+                            for (Collections value : Collections.values()) {
+                                if (value.getId().equalsIgnoreCase(id)) {
+                                    BBsentials.sender.addSendTask("/viewrecipe %s".formatted(value.getMinionID()));
+                                }
+                            }
+                        });
+                    }
         }
     }
 

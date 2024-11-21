@@ -47,6 +47,12 @@ public interface Collections extends MinionResourceItem {
         return 160;
     }
 
+    default String getMinionID() {
+        return "%s_GENERATOR".formatted(this.getId().toLowerCase().replace("item", "").replace("_collection", "")).toUpperCase();
+    }
+
+    ;
+
     enum Farming implements Collections {
         Cocoa_Beans("INK_SACK:3", 75, 200, 500, 2000, 5000, 10000, 20000, 50000, 100000),
         Carrot("CARROT_ITEM", 100, 250, 500, 1750, 5000, 10000, 25000, 50000, 100000),

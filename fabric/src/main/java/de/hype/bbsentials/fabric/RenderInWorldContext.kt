@@ -6,6 +6,8 @@ import de.hype.bbsentials.fabric.objects.WorldRenderLastEvent
 import de.hype.bbsentials.shared.objects.RenderInformation
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
+import net.minecraft.client.gl.Defines
+import net.minecraft.client.gl.ShaderProgramKey
 import java.lang.Math.pow
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -18,6 +20,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import java.awt.Color
+import java.io.InputStream
 
 /**
  * @author nea89o in Firmanent
@@ -30,9 +33,42 @@ class RenderInWorldContext(
     val vertexConsumers: VertexConsumerProvider.Immediate,
 ) {
     object RenderLayers {
-        val TRANSLUCENT_TRIS = FirmanentWaypointRenderingCircumVention.tryTest();
+        val TRANSLUCENT_TRIS = RenderLayer.of(
+            "bbsentials_firmament_translucent_tris",
+            VertexFormats.POSITION_COLOR,
+            VertexFormat.DrawMode.TRIANGLES,
+            RenderLayer.CUTOUT_BUFFER_SIZE,
+            false, true,
+            RenderLayer.MultiPhaseParameters.builder()
+                .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
+                .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                .program(RenderPhase.POSITION_COLOR_PROGRAM)
+                .build(false)
+        )
+        val LINES = RenderLayer.of(
+            "bbsentials_firmament_rendertype_lines",
+            VertexFormats.LINES,
+            VertexFormat.DrawMode.LINES,
+            RenderLayer.CUTOUT_BUFFER_SIZE,
+            false, false, // do we need translucent? i dont think so
+            RenderLayer.MultiPhaseParameters.builder()
+                .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
+                .program(RenderPhase.ShaderProgram(shader("core/rendertype_lines", VertexFormats.LINES, Defines.EMPTY)))
+                .build(false)
+        )
+        val COLORED_QUADS = RenderLayer.of(
+            "bbsentials_firmament_quads",
+            VertexFormats.POSITION_COLOR,
+            VertexFormat.DrawMode.QUADS,
+            RenderLayer.CUTOUT_BUFFER_SIZE,
+            false, true,
+            RenderLayer.MultiPhaseParameters.builder()
+                .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
+                .program(RenderPhase.POSITION_COLOR_PROGRAM)
+                .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                .build(false)
+        )
     }
-
     fun color(color: me.shedaniel.math.Color) {
         color(color.red / 255F, color.green / 255f, color.blue / 255f, color.alpha / 255f)
     }
@@ -44,10 +80,10 @@ class RenderInWorldContext(
         RenderSystem.setShaderColor(red, green, blue, alpha)
     }
 
-    fun block(blockPos: BlockPos) {
+    fun block(blockPos: BlockPos, color: Int) {
         matrixStack.push()
         matrixStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
-        buildCube(matrixStack.peek().positionMatrix, tesselator)
+        buildCube(matrixStack.peek().positionMatrix, vertexConsumers.getBuffer(RenderLayers.COLORED_QUADS), color)
         matrixStack.pop()
     }
 
@@ -63,11 +99,12 @@ class RenderInWorldContext(
         }
     }
 
-    fun waypoint(position: BlockPos, label: Text) {
+    fun waypoint(position: BlockPos, vararg label: Text) {
         text(
             position.toCenterPos(),
-            label,
-            Text.literal("§e${formatDistance(MinecraftClient.getInstance().player?.pos?.distanceTo(position.toCenterPos()) ?: 42069.0)}")
+            *label,
+            Text.literal("§e${formatDistance(MinecraftClient.getInstance().player?.pos?.distanceTo(position.toCenterPos()) ?: 42069.0)}"),
+            background = 0xAA202020.toInt()
         )
     }
 
@@ -108,29 +145,36 @@ class RenderInWorldContext(
         }
     }
 
-    fun text(position: Vec3d, vararg texts: Text, verticalAlign: VerticalAlign = VerticalAlign.CENTER) {
+    fun text(
+        position: Vec3d,
+        vararg texts: Text,
+        verticalAlign: VerticalAlign = VerticalAlign.CENTER,
+        background: Int = 0x70808080
+    ) {
         withFacingThePlayer(position) {
-            text(*texts, verticalAlign = verticalAlign)
+            text(*texts, verticalAlign = verticalAlign, background = background)
         }
     }
 
-    fun tinyBlock(vec3d: Vec3d, size: Float) {
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram)
+    fun tinyBlock(vec3d: Vec3d, size: Float, color: Int) {
         matrixStack.push()
         matrixStack.translate(vec3d.x, vec3d.y, vec3d.z)
         matrixStack.scale(size, size, size)
         matrixStack.translate(-.5, -.5, -.5)
-        buildCube(matrixStack.peek().positionMatrix, tesselator)
+        buildCube(matrixStack.peek().positionMatrix, vertexConsumers.getBuffer(RenderLayers.COLORED_QUADS), color)
         matrixStack.pop()
+        vertexConsumers.draw()
     }
 
     fun wireframeCube(blockPos: BlockPos, lineWidth: Float = 10F) {
-        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
+        val buf = vertexConsumers.getBuffer(RenderLayer.LINES)
         matrixStack.push()
+        // TODO: this does not render through blocks (or water layers) anymore
         RenderSystem.lineWidth(lineWidth / pow(camera.pos.squaredDistanceTo(blockPos.toCenterPos()), 0.25).toFloat())
         matrixStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
-        buildWireFrameCube(matrixStack.peek(), tesselator)
+        buildWireFrameCube(matrixStack.peek(), buf)
         matrixStack.pop()
+        vertexConsumers.draw()
     }
 
     fun line(vararg points: Vec3d, lineWidth: Float = 10F) {
@@ -138,13 +182,13 @@ class RenderInWorldContext(
     }
 
     fun tracer(toWhere: Vec3d, lineWidth: Float = 3f) {
-        val cameraForward = Vector3f(0f, 0f, 1f).rotate(camera.rotation)
+        val cameraForward = Vector3f(0f, 0f, -1f).rotate(camera.rotation)
         line(camera.pos.add(Vec3d(cameraForward)), toWhere, lineWidth = lineWidth)
     }
 
     fun line(points: List<Vec3d>, lineWidth: Float = 10F) {
-        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
         RenderSystem.lineWidth(lineWidth)
+        // TODO: replace with renderlayers
         val buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
 
         val matrix = matrixStack.peek()
@@ -161,12 +205,20 @@ class RenderInWorldContext(
                 .normal(matrix, normal.x, normal.y, normal.z).next()
         }
 
-        BufferRenderer.drawWithGlobalProgram(buffer.end())
+        RenderLayers.LINES.draw(buffer.end())
     }
+    // TODO: put the favourite icons in front of items again
 
     companion object {
         private fun doLine(
-            matrix: MatrixStack.Entry, buf: BufferBuilder, i: Float, j: Float, k: Float, x: Float, y: Float, z: Float
+            matrix: MatrixStack.Entry,
+            buf: VertexConsumer,
+            i: Float,
+            j: Float,
+            k: Float,
+            x: Float,
+            y: Float,
+            z: Float
         ) {
             val normal = Vector3f(x, y, z).sub(i, j, k).normalize()
             buf.vertex(matrix.positionMatrix, i, j, k).normal(matrix, normal.x, normal.y, normal.z).color(-1).next()
@@ -174,9 +226,7 @@ class RenderInWorldContext(
         }
 
 
-        private fun buildWireFrameCube(matrix: MatrixStack.Entry, tessellator: Tessellator) {
-            val buf = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
-
+        private fun buildWireFrameCube(matrix: MatrixStack.Entry, buf: VertexConsumer) {
             for (i in 0..1) {
                 for (j in 0..1) {
                     val i = i.toFloat()
@@ -186,52 +236,45 @@ class RenderInWorldContext(
                     doLine(matrix, buf, i, j, 0F, i, j, 1F)
                 }
             }
-            BufferRenderer.drawWithGlobalProgram(buf.end())
         }
 
-        private fun buildCube(matrix: Matrix4f, tessellator: Tessellator) {
-            val buf = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR)
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 0.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 0.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 0.0F, 1.0F, 1.0F).color(-1).next()
-            buf.vertex(matrix, 1.0F, 0.0F, 1.0F).color(-1).next()
-            RenderLayers.TRANSLUCENT_TRIS.draw(buf.end())
+        private fun buildCube(matrix: Matrix4f, buf: VertexConsumer, color: Int) {
+            // Y-
+            buf.vertex(matrix, 0F, 0F, 0F).color(color)
+            buf.vertex(matrix, 0F, 0F, 1F).color(color)
+            buf.vertex(matrix, 1F, 0F, 1F).color(color)
+            buf.vertex(matrix, 1F, 0F, 0F).color(color)
+            // Y+
+            buf.vertex(matrix, 0F, 1F, 0F).color(color)
+            buf.vertex(matrix, 1F, 1F, 0F).color(color)
+            buf.vertex(matrix, 1F, 1F, 1F).color(color)
+            buf.vertex(matrix, 0F, 1F, 1F).color(color)
+            // X-
+            buf.vertex(matrix, 0F, 0F, 0F).color(color)
+            buf.vertex(matrix, 0F, 0F, 1F).color(color)
+            buf.vertex(matrix, 0F, 1F, 1F).color(color)
+            buf.vertex(matrix, 0F, 1F, 0F).color(color)
+            // X+
+            buf.vertex(matrix, 1F, 0F, 0F).color(color)
+            buf.vertex(matrix, 1F, 1F, 0F).color(color)
+            buf.vertex(matrix, 1F, 1F, 1F).color(color)
+            buf.vertex(matrix, 1F, 0F, 1F).color(color)
+            // Z-
+            buf.vertex(matrix, 0F, 0F, 0F).color(color)
+            buf.vertex(matrix, 1F, 0F, 0F).color(color)
+            buf.vertex(matrix, 1F, 1F, 0F).color(color)
+            buf.vertex(matrix, 0F, 1F, 0F).color(color)
+            // Z+
+            buf.vertex(matrix, 0F, 0F, 1F).color(color)
+            buf.vertex(matrix, 0F, 1F, 1F).color(color)
+            buf.vertex(matrix, 1F, 1F, 1F).color(color)
+            buf.vertex(matrix, 1F, 0F, 1F).color(color)
         }
 
 
         fun renderInWorld(event: WorldRenderLastEvent, block: RenderInWorldContext. () -> Unit) {
+            // TODO: there should be *no more global state*. the only thing we should be doing is render layers. that includes settings like culling, blending, shader color, and depth testing
+            // For now i will let these functions remain, but this needs to go before i do a full (non-beta) release
             RenderSystem.disableDepthTest()
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
@@ -251,7 +294,7 @@ class RenderInWorldContext(
             block(ctx)
 
             event.matrices.pop()
-
+            event.vertexConsumers.draw()
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F)
             VertexBuffer.unbind()
             RenderSystem.enableDepthTest()

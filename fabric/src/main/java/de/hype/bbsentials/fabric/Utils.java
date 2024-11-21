@@ -17,6 +17,7 @@ import de.hype.bbsentials.fabric.tutorial.TutorialManager;
 import de.hype.bbsentials.fabric.tutorial.nodes.CoordinateNode;
 import de.hype.bbsentials.shared.constants.ChChestItem;
 import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.constants.VanillaItems;
 import de.hype.bbsentials.shared.objects.ChChestData;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.minions.Minions;
@@ -49,7 +50,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardEntry;
@@ -223,7 +223,8 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 inMinionData = true;
                 slots = Integer.parseInt(string.split("/")[1].replaceAll("\\D+", ""));
             }
-            else if (inMinionData && string.trim().isEmpty()) return new MinionDataResponse(minions, slots);
+            else
+                if (inMinionData && string.trim().isEmpty()) return new MinionDataResponse(minions, slots);
             if (!(inMinionData)) continue;
             try {
                 String[] arguments = string.split(" ");
@@ -364,11 +365,12 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                         leechPotions++;
                     }
                 }
-                else if (effect == StatusEffects.JUMP_BOOST && amplifier >= 5) {
-                    if (entry.getValue().getDuration() >= 60000) {
-                        leechPotions++;
+                else
+                    if (effect == StatusEffects.JUMP_BOOST && amplifier >= 5) {
+                        if (entry.getValue().getDuration() >= 60000) {
+                            leechPotions++;
+                        }
                     }
-                }
             }
             if (leechPotions >= 2) {
                 prefix += "§4[⏳] §r";
@@ -509,67 +511,72 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 y += 10; // Adjust the vertical position for the next string
             }
         }
-        else if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
-            ChChestUpdateListener listener = UpdateListenerManager.chChestUpdateListener;
+        else
+            if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
+                ChChestUpdateListener listener = UpdateListenerManager.chChestUpdateListener;
 
-            int x = 10;
-            int y = 15;
-            List<Text> toRender = new ArrayList<>();
-            if (listener.isHoster) {
-                String status = listener.lobby.getStatus();
-                switch (status) {
-                    case "Open":
-                        status = "§aOpen";
-                        break;
-                    case "Closed":
-                        status = "§4Closed";
-                        break;
-                    case "Full":
-                        status = "Full";
-                        break;
-                }
-                String warpInfo = "§cFull";
-                int playerThatCanBeWarped = EnvironmentCore.utils.getMaximumPlayerCount() - EnvironmentCore.utils.getPlayerCount();
-                if (playerThatCanBeWarped >= 1) {
-                    warpInfo = "§a(" + playerThatCanBeWarped + ")";
-                }
+                int x = 10;
+                int y = 15;
+                List<Text> toRender = new ArrayList<>();
+                if (listener.isHoster) {
+                    String status = listener.lobby.getStatus();
+                    switch (status) {
+                        case "Open":
+                            status = "§aOpen";
+                            break;
+                        case "Closed":
+                            status = "§4Closed";
+                            break;
+                        case "Full":
+                            status = "Full";
+                            break;
+                    }
+                    String warpInfo = "§cFull";
+                    int playerThatCanBeWarped = EnvironmentCore.utils.getMaximumPlayerCount() - EnvironmentCore.utils.getPlayerCount();
+                    if (playerThatCanBeWarped >= 1) {
+                        warpInfo = "§a(" + playerThatCanBeWarped + ")";
+                    }
 
-                toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                long closingTimeInMinutes = Duration.between(Instant.now(), getLobbyClosingTime()).toMinutes();
-                if (closingTimeInMinutes <= 0) {
-                    toRender.add(Text.of("§4Lobby Closed"));
+                    toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
+                    long closingTimeInMinutes = Duration.between(Instant.now(), getLobbyClosingTime()).toMinutes();
+                    if (closingTimeInMinutes <= 0) {
+                        toRender.add(Text.of("§4Lobby Closed"));
+                    }
+                    else {
+                        toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
+                    }
+                    for (ChChestData chest : listener.getUnopenedChests()) {
+                        if (chest.finder.equals(BBsentials.generalConfig.getUsername())) continue;
+                        toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.finder)));
+                        chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
+                    }
                 }
                 else {
-                    toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
+                    toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
+                    for (ChChestData chest : listener.getUnopenedChests()) {
+                        String author = "";
+                        if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder))
+                            author = " [" + chest.finder + "]";
+                        toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
+                        chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
+                    }
                 }
-                for (ChChestData chest : listener.getUnopenedChests()) {
-                    if (chest.finder.equals(BBsentials.generalConfig.getUsername())) continue;
-                    toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.finder)));
-                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
-                }
-            }
-            else {
-                toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
-                for (ChChestData chest : listener.getUnopenedChests()) {
-                    String author = "";
-                    if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder)) author = " [" + chest.finder + "]";
-                    toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
-                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
+                for (Text text : toRender) {
+                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
+                    y += 10; // Adjust the vertical position for the next string
                 }
             }
-            for (Text text : toRender) {
-                drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
-                y += 10; // Adjust the vertical position for the next string
-            }
-        }
-        else if (BBsentials.funConfig.lowPlayTimeHelpers && BBsentials.funConfig.lowPlaytimeHelperJoinDate != null) {
-            long differece = ((Instant.now().getEpochSecond() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
-            String colorCode = "§a";
-            if (differece > 50) colorCode = "§4§l";
-            else if (differece > 45) colorCode = "§4";
-            else if (differece > 40) colorCode = "§6";
-            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
-        }
+            else
+                if (BBsentials.funConfig.lowPlayTimeHelpers && BBsentials.funConfig.lowPlaytimeHelperJoinDate != null) {
+                    long differece = ((Instant.now().getEpochSecond() - BBsentials.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
+                    String colorCode = "§a";
+                    if (differece > 50) colorCode = "§4§l";
+                    else
+                        if (differece > 45) colorCode = "§4";
+                        else
+                            if (differece > 40) colorCode = "§6";
+                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
+                }
         if (ModInitialiser.tutorialManager.current != null) {
             TutorialManager manager = ModInitialiser.tutorialManager;
             Tutorial current = manager.current;
@@ -733,19 +740,29 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
         String title;
         String description;
         Integer displayTime = DEFAULT_DURATION_MS;
-        Identifier sound = SoundEvents.UI_TOAST_CHALLENGE_COMPLETE.getId();
-        Identifier icon;
+        Identifier sound;
+        ItemStack icon;
         Integer width;
         Integer height;
         Integer imageSize = 16;
         Integer integerToWrap = getWidth() - imageSize * 3;
         private boolean soundPlayed;
 
-        public BBToast(String title, String description, Identifier sound, Identifier icon) {
+        public BBToast(String title, String description) {
+            this(title, description, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, VanillaItems.DIAMOND);
+        }
+
+        /**
+         * @param title
+         * @param description
+         * @param sound       use SoundEvents. For autocompletion
+         * @param icon
+         */
+        public BBToast(String title, String description, SoundEvent sound, VanillaItems icon) {
             this.title = title;
             this.description = description;
-            if (sound != null) this.sound = sound;
-            if (icon != null) this.icon = icon;
+            this.sound = sound != null ? sound.getId() : null;
+            this.icon = icon != null ? VanillaRegistry.get(icon).getDefaultStack() : null;
         }
 
         public void setHeight() {
@@ -798,12 +815,17 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
             }
 
-            if (!this.soundPlayed && startTime > 0L) {
+            if (!this.soundPlayed && startTime > 0L && sound != null) {
                 this.soundPlayed = true;
                 manager.getClient().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(sound), 1.0F, 1.0F));
             }
 
-            context.drawItemWithoutEntity(Items.DIAMOND.getDefaultStack(), 1, 8, 8);
+            if (icon != null) {
+                int iconX = 5; // Position the icon on the left with a small padding
+                int iconY = (boxHeight - imageSize) / 2; // Center vertically
+                context.drawItemWithoutEntity(icon, iconX, iconY);
+            }
+
             return (double) startTime >= displayTime * manager.getNotificationDisplayTimeMultiplier() ? Visibility.HIDE : Visibility.SHOW;
         }
 

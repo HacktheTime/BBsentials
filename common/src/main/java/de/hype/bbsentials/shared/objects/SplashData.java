@@ -20,7 +20,7 @@ public class SplashData {
         this.hubNumber = hubNumber;
         this.locationInHub = locationInHub;
         this.hubType = hubType;
-        this.extraMessage = extraMessage.replace("&", "§");
+        this.extraMessage = extraMessage != null ? extraMessage.replace("&", "§") : null;
         this.lessWaste = lessWaste;
         if (!(hubType.equals(Islands.HUB) || hubType.equals(Islands.DUNGEON_HUB))) {
             throw new IllegalArgumentException("§cInvalid hub type specified. Please only use the Suggestions!");

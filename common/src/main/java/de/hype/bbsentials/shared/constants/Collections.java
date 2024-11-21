@@ -16,6 +16,16 @@ public interface Collections extends MinionResourceItem {
         return collections;
     }
 
+    static String getCodeReference(String goalName) {
+        goalName = goalName.replace("_", " ");
+        for (Collections value : values()) {
+            if (value.getDisplayName().equalsIgnoreCase(goalName)) {
+                return value.getClass().getName().replaceAll("\\$[0-9]+", "").replace("$", ".").replace("de.hype.bbsentials.shared.constants.", "") + "." + value.toString();
+            }
+        }
+        return null;
+    }
+
     String getId();
 
     int getTierCount();

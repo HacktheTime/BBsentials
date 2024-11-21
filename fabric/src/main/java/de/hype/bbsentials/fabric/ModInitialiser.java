@@ -671,13 +671,6 @@ public class ModInitialiser implements ClientModInitializer {
         EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new FabricTextUtils(), new FabricWorldUtils());
         codes = new NumPadCodes();
         BBsentials.init();
-        if (!BBsentials.generalConfig.didFirstBoot) {
-            FirstBootPrompt screen = new FirstBootPrompt();
-            MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(screen));
-            screen.waitFor();
-            generalConfig.didFirstBoot = true;
-            generalConfig.save();
-        }
         tutorialManager = new TutorialManager();
         if (developerConfig.quickLaunch) {
             executionService.execute(() -> {
@@ -687,6 +680,13 @@ public class ModInitialiser implements ClientModInitializer {
                     } catch (InterruptedException e) {
 
                     }
+                }
+                if (!BBsentials.generalConfig.didFirstBoot) {
+                    FirstBootPrompt screen = new FirstBootPrompt();
+                    MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(screen));
+                    screen.waitFor();
+                    generalConfig.didFirstBoot = true;
+                    generalConfig.save();
                 }
                 MinecraftClient.getInstance().execute(this::joinHypixel);
             });

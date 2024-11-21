@@ -4,19 +4,19 @@ import de.hype.bbsentials.client.common.SystemUtils;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.communication.BBsentialConnection;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.shared.constants.VanillaItems;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.GridWidget;
-import net.minecraft.client.gui.widget.SimplePositioningWidget;
+import net.minecraft.client.gui.widget.ScrollableTextWidget;
 import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.client.sound.Sound;
+import net.minecraft.client.sound.SoundSystem;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.minecraft.util.Identifier;
 
 public class FirstBootPrompt extends Screen {
     public final Screen parent;
@@ -25,55 +25,109 @@ public class FirstBootPrompt extends Screen {
     TextRenderer textRenderer = client.textRenderer;
 
     protected FirstBootPrompt() {
-        super(Text.of("BBsentials Notice"));
+        super(Text.literal("§6§lBBsentials Notice"));
         parent = client.currentScreen;
-        String notice =
+        init();
+    }
 
-                """
-                        Before you can use BBsentials you need to do some things. If you dont want to click the mod Self Remove Button.
-                        
-                        BBsentials is a Network Mod. Due too this we require you to link (Your/a) Discord to your Minecraft Account.
-                        
-                        This is to inform about changes and have a separate way to contact you other than MC.
-                        
-                        We take ourselves a LOT of Freedom going further than most expect:
-                        We spent Thousands of Hours into the Mod and its Server and the Website in total. Over 1 Year of mainly Development in free time adds up!
-                        Due too that we take the freedom to request things from you as well.
-                        We have DRM in this mod alongside a Punishment System. Those DRM's for example allow us to trigger a mod self removal.
-                        We dont want to harm but we dont want some individuals to be able to use the things we spent a lot of effort in.
-                        We also have a couple Trolls at our disposal but those should not cause any serious damage.
-                        We collect Data about Bingo which also include some personal Data of yours such as Profiles, Contribution Numbers and more.
-                        
-                        We dont want to sell your Data but use them to analyze Bingos and improve our Data sets which should help the whole community.
-                        
-                        In the past we noticed that most people arent aware that this mod requires Registration etc which we try to Solve with this Screen.
-                        
-                        The First time we get Data about you is when you click the try connect Button or when you register. If you dont agree to this click the Self Remove Button. To open the Discord if you still need to link Click the Discord Button.
-                        """;
-        List<String> splitted = new ArrayList<>(Arrays.asList(notice.split("\n")));
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        super.resize(client, width, height);
+        this.init(client, width, height);
+    }
 
-        clearAndInit();
-        GridWidget gridWidget = new GridWidget();
-        gridWidget.setSpacing(10);
-        gridWidget.getMainPositioner().marginX(5).marginY(2);
-        GridWidget.Adder adder = gridWidget.createAdder(5);
-        for (String s : splitted) {
-            TextWidget textWidget = new TextWidget(Text.literal(s), textRenderer);
+    @Override
+    protected void init() {
+        super.init();
+        clearChildren();
+        try {
+            String notice = """
+                §7We experienced players being surprised by the things we collect. Due too this this Screen was created. We try to be very open about the things we collect to avoid surprises. We think the Data we collect is beneficial for the community over all.
+                
+                Because we respect wish for Privacy we made it so the first time we get send data is if you continue after this Screen.
+
+                Before you can use BBsentials you need to do some things. If you don't want to click the mod Self Remove Button.
+
+                BBsentials is a Network Mod. Due too this we require you to link (Your/a) Discord to your Minecraft Account.
+
+                This is the case because we
+                ◉ Use Discord for Announcements regarding the Mod AND its Usage
+                ◉ We can use this to inform you about Changes and Updates
+                ◉ We have our explanations there
+                and more.
+                
+                The Data we get sent is processed by us and a lot of it also stored to Database. We also log a lot of things.
+                
+                We take ourselves a LOT of Freedom going further than most expect:
+                We spent Thousands of Hours into the Mod and its Server and the Website in total. Over 1 Year of mainly Development in free time adds up!
+                Due too that we take the freedom to request things from you as well.
+                We have DRM in this mod alongside a Punishment System. Those DRM's for example allow us to trigger a mod self removal.
+                (We don't want to harm but we don't want some individuals to be able to use the things we spent a lot of effort in.)
+                We also have a couple Trolls at our disposal but those should not cause any serious damage.
+                We collect Data about Bingo which also include some personal Data of yours such as Profiles, Contribution Numbers and more.
+
+                We dont want to sell your Data but use them to analyze Bingos and improve our Data sets which should help the whole community.
+
+                In the past we noticed that most people arent aware that this mod requires Registration etc which we try to Solve with this Screen.
+
+                The First time we get Data about you is when you click the try connect Button or when you register. If you dont agree to this click the Self Remove Button. To open the Discord if you still need to link Click the Discord Button. For a even more detailed Privacy Policy click the Privacy Policy Button.
+                
+                §4§lWhen you click the connect to Network Button you agree to the Privacy Policy!
+                
+                The Mod is an entirely provided as is basis and we are not responsible for any damage caused by the Mod.
+                """;
+
+            int padding = 10;
+            int buttonHeight = 20;
+            int buttonWidth = 200;
+            int textWidgetWidth = (int) (width * 0.5); // 50% of the screen width
+            int textWidgetHeight = height / 2;
+
+            TextWidget titleWidget = new TextWidget(Text.literal("BBsentials Notice"), textRenderer);
+            titleWidget.setX((width - textWidgetWidth) / 2);
+            titleWidget.setY(padding);
+
+            ScrollableTextWidget textWidget = new ScrollableTextWidget((width - textWidgetWidth) / 2, padding * 2 + titleWidget.getHeight(), textWidgetWidth, textWidgetHeight, Text.literal(notice), textRenderer);
+
+            //Color Coding against using it knowingly.
+            ButtonWidget openDiscord = ButtonWidget.builder(Text.literal("§cOpen Discord in Browser"), (b) -> this.openDiscord())
+                    .dimensions((width - buttonWidth) / 2, padding * 3 + titleWidget.getHeight() + textWidgetHeight, buttonWidth, buttonHeight)
+                    .build();
+            ButtonWidget openPrivacyPolicyInBrowser = ButtonWidget.builder(Text.literal("§aOpen Privacy Policy in Browser"), (b) -> this.openPrivacyBrowser())
+                    .dimensions((width - buttonWidth) / 2, padding * 4 + titleWidget.getHeight() + textWidgetHeight + buttonHeight, buttonWidth, buttonHeight)
+                    .build();
+            ButtonWidget connectToNetwork = ButtonWidget.builder(Text.literal("§cConnect to Network (Requires to be registered already)"), (b) -> this.connectToNetwork())
+                    .dimensions((width - buttonWidth) / 2, padding * 5 + titleWidget.getHeight() + textWidgetHeight + buttonHeight * 2, buttonWidth, buttonHeight)
+                    .build();
+            ButtonWidget modSelfRemove = ButtonWidget.builder(Text.literal("§aMod Self Remove"), (b) -> this.selfRemove())
+                    .dimensions((width - buttonWidth) / 2, padding * 6 + titleWidget.getHeight() + textWidgetHeight + buttonHeight * 3, buttonWidth, buttonHeight)
+                    .build();
+            ButtonWidget gitHubButton = ButtonWidget.builder(Text.literal("§aOpen Github"), (b) -> this.openGithub())
+                    .dimensions((width - buttonWidth) / 2, padding * 7 + titleWidget.getHeight() + textWidgetHeight + buttonHeight * 4, buttonWidth, buttonHeight)
+                    .build();
+
+            addDrawableChild(titleWidget);
             addDrawableChild(textWidget);
+            addDrawableChild(openDiscord);
+            addDrawableChild(gitHubButton);
+            addDrawableChild(openPrivacyPolicyInBrowser);
+            addDrawableChild(connectToNetwork);
+            addDrawableChild(modSelfRemove);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        ButtonWidget openDiscord = new ButtonWidget.Builder(Text.literal("Open Discord in Browser"), (b) -> this.openDiscord()).build();
-        addSelectableChild(openDiscord);
-        ButtonWidget connectToNetwork = new ButtonWidget.Builder(Text.literal("Connect to Network"), (b) -> this.connectToNetwork()).build();
-        addSelectableChild(connectToNetwork);
-        ButtonWidget modSelfRemove = new ButtonWidget.Builder(Text.literal("Mod Self Remove"), (b) -> this.selfRemove()).build();
-        addSelectableChild(modSelfRemove);
-        gridWidget.refreshPositions();
-        SimplePositioningWidget.setPos(gridWidget, 0, 0, width, height);
-        gridWidget.forEachChild((w) -> {
-            if (w instanceof ButtonWidget) {
-                addSelectableChild(w);
-            } else addDrawableChild(w);
-        });
+    }
+
+    private void openGithub() {
+        String link = "https://github.com/HacktheTime/BBsentials";
+        SystemUtils.openInBrowser(link);
+        SystemUtils.setClipboardContent(link);
+    }
+
+    private void openPrivacyBrowser() {
+        String link = "https://hackthetime.de/privacy";
+        SystemUtils.openInBrowser(link);
+        SystemUtils.setClipboardContent(link);
     }
 
     private void selfRemove() {
@@ -113,16 +167,16 @@ public class FirstBootPrompt extends Screen {
             }
         }
         if (BBsentials.connection.getAuthenticated()) {
-            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connected", "Authentication Successful. Continuing", null, null));
+            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connected", "Authentication Successful. Continuing", SoundEvents.ENTITY_ARROW_HIT, VanillaItems.EMERALD_BLOCK));
             close();
         } else {
-            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connecting Failed", "You are not registered. Please register! (If you are registered try again. If still not working you probably have an ongoing Punishment.)", null, null));
+            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connecting Failed", "You are not registered. Please register! (If you are registered try again. If still not working you probably have an ongoing Punishment.)", null, VanillaItems.REDSTONE_BLOCK));
         }
     }
 
     @Override
     public boolean shouldCloseOnEsc() {
-        return false;
+        return true;
     }
 
     public void close() {

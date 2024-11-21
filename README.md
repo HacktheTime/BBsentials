@@ -21,10 +21,10 @@ Contributors:
 hannibal2 (never made a push but was very helpful with questions and did some parts of the code)
 nea89 (helped with gradle and the waypoint render)
 
-1.20.4
+1.21
 I recommend using Fabulously Optimized together with this mod.
 
-Textures are usually by ic22487 but can be overriden by putting the textures at the correct path.
+Textures are usually by ic22487 but can be overridden by putting the textures at the correct path.
 
 They have a full texture pack here.
 (https://hypixel.net/threads/0-19-1-hypixel-for-1-8-1-12-and-1-20.4174260/)
@@ -32,5 +32,3 @@ They have a full texture pack here.
 **Do not expect any kind of support during Bingo times since those developing and/or moderating this are likely to sweat
 it just like you.
 If you have any kind of request you can still try it though.**
-
-The newest branch is usually hypeswap. I recommend always looking at it since master is not updated very often. Only stable versions get merged into master

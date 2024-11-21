@@ -79,7 +79,9 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
                         BBsentials.executionService.execute(() -> {
                             for (Collections value : Collections.values()) {
                                 if (value.getId().equalsIgnoreCase(id)) {
-                                    BBsentials.sender.addSendTask("/viewrecipe %s".formatted(value.getMinionID()));
+                                    String minionId = value.getMinionID();
+                                    if (minionId != null)
+                                        BBsentials.sender.addSendTask("/viewrecipe %s".formatted(minionId), 0);
                                 }
                             }
                         });

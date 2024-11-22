@@ -75,7 +75,7 @@ public class FabricChat implements MCChat {
     public void sendClientSideMessage(Message message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
-            client.player.sendMessage(FabricTextUtils.opposite(message.getJson()));
+            client.player.sendMessage(FabricTextUtils.opposite(message.getJson()), false);
         }
     }
 

@@ -39,9 +39,6 @@ public abstract class IncomingPacketListenerPatches {
     @Final
     private ClientCommandSource commandSource;
 
-    @Shadow
-    protected abstract void readLightData(int x, int z, LightData data);
-
     @Shadow protected abstract ParseResults<CommandSource> parse(String command);
 
     @ModifyExpressionValue(method = "onCommandTree", at = @At(value = "NEW", target = "(Lcom/mojang/brigadier/tree/RootCommandNode;)Lcom/mojang/brigadier/CommandDispatcher;", remap = false))

@@ -46,14 +46,14 @@ class RenderInWorldContext(
                 .build(false)
         )
         val LINES = RenderLayer.of(
-            "bbsentials_firmament_rendertype_lines",
+            "firmament_rendertype_lines",
             VertexFormats.LINES,
             VertexFormat.DrawMode.LINES,
             RenderLayer.CUTOUT_BUFFER_SIZE,
             false, false, // do we need translucent? i dont think so
             RenderLayer.MultiPhaseParameters.builder()
                 .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
-                .program(RenderPhase.ShaderProgram(shader("core/rendertype_lines", VertexFormats.LINES, Defines.EMPTY)))
+                .program(FirmamentShaders.LINES)
                 .build(false)
         )
         val COLORED_QUADS = RenderLayer.of(
@@ -145,6 +145,7 @@ class RenderInWorldContext(
         }
     }
 
+
     fun text(
         position: Vec3d,
         vararg texts: Text,
@@ -152,7 +153,7 @@ class RenderInWorldContext(
         background: Int = 0x70808080
     ) {
         withFacingThePlayer(position) {
-            text(*texts, verticalAlign = verticalAlign, background = background)
+            text(*texts, verticalAlign = verticalAlign)
         }
     }
 
@@ -303,45 +304,6 @@ class RenderInWorldContext(
         }
     }
 
-    fun waypointIcon(
-        position: Vec3d, textures: RenderInformation, width: Int, height: Int, xmodifier: Float
-    ) {
-        val backupColor = RenderSystem.getShaderColor()
-        color(1f, 1f, 1f, 1f)
-        withFacingThePlayer(position) {
-            matrixStack.push()
-            matrixStack.translate(xmodifier, -25f, 0f)
-            RenderSystem.setShaderTexture(
-                0, Identifier.of(textures.namespace, textures.pathToFile)
-            )
-            RenderSystem.setShader(net.minecraft.client.render.GameRenderer::getPositionTexColorProgram)
-            val hw = width / 2F
-            val hh = height / 2F
-            val matrix4f: Matrix4f = matrixStack.peek().positionMatrix
-            val buf = tesselator.begin(
-                net.minecraft.client.render.VertexFormat.DrawMode.QUADS,
-                VertexFormats.POSITION_TEXTURE_COLOR
-            )
-            buf.color(255, 255, 255, 255)
-            buf.vertex(matrix4f, -hw, -hh, 0F).texture(0f, 0f).next()
-            buf.vertex(matrix4f, -hw, +hh, 0F).texture(0f, 1f).next()
-            buf.vertex(matrix4f, +hw, +hh, 0F).texture(1f, 1f).next()
-            buf.vertex(matrix4f, +hw, -hh, 0F).texture(1f, 0f).next()
-            BufferRenderer.drawWithGlobalProgram(buf.end())
-        }
-        RenderSystem.setShaderColor(backupColor[0], backupColor[1], backupColor[2], backupColor[3])
-    }
-
-    fun doWaypointIcon(position: Vec3d, textures: List<RenderInformation>, width: Int, height: Int) {
-        val xStartPosition = -((textures.dropLast(1).sumOf { it.spaceToNext }) / 2).toFloat()
-        var xmodifer = xStartPosition
-        for ((index, value) in textures.withIndex()) {
-            if (value.pathToFile.isEmpty()) continue
-            waypointIcon(position, value, width, height, xmodifer)
-            xmodifer += width
-        }
-
-    }
 }
 
 /**
@@ -398,28 +360,47 @@ class FacingThePlayerContext(val worldContext: RenderInWorldContext) {
         }
     }
 
-
     fun texture(
         texture: Identifier, width: Int, height: Int,
         u1: Float, v1: Float,
         u2: Float, v2: Float,
     ) {
-        RenderSystem.setShaderTexture(0, texture)
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram)
+        val buf = worldContext.vertexConsumers.getBuffer(RenderLayer.getGuiTexturedOverlay(texture))
         val hw = width / 2F
         val hh = height / 2F
         val matrix4f: Matrix4f = worldContext.matrixStack.peek().positionMatrix
-        val buf = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR)
-        buf.vertex(matrix4f, -hw, -hh, 0F).color(-1).texture(u1, v1).next()
-        buf.vertex(matrix4f, -hw, +hh, 0F).color(-1).texture(u1, v2).next()
-        buf.vertex(matrix4f, +hw, +hh, 0F).color(-1).texture(u2, v2).next()
-        buf.vertex(matrix4f, +hw, -hh, 0F).color(-1).texture(u2, v1).next()
-        BufferRenderer.drawWithGlobalProgram(buf.end())
+        buf.vertex(matrix4f, -hw, -hh, 0F)
+            .color(-1)
+            .texture(u1, v1).next()
+        buf.vertex(matrix4f, -hw, +hh, 0F)
+            .color(-1)
+            .texture(u1, v2).next()
+        buf.vertex(matrix4f, +hw, +hh, 0F)
+            .color(-1)
+            .texture(u2, v2).next()
+        buf.vertex(matrix4f, +hw, -hh, 0F)
+            .color(-1)
+            .texture(u2, v1).next()
+        worldContext.vertexConsumers.draw()
     }
+
 }
 fun VertexConsumer.next() = this
 
 
 fun getFontHeight(): Float {
     return MinecraftClient.getInstance().textRenderer.fontHeight.toFloat()
+}
+
+
+object FirmamentShaders {
+    val shaders = mutableListOf<ShaderProgramKey>()
+
+    private fun shader(name: String, format: VertexFormat, defines: Defines): ShaderProgramKey {
+        val key = ShaderProgramKey(Identifier.of("bbsentials", name), format, defines)
+        shaders.add(key)
+        return key
+    }
+
+    val LINES = RenderPhase.ShaderProgram(shader("core/rendertype_lines", VertexFormats.LINES, Defines.EMPTY))
 }

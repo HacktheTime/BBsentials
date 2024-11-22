@@ -64,7 +64,7 @@ public class BBCommandDispatcher extends CommandDispatcher<IBBsentialsCommandSou
         // noinspection ConstantConditions
         IBBsentialsCommandSource commandSource = (IBBsentialsCommandSource) client.getNetworkHandler().getCommandSource();
 
-        client.getProfiler().push(command);
+        client.getProfiler().push("command");
 
         try {
             INSTANCE.execute(command, commandSource);

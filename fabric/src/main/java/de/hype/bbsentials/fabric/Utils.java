@@ -416,6 +416,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public InputStream makeScreenshot() {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        Chat.sendPrivateMessageToSelfInfo("Taking a ScreenShot (Code Request)");
 
         AtomicReferenceArray<InputStream> screenshotInputStream = new AtomicReferenceArray<>(new InputStream[1]);
         AtomicBoolean isWaiting = new AtomicBoolean(true);

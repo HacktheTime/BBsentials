@@ -609,6 +609,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Renders the XP Boost Potions differently. Not recommended outside of splash preparation"))
                     .setSaveConsumer(newValue -> BBsentials.splashConfig.xpBoostHighlight = newValue)
                     .build());
+            splasher.addEntry(entryBuilder.startBooleanToggle(Text.of("Water Bottle → Red Concrete"), BBsentials.splashConfig.markWatterBottles)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Renders Water Bottles as Red Concrete."))
+                    .setSaveConsumer(newValue -> BBsentials.splashConfig.markWatterBottles = newValue)
+                    .build());
         }
         return builder.build();
     }

@@ -137,19 +137,14 @@ public abstract class RenderingDefinitions {
                             return false;
                         }
                     }
+                    else
+                        if (BBsentials.splashConfig.markWatterBottles && itemName.equals("Water Bottle")) {
+                            check.renderAsItem(VanillaItems.RED_CONCRETE);
+                        }
                     return false;
                 }
             };
         }
-        new RenderingDefinitions("Water Bottle to Red Concrete") {
-            @Override
-            public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
-                if (itemName.equals("Water Bottle")) {
-                    check.renderAsItem(VanillaItems.RED_CONCRETE);
-                }
-                return false;
-            }
-        };
         new RenderingDefinitions("Chocolate Factory Rabbit Notifications") {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {

@@ -84,8 +84,6 @@ public abstract class BBsentialsCommandSource implements IBBsentialsCommandSourc
     @Shadow
     public abstract Stream<Identifier> getSoundIds() ;
 
-    @Shadow
-    public abstract Stream<Identifier> getRecipeIds() ;
 
     @Shadow
     public abstract CompletableFuture<Suggestions> getCompletions(CommandContext<?> context) ;

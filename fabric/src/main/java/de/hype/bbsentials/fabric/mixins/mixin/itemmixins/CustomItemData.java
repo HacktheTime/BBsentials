@@ -1,4 +1,4 @@
-package de.hype.bbsentials.fabric.mixins.mixin;
+package de.hype.bbsentials.fabric.mixins.mixin.itemmixins;
 
 import de.hype.bbsentials.fabric.VanillaRegistry;
 import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;

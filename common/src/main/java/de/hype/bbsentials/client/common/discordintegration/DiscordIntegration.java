@@ -63,6 +63,7 @@ public class DiscordIntegration extends ListenerAdapter {
     }
 
     public static void sendScreenshotMessage(SlashCommandInteractionEvent event) {
+        Chat.sendPrivateMessageToSelfInfo("Mod Sync Discord Bot is taking (and sending) a Screenshot.");
         event.getHook().editOriginalAttachments(FileUpload.fromData(EnvironmentCore.utils.makeScreenshot(), "screenshot.png")).queue();
     }
 

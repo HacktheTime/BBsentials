@@ -75,12 +75,12 @@ public abstract class RenderingDefinitions {
                         for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
                             if (value.receivedTime.isAfter(Instant.now().minusSeconds(20))) {
                                 if (value.serverID.equalsIgnoreCase(serverid)) {
-                                    if (full) check.texturePath = "bbsentials:customitems/splash_hub_full";
-                                    else check.texturePath = "bbsentials:customitems/splash_hub";
+                                    if (full) check.texturePath = "bbsentials:hub-items/splash_hub_full";
+                                    else check.texturePath = "bbsentials:hub-items/splash_hub";
                                 } else if (value.serverID.isEmpty()) {
                                     if (value.hubNumber == hubNumber) {
-                                        if (full) check.texturePath = "bbsentials:customitems/splash_hub_full";
-                                        else check.texturePath = "bbsentials:customitems/splash_hub";
+                                        if (full) check.texturePath = "bbsentials:hub-items/splash_hub_full";
+                                        else check.texturePath = "bbsentials:hub-items/splash_hub";
                                     }
                                 }else {
                                     return false;
@@ -99,7 +99,7 @@ public abstract class RenderingDefinitions {
                     }
                     if (BBsentials.splashConfig.showSmallestHub && (BBsentials.splashConfig.smallestHubName != null)) {
                         if (itemName.equals(BBsentials.splashConfig.smallestHubName)) {
-                            check.setTexturePath("bbsentials:customitems/low_player_hub");
+                            check.setTexturePath("bbsentials:hub-items/low_player_hub");
                             return true;
                         }
                     }
@@ -137,19 +137,14 @@ public abstract class RenderingDefinitions {
                             return false;
                         }
                     }
+                    else
+                        if (BBsentials.splashConfig.markWatterBottles && itemName.equals("Water Bottle")) {
+                            check.renderAsItem(VanillaItems.RED_CONCRETE);
+                        }
                     return false;
                 }
             };
         }
-        new RenderingDefinitions("Water Bottle to Red Concrete") {
-            @Override
-            public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {
-                if (itemName.equals("Water Bottle")) {
-                    check.renderAsItem(VanillaItems.RED_CONCRETE);
-                }
-                return false;
-            }
-        };
         new RenderingDefinitions("Chocolate Factory Rabbit Notifications") {
             @Override
             public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {

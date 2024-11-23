@@ -18,6 +18,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.awt.*;
+
 public class FirstBootPrompt extends Screen {
     public final Screen parent;
     boolean wait = true;
@@ -157,7 +159,7 @@ public class FirstBootPrompt extends Screen {
     }
 
     public void connectToNetwork() {
-        ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connecting to Network", "Connecting", null, null));
+        ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connecting to Network", "Connecting", null, null, Color.CYAN));
         BBsentials.connectToBBserver();
         while (BBsentials.connection == null) {
             try {
@@ -167,10 +169,10 @@ public class FirstBootPrompt extends Screen {
             }
         }
         if (BBsentials.connection.getAuthenticated()) {
-            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connected", "Authentication Successful. Continuing", SoundEvents.ENTITY_ARROW_HIT, VanillaItems.EMERALD_BLOCK));
+            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connected", "Authentication Successful. Continuing", SoundEvents.ENTITY_ARROW_HIT, VanillaItems.EMERALD_BLOCK, Color.GREEN));
             close();
         } else {
-            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connecting Failed", "You are not registered. Please register! (If you are registered try again. If still not working you probably have an ongoing Punishment.)", null, VanillaItems.REDSTONE_BLOCK));
+            ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connecting Failed", "You are not registered. Please register! (If you are registered try again. If still not working you probably have an ongoing Punishment.)", null, VanillaItems.REDSTONE_BLOCK, Color.RED));
         }
     }
 

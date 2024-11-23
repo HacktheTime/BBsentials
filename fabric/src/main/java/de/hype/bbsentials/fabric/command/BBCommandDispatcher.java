@@ -64,8 +64,6 @@ public class BBCommandDispatcher extends CommandDispatcher<IBBsentialsCommandSou
         // noinspection ConstantConditions
         IBBsentialsCommandSource commandSource = (IBBsentialsCommandSource) client.getNetworkHandler().getCommandSource();
 
-        client.getProfiler().push(command);
-
         try {
             INSTANCE.execute(command, commandSource);
             return true;
@@ -84,8 +82,6 @@ public class BBCommandDispatcher extends CommandDispatcher<IBBsentialsCommandSou
             LOGGER.warn("Error while executing client-sided command '{}'", command, e);
             commandSource.sendError(Text.of(e.getMessage()));
             return true;
-        } finally {
-            client.getProfiler().pop();
         }
     }
 

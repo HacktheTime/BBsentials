@@ -1,15 +1,15 @@
 [versions]
-modVersion = "0.99.2.8"
+modVersion = "0.99.2.9"
 kotlinVersion = "1.9.0"
 apache_httpcomponents = "4.5.13"
 lwjglModern = "3.3.3"
 
 minecraft_versionSupported = "1.21.*"
 
-modern_minecraft = "1.21"
-modern_yarn = "1.21+build.9"
-modern_fabric_loader = "0.15.11"
-modern_fabric_api = "0.100.7+1.21"
+modern_minecraft = "1.21.3"
+modern_yarn = "1.21.3+build.2"
+modern_fabric_loader = "0.16.9"
+modern_fabric_api = "0.109.0+1.21.3"
 
 legacy_mcp = "22-1.8.9"
 legacy_minecraft = "1.8.9"

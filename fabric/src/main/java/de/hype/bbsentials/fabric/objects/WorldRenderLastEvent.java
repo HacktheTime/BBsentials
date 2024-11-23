@@ -26,23 +26,15 @@ public class WorldRenderLastEvent
 
     public final MatrixStack matrices;
     public final RenderTickCounter tickCounter;
-    public final boolean renderBlockOutline;
     public final Camera camera;
-    public final GameRenderer gameRenderer;
-    public final LightmapTextureManager lightmapTextureManager;
     public final VertexConsumerProvider.Immediate vertexConsumers;
 
     public final List<TextRenderCall> toRender = new ArrayList<>();
 
-    public WorldRenderLastEvent(MatrixStack matrices, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera,
-                                GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
-                                VertexConsumerProvider.Immediate vertexConsumers) {
+    public WorldRenderLastEvent(MatrixStack matrices, RenderTickCounter tickCounter, Camera camera, VertexConsumerProvider.Immediate vertexConsumers) {
         this.matrices = matrices;
         this.tickCounter = tickCounter;
-        this.renderBlockOutline = renderBlockOutline;
         this.camera = camera;
-        this.gameRenderer = gameRenderer;
-        this.lightmapTextureManager = lightmapTextureManager;
         this.vertexConsumers = vertexConsumers;
     }
 }

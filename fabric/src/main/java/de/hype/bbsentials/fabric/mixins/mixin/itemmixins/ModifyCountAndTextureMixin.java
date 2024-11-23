@@ -29,17 +29,21 @@ public abstract class ModifyCountAndTextureMixin {
     )
     private String BBsentials$modifyStackCountText(String stackCountText, TextRenderer textRenderer, ItemStack stack, int x, int y) {
         if (stack == null) return stackCountText;
-        String data = (((ICusomItemDataAccess) (Object) stack)).getItemCountCustom();
+        ICusomItemDataAccess data = (((ICusomItemDataAccess) (Object) stack));
         if (data != null) {
-            return data;
+            String text = data.getItemCountCustom();
+            if (text != null) return text;
+            else return stackCountText;
         }
         else return stackCountText;
     }
 
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"), cancellable = true)
     private void BBsentials$drawCustomTexture(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
+        if (stack == null) return;
         ICusomItemDataAccess data = (((ICusomItemDataAccess) (Object) stack));
-        var customTexture = data.BBsentialsAll$getCustomItemTexture();
+        if (data == null) return;
+        String customTexture = data.BBsentialsAll$getCustomItemTexture();
         if (customTexture != null) {
             drawGuiTexture(RenderLayer::getGuiTextured, Identifier.of(customTexture), x, y, 16, 16);
             ci.cancel();

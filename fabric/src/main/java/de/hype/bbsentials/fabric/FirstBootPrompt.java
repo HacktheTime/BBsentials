@@ -12,11 +12,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ScrollableTextWidget;
 import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.sound.Sound;
-import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.awt.*;
 
@@ -44,40 +41,35 @@ public class FirstBootPrompt extends Screen {
         clearChildren();
         try {
             String notice = """
-                §7We experienced players being surprised by the things we collect. Due too this this Screen was created. We try to be very open about the things we collect to avoid surprises. We think the Data we collect is beneficial for the community over all.
-                
-                Because we respect wish for Privacy we made it so the first time we get send data is if you continue after this Screen.
-
-                Before you can use BBsentials you need to do some things. If you don't want to click the mod Self Remove Button.
-
-                BBsentials is a Network Mod. Due too this we require you to link (Your/a) Discord to your Minecraft Account.
-
-                This is the case because we
-                ◉ Use Discord for Announcements regarding the Mod AND its Usage
-                ◉ We can use this to inform you about Changes and Updates
-                ◉ We have our explanations there
-                and more.
-                
-                The Data we get sent is processed by us and a lot of it also stored to Database. We also log a lot of things.
-                
-                We take ourselves a LOT of Freedom going further than most expect:
-                We spent Thousands of Hours into the Mod and its Server and the Website in total. Over 1 Year of mainly Development in free time adds up!
-                Due too that we take the freedom to request things from you as well.
-                We have DRM in this mod alongside a Punishment System. Those DRM's for example allow us to trigger a mod self removal.
-                (We don't want to harm but we don't want some individuals to be able to use the things we spent a lot of effort in.)
-                We also have a couple Trolls at our disposal but those should not cause any serious damage.
-                We collect Data about Bingo which also include some personal Data of yours such as Profiles, Contribution Numbers and more.
-
-                We dont want to sell your Data but use them to analyze Bingos and improve our Data sets which should help the whole community.
-
-                In the past we noticed that most people arent aware that this mod requires Registration etc which we try to Solve with this Screen.
-
-                The First time we get Data about you is when you click the try connect Button or when you register. If you dont agree to this click the Self Remove Button. To open the Discord if you still need to link Click the Discord Button. For a even more detailed Privacy Policy click the Privacy Policy Button.
-                
-                §4§lWhen you click the connect to Network Button you agree to the Privacy Policy!
-                
-                The Mod is an entirely provided as is basis and we are not responsible for any damage caused by the Mod.
-                """;
+                    §7We experienced players being surprised by the things we collect. Due too this this Screen was created. We try to be very open about the things we collect to avoid surprises. We think the Skyblock Data we collect is beneficial for the community over all.
+                    
+                    We also collect IP Addresses etc for moderation and analysis purposes. We understand wishes for privacy. We do not receive any Data until you connect to the Network.
+                    
+                    Before you can use BBsentials you need to do some things. Due too technical Reasons this can't be skipped. If you don't want to do this now you will have to remove the mod again for now. You can click the §aMod Self Remove§7 to remove the mod. You will have to restart the game afterwards manually though. The Process will cost you roughly §630 Minutes§7 if you actually read the Stuff.
+                    
+                    BBsentials is a Network Mod. Due too this we require you to link (Your/a new) §bDiscord Account§7 to your Minecraft Account.
+                    
+                    This is the case because we
+                    ◉ Use Discord for Announcements regarding the Mod AND its Usage
+                    ◉ We can use this to inform you about Changes and Updates
+                    ◉ We have our explanations there
+                    and more.
+                    
+                    The Data we get sent is processed by us and a lot of it also stored to Database. We also log a lot of things.
+                    
+                    §f§lThis mod has DRM. As the mod Self Remove already indicates we have the option to trigger a mod Self Removal option.§r§7
+                    - We spent thousands of hours into the Network and we do not want some individuals to be able to use the things we spent a lot of effort in.
+                    We also have a couple Trolls at our disposal but those are made in a way to avoid any type of permanent damage.
+                    We collect Data about Bingo which also include some personal Data of yours such as Profiles, Contribution Numbers and more.
+                    
+                    We do §cNOT§7 sell your Data but use them to analyze Bingos and improve our Data sets to provide it to those we know how to understand it. For example to allow looking up old Profile Data to view Contribution counts and more!
+                    
+                    §4§lWhen you click the connect to Network Button you agree to the Privacy Policy!
+                    
+                    The Mod is an entirely provided on an as is basis and we are not responsible for any damage caused by the Mod.
+                    
+                    §7We knowingly Color Coded like this! We want to make it so you actually read through the Stuff!
+                    """;
 
             int padding = 10;
             int buttonHeight = 20;
@@ -135,7 +127,8 @@ public class FirstBootPrompt extends Screen {
     private void selfRemove() {
         if (BBsentialConnection.selfDestruct()) {
             throw new RuntimeException("Mod was removed successfully. You can Relaunch (cause we cant for you)");
-        } else {
+        }
+        else {
             client.execute(() -> client.setScreen(new NoticeScreen(() -> {
                 throw new RuntimeException("Closing MC");
             }, Text.literal("BBsentials"), Text.literal("Sorry we weren't able to remove the mod for you. You will need to remove it yourself"))));
@@ -171,7 +164,8 @@ public class FirstBootPrompt extends Screen {
         if (BBsentials.connection.getAuthenticated()) {
             ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connected", "Authentication Successful. Continuing", SoundEvents.ENTITY_ARROW_HIT, VanillaItems.EMERALD_BLOCK, Color.GREEN));
             close();
-        } else {
+        }
+        else {
             ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connecting Failed", "You are not registered. Please register! (If you are registered try again. If still not working you probably have an ongoing Punishment.)", null, VanillaItems.REDSTONE_BLOCK, Color.RED));
         }
     }

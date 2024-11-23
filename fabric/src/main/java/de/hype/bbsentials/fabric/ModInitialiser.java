@@ -674,25 +674,24 @@ public class ModInitialiser implements ClientModInitializer {
         codes = new NumPadCodes();
         BBsentials.init();
         tutorialManager = new TutorialManager();
-        if (developerConfig.quickLaunch) {
-            executionService.execute(() -> {
-                while (!MinecraftClient.getInstance().isFinishedLoading()) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
+        executionService.execute(() -> {
+            while (!MinecraftClient.getInstance().isFinishedLoading()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
 
-                    }
                 }
-                if (!BBsentials.generalConfig.didFirstBoot) {
-                    FirstBootPrompt screen = new FirstBootPrompt();
-                    MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(screen));
-                    screen.waitFor();
-                    generalConfig.didFirstBoot = true;
-                    generalConfig.save();
-                }
-                MinecraftClient.getInstance().execute(this::joinHypixel);
-            });
-        }
+            }
+            if (!BBsentials.generalConfig.didFirstBoot) {
+                FirstBootPrompt screen = new FirstBootPrompt();
+                MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(screen));
+                screen.waitFor();
+                generalConfig.didFirstBoot = true;
+                generalConfig.save();
+            }
+            if (developerConfig.quickLaunch) MinecraftClient.getInstance().execute(this::joinHypixel);
+        });
+
         RenderingDefinitions.clearAndInitDefaults();
         ItemTooltipCallback.EVENT.register(this::modifyItemTooltip);
         if (generalConfig.hasBBRoles("dev")) {

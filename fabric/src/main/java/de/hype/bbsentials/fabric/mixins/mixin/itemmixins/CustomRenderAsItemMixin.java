@@ -7,13 +7,12 @@ import de.hype.bbsentials.shared.constants.VanillaItems;
 import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @SuppressWarnings("UnreachableCode")
 @Mixin(ItemModels.class)
-public abstract class CustomItemTextures {
+public abstract class CustomRenderAsItemMixin {
 
     @ModifyExpressionValue(
             method = "getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;",
@@ -22,10 +21,6 @@ public abstract class CustomItemTextures {
     private Object BBsentials$overrideGetModel(Object original, ItemStack stack) {
         if (stack == null) return original;
         ICusomItemDataAccess data = (ICusomItemDataAccess) (Object) stack;
-        String customTexturePath = data.BBsentialsAll$getCustomItemTexture();
-        if (customTexturePath != null) {
-            return Identifier.of(customTexturePath);
-        }
         VanillaItems renderAsItem = data.getVanillaRenderasItem();
         if (renderAsItem != null) {
             return VanillaRegistry.get(renderAsItem).getComponents().get(DataComponentTypes.ITEM_MODEL);

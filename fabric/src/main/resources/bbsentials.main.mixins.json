@@ -12,17 +12,17 @@
     "ChestMixin",
     "ClientCommandSourceMixin",
     "CommandNodeAccessMixin",
-    "CustomItemData",
-    "CustomItemTextures",
-    "CustomItemTooltip",
+    "itemmixins.CustomItemData",
+    "itemmixins.CustomItemTooltip",
     "IncomingPacketListenerPatches",
     "InventoryKeyBinds",
-    "ItemRendererMixin",
     "LiteralCommandNodeMixin",
     "RootCommandNodeAccessMixin",
     "ScreenHandlerMixin",
     "SimpleOptionMixin",
-    "WorldRenderLastEventPatch"
+    "WorldRenderLastEventPatch",
+    "itemmixins.CustomItemCount",
+    "itemmixins.CustomItemTextures"
   ],
   "injectors": {
     "defaultRequire": 1

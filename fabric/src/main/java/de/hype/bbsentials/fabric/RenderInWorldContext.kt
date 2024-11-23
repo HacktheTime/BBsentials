@@ -8,9 +8,6 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gl.Defines
 import net.minecraft.client.gl.ShaderProgramKey
-import java.lang.Math.pow
-import org.joml.Matrix4f
-import org.joml.Vector3f
 import net.minecraft.client.gl.VertexBuffer
 import net.minecraft.client.render.*
 import net.minecraft.client.texture.Sprite
@@ -19,8 +16,10 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
+import org.joml.Matrix4f
+import org.joml.Vector3f
 import java.awt.Color
-import java.io.InputStream
+import java.lang.Math.pow
 
 /**
  * @author nea89o in Firmanent
@@ -34,7 +33,7 @@ class RenderInWorldContext(
 ) {
     object RenderLayers {
         val TRANSLUCENT_TRIS = RenderLayer.of(
-            "bbsentials_firmament_translucent_tris",
+            "bbsentials_translucent_tris",
             VertexFormats.POSITION_COLOR,
             VertexFormat.DrawMode.TRIANGLES,
             RenderLayer.CUTOUT_BUFFER_SIZE,
@@ -46,7 +45,7 @@ class RenderInWorldContext(
                 .build(false)
         )
         val LINES = RenderLayer.of(
-            "firmament_rendertype_lines",
+            "bbsentials_rendertype_lines",
             VertexFormats.LINES,
             VertexFormat.DrawMode.LINES,
             RenderLayer.CUTOUT_BUFFER_SIZE,
@@ -57,7 +56,7 @@ class RenderInWorldContext(
                 .build(false)
         )
         val COLORED_QUADS = RenderLayer.of(
-            "bbsentials_firmament_quads",
+            "bbsentials_quads",
             VertexFormats.POSITION_COLOR,
             VertexFormat.DrawMode.QUADS,
             RenderLayer.CUTOUT_BUFFER_SIZE,
@@ -69,22 +68,16 @@ class RenderInWorldContext(
                 .build(false)
         )
     }
-    fun color(color: me.shedaniel.math.Color) {
-        color(color.red / 255F, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-    }
-    fun color(color: Color, alpha: Float) {
-        color(color.red / 255F, color.green / 255f, color.blue / 255f, alpha)
-    }
-
-    fun color(red: Float, green: Float, blue: Float, alpha: Float) {
-        RenderSystem.setShaderColor(red, green, blue, alpha)
-    }
 
     fun block(blockPos: BlockPos, color: Int) {
         matrixStack.push()
         matrixStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
         buildCube(matrixStack.peek().positionMatrix, vertexConsumers.getBuffer(RenderLayers.COLORED_QUADS), color)
         matrixStack.pop()
+    }
+
+    fun block(blockPos: BlockPos, color: Color) {
+        block(blockPos, color.rgb)
     }
 
     enum class VerticalAlign {
@@ -106,6 +99,39 @@ class RenderInWorldContext(
             Text.literal("§e${formatDistance(MinecraftClient.getInstance().player?.pos?.distanceTo(position.toCenterPos()) ?: 42069.0)}"),
             background = 0xAA202020.toInt()
         )
+    }
+
+    fun waypoint(position: BlockPos, color: Color, vararg label: Text) {
+        text(
+            position.toCenterPos(),
+            *label,
+            Text.literal("§e${formatDistance(MinecraftClient.getInstance().player?.pos?.distanceTo(position.toCenterPos()) ?: 42069.0)}"),
+            background = color.rgb
+        )
+    }
+
+
+    fun doWaypointIcon(position: Vec3d, textures: List<RenderInformation>, width: Int, height: Int) {
+        renderTextures(
+            position,
+            textures.map { it.texturePath?.let { path -> Identifier.of(path) } },
+            width,
+            height,
+            0.1f
+        )
+    }
+
+    fun renderTextures(position: Vec3d, textures: List<Identifier?>, width: Int, height: Int, padding: Float) {
+        if (textures.isEmpty()) return
+        val totalWidth = width * textures.size + padding * (textures.size - 1)
+        val left = -totalWidth / 2
+        for ((index, texture) in textures.withIndex()) {
+            if (texture == null || texture.path.isEmpty()) continue
+            texture(
+                position.add(left + index * (width + padding).toDouble(), 0.0, 0.0),
+                texture, width, height
+            )
+        }
     }
 
     fun formatDistance(distance: Double): String {
@@ -133,6 +159,10 @@ class RenderInWorldContext(
         texture(
             position, sprite.atlasId, width, height, sprite.minU, sprite.minV, sprite.maxU, sprite.maxV
         )
+    }
+
+    fun texture(position: Vec3d, texture: Identifier, width: Int, height: Int) {
+        texture(position, texture, width, height, 0.0f, 0.0f, 1.0f, 1.0f)
     }
 
     fun texture(
@@ -385,6 +415,7 @@ class FacingThePlayerContext(val worldContext: RenderInWorldContext) {
     }
 
 }
+
 fun VertexConsumer.next() = this
 
 

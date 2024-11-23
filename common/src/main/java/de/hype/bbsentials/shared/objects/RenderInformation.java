@@ -2,7 +2,7 @@ package de.hype.bbsentials.shared.objects;
 
 public class RenderInformation {
     public String namespace = "";
-    public String pathToFile = "";
+    public String pathToFile = null;
     public Integer spaceToNext = 5;
 
     /**
@@ -15,9 +15,6 @@ public class RenderInformation {
         if (namespace == null) {
             this.namespace = "";
         }
-        if (textureFilePath == null) {
-            this.pathToFile = "";
-        }
     }
 
     public RenderInformation(String namespace, String textureFilePath, int spaceToNext) {
@@ -27,12 +24,10 @@ public class RenderInformation {
         if (namespace == null) {
             this.namespace = "";
         }
-        if (textureFilePath == null) {
-            this.pathToFile = "";
-        }
     }
 
     public String getTexturePath() {
+        if (pathToFile == null) return null;
         if (namespace.isEmpty()) return pathToFile;
         return namespace + ":" + pathToFile;
     }

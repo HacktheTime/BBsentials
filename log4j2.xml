@@ -2,7 +2,7 @@
 <Configuration status="WARN">
     <!-- Filter out Hypixel scoreboard and sound errors -->
     <RegexFilter
-            regex="Missing sound for event.*|Ignoring player info update for unknown player.*|Received packet for unknown team .*|Ignoring player info update for unknown player .*|Requested creation of existing .*|Shader rendertype.*|Shader particle.*"
+            regex="Missing sound for event.*|Ignoring player info update for unknown player.*|Received packet for unknown team .*|Ignoring player info update for unknown player .*|Requested creation of existing .*|Shader rendertype.*|Shader particle.*|Profile contained invalid signature for textures property.*|Unable to resolve texture due to reference chain.*"
             onMatch="DENY"
                  onMismatch="NEUTRAL"/>
     <!-- Filter out other errors -->

@@ -99,7 +99,7 @@ public class Waypoints extends ClientWaypointData {
         builder.append("Maximum Render Distance: " + renderDistance + "\n");
         for (int i = 0; i < render.size(); i++) {
             String customTexture = render.get(i).getTexturePath();
-            if (!customTexture.isEmpty())
+            if (customTexture != null)
                 builder.append("(").append(i).append(")Custom Texture: ").append(customTexture);
         }
 

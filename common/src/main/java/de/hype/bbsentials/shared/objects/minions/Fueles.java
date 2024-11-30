@@ -40,5 +40,9 @@ public enum Fueles {
     public Integer getBoostPercentage() {
         return boostPercentage;
     }
+
+    public boolean isBingoObtainable() {
+        return bingoObtainable;
+    }
 }
 

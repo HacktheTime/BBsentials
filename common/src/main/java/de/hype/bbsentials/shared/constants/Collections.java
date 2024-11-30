@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public interface Collections extends MinionResourceItem {
-
     static Set<Collections> values() {
+        if (values != null) return new HashSet<>(values);
         Set<Collections> collections = new HashSet<>();
         collections.addAll(Arrays.stream(Farming.values()).toList());
         collections.addAll(Arrays.stream(Foraging.values()).toList());
@@ -14,7 +14,9 @@ public interface Collections extends MinionResourceItem {
         collections.addAll(Arrays.stream(Fishing.values()).toList());
         collections.addAll(Arrays.stream(Combat.values()).toList());
         return collections;
-    }
+    }    Set<Collections> values = values();
+
+
 
     static String getCodeReference(String goalName) {
         goalName = goalName.replace("_", " ");

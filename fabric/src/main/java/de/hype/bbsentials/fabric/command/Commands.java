@@ -122,7 +122,7 @@ public class Commands implements MCCommand {
                                                                 BlockPos pos = CBlockPosArgument.getBlockPos((CommandContext<FabricClientCommandSource>) (Object) context, "coordinates");
                                                                 String contactWay = StringArgumentType.getString(context, "ContactWay");
                                                                 String extraMessage = StringArgumentType.getString(context, "extraMessage");
-                                                                BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, extraMessage);
+                                                        BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItems(item.split(";")), contactWay, extraMessage);
                                                                 return 1;
                                                             }
                                                     )
@@ -131,7 +131,7 @@ public class Commands implements MCCommand {
                                                         String item = StringArgumentType.getString(context, "Item");
                                                         BlockPos pos = CBlockPosArgument.getBlockPos((CommandContext<FabricClientCommandSource>) (Object) context, "coordinates");
                                                         String contactWay = StringArgumentType.getString(context, "ContactWay");
-                                                        BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItem(item.split(";")), contactWay, "");
+                                                BBsentials.connection.annonceChChest(new Position(pos.getX(), pos.getY(), pos.getZ()), ChChestItems.getItems(item.split(";")), contactWay, "");
                                                         return 1;
                                                     }
                                             )

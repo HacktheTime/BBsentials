@@ -161,7 +161,14 @@ public class FirstBootPrompt extends Screen {
                 throw new RuntimeException(e);
             }
         }
-        if (BBsentials.connection.getAuthenticated()) {
+        while (BBsentials.connection.getAuthenticated() == null) {
+            try {
+                Thread.sleep(1_000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (BBsentials.connection.getAuthenticated() == Boolean.TRUE) {
             ((Utils) EnvironmentCore.utils).displayToast(new Utils.BBToast("Connected", "Authentication Successful. Continuing", SoundEvents.ENTITY_ARROW_HIT, VanillaItems.EMERALD_BLOCK, Color.GREEN));
             close();
         }

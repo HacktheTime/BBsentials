@@ -29,7 +29,6 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.HypixelPacket;
-import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -61,7 +60,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -71,7 +69,6 @@ import org.joml.Vector3f;
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -456,6 +453,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
         return screenshotInputStream.get(0);
     }
+
     @Override
     public String getStringFromTextJson(String textJSon) throws Exception {
         try {
@@ -821,7 +819,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
                 }
             }
 
-            context.drawItemWithoutEntity(icon, 8, 8);
+            if (icon != null) context.drawItemWithoutEntity(icon, 8, 8);
 
         }
 

@@ -16,7 +16,7 @@ public class Position extends Vector3i {
     /**
      * @param string nneds to be `x y z` formating!
      */
-    public static Position fromString(String string) throws Exception {
+    public static Position fromString(String string) {
         String[] temp = string.split(" ");
         return new Position(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
     }

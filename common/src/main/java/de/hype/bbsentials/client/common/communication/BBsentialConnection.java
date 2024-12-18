@@ -687,7 +687,7 @@ public class BBsentialConnection {
     }
 
     public void onWantedSearchPacket(WantedSearchPacket packet) {
-        if (packet.serverId != null && !packet.serverId.equals(EnvironmentCore.utils.getServerId())) return;
+        if (packet.serverId != null && !(EnvironmentCore.utils.getServerId().matches(packet.serverId))) return;
         if (packet.mega != null && packet.mega != EnvironmentCore.utils.isOnMegaServer()) return;
         List<String> playerCount = EnvironmentCore.utils.getPlayers();
         if (packet.maximumPlayerCount != null && packet.maximumPlayerCount > playerCount.size()) return;

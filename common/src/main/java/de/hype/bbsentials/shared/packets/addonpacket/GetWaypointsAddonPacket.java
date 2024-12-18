@@ -4,7 +4,6 @@ import de.hype.bbsentials.environment.addonpacketconfig.AbstractAddonPacket;
 import de.hype.bbsentials.shared.objects.ClientWaypointData;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Used to tell the addon what message came in.

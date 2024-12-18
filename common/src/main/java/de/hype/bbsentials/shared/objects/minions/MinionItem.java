@@ -55,7 +55,7 @@ public enum MinionItem {
     },
     LESSER_SOULFLOW_ENGINE("Lesser Soulflow Engine") {
         @Override
-        public Map<MinionResourceItem, Integer> itemsGenerated(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
+        public Map<MinionResourceItem, Integer> items(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
             for (Map.Entry<MinionResourceItem, Integer> collectionsIntegerEntry : dropsGenerated.entrySet()) {
                 dropsGenerated.put(collectionsIntegerEntry.getKey(), collectionsIntegerEntry.getValue() / 2);
             }
@@ -70,7 +70,7 @@ public enum MinionItem {
     },
     CORRUPT_SOIL("Corrupt Soil") {
         @Override
-        public Map<MinionResourceItem, Integer> itemsGenerated(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
+        public Map<MinionResourceItem, Integer> items(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
             if (minion.spawnsMobs()) dropsGenerated.put(Collections.Mining.Sulphur, minionActions);
             return dropsGenerated;
         }
@@ -85,7 +85,7 @@ public enum MinionItem {
     },
     SLEEPY_HOLLOW(false, "Sleepy Hollow") {
         @Override
-        public Map<MinionResourceItem, Integer> itemsGenerated(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
+        public Map<MinionResourceItem, Integer> items(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
             //dropsGenerated.put(PURPLE_CANY,(int) dropsGenerated.values().stream().mapToInt(v->v).sum()*0.00015);
             return dropsGenerated;
         }
@@ -108,7 +108,7 @@ public enum MinionItem {
         return 0;
     }
 
-    public Map<MinionResourceItem, Integer> itemsGenerated(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
+    public Map<MinionResourceItem, Integer> items(Map<MinionResourceItem, Integer> dropsGenerated, Integer minionActions, Minions minion) {
         return dropsGenerated;
     }
 

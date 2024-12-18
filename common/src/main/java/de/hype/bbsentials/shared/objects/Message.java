@@ -1,6 +1,8 @@
 package de.hype.bbsentials.shared.objects;
 
 import com.google.gson.JsonObject;
+import de.hype.bbsentials.client.common.config.EnvironmentConfig;
+import de.hype.bbsentials.environment.packetconfig.EnvironmentPacketConfig;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.function.Predicate;
@@ -8,7 +10,7 @@ import java.util.function.Predicate;
 import static de.hype.bbsentials.shared.objects.Message.MessageSource.*;
 
 
-public abstract class Message {
+public class Message {
     public boolean actionBar;
     public MessageSource source = null;
     protected String text;
@@ -38,28 +40,20 @@ public abstract class Message {
     public static Message of(String string) {
         JsonObject obj = new JsonObject();
         obj.addProperty("text", string);
-        Message message = new Message(obj.toString(), string) {
-            @Override
-            public String getSelfUsername() {
-                return null;
-            }
-        };
+        Message message = new Message(obj.toString(), string);
         message.source = SELFCREATED;
         return message;
     }
 
     public static Message tellraw(String json) {
-        Message message = new Message(json, "") {
-            @Override
-            public String getSelfUsername() {
-                return null;
-            }
-        };
+        Message message = new Message(json, "");
         message.source = SELFCREATED;
         return message;
     }
 
-    public abstract String getSelfUsername();
+    public String getSelfUsername() {
+        return EnvironmentPacketConfig.getSelfUsername();
+    }
 
     public String getJson() {
         return text;

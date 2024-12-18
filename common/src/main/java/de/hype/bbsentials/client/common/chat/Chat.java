@@ -14,6 +14,7 @@ import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
 import org.apache.commons.lang3.StringEscapeUtils;
+import de.hype.bbsentials.shared.objects.Message;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -221,7 +222,7 @@ public class Chat {
         return null;
     }
 
-    public Message onEvent(Message text, boolean actionbar) {
+    public Message onEvent(de.hype.bbsentials.client.common.chat.Message text, boolean actionbar) {
         if (!actionbar && !isSpam(text.getString())) {
             if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                 System.out.println("got a message: " + text.getJson());
@@ -233,7 +234,7 @@ public class Chat {
     }
 
     //Handle in the messages which need to be modified here
-    public Message processNotThreaded(Message message, boolean actionbar) {
+    public de.hype.bbsentials.client.common.chat.Message processNotThreaded(de.hype.bbsentials.client.common.chat.Message message, boolean actionbar) {
         if (actionbar && !BBsentials.funConfig.overwriteActionBar.isEmpty()) {
             if (message.getUnformattedString().equals(BBsentials.funConfig.overwriteActionBar.replaceAll("§.", ""))) {
                 return message;
@@ -273,7 +274,7 @@ public class Chat {
         return message;
     }
 
-    public void processThreaded(Message message) {
+    public void processThreaded(de.hype.bbsentials.client.common.chat.Message message) {
         if (message.getString() != null) {
             String messageUnformatted = message.getUnformattedString();
             String username = message.getPlayerName();

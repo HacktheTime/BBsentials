@@ -15,4 +15,8 @@ public class EnvironmentPacketConfig {
     public static boolean getWaypointDefaultWithTracer() {
         return BBsentials.visualConfig.waypointDefaultWithTracer;
     }
+
+    public static String getSelfUsername() {
+        return BBsentials.generalConfig.getUsername();
+    }
 }

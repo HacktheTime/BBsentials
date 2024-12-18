@@ -9,6 +9,7 @@ import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdat
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
 import de.hype.bbsentials.client.common.objects.Waypoints;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
@@ -76,6 +77,29 @@ public class BBsentialConnection {
         return false;
     }
 
+    public static boolean selfDestruct() {
+        try {
+            // Get the path to the running JAR file
+            String jarFilePath = BBsentials.class.getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .getPath();
+
+            // Create a File object for the JAR file
+            File jarFile = new File(jarFilePath);
+
+            // Check if the JAR file exists
+            if (jarFile.exists()) {
+                // Delete the JAR file
+                return jarFile.delete();
+            }
+            else {
+                return false;
+            }
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
 
     public void connect(String serverIP, int serverPort) {
         // Enable SSL handshake debugging
@@ -236,7 +260,6 @@ public class BBsentialConnection {
         }
     }
 
-
     public void onMessageReceived(String message) {
         if (!PacketUtils.handleIfPacket(this, message)) {
             if (message.startsWith("H-")) {
@@ -250,7 +273,6 @@ public class BBsentialConnection {
     public <T extends AbstractPacket> void dummy(T o) {
         //this does absolutely nothing. dummy for packet in packt manager
     }
-
 
     public <E extends AbstractPacket> void sendPacket(E packet) {
         String packetName = packet.getClass().getSimpleName();
@@ -341,7 +363,6 @@ public class BBsentialConnection {
         }
         Chat.sendPrivateMessageToSelfImportantInfo(packet.username + ": There is a " + packet.event.getDisplayName() + " in the " + packet.island.getDisplayName() + " now/soon.");
     }
-
 
     public void onWelcomePacket(WelcomeClientPacket packet) {
         authenticated = packet.success;
@@ -575,35 +596,10 @@ public class BBsentialConnection {
         }
     }
 
-
     public boolean isConnected() {
         try {
             return socket.isConnected() && !socket.isClosed();
         } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public static boolean selfDestruct() {
-        try {
-            // Get the path to the running JAR file
-            String jarFilePath = BBsentials.class.getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .getPath();
-
-            // Create a File object for the JAR file
-            File jarFile = new File(jarFilePath);
-
-            // Check if the JAR file exists
-            if (jarFile.exists()) {
-                // Delete the JAR file
-                return jarFile.delete();
-            }
-            else {
-                return false;
-            }
-        } catch (Exception ignored) {
             return false;
         }
     }
@@ -696,11 +692,6 @@ public class BBsentialConnection {
         sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket.WantedSearchPacketReply(BBsentials.generalConfig.getUsername(), EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.isOnMegaServer(), EnvironmentCore.utils.getServerId())));
     }
 
-
-    public void onSkyblockLobbyDataPacket(SkyblockLobbyDataPacket packet) {
-        packet.preparePacketToReplyToThis(new SkyblockLobbyDataPacket(EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.getLobbyTime(), EnvironmentCore.utils.getServerId(), EnvironmentCore.utils.getCurrentIsland()));
-    }
-
     public void onPunishedPacket(PunishedPacket packet) {
         for (PunishmentData data : packet.data) {
             if (!data.isActive()) continue;
@@ -752,5 +743,15 @@ public class BBsentialConnection {
 
     public Boolean getAuthenticated() {
         return authenticated;
+    }
+
+    public void onCommandChatPromptPacket(CommandChatPromptPacket packet) {
+        ChatPrompt prompt = new ChatPrompt(() -> {
+            for (CommandChatPromptPacket.CommandRecord command : packet.getCommands()) {
+                BBsentials.sender.addSendTask(command.command, command.delay);
+            }
+        }, 10);
+        Chat.sendPrivateMessageToSelfText(packet.getPrintMessage());
+        BBsentials.temporaryConfig.lastChatPromptAnswer = prompt;
     }
 }

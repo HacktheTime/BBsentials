@@ -1,10 +1,10 @@
 package de.hype.bbsentials.fabric;
 
 import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.chat.Message;
 import de.hype.bbsentials.client.common.chat.MessageEvent;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.MCChat;
+import de.hype.bbsentials.shared.objects.Message;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 public class FabricChat implements MCChat {
     public Chat chat = new Chat();
     MinecraftClient client;
+
     public FabricChat() {
         init();
     }
@@ -24,8 +25,8 @@ public class FabricChat implements MCChat {
 //        });
         client = MinecraftClient.getInstance();
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, isActionBar) -> {
-            if (client.world==null) return true;
-            Message bbMessage = new Message(FabricTextUtils.opposite(message), message.getString());
+            if (client.world == null) return true;
+            de.hype.bbsentials.client.common.chat.Message bbMessage = new de.hype.bbsentials.client.common.chat.Message(FabricTextUtils.opposite(message), message.getString());
             boolean block = (BBsentials.chat.processNotThreaded(bbMessage, isActionBar) == null);
             MessageEvent event = new FabricMessageEvent(bbMessage);
             BBsentials.annotationProcessor.triggerEvent(event);
@@ -37,12 +38,12 @@ public class FabricChat implements MCChat {
     }
 
     public Text prepareOnEvent(Text text, boolean actionbar) {
-        if (MinecraftClient.getInstance().world==null) return text;
+        if (MinecraftClient.getInstance().world == null) return text;
         String json = FabricTextUtils.opposite(text);
-        Message message = new Message(json, text.getString(), actionbar);
+        Message message = new de.hype.bbsentials.client.common.chat.Message(json, text.getString(), actionbar);
 
         if (!actionbar) {
-            message = chat.onEvent(message, actionbar);
+            message = chat.onEvent((de.hype.bbsentials.client.common.chat.Message) message, actionbar);
         }
         Text toReturn = null;
         try {
@@ -62,7 +63,7 @@ public class FabricChat implements MCChat {
         }
         if (actionbar) {
             Message finalMessage = message;
-            BBsentials.executionService.execute(()->{
+            BBsentials.executionService.execute(() -> {
                 processActionbarThreaded(finalMessage);
             });
         }

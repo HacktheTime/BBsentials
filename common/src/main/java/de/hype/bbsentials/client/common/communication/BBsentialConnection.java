@@ -472,7 +472,14 @@ public class BBsentialConnection {
                 Chat.sendCommand("/p leave");
             }
 
-        } else Chat.sendCommand("/p " + packet.type.toString().toLowerCase() + " " + String.join(" ", packet.users));
+        } else {
+            List<String> users = packet.users;
+            int chunkSize = 5;
+            for (int i = 0; i < users.size(); i += chunkSize) {
+                List<String> chunk = users.subList(i, Math.min(users.size(), i + chunkSize));
+                Chat.sendCommand("/p " + packet.type.toString().toLowerCase() + " " + String.join(" ", chunk));
+            }
+        }
 
     }
 

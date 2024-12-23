@@ -454,7 +454,7 @@ public class BBsentialsConfigScreenFactory {
                 discordIntegration.addEntry(entryBuilder.startStrField(Text.of("DC Bot Token"), BBsentials.discordConfig.botToken)
                         .setDefaultValue("")
                         .requireRestart()
-                        .setTooltip(Text.of("Whether you want to allow executing any command from remote. Is a security risk in case someone hacks your dc account."))
+                        .setTooltip(Text.of("The Token of your Discord Bot. You can get your own by creating a discord bot here: https://discord.com/developers/applications"))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.botToken = newValue)
                         .build());
                 discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Always silent"), BBsentials.discordConfig.alwaysSilent)

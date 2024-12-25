@@ -6,6 +6,7 @@ package de.hype.bbsentials.client.common.config;
  */
 
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.shared.objects.BBRole;
 
 /**
  * DO NOT MODIFY THIS CLASS! If you modify this class you can easily do things which will ban you from the network permanently without prior notice nor warning!
@@ -55,6 +56,6 @@ public class DeveloperConfig extends BBsentialsConfig {
      * DO NOT MODIFY THIS METHOD! If you modify this method you can easily do things which will ban you from the network permanently without prior notice nor warning!
      */
     private boolean hasDevPerm() {
-        return BBsentials.generalConfig.hasBBRoles("dev");
+        return BBsentials.generalConfig.hasBBRoles(BBRole.DEVELOPER);
     }
 }

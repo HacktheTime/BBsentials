@@ -10,6 +10,7 @@ import de.hype.bbsentials.client.common.mclibraries.interfaces.NBTCompound;
 import de.hype.bbsentials.client.common.mclibraries.interfaces.Text;
 import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.shared.constants.VanillaItems;
+import de.hype.bbsentials.shared.objects.BBRole;
 import de.hype.bbsentials.shared.packets.function.PositionCommunityFeedback;
 import net.minecraft.client.MinecraftClient;
 
@@ -116,7 +117,7 @@ public abstract class RenderingDefinitions {
                 }
             }
         };
-        if (BBsentials.generalConfig.hasBBRoles("splasher")) {
+        if (BBsentials.generalConfig.hasBBRoles(BBRole.SPLASHER)) {
             new RenderingDefinitions("Splasher Exp Boost Potion Changer") {
                 @Override
                 public boolean modifyItem(ItemStack stack, NBTCompound extraNbt, RenderStackItemCheck check, String itemName) {

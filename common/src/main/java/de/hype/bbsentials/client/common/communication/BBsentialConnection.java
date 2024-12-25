@@ -41,6 +41,7 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -367,7 +368,7 @@ public class BBsentialConnection {
     public void onWelcomePacket(WelcomeClientPacket packet) {
         authenticated = packet.success;
         if (packet.success) {
-            BBsentials.generalConfig.bbsentialsRoles = packet.roles;
+            BBsentials.generalConfig.bbsentialsRoles = new HashSet<>(packet.roles);
             Chat.sendPrivateMessageToSelfSuccess("Login Success");
             if (socket.getRemoteSocketAddress().toString().startsWith("localhost"))
                 Chat.sendPrivateMessageToSelfError("You are connected to the Local Test Server!");
@@ -749,6 +750,16 @@ public class BBsentialConnection {
         ChatPrompt prompt = new ChatPrompt(() -> {
             for (CommandChatPromptPacket.CommandRecord command : packet.getCommands()) {
                 BBsentials.sender.addSendTask(command.command, command.delay);
+            }
+        }, 10);
+        Chat.sendPrivateMessageToSelfText(packet.getPrintMessage());
+        BBsentials.temporaryConfig.lastChatPromptAnswer = prompt;
+    }
+
+    public void onPacketChatPromptPacket(PacketChatPromptPacket packet) {
+        ChatPrompt prompt = new ChatPrompt(() -> {
+            for (AbstractPacket p : packet.getPackets()) {
+                sendPacket(p);
             }
         }, 10);
         Chat.sendPrivateMessageToSelfText(packet.getPrintMessage());

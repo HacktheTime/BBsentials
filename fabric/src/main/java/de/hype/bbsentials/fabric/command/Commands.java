@@ -115,7 +115,7 @@ public class Commands implements MCCommand {
                                             .suggests(((context, builder) -> CommandSource.suggestMatching(new String[]{"\"/msg " + BBsentials.generalConfig.getUsername() + " bb:party me\"", "\"/p join " + BBsentials.generalConfig.getUsername() + "\""}, builder)))
                                             .then(argument("extraMessage", StringArgumentType.greedyString())
                                                     .requires(fabricClientCommandSource -> {
-                                                        return EnvironmentCore.utils.getCurrentIsland() == Islands.CRYSTAL_HOLLOWS && BBsentials.generalConfig.hasBBRoles("chchest");
+                                                        return EnvironmentCore.utils.getCurrentIsland() == Islands.CRYSTAL_HOLLOWS && BBsentials.generalConfig.hasBBRoles(BBRole.CHCHEST_ANNOUNCE_PERM);
                                                     })
                                                     .executes((context) -> {
                                                                 String item = StringArgumentType.getString(context, "Item");

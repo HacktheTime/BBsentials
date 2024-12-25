@@ -3,6 +3,7 @@ package de.hype.bbsentials.fabric.numpad;
 import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.fabric.screens.components.IntegerFieldWidget;
+import de.hype.bbsentials.shared.objects.BBRole;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
@@ -50,7 +51,7 @@ public class NumCodeInputFieldWidget extends IntegerFieldWidget {
     }
 
     public boolean forbiddenCode(String input) {
-        if (BBsentials.generalConfig.hasBBRoles("dev")) return false;
+        if (BBsentials.generalConfig.hasBBRoles(BBRole.DEVELOPER)) return false;
         if (input.startsWith(String.valueOf(0))) {
             return true;
         }

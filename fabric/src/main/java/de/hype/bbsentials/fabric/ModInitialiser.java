@@ -33,6 +33,7 @@ import de.hype.bbsentials.fabric.tutorial.Tutorial;
 import de.hype.bbsentials.fabric.tutorial.TutorialManager;
 import de.hype.bbsentials.fabric.tutorial.nodes.ObtainItemNode;
 import de.hype.bbsentials.shared.constants.HypixelInstanceIsland;
+import de.hype.bbsentials.shared.objects.BBRole;
 import de.hype.bbsentials.shared.objects.Position;
 import de.hype.bbsentials.shared.objects.RenderInformation;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
@@ -402,7 +403,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                                         String variableName = StringArgumentType.getString(context, "variableName");
                                                                         String variableValue = StringArgumentType.getString(context, "variableValue");
                                                                         try {
-                                                                            if (!variableName.toLowerCase().contains("dev") || generalConfig.hasBBRoles("dev")) {
+                                                                            if (!variableName.toLowerCase().contains("dev") || generalConfig.hasBBRoles(BBRole.DEVELOPER)) {
                                                                                 Chat.setVariableValue(StringArgumentType.getString(context, "className"), variableName, variableValue);
                                                                             }
                                                                             ConfigManager.saveAll();
@@ -694,7 +695,7 @@ public class ModInitialiser implements ClientModInitializer {
 
         RenderingDefinitions.clearAndInitDefaults();
         ItemTooltipCallback.EVENT.register(this::modifyItemTooltip);
-        if (generalConfig.hasBBRoles("dev")) {
+        if (generalConfig.hasBBRoles(BBRole.DEVELOPER)) {
             ServerSwitchTask.onServerJoinTask(() -> EnvironmentCore.debug.onServerJoin(), true);
             ServerSwitchTask.onServerLeaveTask(() -> EnvironmentCore.debug.onServerLeave(), true);
         }

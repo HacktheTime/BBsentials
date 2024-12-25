@@ -1,9 +1,10 @@
 package de.hype.bbsentials.fabric.numpad;
 
-import de.hype.bbsentials.shared.constants.Formatting;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bbsentials.shared.constants.Formatting;
+import de.hype.bbsentials.shared.objects.BBRole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class NumCode {
     public String code;
     public boolean codeIsTransient;
     public Formatting formatting;
-    public String requiredPermission;
+    public BBRole requiredPermission;
     public transient Runnable toPerform;
 
     public NumCode(String code, String command) {
@@ -23,7 +24,7 @@ public class NumCode {
         this.code = code;
         this.codeIsTransient = false;
         this.formatting = Formatting.DARK_GREEN;
-        requiredPermission = "";
+        requiredPermission = null;
     }
 
     public NumCode(String code, List<String> command, List<Double> commandDelay) {
@@ -32,10 +33,10 @@ public class NumCode {
         this.code = code;
         this.codeIsTransient = false;
         this.formatting = Formatting.DARK_GREEN;
-        requiredPermission = "";
+        requiredPermission = null;
     }
 
-    public NumCode(String code, Formatting format, String requiredRole, Runnable toPerform) {
+    public NumCode(String code, Formatting format, BBRole requiredRole, Runnable toPerform) {
         this.commands = new ArrayList<>();
         this.code = code;
         this.formatting = format;
@@ -51,7 +52,7 @@ public class NumCode {
     }
 
     public void execute() {
-        if (!BBsentials.generalConfig.hasBBRoles(requiredPermission)) {
+        if (!(requiredPermission == null || (BBsentials.generalConfig.hasBBRoles(requiredPermission)))) {
             Chat.sendPrivateMessageToSelfError("You don't have the required permissions to run '" + code + "' ! (Required: '" + requiredPermission + "')");
             return;
         }
@@ -60,22 +61,19 @@ public class NumCode {
                 String command = commands.get(i);
                 if (command.startsWith("\\")) {
                     try {
-                        Thread.sleep((long) (commandDelay.get(i)*1000));
+                        Thread.sleep((long) (commandDelay.get(i) * 1000));
                     } catch (InterruptedException ignored) {
 
                     }
                     if (EnvironmentCore.utils.executeClientCommand(command.replaceFirst("\\\\", ""))) {
                         Chat.sendPrivateMessageToSelfSuccess("Code '" + code + "': Success");
-                    }
-                    else {
+                    } else {
                         Chat.sendPrivateMessageToSelfError("Code '" + code + "': Error Occurd. \nCommand: " + command);
                     }
-                }
-                else
+                } else
                     BBsentials.sender.addHiddenSendTask(commands.get(i), commandDelay.get(i));
             }
-        }
-        else {
+        } else {
             if (toPerform == null) {
                 Chat.sendPrivateMessageToSelfError("The specified code doesn't do anything");
                 return;

@@ -3,6 +3,7 @@ package de.hype.bbsentials.fabric.screens;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.config.ConfigManager;
 import de.hype.bbsentials.shared.constants.Islands;
+import de.hype.bbsentials.shared.objects.BBRole;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -24,7 +25,7 @@ public class BBsentialsConfigScreenFactory {
                 .setTitle(Text.of("BBsentials Config"));
         builder.setSavingRunnable(ConfigManager::saveAll);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        if (BBsentials.developerConfig.doDevDashboardConfig && BBsentials.generalConfig.hasBBRoles("dev")) {
+        if (BBsentials.developerConfig.doDevDashboardConfig && BBsentials.generalConfig.hasBBRoles(BBRole.DEVELOPER)) {
             {
                 ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing Dashboard"));
                 dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), BBsentials.developerConfig.devMode)
@@ -547,7 +548,7 @@ public class BBsentialsConfigScreenFactory {
                     .setSaveConsumer(newValue -> BBsentials.socketAddonConfig.addonChatDebug = newValue)
                     .build());
         }//Socket Addons
-        if (BBsentials.generalConfig.hasBBRoles("dev")) {
+        if (BBsentials.generalConfig.hasBBRoles(BBRole.DEVELOPER)) {
             ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing"));
             dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), BBsentials.developerConfig.devMode)
                     .setDefaultValue(false)
@@ -570,7 +571,7 @@ public class BBsentialsConfigScreenFactory {
                     .setSaveConsumer(newValue -> BBsentials.developerConfig.doDevDashboardConfig = newValue)
                     .build());
         }
-        if (BBsentials.generalConfig.hasBBRoles("splasher")) {
+        if (BBsentials.generalConfig.hasBBRoles(BBRole.SPLASHER)) {
             ConfigCategory splasher = builder.getOrCreateCategory(Text.of("§dSplashes"));
             BooleanListEntry updateSplashStatus = entryBuilder.startBooleanToggle(Text.of("Auto Update Statuses"), BBsentials.splashConfig.autoSplashStatusUpdates)
                     .setDefaultValue(true)

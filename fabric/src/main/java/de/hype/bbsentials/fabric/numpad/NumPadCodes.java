@@ -11,6 +11,7 @@ import de.hype.bbsentials.fabric.FabricTextUtils;
 import de.hype.bbsentials.fabric.screens.RoutesConfigScreen;
 import de.hype.bbsentials.fabric.screens.TrustedPartyMembersConfigScreen;
 import de.hype.bbsentials.fabric.screens.WaypointsConfigScreen;
+import de.hype.bbsentials.shared.objects.BBRole;
 import de.hype.bbsentials.shared.objects.Position;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -125,14 +126,14 @@ public class NumPadCodes {
 
     public void addDefaultCodes(boolean all) {
         List<NumCode> defaultCodes = new ArrayList();
-        defaultCodes.add((new NumCode("042", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new NumPadCodesConfigScreen(this))))));
-        defaultCodes.add((new NumCode("040", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new RoutesConfigScreen(null))))));
-        defaultCodes.add((new NumCode("041", Formatting.DARK_BLUE, "", () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen(null))))));
-        defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, "debug", () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
-        defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, "debug", () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
-        defaultCodes.add(new NumCode("043", Formatting.GREEN, "", TrustedPartyMembersConfigScreen::openFromNothing));
+        defaultCodes.add((new NumCode("042", Formatting.DARK_BLUE, null, () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new NumPadCodesConfigScreen(this))))));
+        defaultCodes.add((new NumCode("040", Formatting.DARK_BLUE, null, () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new RoutesConfigScreen(null))))));
+        defaultCodes.add((new NumCode("041", Formatting.DARK_BLUE, null, () -> MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new WaypointsConfigScreen(null))))));
+        defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, BBRole.DEBUG, () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
+        defaultCodes.add((new NumCode("0", Formatting.DARK_BLUE, BBRole.DEBUG, () -> BBsentials.executionService.execute(() -> ((DebugThread) EnvironmentCore.debug).onNumpadCode()))));
+        defaultCodes.add(new NumCode("043", Formatting.GREEN, null, TrustedPartyMembersConfigScreen::openFromNothing));
         defaultCodes.add((new NumCode("04", "/visit portal_hub")));
-        defaultCodes.add((new NumCode("002", Formatting.DARK_BLUE, "", () -> {
+        defaultCodes.add((new NumCode("002", Formatting.DARK_BLUE, null, () -> {
             new Waypoints( new Position(-94, 201, -30), FabricTextUtils.textToJson(Text.of("mono1")), 1000, true, true, new ArrayList<>());
             new Waypoints( new Position(-91, 221, -53), FabricTextUtils.textToJson(Text.of("mono2")), 1000, true, true, new ArrayList<>());
             new Waypoints( new Position(-64, 206, -63), FabricTextUtils.textToJson(Text.of("mono3")), 1000, true, true, new ArrayList<>());

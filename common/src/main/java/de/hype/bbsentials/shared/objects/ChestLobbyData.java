@@ -24,7 +24,7 @@ public class ChestLobbyData {
     public ChestLobbyData(Collection<ChChestData> chest, String serverId, String bbcommand, String extraMessage, Object status) {
         chests.addAll(chest);
         this.serverId = serverId;
-        this.contactMan = chests.get(0).finder;
+        this.contactMan = chests.getFirst().finder;
         this.bbcommand = bbcommand;
         this.extraMessage = extraMessage;
         setStatusNoOverride(status);
@@ -105,5 +105,10 @@ public class ChestLobbyData {
             setLobbyMetaData(lobby.getPlayersStillIn(), lobby.getClosingTime());
         } catch (SQLException ignored) {
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return lobbyId;
     }
 }

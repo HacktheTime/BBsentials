@@ -4,7 +4,6 @@ import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.shared.constants.InternalReasonConstants;
 import de.hype.bbsentials.shared.objects.BBRole;
 
-import java.util.List;
 import java.util.Set;
 
 /**

@@ -13,7 +13,7 @@ public class CommandChatPromptPacket extends AbstractPacket {
     private final String message;
     private List<CommandRecord> commands;
 
-    protected CommandChatPromptPacket(List<CommandRecord> commands, String message) {
+    public CommandChatPromptPacket(List<CommandRecord> commands, String message) {
         super(1, 1);
         this.commands = commands;
         this.message = message;

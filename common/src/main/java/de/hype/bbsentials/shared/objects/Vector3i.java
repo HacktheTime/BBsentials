@@ -148,11 +148,9 @@ public class Vector3i implements Comparable<Vector3i> {
     public boolean equals(Object other) {
         if (this == other) {
             return true;
-        }
-        else if (!(other instanceof Vector3i)) {
+        } else if (!(other instanceof Vector3i)) {
             return false;
-        }
-        else {
+        } else {
             Vector3i Vectorc = (Vector3i) other;
             return this.x == Vectorc.x && this.y == Vectorc.y && this.z == Vectorc.z;
         }
@@ -170,9 +168,9 @@ public class Vector3i implements Comparable<Vector3i> {
     public int compareTo(Vector3i other) {
         return this.y == other.y ?
                 (this.z == other.z ?
-                        (int) (this.x - other.x)
-                        : (int) (this.z - other.z))
-                : (int) (this.y - other.y);
+                        (this.x - other.x)
+                        : (this.z - other.z))
+                : (this.y - other.y);
     }
 
     public boolean signumEquals(Vector3i other) {

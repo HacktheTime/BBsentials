@@ -3,7 +3,6 @@ package de.hype.bbsentials.shared.packets.network;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 import de.hype.bbsentials.shared.objects.BBRole;
 
-import java.util.List;
 import java.util.Set;
 
 /**

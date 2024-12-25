@@ -1,7 +1,6 @@
 package de.hype.bbsentials.shared.objects;
 
 import com.google.gson.JsonObject;
-import de.hype.bbsentials.client.common.config.EnvironmentConfig;
 import de.hype.bbsentials.environment.packetconfig.EnvironmentPacketConfig;
 import org.apache.commons.text.StringEscapeUtils;
 

@@ -14,40 +14,28 @@ public class FormattingUtils {
         DecimalFormat df = new DecimalFormat("0.0");
         if (amount >= 1_000_000_000_000L) {
             return df.format(amount / 1_000_000_000_000.0) + "T";
+        } else if (amount >= 1_000_000_000) {
+            return df.format(amount / 1_000_000_000.0) + "B";
+        } else if (amount >= 1_000_000) {
+            return df.format(amount / 1_000_000.0) + "M";
+        } else if (amount >= 1_000) {
+            return df.format(amount / 1_000.0) + "k";
+        } else {
+            return String.valueOf(amount);
         }
-        else
-            if (amount >= 1_000_000_000) {
-                return df.format(amount / 1_000_000_000.0) + "B";
-            }
-            else
-                if (amount >= 1_000_000) {
-                    return df.format(amount / 1_000_000.0) + "M";
-                }
-                else
-                    if (amount >= 1_000) {
-                        return df.format(amount / 1_000.0) + "k";
-                    }
-                    else {
-                        return String.valueOf(amount);
-                    }
     }
 
     public static String formatAmountShortened(Integer amount) {
         DecimalFormat df = new DecimalFormat("0.0");
         if (amount >= 1_000_000_000) {
             return df.format(amount / 1_000_000_000.0) + "B";
+        } else if (amount >= 1_000_000) {
+            return df.format(amount / 1_000_000.0) + "M";
+        } else if (amount >= 1_000) {
+            return df.format(amount / 1_000.0) + "k";
+        } else {
+            return String.valueOf(amount);
         }
-        else
-            if (amount >= 1_000_000) {
-                return df.format(amount / 1_000_000.0) + "M";
-            }
-            else
-                if (amount >= 1_000) {
-                    return df.format(amount / 1_000.0) + "k";
-                }
-                else {
-                    return String.valueOf(amount);
-                }
     }
 
     /**
@@ -59,22 +47,15 @@ public class FormattingUtils {
         DecimalFormat df = new DecimalFormat("0.0");
         if (amount >= 1_000_000_000_000L) {
             return df.format(amount / 1_000_000_000_000.0) + "T";
+        } else if (amount >= 1_000_000_000) {
+            return df.format(amount / 1_000_000_000.0) + "B";
+        } else if (amount >= 1_000_000) {
+            return df.format(amount / 1_000_000.0) + "M";
+        } else if (amount >= 1_000) {
+            return df.format(amount / 1_000.0) + "k";
+        } else {
+            return String.valueOf(amount);
         }
-        else
-            if (amount >= 1_000_000_000) {
-                return df.format(amount / 1_000_000_000.0) + "B";
-            }
-            else
-                if (amount >= 1_000_000) {
-                    return df.format(amount / 1_000_000.0) + "M";
-                }
-                else
-                    if (amount >= 1_000) {
-                        return df.format(amount / 1_000.0) + "k";
-                    }
-                    else {
-                        return String.valueOf(amount);
-                    }
     }
 
     /**
@@ -93,8 +74,7 @@ public class FormattingUtils {
 
         if (mod100 >= 11 && mod100 <= 13) {
             suffix = "th"; // Special case for 11th, 12th, 13th
-        }
-        else {
+        } else {
             switch (mod10) {
                 case 1:
                     suffix = "st";

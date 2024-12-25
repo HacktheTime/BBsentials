@@ -20,4 +20,9 @@ public class ChChestData {
         if (!(obj instanceof ChestLobbyData)) return false;
         return ((ChChestData) obj).coords.equals(coords);
     }
+
+    @Override
+    public int hashCode() {
+        return coords.hashCode();
+    }
 }

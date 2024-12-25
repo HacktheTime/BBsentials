@@ -64,6 +64,7 @@ public class PacketManager {
         packets.add(new Packet<>(CompletedGoalPacket.class, connection::onCompletedGoalPacket));
         packets.add(new Packet<>(WantedSearchPacket.class, connection::onWantedSearchPacket));
         packets.add(new Packet<>(CommandChatPromptPacket.class, connection::onCommandChatPromptPacket));
+        packets.add(new Packet<>(PacketChatPromptPacket.class, connection::onPacketChatPromptPacket));
         packets.add(new Packet<>(PunishedPacket.class, connection::onPunishedPacket));
         packets.add(new Packet<>(PlaySoundPacket.class, connection::onPlaySoundPacket));
         packets.add(new Packet<>(MinionDataResponse.RequestMinionDataPacket.class, connection::onRequestMinionDataPacket));

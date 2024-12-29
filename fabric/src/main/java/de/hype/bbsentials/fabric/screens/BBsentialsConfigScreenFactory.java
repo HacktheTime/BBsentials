@@ -227,7 +227,7 @@ public class BBsentialsConfigScreenFactory {
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.broadcastGoalAndCardCompletion = newValue)
                     .build());
             visual.addEntry(entryBuilder.startStrField(Text.of("Minecraft Window Title"), BBsentials.visualConfig.appendMinecraftWindowTitle)
-                    .setDefaultValue("%default% - (%username%)")
+                    .setDefaultValue("%default%")
                     .setTooltip(Text.of("You can set a new Minecraft Window Title here. %default% will be replaced by the value with no changes from BBsentials. %username% will be replaced with your Minecraft Username"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.appendMinecraftWindowTitle = newValue)
                     .build());

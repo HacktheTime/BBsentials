@@ -15,14 +15,15 @@
     "IncomingPacketListenerPatches",
     "InventoryKeyBinds",
     "LiteralCommandNodeMixin",
+    "MinecraftWindowTitleMixin",
     "RootCommandNodeAccessMixin",
     "ScreenHandlerMixin",
     "SimpleOptionMixin",
     "WorldRenderLastEventPatch",
-    "itemmixins.ModifyCountAndTextureMixin",
     "itemmixins.CustomItemData",
+    "itemmixins.CustomItemTooltip",
     "itemmixins.CustomRenderAsItemMixin",
-    "itemmixins.CustomItemTooltip"
+    "itemmixins.ModifyCountAndTextureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

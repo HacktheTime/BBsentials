@@ -15,6 +15,7 @@ public class VisualConfig extends BBsentialsConfig {
     public boolean addSplashWaypoint = true;
     public boolean infiniteChatHistory = true;
     public boolean showMODSolver = false;
+    public String appendMinecraftWindowTitle = " - (%username%)";
 
 
     public VisualConfig() {

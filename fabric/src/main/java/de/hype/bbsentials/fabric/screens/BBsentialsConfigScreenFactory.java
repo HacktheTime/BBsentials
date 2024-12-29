@@ -226,6 +226,11 @@ public class BBsentialsConfigScreenFactory {
                     .setTooltip(Text.of("Whether you want that your goal completions are shared with everyone. Cards will always be shared!"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.broadcastGoalAndCardCompletion = newValue)
                     .build());
+            visual.addEntry(entryBuilder.startStrField(Text.of("Minecraft Window Title"), BBsentials.visualConfig.appendMinecraftWindowTitle)
+                    .setDefaultValue("%default% - (%username%)")
+                    .setTooltip(Text.of("You can set a new Minecraft Window Title here. %default% will be replaced by the value with no changes from BBsentials. %username% will be replaced with your Minecraft Username"))
+                    .setSaveConsumer(newValue -> BBsentials.visualConfig.appendMinecraftWindowTitle = newValue)
+                    .build());
         }
         //Visual
         ConfigCategory notifications = builder.getOrCreateCategory(Text.of("Notifications"));

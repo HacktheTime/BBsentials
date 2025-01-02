@@ -149,12 +149,12 @@ public class Chat {
         sendPrivateMessageToSelfBase(message, Formatting.AQUA);
     }
 
-    public static void sendPrivateMessageToSelfBase(String message, Formatting formatting) {
-        sendPrivateMessageToSelfBase(message, formatting.toString());
+    public static void sendPrivateMessageToSelfBase(String message, Formatting... formatting) {
+        sendPrivateMessageToSelfBase(message, String.join("", Arrays.stream(formatting).map(Formatting::getMCCode).toList()));
     }
 
     public static void sendPrivateMessageToSelfBase(String message, String formatting) {
-        EnvironmentCore.chat.sendClientSideMessage(Message.of(formatting.toString() + message.replace("§r", "§r" + formatting)), false);
+        EnvironmentCore.chat.sendClientSideMessage(Message.of(formatting + message.replace("§r", "§r" + formatting)), false);
     }
 
     public static void sendPrivateMessageToSelfText(Message message) {
@@ -407,8 +407,8 @@ public class Chat {
                             BBsentials.sender.addSendTask("/pc Catacombs Level " + level + " reached", 1);
                         }
                     }
-                } else if (island == Islands.DUNGEON && isBingo && (messageUnformatted.contains("Milestone ❷") || messageUnformatted.contains("Milestone ❸"))) {
-                    BBsentials.sender.addSendTask("/pc Catacombs Milestone 3 reached", 1);
+                } else if (island == Islands.DUNGEON && isBingo && message.contains("You") && !messageUnformatted.contains("only") && (messageUnformatted.contains("Milestone ❷") || messageUnformatted.contains("Milestone ❸"))) {
+                    BBsentials.sender.addSendTask("/pc Catacombs Milestone %s reached".formatted(messageUnformatted.replaceAll("[a-zA-Z\s:/0-9,!]+", "").trim()), 1);
                 }
             } else if (message.isFromGuild()) {
 

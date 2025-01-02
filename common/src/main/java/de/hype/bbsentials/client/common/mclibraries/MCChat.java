@@ -6,18 +6,15 @@ import de.hype.bbsentials.client.common.client.BBsentials;
 public interface MCChat {
     void init();
 
+    void sendClientSideMessage(Message message, boolean actionbar);
+
     void sendChatMessage(String message);
 
-    void sendClientSideMessage(Message message);
-
-    default void sendClientSideMessage(Message message, boolean actionbar) {
-        if (BBsentials.funConfig.swapActionBarChat && !BBsentials.funConfig.swapOnlyNormal) {
-            actionbar = !actionbar;
-        }
-        else {
-            sendClientSideMessage(message);
-        }
+    default void sendClientSideMessage(Message message) {
+        sendClientSideMessage(message, false);
     }
 
-    void showActionBar(Message message);
+    default void showActionBar(Message message) {
+        sendClientSideMessage(message, true);
+    }
 }

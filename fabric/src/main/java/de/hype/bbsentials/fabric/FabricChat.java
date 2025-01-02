@@ -54,12 +54,7 @@ public class FabricChat implements MCChat {
         }
 
         if (BBsentials.funConfig.swapActionBarChat && !BBsentials.funConfig.swapOnlyBBsentials) {
-            if (!actionbar) {
-                showActionBar(message);
-            }
-            else {
-                sendClientSideMessage(message);
-            }
+            sendClientSideMessage(message, !actionbar);
         }
         if (actionbar) {
             Message finalMessage = message;
@@ -73,21 +68,21 @@ public class FabricChat implements MCChat {
     private void processActionbarThreaded(Message message) {
     }
 
-    public void sendClientSideMessage(Message message) {
+    @Override
+    public void sendClientSideMessage(Message message, boolean actionbar) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player != null) {
-            client.player.sendMessage(FabricTextUtils.opposite(message.getJson()), false);
+        Text text = FabricTextUtils.opposite(message.getJson());
+        if (text == null) return;
+        if (client.inGameHud != null) {
+            if (actionbar) {
+                if (BBsentials.funConfig.overwriteActionBar.isEmpty())
+                    text = FabricTextUtils.opposite(BBsentials.funConfig.overwriteActionBar);
+                client.inGameHud.setOverlayMessage(text, false);
+            } else client.inGameHud.getChatHud().addMessage(text);
         }
     }
 
-    public void showActionBar(Message message) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player != null) {
-            if (BBsentials.funConfig.overwriteActionBar.isEmpty())
-                message = Message.of(BBsentials.funConfig.overwriteActionBar);
-            client.player.sendMessage(FabricTextUtils.opposite(message.getJson()), true);
-        }
-    }
+    @Override
 
     public void sendChatMessage(String message) {
         ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();

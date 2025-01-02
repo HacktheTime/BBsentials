@@ -43,6 +43,7 @@ public class TrustedPartyMemberConfig {
         main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Can Mute"), data.canMute()).setDefaultValue(false).setSaveConsumer(data::canMute).setTooltip(Text.literal("Whether you want them to be able to mute the party")).build());
         main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Can Trigger Warp"), data.canRequestWarp()).setDefaultValue(false).setSaveConsumer(data::canRequestWarp).setTooltip(Text.literal("Whether you want them to be able to trigger party warps.")).build());
         main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Can Trigger Polls"), data.canRequestPolls()).setDefaultValue(false).setSaveConsumer(data::canRequestPolls).setTooltip(Text.literal("Whether you want them to be able to make polls in your name. Keep in mind that polls require §6MVP++§r")).build());
+        main.addEntry(entryBuilder.startBooleanToggle(Text.literal("Can Kick Offline"), data.canRequestPolls()).setDefaultValue(false).setSaveConsumer(data::canRequestPolls).setTooltip(Text.literal("Whether you want them to be able to kick offline members")).build());
         try {
             return builder.build();
         } catch (Exception e) {

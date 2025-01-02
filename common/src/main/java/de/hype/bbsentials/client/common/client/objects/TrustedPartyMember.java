@@ -22,6 +22,7 @@ public class TrustedPartyMember {
     boolean canRequestPolls = true;
 
     private transient String username = null;
+    private boolean canKickOffline;
 
     private TrustedPartyMember(String mcuuid) {
         this.mcUuid = mcuuid.replace("-", "");
@@ -126,6 +127,11 @@ public class TrustedPartyMember {
         return this;
     }
 
+    public TrustedPartyMember canKickOffline(boolean value) {
+        canRequestPolls = value;
+        return this;
+    }
+
     public boolean canKick() {
         if (partyAdmin) return true;
         return canKick;
@@ -190,5 +196,10 @@ public class TrustedPartyMember {
         if (getUsername() != null) return username;
         if (mcUuid != null) return mcUuid;
         return "";
+    }
+
+    public boolean canKickOffline() {
+        if (partyAdmin) return true;
+        return canKickOffline;
     }
 }

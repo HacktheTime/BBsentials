@@ -8,6 +8,7 @@ import de.hype.bbsentials.client.common.SystemUtils;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.shared.constants.Formatting;
@@ -15,6 +16,7 @@ import de.hype.bbsentials.shared.constants.Islands;
 import de.hype.bbsentials.shared.constants.StatusConstants;
 import de.hype.bbsentials.shared.objects.Message;
 import de.hype.bbsentials.shared.packets.network.CompletedGoalPacket;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
@@ -366,7 +368,8 @@ public class Chat {
                         (message.getNoRanks().startsWith("The party was transferred to " + BBsentials.generalConfig.getUsername()))
                         || message.getNoRanks().endsWith(" has promoted " + BBsentials.generalConfig.getUsername() + " to Party Leader") ||
                         (message.contains("warped to your dungeon"))) {
-                    BBsentials.partyConfig.isPartyLeader = true;
+                    ClientboundPartyInfoPacket partyPacket = HPModAPIPacket.PARTYINFO.complete();
+                    BBsentials.partyConfig.isPartyLeader = partyPacket.getLeader().get().equals(BBsentials.generalConfig.getMCUUID());
                     if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
                         sendPrivateMessageToSelfDebug("Leader: " + BBsentials.partyConfig.isPartyLeader);
                     }
@@ -443,142 +446,167 @@ public class Chat {
                     if (messageContent.startsWith("bb:party me")) {
                         if (BBsentials.partyConfig.allowBBinviteMe) {
                             BBsentials.sender.addSendTask("/p invite " + username, 1);
+                            message.replyToUser("Command executed");
                         }
-                    }
-                    if (messageContent.startsWith("bb:party list")) {
+                    } else if (messageContent.startsWith("bb:party list")) {
                         BBsentials.sender.addSendTask("/p list", 1);
-                    } else if (BBsentials.partyConfig.isPartyLeader) {
+                        message.replyToUser("Command executed");
+                    } else {
+                        ClientboundPartyInfoPacket partyInfoPacket = HPModAPIPacket.PARTYINFO.complete();
+                        ClientboundPartyInfoPacket.PartyRole role = partyInfoPacket.getMemberMap().get(BBsentials.generalConfig.getMCUUIDID()).getRole();
                         TrustedPartyMember person = BBsentials.partyConfig.getTrustedUsername(username);
                         if (person == null) {
                             message.replyToUser("Permission Denied");
-                        }
-                        String[] splittedParams = messageContent.replace("bb:party", "").trim().split(" ");
-                        String actionParamter = "";
-                        String targetName = BBsentials.generalConfig.getUsername();
-                        try {
-                            actionParamter = splittedParams[0].trim();
-                            if (splittedParams.length < 2) {
-                                message.replyToUser("Incorrect arguments");
-                                return;
-                            }
-                            targetName = splittedParams[1].trim();
-                        } catch (Exception ignored) {
-
-                        }
-                        if (actionParamter.equalsIgnoreCase("invite")) {
-                            if (person.canInvite()) {
-                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
-                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
-                                BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("promote")) {
-                            if (person.partyAdmin()) {
-                                BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName));
-                                BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        }
-                        if (messageContent.equalsIgnoreCase("bb:party accept")) {
-                            if (person.canInvite()) {
-                                BBsentials.sender.addSendTask("/p accept " + username, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("demote")) {
-                            if (person.partyAdmin()) {
-                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
-                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
-                                BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("kick")) {
-                            if (person.canKick()) {
-                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
-                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
-                                BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("ban")) {
-                            if (person.canBan()) {
-                                if (!targetName.equalsIgnoreCase(username)) {
-                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName));
-                                    BBsentials.sender.addSendTask("/p kick " + targetName, 1);
-                                    BBsentials.sender.addSendTask("/ignore add " + targetName, 1);
-                                }
-                                message.replyToUser("canceled! you can not ban yourself");
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("stream")) {
-                            if (person.partyAdmin()) {
-                                int amount = 24;
-                                try {
-                                    amount = Integer.parseInt(targetName);
-                                } catch (Exception ignored) {
-                                }
-                                BBsentials.sender.addSendTask("/stream open " + amount, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("join")) {
-                            if (person.partyAdmin()) {
-                                BBsentials.sender.addSendTask("/p join " + targetName, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("transfer")) {
-                            if (person.partyAdmin()) {
-                                if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
-                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
-                                BBsentials.sender.addSendTask("/p transfer " + targetName, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("disband")) {
-                            if (person.partyAdmin()) {
-                                BBsentials.sender.addSendTask("/pc " + username + " disbanded the party.", 1);
-                                BBsentials.sender.addSendTask("/p disband ", 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("mute")) {
-                            if (person.canMute()) {
-                                BBsentials.sender.addSendTask("/pc " + username + " muted the party", 1);
-                                BBsentials.sender.addSendTask("/p " + actionParamter, 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("warp")) {
-                            if (person.canRequestWarp()) {
-                                BBsentials.sender.addSendTask("/pc " + username + " warped the party. So blame them not me", 1);
-                                BBsentials.sender.addSendTask("/p warp", 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("poll")) {
-                            if (person.canRequestWarp()) {
-                                BBsentials.sender.addSendTask("/pc posting poll in name of " + username, 1);
-                                BBsentials.sender.addSendTask("/p poll " + messageContent.replace("bb:party poll", "").trim(), 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
-                        } else if (actionParamter.equalsIgnoreCase("allinvite")) {
-                            if (person.canRequestWarp()) {
-                                BBsentials.sender.addSendTask("/pc " + username + "triggered toggle of All invite", 1);
-                                BBsentials.sender.addSendTask("/p settings allinvite", 1);
-                            } else {
-                                message.replyToUser("Insufficient Privileges");
-                            }
                         } else {
-                            message.replyToUser("Incorrect Arguments");
+                            String[] splittedParams = messageContent.replace("bb:party", "").trim().split(" ");
+                            String actionParamter = "";
+                            String targetName = BBsentials.generalConfig.getUsername();
+                            try {
+                                actionParamter = splittedParams[0].trim();
+                                if (splittedParams.length < 2) {
+                                    message.replyToUser("Incorrect arguments");
+                                    return;
+                                }
+                                targetName = splittedParams[1].trim();
+                            } catch (Exception ignored) {
+
+                            }
+                            if (messageContent.equalsIgnoreCase("bb:party accept")) {
+                                if (person.canInvite()) {
+                                    BBsentials.sender.addSendTask("/p accept " + username, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("join")) {
+                                if (person.partyAdmin()) {
+                                    BBsentials.sender.addSendTask("/p join " + targetName, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (!partyInfoPacket.isInParty()) {
+                                message.replyToUser("Currently not in a party");
+                            } else if (actionParamter.equalsIgnoreCase("leave")) {
+                                if (person.partyAdmin()) {
+                                    if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                        BBsentials.sender.addSendTask("/pc leaving party due too request from %s".formatted(message.getPlayerName()), 1);
+                                    BBsentials.sender.addSendTask("/p leave", 1);
+                                    message.replyToUser("Invite Sent. (If not received check Party Permissions or All invite may not be enabled.)");
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("invite")) {
+                                if (person.canInvite()) {
+                                    if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                        BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                    BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
+                                    message.replyToUser("Invite Sent. (If not received check Party Permissions or All invite may not be enabled.)");
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (role.equals(ClientboundPartyInfoPacket.PartyRole.MEMBER)) {
+                                message.replyToUser("I am currently only Party Member → insufficient privileges");
+                            } else if (actionParamter.equalsIgnoreCase("mute")) {
+                                if (person.canMute()) {
+                                    BBsentials.sender.addSendTask("/pc " + username + " muted the party", 1);
+                                    BBsentials.sender.addSendTask("/p " + actionParamter, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (role.equals(ClientboundPartyInfoPacket.PartyRole.MOD)) {
+                                message.replyToUser("I am currently only Party Member → insufficient privileges");
+                            } else if (actionParamter.equalsIgnoreCase("promote")) {
+                                if (person.partyAdmin()) {
+                                    BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName));
+                                    BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("demote")) {
+                                if (person.partyAdmin()) {
+                                    if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                        BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                    BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("kickoffline") || (actionParamter.equalsIgnoreCase("kick") && username.equalsIgnoreCase("offline"))) {
+                                if (person.canKickOffline()) {
+                                    if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                        BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                    BBsentials.sender.addSendTask("/p kickoffline", 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("kick")) {
+                                if (person.canKick()) {
+                                    if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                        BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                    BBsentials.sender.addSendTask("/p " + actionParamter + " " + targetName, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("ban")) {
+                                if (person.canBan()) {
+                                    if (!targetName.equalsIgnoreCase(username)) {
+                                        BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName));
+                                        BBsentials.sender.addSendTask("/p kick " + targetName, 1);
+                                        BBsentials.sender.addSendTask("/ignore add " + targetName, 1);
+                                    }
+                                    message.replyToUser("canceled! you can not ban yourself");
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("stream")) {
+                                if (person.partyAdmin()) {
+                                    int amount = 24;
+                                    try {
+                                        amount = Integer.parseInt(targetName);
+                                    } catch (Exception ignored) {
+                                    }
+                                    BBsentials.sender.addSendTask("/stream open " + amount, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("transfer")) {
+                                if (person.partyAdmin()) {
+                                    if (BBsentials.partyConfig.announceRemoteMsgPartyCommands)
+                                        BBsentials.sender.addSendTask(getPartyAnnounceAction(username, actionParamter, targetName), 1);
+                                    BBsentials.sender.addSendTask("/p transfer " + targetName, 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("disband")) {
+                                if (person.partyAdmin()) {
+                                    BBsentials.sender.addSendTask("/pc " + username + " disbanded the party.", 1);
+                                    BBsentials.sender.addSendTask("/p disband ", 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("warp")) {
+                                if (person.canRequestWarp()) {
+                                    BBsentials.sender.addSendTask("/pc " + username + " warped the party. So blame them not me", 1);
+                                    BBsentials.sender.addSendTask("/p warp", 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("poll")) {
+                                if (person.canRequestWarp()) {
+                                    BBsentials.sender.addSendTask("/pc posting poll in name of " + username, 1);
+                                    BBsentials.sender.addSendTask("/p poll " + messageContent.replace("bb:party poll", "").trim(), 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else if (actionParamter.equalsIgnoreCase("allinvite")) {
+                                if (person.canRequestWarp()) {
+                                    BBsentials.sender.addSendTask("/pc " + username + "triggered toggle of All invite", 1);
+                                    BBsentials.sender.addSendTask("/p settings allinvite", 1);
+                                } else {
+                                    message.replyToUser("Insufficient Privileges");
+                                }
+                            } else {
+                                message.replyToUser("Incorrect Arguments");
+                            }
                         }
-                    } else {
-                        message.replyToUser("Currently not in a Party / not party Leader");
                     }
                 }
             }

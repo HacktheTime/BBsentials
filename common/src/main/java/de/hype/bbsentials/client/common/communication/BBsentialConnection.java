@@ -69,8 +69,7 @@ public class BBsentialConnection {
     public static boolean isCommandSafe(String command) {
         if (command.startsWith("/p ") || command.startsWith("/party ") || command.startsWith("/boop ") || command.startsWith("/msg ") || command.startsWith("/hub ")) {
             return true;
-        }
-        else {
+        } else {
             String emergencyMessage = "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and DeveloperAbstractConfig Hype_the_Time (@hackthetime). If it is not safe immediately remove BBsentials!!!!!!!! ";
             System.out.println(emergencyMessage);
             Chat.sendPrivateMessageToSelfFatal("§4" + emergencyMessage + "\n\n");
@@ -93,8 +92,7 @@ public class BBsentialConnection {
             if (jarFile.exists()) {
                 // Delete the JAR file
                 return jarFile.delete();
-            }
-            else {
+            } else {
                 return false;
             }
         } catch (Exception ignored) {
@@ -161,8 +159,7 @@ public class BBsentialConnection {
                             if (!publicKey.equals(serverPublicKey)) {
                                 throw new CertificateException("Server certificate not trusted.");
                             }
-                        }
-                        else {
+                        } else {
                             throw new CertificateException("Invalid server certificate chain.");
                         }
                     }
@@ -174,8 +171,7 @@ public class BBsentialConnection {
                 // Create an SSL socket factory
                 SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
                 socket = sslSocketFactory.createSocket(serverIP, serverPort);
-            }
-            else {
+            } else {
                 try {
                     socket = new Socket(serverIP, serverPort);
                 } catch (Exception e) {
@@ -194,8 +190,7 @@ public class BBsentialConnection {
                         String message = reader.readLine();
                         if (message != null) {
                             onMessageReceived(message);
-                        }
-                        else {
+                        } else {
                             Chat.sendPrivateMessageToSelfError("BB: It seemed like you disconnected.");
                             try {
                                 Thread.sleep(10000);
@@ -239,8 +234,7 @@ public class BBsentialConnection {
         if (messageQueue != null) {
             Chat.sendPrivateMessageToSelfDebug("BBs: " + message);
             messageQueue.offer(message);
-        }
-        else {
+        } else {
             Chat.sendPrivateMessageToSelfError("BB: It seems like the connection was lost. Please try to reconnect with /bbi reconnect");
         }
     }
@@ -264,8 +258,7 @@ public class BBsentialConnection {
     public void onMessageReceived(String message) {
         if (!PacketUtils.handleIfPacket(this, message)) {
             if (message.startsWith("H-")) {
-            }
-            else {
+            } else {
                 Chat.sendPrivateMessageToSelfSuccess("BB: " + message);
             }
         }
@@ -283,8 +276,7 @@ public class BBsentialConnection {
                 Chat.sendPrivateMessageToSelfDebug("BBDev-sP: " + packetName + ": " + rawjson);
             }
             writer.println(packetName + "." + rawjson);
-        }
-        else {
+        } else {
             Chat.sendPrivateMessageToSelfError("BB: Couldn't send a " + packetName + "! did you get disconnected?");
         }
     }
@@ -301,13 +293,11 @@ public class BBsentialConnection {
             SplashStatusUpdateListener splashStatusUpdateListener = new SplashStatusUpdateListener(packet.splash);
             UpdateListenerManager.splashStatusUpdateListener = splashStatusUpdateListener;
             BBsentials.executionService.execute(splashStatusUpdateListener);
-        }
-        else {
+        } else {
             SplashManager.addSplash(packet);
             if (packet.splash.lessWaste) {
                 waitTime = Math.min(((EnvironmentCore.utils.getPotTime() * 1000) / 80), 25 * 1000);
-            }
-            else {
+            } else {
                 waitTime = 0;
             }
             BBsentials.executionService.schedule(() -> {
@@ -328,42 +318,33 @@ public class BBsentialConnection {
         if (!(BBsentials.miningEventConfig.allEvents)) {
             if (packet.event.equals(MiningEvents.RAFFLE)) {
                 if (!BBsentials.miningEventConfig.raffle) return;
+            } else if (packet.event.equals(MiningEvents.GOBLIN_RAID)) {
+                if (!BBsentials.miningEventConfig.goblinRaid) return;
+            } else if (packet.event.equals(MiningEvents.MITHRIL_GOURMAND)) {
+                if (!BBsentials.miningEventConfig.mithrilGourmand) return;
+            } else if (packet.event.equals(MiningEvents.BETTER_TOGETHER)) {
+                if (BBsentials.miningEventConfig.betterTogether.equals("none")) return;
+                if (BBsentials.miningEventConfig.betterTogether.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                    return;
+                if (BBsentials.miningEventConfig.betterTogether.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                    return;
+            } else if (packet.event.equals(MiningEvents.DOUBLE_POWDER)) {
+                if (BBsentials.miningEventConfig.doublePowder.equals("none")) return;
+                if (BBsentials.miningEventConfig.doublePowder.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                    return;
+                if (BBsentials.miningEventConfig.doublePowder.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                    return;
+            } else if (packet.event.equals(MiningEvents.GONE_WITH_THE_WIND)) {
+                if (BBsentials.miningEventConfig.goneWithTheWind.equals("none")) return;
+                if (BBsentials.miningEventConfig.goneWithTheWind.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
+                    return;
+                if (BBsentials.miningEventConfig.goneWithTheWind.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
+                    return;
             }
-            else
-                if (packet.event.equals(MiningEvents.GOBLIN_RAID)) {
-                    if (!BBsentials.miningEventConfig.goblinRaid) return;
-                }
-                else
-                    if (packet.event.equals(MiningEvents.MITHRIL_GOURMAND)) {
-                        if (!BBsentials.miningEventConfig.mithrilGourmand) return;
-                    }
-                    else
-                        if (packet.event.equals(MiningEvents.BETTER_TOGETHER)) {
-                            if (BBsentials.miningEventConfig.betterTogether.equals("none")) return;
-                            if (BBsentials.miningEventConfig.betterTogether.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                                return;
-                            if (BBsentials.miningEventConfig.betterTogether.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                                return;
-                        }
-                        else
-                            if (packet.event.equals(MiningEvents.DOUBLE_POWDER)) {
-                                if (BBsentials.miningEventConfig.doublePowder.equals("none")) return;
-                                if (BBsentials.miningEventConfig.doublePowder.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                                    return;
-                                if (BBsentials.miningEventConfig.doublePowder.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                                    return;
-                            }
-                            else
-                                if (packet.event.equals(MiningEvents.GONE_WITH_THE_WIND)) {
-                                    if (BBsentials.miningEventConfig.goneWithTheWind.equals("none")) return;
-                                    if (BBsentials.miningEventConfig.goneWithTheWind.equals(Islands.DWARVEN_MINES.getDisplayName()) && packet.island.equals(Islands.CRYSTAL_HOLLOWS))
-                                        return;
-                                    if (BBsentials.miningEventConfig.goneWithTheWind.equals(Islands.CRYSTAL_HOLLOWS.getDisplayName()) && packet.island.equals(Islands.DWARVEN_MINES))
-                                        return;
-                                }
         }
         Chat.sendPrivateMessageToSelfImportantInfo(packet.username + ": There is a " + packet.event.getDisplayName() + " in the " + packet.island.getDisplayName() + " now/soon.");
     }
+
 
     public void onWelcomePacket(WelcomeClientPacket packet) {
         authenticated = packet.success;
@@ -375,8 +356,7 @@ public class BBsentialConnection {
             if (!packet.motd.isEmpty()) {
                 Chat.sendPrivateMessageToSelfImportantInfo(packet.motd);
             }
-        }
-        else {
+        } else {
             Chat.sendPrivateMessageToSelfError("Login Failed");
         }
     }
@@ -393,14 +373,12 @@ public class BBsentialConnection {
                 BBsentials.executionService.schedule(() -> {
                     if (finalI == 0) {
                         BBsentials.connectToBBserver();
-                    }
-                    else {
+                    } else {
                         BBsentials.conditionalReconnectToBBserver();
                     }
                 }, (long) (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)), TimeUnit.SECONDS);
             }
-        }
-        else {
+        } else {
             if (packet.internalReason.equals(InternalReasonConstants.NOT_REGISTERED))
                 EnvironmentCore.utils.showErrorScreen("Could not connect to the network. Reason: \n" + packet.displayMessage);
             else EnvironmentCore.utils.showErrorScreen(packet.displayMessage);
@@ -415,67 +393,51 @@ public class BBsentialConnection {
     public void onInternalCommandPacket(InternalCommandPacket packet) {
         if (packet.command.equals(InternalCommandPacket.REQUEST_POT_DURATION)) {
             sendPacket(new InternalCommandPacket(InternalCommandPacket.SET_POT_DURATION, new String[]{String.valueOf(EnvironmentCore.utils.getPotTime())}));
-        }
-        else
-            if (packet.command.equals(InternalCommandPacket.SELFDESTRUCT)) {
-                selfDestruct();
-                Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated. Stopping in 10 seconds.");
-                if (!packet.parameters[0].isEmpty())
-                    Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-                EnvironmentCore.utils.playsound("block.anvil.destroy");
-                for (int i = 0; i < 10; i++) {
-                    int finalI = i;
-                    BBsentials.executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
-                }
-                throw new RuntimeException("BBsentials: Self Remove was triggered");
+        } else if (packet.command.equals(InternalCommandPacket.SELFDESTRUCT)) {
+            selfDestruct();
+            Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated. Stopping in 10 seconds.");
+            if (!packet.parameters[0].isEmpty())
+                Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
+            EnvironmentCore.utils.playsound("block.anvil.destroy");
+            for (int i = 0; i < 10; i++) {
+                int finalI = i;
+                BBsentials.executionService.schedule(() -> Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI), i, TimeUnit.SECONDS);
             }
-            else
-                if (packet.command.equals(InternalCommandPacket.PEACEFULLDESTRUCT)) {
-                    selfDestruct();
-                    Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated! Becomes effective on next launch");
-                    if (!packet.parameters[0].isEmpty())
-                        Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-                    EnvironmentCore.utils.playsound("block.anvil.destroy");
-                }
-                else
-                    if (packet.command.equals(InternalCommandPacket.HUB)) {
-                        BBsentials.sender.addImmediateSendTask("/hub");
+            throw new RuntimeException("BBsentials: Self Remove was triggered");
+        } else if (packet.command.equals(InternalCommandPacket.PEACEFULLDESTRUCT)) {
+            selfDestruct();
+            Chat.sendPrivateMessageToSelfFatal("BB: Self remove activated! Becomes effective on next launch");
+            if (!packet.parameters[0].isEmpty())
+                Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
+            EnvironmentCore.utils.playsound("block.anvil.destroy");
+        } else if (packet.command.equals(InternalCommandPacket.HUB)) {
+            BBsentials.sender.addImmediateSendTask("/hub");
+        } else if (packet.command.equals(InternalCommandPacket.PRIVATE_ISLAND)) {
+            BBsentials.sender.addImmediateSendTask("/is");
+        } else if (packet.command.equals(InternalCommandPacket.HIDDEN_HUB)) {
+            BBsentials.sender.addHiddenSendTask("/hub", 0);
+        } else if (packet.command.equals(InternalCommandPacket.HIDDEN_PRIVATE_ISLAND)) {
+            BBsentials.sender.addHiddenSendTask("/is", 0);
+        } else if (packet.command.equals(InternalCommandPacket.CRASH)) {
+            Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
+            if (!packet.parameters[0].isEmpty())
+                Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
+            Thread crashThread = new Thread(() -> {
+                EnvironmentCore.utils.playsound("block.anvil.destroy");
+                for (int i = 10; i >= 0; i--) {
+                    Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + i);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignored) {
                     }
-                    else
-                        if (packet.command.equals(InternalCommandPacket.PRIVATE_ISLAND)) {
-                            BBsentials.sender.addImmediateSendTask("/is");
-                        }
-                        else
-                            if (packet.command.equals(InternalCommandPacket.HIDDEN_HUB)) {
-                                BBsentials.sender.addHiddenSendTask("/hub", 0);
-                            }
-                            else
-                                if (packet.command.equals(InternalCommandPacket.HIDDEN_PRIVATE_ISLAND)) {
-                                    BBsentials.sender.addHiddenSendTask("/is", 0);
-                                }
-                                else
-                                    if (packet.command.equals(InternalCommandPacket.CRASH)) {
-                                        Chat.sendPrivateMessageToSelfFatal("BB: Stopping in 10 seconds.");
-                                        if (!packet.parameters[0].isEmpty())
-                                            Chat.sendPrivateMessageToSelfFatal("Reason: " + packet.parameters[0]);
-                                        Thread crashThread = new Thread(() -> {
-                                            EnvironmentCore.utils.playsound("block.anvil.destroy");
-                                            for (int i = 10; i >= 0; i--) {
-                                                Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + i);
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException ignored) {
-                                                }
-                                            }
-                                            EnvironmentCore.utils.systemExit(69);
-                                        });
-                                        crashThread.start();
-                                    }
-                                    else
-                                        if (packet.command.equals(InternalCommandPacket.INSTACRASH)) {
-                                            System.out.println("BBsentials: InstaCrash triggered");
-                                            EnvironmentCore.utils.systemExit(69);
-                                        }
+                }
+                EnvironmentCore.utils.systemExit(69);
+            });
+            crashThread.start();
+        } else if (packet.command.equals(InternalCommandPacket.INSTACRASH)) {
+            System.out.println("BBsentials: InstaCrash triggered");
+            EnvironmentCore.utils.systemExit(69);
+        }
     }
 
     public void onInvalidCommandFeedbackPacket(InvalidCommandFeedbackPacket packet) {
@@ -494,60 +456,51 @@ public class BBsentialConnection {
                 Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party join");
                 if (partyInfo.isInParty()) BBsentials.sender.addSendTask("/p leave");
                 BBsentials.sender.addSendTask("/p join " + packet.users.get(0));
-            }
-            else
-                if (packet.type == PartyConstants.ACCEPT) {
-                    if (partyInfo.isInParty()) BBsentials.sender.addSendTask("/p leave");
-                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party accept");
-                    BBsentials.sender.addSendTask("/p accept " + packet.users.get(0));
+            } else if (packet.type == PartyConstants.ACCEPT) {
+                if (partyInfo.isInParty()) BBsentials.sender.addSendTask("/p leave");
+                Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party accept");
+                BBsentials.sender.addSendTask("/p accept " + packet.users.get(0));
+            } else if (packet.type == PartyConstants.DISBAND) {
+                if (leader) {
+                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party disband");
+                    Chat.sendCommand("/p disband");
+                } else {
+                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party disband but you are not the leader. Leaving party");
+                    Chat.sendCommand("/p leave");
                 }
-                else
-                    if (packet.type == PartyConstants.DISBAND) {
-                        if (leader) {
-                            Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party disband");
-                            Chat.sendCommand("/p disband");
-                        }
-                        else {
-                            Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party disband but you are not the leader. Leaving party");
-                            Chat.sendCommand("/p leave");
-                        }
-                    }
-                    else
-                        if (packet.type == PartyConstants.INVITE) {
-                            if (leader || moderator) {
-                                Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party invite");
-                                Chat.sendCommand("/p invite " + packet.users.get(0));
-                            }
-                            else {
-                                BBsentials.sender.addSendTask("/pc BBsentials Server requested a party invite for: %s".formatted(packet.users));
-                            }
-                        }
-                        else
-                            if (packet.type == PartyConstants.KICK) {
-                                if (leader) {
-                                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party kick");
-                                    packet.users.forEach((u) -> BBsentials.sender.addSendTask("/p kick %s".formatted(u)));
-                                }
-                                else {
-                                    BBsentials.sender.addSendTask("/pc BBsentials Server requested a party kicks for: %s".formatted(packet.users));
-                                }
-                            }
-                            else
-                                if (packet.type == PartyConstants.PROMOTE) {
-                                    if (leader) {
-                                        Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party promote");
-                                        Chat.sendCommand("/p promote " + packet.users.get(0));
-                                    }
-                                    else {
-                                        BBsentials.sender.addSendTask("/pc BBsentials Server requested party promotion for: %s".formatted(packet.users));
-                                    }
-                                }
-                                else
-                                    if (packet.type == PartyConstants.LEAVE) {
-                                        Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party leave");
-                                        Chat.sendCommand("/p leave");
-                                    }
+            } else if (packet.type == PartyConstants.INVITE) {
+                if (leader || moderator) {
+                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party invite");
+                    Chat.sendCommand("/p invite " + packet.users.get(0));
+                } else {
+                    BBsentials.sender.addSendTask("/pc BBsentials Server requested a party invite for: %s".formatted(packet.users));
+                }
+            } else if (packet.type == PartyConstants.KICK) {
+                if (leader) {
+                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party kick");
+                    packet.users.forEach((u) -> BBsentials.sender.addSendTask("/p kick %s".formatted(u)));
+                } else {
+                    BBsentials.sender.addSendTask("/pc BBsentials Server requested a party kicks for: %s".formatted(packet.users));
+                }
+            } else if (packet.type == PartyConstants.PROMOTE) {
+                if (leader) {
+                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party promote");
+                    Chat.sendCommand("/p promote " + packet.users.get(0));
+                } else {
+                    BBsentials.sender.addSendTask("/pc BBsentials Server requested party promotion for: %s".formatted(packet.users));
+                }
+            } else if (packet.type == PartyConstants.LEAVE) {
+                Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party leave");
+                Chat.sendCommand("/p leave");
+            }
 
+        } else {
+            List<String> users = packet.users;
+            int chunkSize = 5;
+            for (int i = 0; i < users.size(); i += chunkSize) {
+                List<String> chunk = users.subList(i, Math.min(users.size(), i + chunkSize));
+                Chat.sendCommand("/p " + packet.type.toString().toLowerCase() + " " + String.join(" ", chunk));
+            }
         }
         else Chat.sendCommand("/p " + packet.type.toString().toLowerCase() + " " + String.join(" ", packet.users));
 
@@ -556,8 +509,7 @@ public class BBsentialConnection {
     public void onSystemMessagePacket(SystemMessagePacket packet) {
         if (packet.important) {
             Chat.sendPrivateMessageToSelfImportantInfo("§n" + packet.message);
-        }
-        else {
+        } else {
             Chat.sendPrivateMessageToSelfInfo(packet.message);
         }
         if (packet.ping) {
@@ -569,8 +521,7 @@ public class BBsentialConnection {
         if (socket.getPort() == 5011) {
             Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online (Beta Development Server)");
             Chat.sendPrivateMessageToSelfImportantInfo("You may test here but do NOT Spam unless you have very good reasons. Spamming may still be punished");
-        }
-        else {
+        } else {
             Chat.sendPrivateMessageToSelfSuccess("Logging into BBsentials-online");
         }
         try {
@@ -591,11 +542,11 @@ public class BBsentialConnection {
             EnvironmentCore.utils.mojangAuth(serverId);
             RequestConnectPacket connectPacket = new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), clientRandom, EnvironmentCore.utils.getModVersion(), EnvironmentCore.utils.getGameVersion(), BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.MOJANG);
             sendPacket(connectPacket);
-        }
-        else {
+        } else {
             sendPacket(new RequestConnectPacket(BBsentials.generalConfig.getMCUUID(), BBsentials.bbServerConfig.apiKey, EnvironmentCore.utils.getModVersion(), EnvironmentCore.utils.getGameVersion(), BBsentials.generalConfig.getApiVersion(), AuthenticationConstants.DATABASE));
         }
     }
+
 
     public boolean isConnected() {
         try {
@@ -644,24 +595,20 @@ public class BBsentialConnection {
     public void onWaypointPacket(WaypointPacket packet) {
         if (packet.operation.equals(WaypointPacket.Operation.ADD)) {
             new Waypoints(packet.waypoint);
-        }
-        else
-            if (packet.operation.equals(WaypointPacket.Operation.REMOVE)) {
-                try {
-                    Waypoints.waypoints.get(packet.waypointId).removeFromPool();
-                } catch (Exception ignored) {
+        } else if (packet.operation.equals(WaypointPacket.Operation.REMOVE)) {
+            try {
+                Waypoints.waypoints.get(packet.waypointId).removeFromPool();
+            } catch (Exception ignored) {
 
-                }
             }
-            else
-                if (packet.operation.equals(WaypointPacket.Operation.EDIT)) {
-                    try {
-                        Waypoints oldWaypoint = Waypoints.waypoints.get(packet.waypointId);
-                        oldWaypoint.replaceWithNewWaypoint(packet.waypoint, packet.waypointId);
-                    } catch (Exception ignored) {
+        } else if (packet.operation.equals(WaypointPacket.Operation.EDIT)) {
+            try {
+                Waypoints oldWaypoint = Waypoints.waypoints.get(packet.waypointId);
+                oldWaypoint.replaceWithNewWaypoint(packet.waypoint, packet.waypointId);
+            } catch (Exception ignored) {
 
-                    }
-                }
+            }
+        }
     }
 
     public void onGetWaypointsPacket(GetWaypointsPacket packet) {
@@ -672,9 +619,8 @@ public class BBsentialConnection {
         if (!BBsentials.visualConfig.showCardCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.CARD))
             Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username \",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"just completed the \",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"Bingo\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"!\",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}}]".replace("@username", packet.username).replace("@lore", packet.lore)));
             //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"@username "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"just completed the "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"Bingo"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gray","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@lore"}],"text":"!"}],"command":"%s","jtemplate":"tellraw"}
-        else
-            if (!BBsentials.visualConfig.showGoalCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.GOAL))
-                Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username \",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"just completed the Goal \",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"@name\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"!\",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}}]".replace("@username", packet.username).replace("@lore", packet.lore).replace("@name", packet.name)));
+        else if (!BBsentials.visualConfig.showGoalCompletions && packet.completionType.equals(CompletedGoalPacket.CompletionType.GOAL))
+            Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username \",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"just completed the Goal \",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"@name\",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}},{\"text\":\"!\",\"color\":\"gray\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@lore\"]}}]".replace("@username", packet.username).replace("@lore", packet.lore).replace("@name", packet.name)));
         //["",{"text":"@username ","color":"gold","hoverEvent":{"action":"show_text","contents":["@lore"]}},{"text":"just completed the Goal ","color":"gray","hoverEvent":{"action":"show_text","contents":["@lore"]}},{"text":"@name","color":"gold","hoverEvent":{"action":"show_text","contents":["@lore"]}},{"text":"!","color":"gray","hoverEvent":{"action":"show_text","contents":["@lore"]}}]
     }
 
@@ -691,6 +637,11 @@ public class BBsentialConnection {
         if (packet.minimumPlayerCount != null && packet.minimumPlayerCount < playerCount.size()) return;
         if (packet.username != null && !playerCount.contains(packet.username)) return;
         sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket.WantedSearchPacketReply(BBsentials.generalConfig.getUsername(), EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.isOnMegaServer(), EnvironmentCore.utils.getServerId())));
+    }
+
+
+    public void onSkyblockLobbyDataPacket(SkyblockLobbyDataPacket packet) {
+        packet.preparePacketToReplyToThis(new SkyblockLobbyDataPacket(EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.getLobbyTime(), EnvironmentCore.utils.getServerId(), EnvironmentCore.utils.getCurrentIsland()));
     }
 
     public void onPunishedPacket(PunishedPacket packet) {
@@ -726,14 +677,12 @@ public class BBsentialConnection {
             Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap!");
             BBsentials.partyConfig.allowBBinviteMe = true;
             ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
+        } else if (command.trim().equalsIgnoreCase("/p join " + BBsentials.generalConfig.getUsername())) {
+            if (!BBsentials.partyConfig.isPartyLeader) BBsentials.sender.addImmediateSendTask("/p leave");
+            BBsentials.sender.addHiddenSendTask("/stream open 23", 1);
+            BBsentials.sender.addHiddenSendTask("/pl", 2);
+            Chat.sendPrivateMessageToSelfImportantInfo("Opened Stream Party for you since you announced chchest items");
         }
-        else
-            if (command.trim().equalsIgnoreCase("/p join " + BBsentials.generalConfig.getUsername())) {
-                if (!BBsentials.partyConfig.isPartyLeader) BBsentials.sender.addImmediateSendTask("/p leave");
-                BBsentials.sender.addHiddenSendTask("/stream open 23", 1);
-                BBsentials.sender.addHiddenSendTask("/pl", 2);
-                Chat.sendPrivateMessageToSelfImportantInfo("Opened Stream Party for you since you announced chchest items");
-            }
 
         BBsentials.connection.sendPacket(new ChChestPacket(new ChestLobbyData(List.of(new ChChestData("", coords, items)), EnvironmentCore.utils.getServerId(), command, extraMessage, StatusConstants.OPEN)));
     }

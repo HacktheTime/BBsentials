@@ -439,6 +439,11 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", username)));
                     setChatCommand("/p transfer " + username, 10);
                 }
+                else
+                    if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
+                        Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", username));
+                        setChatCommand("/pc r " + username, 10);
+                    }
 
             } else if (message.isMsg()) {
                 String messageContent = message.getMessageContent();

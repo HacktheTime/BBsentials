@@ -42,4 +42,8 @@ public enum BBRole {
     public String getVisualName() {
         return visulaRoleName;
     }
+
+    public String getDescription() {
+        return null;
+    }
 }

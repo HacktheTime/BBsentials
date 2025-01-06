@@ -23,6 +23,7 @@ public class BBServiceData {
     protected int maxUsers;
     protected boolean joinLock;
     protected boolean forceModOnline;
+    public boolean circulateParticipants;
 
     public BBServiceData(String description, BBUser hoster, int price, List<Helper> helpers, int maxUsers, boolean forceModOnline) {
         this(null, description, hoster, price, helpers, maxUsers, forceModOnline);

@@ -502,8 +502,6 @@ public class BBsentialConnection {
                 Chat.sendCommand("/p " + packet.type.toString().toLowerCase() + " " + String.join(" ", chunk));
             }
         }
-        else Chat.sendCommand("/p " + packet.type.toString().toLowerCase() + " " + String.join(" ", packet.users));
-
     }
 
     public void onSystemMessagePacket(SystemMessagePacket packet) {
@@ -637,11 +635,6 @@ public class BBsentialConnection {
         if (packet.minimumPlayerCount != null && packet.minimumPlayerCount < playerCount.size()) return;
         if (packet.username != null && !playerCount.contains(packet.username)) return;
         sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket.WantedSearchPacketReply(BBsentials.generalConfig.getUsername(), EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.isOnMegaServer(), EnvironmentCore.utils.getServerId())));
-    }
-
-
-    public void onSkyblockLobbyDataPacket(SkyblockLobbyDataPacket packet) {
-        packet.preparePacketToReplyToThis(new SkyblockLobbyDataPacket(EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.getLobbyTime(), EnvironmentCore.utils.getServerId(), EnvironmentCore.utils.getCurrentIsland()));
     }
 
     public void onPunishedPacket(PunishedPacket packet) {

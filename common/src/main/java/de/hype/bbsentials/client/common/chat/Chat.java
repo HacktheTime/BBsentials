@@ -284,7 +284,7 @@ public class Chat {
                     } else if (message.isServerMessage() && messageUnformatted.startsWith("HOPPITY'S HUNT")) {
                         sendNotification("BBsentials Hoppity Notifier", messageUnformatted);
                     }
-                    boolean matchesNick = message.getMessageContent().toLowerCase().matches("(^|\s)%s($|\s)".formatted(BBsentials.generalConfig.nickname.toLowerCase())) && BBsentials.generalConfig.notifForMessagesType.equalsIgnoreCase("nick");
+                    boolean matchesNick = message.getMessageContent().toLowerCase().matches("(^|.* )%s( .*|$)".formatted(BBsentials.generalConfig.nickname.toLowerCase())) && BBsentials.generalConfig.notifForMessagesType.equalsIgnoreCase("nick");
                     boolean matchesAll = message.getMessageContent().toLowerCase().contains(BBsentials.generalConfig.getUsername().toLowerCase()) || (BBsentials.generalConfig.notifForMessagesType.equalsIgnoreCase("all"));
                     boolean none = BBsentials.generalConfig.notifForMessagesType.equalsIgnoreCase("none");
                     if (!none && (matchesAll || matchesNick)) {

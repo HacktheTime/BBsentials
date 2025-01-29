@@ -10,7 +10,7 @@
   ],
   "contributors": ["hannibal2","nea89"],
   "contact": {
-    "homepage": "https://github.com/HacktheTime/BBsentials1.20",
+    "homepage": "https://hackthetime.de",
     "issues": "https://github.com/HacktheTime/BBsentials1.20/issues",
     "email": "s0844x76@duck.com",
     "sources": "https://github.com/HacktheTime/BBsentials1.20"
@@ -39,7 +39,8 @@
     "modmenu": {
       "links": {
         "License": "https://github.com/HacktheTime/BBsentials1.20/blob/master/LICENSE",
-        "modmenu.discord":"discord.gg/qr5mPRq8uG"
+        "modmenu.discord": "discord.gg/qr5mPRq8uG",
+        "Website": "https://hackthetime.de"
       },
       "update_checker": true
     }

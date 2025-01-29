@@ -3,6 +3,7 @@ package de.hype.bbsentials.shared.objects;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public enum BBRole {
     DEVELOPER("dev", "Developer"),
     MODERATOR("mod", "Moderator"),

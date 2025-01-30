@@ -22,7 +22,6 @@
     "WorldRenderLastEventPatch",
     "itemmixins.CustomItemData",
     "itemmixins.CustomItemTooltip",
-    "itemmixins.CustomRenderAsItemMixin",
     "itemmixins.ModifyCountAndTextureMixin"
   ],
   "injectors": {

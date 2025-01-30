@@ -63,5 +63,6 @@ public class ItemStack implements de.hype.bbsentials.client.common.mclibraries.i
     public Item getMinecraftItem() {
         return stack.getItem();
     }
+
 }
 

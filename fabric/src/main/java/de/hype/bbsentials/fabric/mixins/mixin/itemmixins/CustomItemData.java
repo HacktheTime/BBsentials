@@ -5,6 +5,12 @@ import de.hype.bbsentials.fabric.mixins.helperclasses.RenderingDefinitions;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.FabricICusomItemDataAccess;
 import de.hype.bbsentials.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
 import de.hype.bbsentials.shared.constants.VanillaItems;
+import net.minecraft.block.pattern.CachedBlockPosition;
+import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.MergedComponentMap;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -12,6 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -33,8 +41,6 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
     @Unique
     boolean override;
 
-    @Unique
-    Item renderasItem = null;
 
     @Shadow
     public abstract String toString();
@@ -47,6 +53,20 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
 
     @Shadow
     public abstract void damage(int amount, LivingEntity entity, EquipmentSlot slot);
+
+    @Shadow
+    @Final
+    private MergedComponentMap components;
+    @Shadow
+    @Final
+    @Deprecated
+    private @Nullable Item item;
+
+    @Shadow
+    public abstract ComponentMap getComponents();
+
+    @Shadow
+    public abstract boolean canBreak(CachedBlockPosition pos);
 
     @Override
     public List<Text> BBsentialsAll$getItemRenderTooltip() {
@@ -64,12 +84,6 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
     public String BBsentialsAll$getCustomItemTexture() {
         if (notInitialised) BBsentialsAll$reevaluate();
         return texturename;
-    }
-
-    @Override
-    public Item BBsentialsAll$getRenderAsItem() {
-        if (notInitialised) BBsentialsAll$reevaluate();
-        return renderasItem;
     }
 
     @Unique
@@ -95,7 +109,7 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
             this.override = true;
         }
         notInitialised = false;
-        renderasItem = VanillaRegistry.get(definition.getRenderAsItem());
+        setRenderasItem(VanillaRegistry.get(definition.getRenderAsItem()));
         itemCountCustom = definition.getItemCount();
         texturename = definition.getTexturePath();
         itemTooltip = definition.getTextTooltip().stream().map(v -> (de.hype.bbsentials.fabric.Text) v).toList();
@@ -113,8 +127,8 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
         if (right1.override != override) return false;
         if (!Objects.equals(right1.texturename, texturename)) return false;
         if (right1.itemTooltip != itemTooltip) return false;
-        if (right1.renderasItem == renderasItem) return false;
-
+        if (!Objects.equals(right1.getComponents().get(DataComponentTypes.ITEM_MODEL), this.getComponents().get(DataComponentTypes.ITEM_MODEL)))
+            return false;
         return true;
     }
 
@@ -138,24 +152,16 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
         this.override = override;
     }
 
-    @Override
-    public Item getRenderasItem() {
-        return renderasItem;
-    }
+
 
     @Override
     public void setRenderasItem(Item renderasItem) {
-        this.renderasItem = renderasItem;
-    }
-
-    @Override
-    public VanillaItems getVanillaRenderasItem() {
-        return VanillaRegistry.get(renderasItem);
+        components.applyChanges(ComponentChanges.builder().add(DataComponentTypes.ITEM_MODEL, renderasItem.getComponents().get(DataComponentTypes.ITEM_MODEL)).build());
     }
 
     @Override
     public void setVanillaRenderasItem(VanillaItems renderasItem) {
-        this.renderasItem = VanillaRegistry.get(renderasItem);
+        setRenderasItem(VanillaRegistry.get(renderasItem));
     }
 
 

@@ -471,9 +471,21 @@ public class BBsentialConnection {
             } else if (packet.type == PartyConstants.INVITE) {
                 if (leader || moderator) {
                     Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party invite");
-                    Chat.sendCommand("/p invite " + packet.users.get(0));
+                    List<String> users = packet.users;
+                    int chunkSize = 5;
+                    for (int i = 0; i < users.size(); i += chunkSize) {
+                        List<String> chunk = users.subList(i, Math.min(users.size(), i + chunkSize));
+                        Chat.sendCommand("/p invite " + String.join(" ", chunk));
+                    }
                 } else {
                     BBsentials.sender.addSendTask("/pc BBsentials Server requested a party invite for: %s".formatted(packet.users));
+                }
+            } else if (packet.type == PartyConstants.WARP) {
+                if (leader || moderator) {
+                    Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party warp");
+                    Chat.sendCommand("/p warp");
+                } else {
+                    BBsentials.sender.addSendTask("/pc BBsentials Server requested a party warp");
                 }
             } else if (packet.type == PartyConstants.KICK) {
                 if (leader) {

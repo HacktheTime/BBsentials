@@ -23,5 +23,6 @@ public enum PartyConstants {
     DISBAND,
     LEAVE,
     PROMOTE,
+    WARP,
     KICK
 }

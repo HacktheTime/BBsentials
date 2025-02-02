@@ -6,18 +6,19 @@ import de.hype.bbsentials.shared.constants.TradeType;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BBServiceData {
     protected int serviceId;
-    protected StatusConstants status;
+    protected StatusConstants status = StatusConstants.OPEN;
     protected String description;
     protected TradeType type;
     protected String title;
     protected BBUser hoster;
     protected List<Helper> helpers;
-    protected List<Participiant> participants;
-    protected List<Participiant> queue;
+    protected List<Participiant> participants = new ArrayList<>();
+    protected List<Participiant> queue = new ArrayList<>();
     protected int price;
     protected String dcMessageID;
     protected int maxUsers;

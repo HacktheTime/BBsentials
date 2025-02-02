@@ -15,6 +15,7 @@ public class ApiJsonList {
         JsonElement temp = parent.getJSONElementSafe();
         if (temp == null) return;
         JsonArray array = temp.getAsJsonObject().getAsJsonArray(key);
+        if (array == null) return;
         for (JsonElement jsonElement : array) {
             values.add(new ApiJsonElement(jsonElement));
         }

@@ -92,7 +92,6 @@ public class ChChestItems {
             int amount = 1;
             String countString = displayName.replaceAll("\\D", "");
             if (!countString.isEmpty()) amount = Integer.parseInt(countString);
-            //TODO use count?
             if (item.isPowder()) {
                 if (displayName.matches(".*Powder")) {
                     if (amount >= 1200) {

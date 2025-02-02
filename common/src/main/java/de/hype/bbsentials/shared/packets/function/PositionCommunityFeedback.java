@@ -2,6 +2,7 @@ package de.hype.bbsentials.shared.packets.function;
 
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class PositionCommunityFeedback extends AbstractPacket {
@@ -28,6 +29,11 @@ public class PositionCommunityFeedback extends AbstractPacket {
         @Override
         public int hashCode() {
             return goalName.hashCode();
+        }
+
+        public boolean dataEquals(ComGoalPosition compare) {
+            if (compare == null) return false;
+            return (Objects.equals(topPercentage, compare.topPercentage)) && Objects.equals(compare.position, this.position) && Objects.equals(contribution, compare.contribution);
         }
     }
 }

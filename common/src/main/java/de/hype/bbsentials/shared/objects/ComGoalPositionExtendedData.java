@@ -19,4 +19,8 @@ public class ComGoalPositionExtendedData {
         int punPos = (100 - position.position);
         return fromTime.plus((long) punPos * punPos, ChronoUnit.MINUTES);
     }
+
+    public boolean dataEquals(ComGoalPositionExtendedData that) {
+        return mcuuid.equals(that.mcuuid) && position.dataEquals(that.position);
+    }
 }

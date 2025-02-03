@@ -8,6 +8,7 @@ import de.hype.bbsentials.client.common.SystemUtils;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bbsentials.client.common.config.PartyConfig;
 import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
@@ -24,7 +25,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.time.Instant;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,8 +38,6 @@ public class Chat {
     public static Date lastNPCMessage = new Date();
     //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}// {"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile f772b2c7-bd2a-46e1-b1a2-41fa561157d6"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bShourtu§e's profile"}},"text":"§9Party §8> §b[MVP§c+§b] Shourtu§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Hype_the_Time TEST"}],"text":""}
     //{"strikethrough":false,"extra":[{"strikethrough":false,"clickEvent":{"action":"run_command","value":"/viewprofile 4fa1228c-8dd6-47c4-8fe3-b04b580311b8"},"hoverEvent":{"action":"show_text","contents":{"strikethrough":false,"text":"§eClick here to view §bHype_the_Time§e's profile"}},"text":"§9Party §8> §b[MVP§2+§b] Hype_the_Time§f: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"h:test"}],"text":""}
-    private final Map<String, Instant> partyDisbandedMap = new HashMap<>();
-    private String lastPartyDisbandedUsername = null;
 
     public static String[] getVariableNames(String packageName, String className) {
         List<String> variableInfoList = new ArrayList<>();
@@ -303,17 +306,17 @@ public class Chat {
                 if (messageUnformatted.startsWith("Select an option:")) {
                     setChatCommand(getFirstGreenSelectOption(message.getJson()), 10);
                 } else if (messageUnformatted.contains(".*disbanded the party")) {
-                    lastPartyDisbandedUsername = message.getNoRanks().split(" ")[0];
-                    partyDisbandedMap.put(lastPartyDisbandedUsername, Instant.now());
+                    BBsentials.partyConfig.partyAcceptConfig.put(message.getNoRanks().split(" ")[0], new PartyConfig.AcceptPartyInvites(false, Instant.now().plus(5, ChronoUnit.MINUTES)));
                 } else if (message.contains(".*invited you to join their party")) {
                     username = message.getNoRanks().replace("-", "").replace("\n", "").trim().split(" ")[0];
-                    if (lastPartyDisbandedUsername != null && partyDisbandedMap != null) {
-                        Instant lastDisbandedInstant = partyDisbandedMap.get(lastPartyDisbandedUsername);
-                        if (BBsentials.partyConfig.acceptReparty) {
-                            if (lastDisbandedInstant != null && lastDisbandedInstant.isAfter(Instant.now().minusSeconds(20)) && (username.equals(lastPartyDisbandedUsername))) {
-                                sendCommand("/p accept " + username);
-                            }
-                        }
+                    PartyConfig.AcceptPartyInvites invites = BBsentials.partyConfig.partyAcceptConfig.get(username);
+                    if (invites == null) return;
+                    else if (invites.timeout().isAfter(Instant.now())) return;
+                    else if (!BBsentials.partyConfig.isInParty()) {
+                        BBsentials.sender.addSendTask("/p accept " + username);
+                    } else if (invites.leavePartyIfPresent()) {
+                        BBsentials.sender.addSendTask("/p leave");
+                        BBsentials.sender.addSendTask("/p accept " + username);
                     }
                     if (!EnvironmentCore.utils.isWindowFocused()) {
                         sendNotification("BBsentials Party Notifier", "You got invited too a party by: " + username);
@@ -438,12 +441,10 @@ public class Chat {
                 } else if (BBsentials.partyConfig.isPartyLeader && message.getMessageContent().equals("!ptme") && !message.isFromSelf()) {
                     Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", username)));
                     setChatCommand("/p transfer " + username, 10);
+                } else if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
+                    Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", username));
+                    setChatCommand("/pc r " + username, 10);
                 }
-                else
-                    if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
-                        Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", username));
-                        setChatCommand("/pc r " + username, 10);
-                    }
 
             } else if (message.isMsg()) {
                 String messageContent = message.getMessageContent();

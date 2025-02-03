@@ -10,6 +10,7 @@ import de.hype.bbsentials.shared.objects.SplashData;
 import de.hype.bbsentials.shared.packets.function.RequestDynamicSplashInvitePacket;
 import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
 import de.hype.bbsentials.shared.packets.function.SplashUpdatePacket;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -81,11 +82,12 @@ public class SplashManager {
                     }
                 }
             }, 10);
+            islandType = StringEscapeUtils.escapeJson(islandType);
             tellraw = tellraw.replace("@island", islandType).replace("@hubnumber", String.valueOf(splash.hubSelectorData.hubNumber));
         }
-        tellraw = tellraw.replace("@splasher", splash.announcer);
-        tellraw = tellraw.replace("@location", splash.locationInHub.getDisplayString());
-        tellraw = tellraw.replace("@extramessage", splash.extraMessage != null ? splash.extraMessage : "");
+        tellraw = tellraw.replace("@splasher", StringEscapeUtils.escapeJson(splash.announcer));
+        tellraw = tellraw.replace("@location", StringEscapeUtils.escapeJson(splash.locationInHub.getDisplayString()));
+        tellraw = tellraw.replace("@extramessage", splash.extraMessage != null ? StringEscapeUtils.escapeJson(splash.extraMessage) : "");
         Chat.sendPrivateMessageToSelfText(Message.tellraw(tellraw));
     }
 

@@ -66,13 +66,13 @@ public class UpdateListenerManager {
                 BBsentials.executionService.execute(UpdateListenerManager::permanentCheck);
                 if (showChChest(data.chests.get(0).items)) {
                     String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-                    tellrawText = tellrawText.replace("@username", data.contactMan);
+                    tellrawText = tellrawText.replace("@username", StringEscapeUtils.escapeJson(data.contactMan));
                     tellrawText = tellrawText.replace("@item", StringEscapeUtils.escapeJson(data.chests.get(0).items.stream()
                             .map(ChChestItem::getDisplayName)
                             .toList()
                             .toString()));
-                    tellrawText = tellrawText.replace("@coords", data.chests.get(0).coords.toString());
-                    tellrawText = tellrawText.replace("@inviteCommand", StringEscapeUtils.escapeJson(data.bbcommand));
+                    tellrawText = tellrawText.replace("@coords", StringEscapeUtils.escapeJson(data.chests.get(0).coords.toString()));
+                    tellrawText = tellrawText.replace("@inviteCommand", StringEscapeUtils.escapeJson(StringEscapeUtils.escapeJson(data.bbcommand)));
                     if (!(data.extraMessage == null || data.extraMessage.isEmpty())) {
                         tellrawText = tellrawText.replace("@extramessage", " : " + StringEscapeUtils.escapeJson(data.extraMessage));
                     }

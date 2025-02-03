@@ -447,7 +447,7 @@ public class BBsentialConnection {
     public void onPartyPacket(PartyPacket packet) {
         if (BBsentials.partyConfig.allowServerPartyInvite) {
             boolean isInParty = PartyManager.isInParty();
-            if (!isInParty && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT))
+            if (!isInParty && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT || packet.type == PartyConstants.INVITE))
                 return;
             boolean leader = PartyManager.isPartyLeader();
             boolean moderator = PartyManager.isModerator();

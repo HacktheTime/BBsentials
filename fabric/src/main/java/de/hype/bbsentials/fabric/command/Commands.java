@@ -1,16 +1,12 @@
 package de.hype.bbsentials.fabric.command;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.client.APIUtils;
 import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bbsentials.client.common.config.PartyConfig;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
@@ -24,15 +20,11 @@ import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.BingoChatMessagePacket;
 import de.hype.bbsentials.shared.packets.network.BroadcastMessagePacket;
 import de.hype.bbsentials.shared.packets.network.InternalCommandPacket;
-import de.hype.bbsentials.shared.packets.network.PunishUserPacket;
 import dev.xpple.clientarguments.arguments.CBlockPosArgument;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -91,8 +83,7 @@ public class Commands implements MCCommand {
                                 if (lastIndex == -1) {
                                     suggestLastQuote = true;
                                     lastIndex = 0;
-                                }
-                                else {
+                                } else {
                                     lastIndex++;
                                     suggestLastQuote = false;
                                 }
@@ -102,8 +93,7 @@ public class Commands implements MCCommand {
                                 List<String> suggestions = items.stream().filter((item) -> item.toLowerCase().startsWith(currentItemSuggestionStart.toLowerCase())).map((newItem) -> {
                                     if (suggestLastQuote) {
                                         return "\"" + input + newItem + "\"";
-                                    }
-                                    else {
+                                    } else {
                                         return "\"" + input + newItem;
                                     }
                                 }).toList();
@@ -168,8 +158,7 @@ public class Commands implements MCCommand {
                                     Chat.sendPrivateMessageToSelfInfo("The refresh may take a couple of seconds");
                                     BBsentials.executionService.execute(() -> BBsentials.dcGameSDK.connectToDiscord());
                                     return 1;
-                                }
-                                else {
+                                } else {
                                     Chat.sendPrivateMessageToSelfError("You cant refresh something which does not exist.");
                                     return 0;
                                 }
@@ -300,28 +289,52 @@ public class Commands implements MCCommand {
             }
             if (hasSplasher) {
                 dispatcher.register(
-                        literal("splashAnnounce")
-                                .then(argument("lesswaste", BoolArgumentType.bool())
-                                        .then(argument("extramessage", StringArgumentType.greedyString())
+                        literal("splash")
+                                .then(literal("announce")
+                                        .then(argument("lesswaste", BoolArgumentType.bool())
+                                                .then(argument("extramessage", StringArgumentType.greedyString())
+                                                        .executes((context) -> {
+                                                            String extramessage = StringArgumentType.getString(context, "extramessage");
+                                                            boolean lessWaste = BoolArgumentType.getBool(context, "lesswaste");
+                                                            splashAnnounce(extramessage, lessWaste);
+                                                            return 1;
+                                                        })
+                                                )
                                                 .executes((context) -> {
-                                                    String extramessage = StringArgumentType.getString(context, "extramessage");
                                                     boolean lessWaste = BoolArgumentType.getBool(context, "lesswaste");
-                                                    splashAnnounce(extramessage, lessWaste);
+                                                    splashAnnounce(BBsentials.splashConfig.defaultExtraMessage, lessWaste);
                                                     return 1;
                                                 })
                                         )
                                         .executes((context) -> {
-                                            boolean lessWaste = BoolArgumentType.getBool(context, "lesswaste");
-                                            splashAnnounce(BBsentials.splashConfig.defaultExtraMessage, lessWaste);
-                                            return 1;
-                                        })
+                                                    splashAnnounce(BBsentials.splashConfig.defaultExtraMessage, BBsentials.splashConfig.defaultUseLessWaste);
+                                                    return 1;
+                                                }
+                                        )
                                 )
-                                .executes((context) -> {
-                                            splashAnnounce(BBsentials.splashConfig.defaultExtraMessage, BBsentials.splashConfig.defaultUseLessWaste);
-                                            return 1;
-                                        }
+                                .then(literal("announce-dynamic")
+                                        .then(argument("lesswaste", BoolArgumentType.bool())
+                                                .then(argument("extramessage", StringArgumentType.greedyString())
+                                                        .executes((context) -> {
+                                                            String extramessage = StringArgumentType.getString(context, "extramessage");
+                                                            boolean lessWaste = BoolArgumentType.getBool(context, "lesswaste");
+                                                            dynamicSplashAnnounce(extramessage, lessWaste);
+                                                            return 1;
+                                                        })
+                                                )
+                                                .executes((context) -> {
+                                                    boolean lessWaste = BoolArgumentType.getBool(context, "lesswaste");
+                                                    dynamicSplashAnnounce(BBsentials.splashConfig.defaultExtraMessage, lessWaste);
+                                                    return 1;
+                                                })
+                                        )
+                                        .executes((context) -> {
+                                                    dynamicSplashAnnounce(BBsentials.splashConfig.defaultExtraMessage, BBsentials.splashConfig.defaultUseLessWaste);
+                                                    return 1;
+                                                }
+                                        )
                                 )
-                );/*SplashAnnounce*/
+                );/*Dynamic SplashAnnounce*/
                 dispatcher.register(
                         literal("requestpottimes")
                                 .executes((context) -> {
@@ -390,7 +403,38 @@ public class Commands implements MCCommand {
         if (loc == null)
             loc = new SplashLocation(new Position(playerPos.x, playerPos.y + 1, playerPos.z), null);
         try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, loc, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste, serverid)));
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), loc, extramessage, lessWaste, serverid, new SplashData.HubSelectorData(hubNumber, EnvironmentCore.utils.getCurrentIsland()))));
+        } catch (Exception e) {
+            Chat.sendPrivateMessageToSelfError(e.getMessage());
+        }
+    }
+
+    public void dynamicSplashAnnounce(String extramessage, boolean lessWaste) {
+        PartyConfig partyConfig = BBsentials.partyConfig;
+        if (!partyConfig.allowServerPartyInvite) {
+            Chat.sendPrivateMessageToSelfError("Server Party Invite is disabled. This is required!");
+            return;
+        }
+        String serverid = EnvironmentCore.utils.getServerId();
+        if (serverid == null) {
+            Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");
+            return;
+        }
+        if (partyConfig.isInParty()) {
+            Chat.sendPrivateMessageToSelfInfo("Leaving Party as preparation for Splash.");
+            BBsentials.sender.addSendTask("/p leave");
+        }
+        Position playerPos = EnvironmentCore.utils.getPlayersPosition();
+        SplashLocation loc = null;
+        for (SplashLocation value : SplashLocations.values()) {
+            if (value.getCoords().isInRange(playerPos, 10)) {
+                loc = value.getSplashLocation();
+            }
+        }
+        if (loc == null)
+            loc = new SplashLocation(new Position(playerPos.x, playerPos.y + 1, playerPos.z), null);
+        try {
+            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), loc, extramessage, lessWaste, serverid, null)));
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
         }

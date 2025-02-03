@@ -8,7 +8,7 @@ import de.hype.bbsentials.client.common.SystemUtils;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.objects.TrustedPartyMember;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.config.PartyConfig;
+import de.hype.bbsentials.client.common.config.PartyManager;
 import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -245,10 +243,10 @@ public class Chat {
             if (message.getJson().equals("{\"text\":\"-----------------------------------------------------\",\"strikethrough\":true,\"color\":\"blue\"}")) {
                 return null;
             }
-            if (BBsentials.partyConfig.hidePartyDisconnet() && message.getMessageContent().endsWith("has disconnected, they have 5 minutes to rejoin before they are removed from the party.")) {
+            if (PartyManager.hidePartyDisconnet() && message.getMessageContent().endsWith("has disconnected, they have 5 minutes to rejoin before they are removed from the party.")) {
                 return null;
             }
-            if (BBsentials.partyConfig.hidePartyJoinOrLeave() && (message.getMessageContent().endsWith("joined the party.") || message.getMessageContent().endsWith("left the party."))) {
+            if (PartyManager.hidePartyJoinOrLeave() && (message.getMessageContent().endsWith("joined the party.") || message.getMessageContent().endsWith("left the party."))) {
                 return null;
             }
         }
@@ -303,82 +301,9 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfError("B: " + messageUnformatted);
                 }
             } else if (message.isServerMessage()) {
+                if (PartyManager.handleMessage(messageUnformatted, message.getNoRanks())) return;
                 if (messageUnformatted.startsWith("Select an option:")) {
                     setChatCommand(getFirstGreenSelectOption(message.getJson()), 10);
-                } else if (messageUnformatted.contains(".*disbanded the party")) {
-                    BBsentials.partyConfig.partyAcceptConfig.put(message.getNoRanks().split(" ")[0], new PartyConfig.AcceptPartyInvites(false, Instant.now().plus(5, ChronoUnit.MINUTES)));
-                } else if (message.contains(".*invited you to join their party")) {
-                    username = message.getNoRanks().replace("-", "").replace("\n", "").trim().split(" ")[0];
-                    PartyConfig.AcceptPartyInvites invites = BBsentials.partyConfig.partyAcceptConfig.get(username);
-                    if (invites == null) return;
-                    else if (invites.timeout().isAfter(Instant.now())) return;
-                    else if (!BBsentials.partyConfig.isInParty()) {
-                        BBsentials.sender.addSendTask("/p accept " + username);
-                    } else if (invites.leavePartyIfPresent()) {
-                        BBsentials.sender.addSendTask("/p leave");
-                        BBsentials.sender.addSendTask("/p accept " + username);
-                    }
-                    if (!EnvironmentCore.utils.isWindowFocused()) {
-                        sendNotification("BBsentials Party Notifier", "You got invited too a party by: " + username);
-                    }
-                } else if (message.startsWith("Party Members (")) {
-                    BBsentials.partyConfig.partyMembers = new ArrayList<>();
-                } else if (message.startsWith("Party Moderators:")) {
-                    String temp = messageUnformatted.replace("Party Moderators:", "").replace(" ●", "").replaceAll("\\s*\\[[^\\]]+\\]", "").trim();
-                    if (temp.contains(",")) {
-                        for (int i = 0; i < temp.split(",").length; i++) {
-                            BBsentials.partyConfig.partyMembers.add(temp.split(",")[i - 1]);
-                        }
-                    } else {
-                        BBsentials.partyConfig.partyMembers.add(temp);
-                    }
-                } else if (message.startsWith("Party Members:")) {
-                    String temp = messageUnformatted.replace("Party Members:", "").replace(" ●", "").replaceAll("\\s*\\[[^\\]]+\\]", "").trim();
-                    if (temp.contains(",")) {
-                        for (int i = 0; i < temp.split(",").length; i++) {
-                            System.out.println("Added to plist: " + (temp.split(",")[i - 1]));
-                            BBsentials.partyConfig.partyMembers.add(temp.split(",")[i - 1]);
-                        }
-                    } else {
-                        BBsentials.partyConfig.partyMembers.add(temp);
-                    }
-                } else if ((message.startsWith("Party Leader:") && !message.contains(BBsentials.generalConfig.getUsername())) || message.equals("You are not currently in a party.") || (message.contains("warped the party into a Skyblock Dungeon") && !message.startsWith(BBsentials.generalConfig.getUsername()) ||
-                        (message.startsWith("The party was transferred to ") && !message.getNoRanks().startsWith("The party was transferred to " + BBsentials.generalConfig.getUsername())))
-                        || message.endsWith(BBsentials.generalConfig.getUsername() + " is now a Party Moderator")
-                        || (message.startsWith("The party was disbanded")) || (message.startsWith("You have joined ")
-                        && message.endsWith("'s party!")) || (message.startsWith("Party Leader, ") && message.contains(" , summoned you to their server."))
-                        || (message.contains("warped to your dungeon"))) {
-                    BBsentials.partyConfig.isPartyLeader = false;
-                    if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
-                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.partyConfig.isPartyLeader);
-                    }
-//                    if (HPModAPIPacket.PARTYINFO.complete().getLeader().get().equals(BBsentials.generalConfig.getMCUUID())) {
-//                        BBsentials.partyConfig.isPartyLeader = true;
-//                    }
-                } else if (BBsentials.partyConfig.partyMembers.isEmpty() && messageUnformatted.endsWith("to the party! They have 60 seconds to accept")) {
-                    BBsentials.partyConfig.isPartyLeader = true;
-                } else if (messageUnformatted.startsWith("You'll be partying with:")) {
-                    List<String> members = new ArrayList<>();
-                    for (String users : messageUnformatted.replace("You'll be partying with:", "").replaceAll("\\[[^\\]]*\\]", "").trim().split(",")) {
-                        if (users.contains("and ")) {
-                            break;
-                        }
-                        members.add(users);
-                    }
-                    BBsentials.partyConfig.partyMembers = members;
-                } else if (((messageUnformatted.startsWith("Party Leader: ") && messageUnformatted.endsWith(BBsentials.generalConfig.getUsername() + " ●")))
-                        || (message.contains(BBsentials.generalConfig.getUsername() + " warped the party to a SkyBlock dungeon!")) ||
-                        (message.getNoRanks().startsWith("The party was transferred to " + BBsentials.generalConfig.getUsername()))
-                        || message.getNoRanks().endsWith(" has promoted " + BBsentials.generalConfig.getUsername() + " to Party Leader") ||
-                        (message.contains("warped to your dungeon"))) {
-                    ClientboundPartyInfoPacket partyPacket = HPModAPIPacket.PARTYINFO.complete();
-                    BBsentials.partyConfig.isPartyLeader = partyPacket.getLeader().get().equals(BBsentials.generalConfig.getMCUUID());
-                    if (BBsentials.developerConfig.isDetailedDevModeEnabled()) {
-                        sendPrivateMessageToSelfDebug("Leader: " + BBsentials.partyConfig.isPartyLeader);
-                    }
-//                    if (HPModAPIPacket.PARTYINFO.complete().getLeader().get().equals(BBsentials.generalConfig.getMCUUID())) {
-//                        BBsentials.partyConfig.isPartyLeader = true;
-//                    }
                 } else if (messageUnformatted.startsWith("BUFF! You splashed yourself with")) {
                     if (UpdateListenerManager.splashStatusUpdateListener != null) {
                         UpdateListenerManager.splashStatusUpdateListener.setStatus(StatusConstants.SPLASHING);
@@ -429,18 +354,10 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfFatal(Formatting.DARK_RED.toString() + Formatting.BOLD + "Don't worry its a" + Formatting.LIGHT_PURPLE + " meme" + Formatting.DARK_RED + Formatting.BOLD + " nothing happens actually. This is to troll Party and it would be irresponsible to send logs without consent.");
                     BBsentials.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
                 }
-                if ((message.getMessageContent().equals("warp") || message.getMessageContent().equals("!warp")) && BBsentials.partyConfig.isPartyLeader && !message.isFromSelf()) {
-                    if (BBsentials.partyConfig.partyMembers.size() == 1) {
-                        Chat.sendCommand("/p warp");
-                    } else if (BBsentials.partyConfig.partyMembers.size() >= 10) {
-                        //ignored because soo many players
-                    } else if (BBsentials.partyConfig.partyMembers.size() > 1) {
-                        Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a warp. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to warp the entire \",{\"text\":\"Party\",\"color\":\"gold\"},\".\"]".replace("@username", StringEscapeUtils.escapeJson(username))));
-                        setChatCommand("/p warp", 10);
-                    }
-                } else if (BBsentials.partyConfig.isPartyLeader && message.getMessageContent().equals("!ptme") && !message.isFromSelf()) {
-                    Chat.sendPrivateMessageToSelfText(Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", StringEscapeUtils.escapeJson(username))));
-                    setChatCommand("/p transfer " + username, 10);
+                if ((message.getMessageContent().equals("warp") || message.getMessageContent().equals("!warp")) && !message.isFromSelf()) {
+                    PartyManager.handleWarpRequest(username);
+                } else if (message.getMessageContent().equals("!ptme") && !message.isFromSelf()) {
+                    PartyManager.handlePartyTransferRequest(username);
                 } else if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
                     Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", StringEscapeUtils.escapeJson(username)));
                     setChatCommand("/pc r " + username, 10);

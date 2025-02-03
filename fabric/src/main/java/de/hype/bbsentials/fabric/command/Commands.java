@@ -7,6 +7,7 @@ import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBsentials;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bbsentials.client.common.config.PartyConfig;
+import de.hype.bbsentials.client.common.config.PartyManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.mclibraries.MCCommand;
 import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
@@ -410,37 +411,39 @@ public class Commands implements MCCommand {
     }
 
     public void dynamicSplashAnnounce(String extramessage, boolean lessWaste) {
-        PartyConfig partyConfig = BBsentials.partyConfig;
-        if (!partyConfig.allowServerPartyInvite) {
-            Chat.sendPrivateMessageToSelfError("Server Party Invite is disabled. This is required!");
-            return;
-        }
-        if (!BBsentials.dataStorage.isInSkyblock()) {
-            Chat.sendPrivateMessageToSelfError("You are not in Skyblock.");
-            return;
-        }
-        String serverid = EnvironmentCore.utils.getServerId();
-        if (serverid == null) {
-            Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");
-            return;
-        }
-        if (partyConfig.isInParty()) {
-            Chat.sendPrivateMessageToSelfInfo("Leaving Party as preparation for Splash.");
-            BBsentials.sender.addSendTask("/p leave");
-        }
-        Position playerPos = EnvironmentCore.utils.getPlayersPosition();
-        SplashLocation loc = null;
-        for (SplashLocation value : SplashLocations.values()) {
-            if (value.getCoords().isInRange(playerPos, 10)) {
-                loc = value.getSplashLocation();
+        BBsentials.executionService.execute(() -> {
+            PartyConfig partyConfig = BBsentials.partyConfig;
+            if (!partyConfig.allowServerPartyInvite) {
+                Chat.sendPrivateMessageToSelfError("Server Party Invite is disabled. This is required!");
+                return;
             }
-        }
-        if (loc == null)
-            loc = new SplashLocation(new Position(playerPos.x, playerPos.y + 1, playerPos.z), null);
-        try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), loc, extramessage, lessWaste, serverid, null)));
-        } catch (Exception e) {
-            Chat.sendPrivateMessageToSelfError(e.getMessage());
-        }
+            if (!BBsentials.dataStorage.isInSkyblock()) {
+                Chat.sendPrivateMessageToSelfError("You are not in Skyblock.");
+                return;
+            }
+            String serverid = EnvironmentCore.utils.getServerId();
+            if (serverid == null) {
+                Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");
+                return;
+            }
+            if (PartyManager.isInParty()) {
+                Chat.sendPrivateMessageToSelfInfo("Leaving Party as preparation for Splash.");
+                BBsentials.sender.addSendTask("/p leave");
+            }
+            Position playerPos = EnvironmentCore.utils.getPlayersPosition();
+            SplashLocation loc = null;
+            for (SplashLocation value : SplashLocations.values()) {
+                if (value.getCoords().isInRange(playerPos, 10)) {
+                    loc = value.getSplashLocation();
+                }
+            }
+            if (loc == null)
+                loc = new SplashLocation(new Position(playerPos.x, playerPos.y + 1, playerPos.z), null);
+            try {
+                sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), loc, extramessage, lessWaste, serverid, null)));
+            } catch (Exception e) {
+                Chat.sendPrivateMessageToSelfError(e.getMessage());
+            }
+        });
     }
 }

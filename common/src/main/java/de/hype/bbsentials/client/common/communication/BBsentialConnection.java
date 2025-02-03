@@ -7,7 +7,7 @@ import de.hype.bbsentials.client.common.client.SplashManager;
 import de.hype.bbsentials.client.common.client.objects.ServerSwitchTask;
 import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
 import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.hpmodapi.HPModAPIPacket;
+import de.hype.bbsentials.client.common.config.PartyManager;
 import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
 import de.hype.bbsentials.client.common.objects.ChatPrompt;
 import de.hype.bbsentials.client.common.objects.InterceptPacketInfo;
@@ -21,7 +21,6 @@ import de.hype.bbsentials.shared.packets.function.*;
 import de.hype.bbsentials.shared.packets.mining.ChChestPacket;
 import de.hype.bbsentials.shared.packets.mining.MiningEventPacket;
 import de.hype.bbsentials.shared.packets.network.*;
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import org.apache.commons.text.StringEscapeUtils;
 
 import javax.net.ssl.SSLContext;
@@ -447,20 +446,20 @@ public class BBsentialConnection {
 
     public void onPartyPacket(PartyPacket packet) {
         if (BBsentials.partyConfig.allowServerPartyInvite) {
-            ClientboundPartyInfoPacket partyInfo = HPModAPIPacket.PARTYINFO.complete();
-            if (!partyInfo.isInParty() && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT))
+            boolean isInParty = PartyManager.isInParty();
+            if (!isInParty && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT))
                 return;
-            boolean leader = partyInfo.getLeader().get().equals(BBsentials.generalConfig.getMCUUIDID());
-            boolean moderator = partyInfo.getMemberMap().get(BBsentials.generalConfig.getMCUUIDID()).getRole().equals(ClientboundPartyInfoPacket.PartyRole.MOD);
+            boolean leader = PartyManager.isPartyLeader();
+            boolean moderator = PartyManager.isModerator();
 
             if (packet.type == PartyConstants.JOIN) {
                 Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party join");
-                if (partyInfo.isInParty()) BBsentials.sender.addSendTask("/p leave");
-                BBsentials.sender.addSendTask("/p join " + packet.users.get(0));
+                if (isInParty) BBsentials.sender.addSendTask("/p leave");
+                BBsentials.sender.addSendTask("/p join " + packet.users.getFirst());
             } else if (packet.type == PartyConstants.ACCEPT) {
-                if (partyInfo.isInParty()) BBsentials.sender.addSendTask("/p leave");
+                if (isInParty) BBsentials.sender.addSendTask("/p leave");
                 Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party accept");
-                BBsentials.sender.addSendTask("/p accept " + packet.users.get(0));
+                BBsentials.sender.addSendTask("/p accept " + packet.users.getFirst());
             } else if (packet.type == PartyConstants.DISBAND) {
                 if (leader) {
                     Chat.sendPrivateMessageToSelfInfo("BBsentials Server requested party disband");
@@ -684,7 +683,7 @@ public class BBsentialConnection {
             BBsentials.partyConfig.allowBBinviteMe = true;
             ServerSwitchTask.onServerLeaveTask(() -> BBsentials.partyConfig.allowBBinviteMe = false);
         } else if (command.trim().equalsIgnoreCase("/p join " + BBsentials.generalConfig.getUsername())) {
-            if (!BBsentials.partyConfig.isPartyLeader) BBsentials.sender.addImmediateSendTask("/p leave");
+            if (!PartyManager.isInParty()) BBsentials.sender.addImmediateSendTask("/p leave");
             BBsentials.sender.addHiddenSendTask("/stream open 23", 1);
             BBsentials.sender.addHiddenSendTask("/pl", 2);
             Chat.sendPrivateMessageToSelfImportantInfo("Opened Stream Party for you since you announced chchest items");

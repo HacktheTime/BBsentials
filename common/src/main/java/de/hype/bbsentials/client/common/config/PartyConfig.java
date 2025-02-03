@@ -17,12 +17,10 @@ import static de.hype.bbsentials.client.common.client.APIUtils.getMcUUIDbyUserna
 
 
 public class PartyConfig extends BBsentialsConfig {
-    public transient List<String> partyMembers = new ArrayList<>();
     public boolean allowBBinviteMe = true;
     public List<TrustedPartyMember> trustedPartyMembers = new ArrayList<>();
     public boolean useRecommendedTrustedMembers = false;
     public boolean acceptReparty = true;
-    public transient boolean isPartyLeader = false;
     public boolean allowServerPartyInvite = true;
     public transient List<TrustedPartyMember> recommendedTrustedMembers;
     public boolean announceRemoteMsgPartyCommands = true;
@@ -80,17 +78,6 @@ public class PartyConfig extends BBsentialsConfig {
 
     }
 
-    public boolean hidePartyDisconnet() {
-        return hidePartyDisconnect < partyMembers.size() && hidePartyDisconnect > 0;
-    }
-
-    public boolean hidePartyJoinOrLeave() {
-        return hidePartyJoinAndLeave < partyMembers.size() && hidePartyJoinAndLeave > 0;
-    }
-
-    public boolean isInParty() {
-        return HPModAPIPacket.PARTYINFO.complete().isInParty();
-    }
 
     public record AcceptPartyInvites(boolean leavePartyIfPresent, Instant timeout) {
     }

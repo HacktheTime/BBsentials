@@ -3,6 +3,8 @@ package de.hype.bbsentials.client.common.hpmodapi;
 import de.hype.bbsentials.client.common.chat.Chat;
 import de.hype.bbsentials.client.common.client.BBDataStorage;
 import de.hype.bbsentials.client.common.client.BBsentials;
+import de.hype.bbsentials.client.common.config.PartyManager;
+import de.hype.bbsentials.environment.packetconfig.PacketManager;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.ClientboundHypixelPacket;
 import net.hypixel.modapi.packet.impl.VersionedPacket;
@@ -19,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static de.hype.bbsentials.client.common.client.BBsentials.developerConfig;
-import static de.hype.bbsentials.client.common.client.BBsentials.generalConfig;
 
 public class HypixelModAPICore {
     private Map<HPModAPIPacketEnum, List<HPModPacketAssociation>> waiting = new HashMap<>();
@@ -57,17 +58,13 @@ public class HypixelModAPICore {
 
     public void onHelloEvent(ClientboundHelloPacket packet) {
         handlePacketDebug(packet);
-        BBsentials.dataStorage= new BBDataStorage(packet);
+        BBsentials.dataStorage = new BBDataStorage(packet);
     }
 
     public void onPartyInfoPacket(ClientboundPartyInfoPacket packet) {
         handlePacketDebug(packet);
         completeGoal(packet, HPModAPIPacket.PARTYINFO.getType());
-        if (packet.isInParty()) {
-            if (packet.getLeader().get().toString().equals(generalConfig.getMCUUID())) {
-                BBsentials.partyConfig.isPartyLeader = true;
-            }
-        }
+        PartyManager.leechData(packet);
     }
 
 

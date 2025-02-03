@@ -415,6 +415,10 @@ public class Commands implements MCCommand {
             Chat.sendPrivateMessageToSelfError("Server Party Invite is disabled. This is required!");
             return;
         }
+        if (!BBsentials.dataStorage.isInSkyblock()) {
+            Chat.sendPrivateMessageToSelfError("You are not in Skyblock.");
+            return;
+        }
         String serverid = EnvironmentCore.utils.getServerId();
         if (serverid == null) {
             Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");

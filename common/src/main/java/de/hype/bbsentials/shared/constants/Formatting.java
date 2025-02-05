@@ -32,12 +32,26 @@ public enum Formatting {
         this.discordFormattingCode = discordFormattingCode;
     }
 
+    public static String covertToDiscordAnsi(String goalString) {
+        for (Formatting formatting : Formatting.values()) {
+            goalString = goalString.replaceAll(formatting.code, formatting.discordFormattingCode);
+        }
+        return goalString;
+    }
+
     @Override
     public String toString() {
         return code;
     }
 
     public String getDiscordFormattingCode() {
+        return discordFormattingCode;
+    }
+
+    /**
+     * short for discordFormattingCode
+     */
+    public String dc() {
         return discordFormattingCode;
     }
 

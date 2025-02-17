@@ -2,6 +2,8 @@ package de.hype.bbsentials.shared;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Locale;
 
 public class FormattingUtils {
@@ -92,6 +94,22 @@ public class FormattingUtils {
         }
 
         return number + suffix;
+    }
+
+    public static String formatTime(Instant time) {
+        Duration duration = Duration.between(Instant.now(), time);
+        long seconds = duration.getSeconds();
+        String prefix = seconds < 0 ? "in %s" : "%s ago";
+        int days = (int) (seconds / 86400);
+        int hours = (int) ((seconds % 86400) / 3600);
+        int minutes = (int) ((seconds % 3600) / 60);
+        int secs = (int) (seconds % 60);
+        StringBuilder sb = new StringBuilder();
+        if (days != 0) sb.append(days).append("d ");
+        if (hours != 0) sb.append(hours).append("h ");
+        if (minutes != 0) sb.append(minutes).append("m ");
+        if (secs != 0) sb.append(secs).append("s");
+        return String.format(prefix, sb.toString());
     }
 
     public static String formatAmount(Long amount) {

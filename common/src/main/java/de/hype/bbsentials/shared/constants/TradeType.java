@@ -56,4 +56,8 @@ public enum TradeType {
     public int getMinimumTradePartners() {
         return 2;
     }
+
+    public String getName() {
+        return name;
+    }
 }

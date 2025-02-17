@@ -6,13 +6,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 public class ComGoalPositionExtendedData {
-    public final Instant fromTime = Instant.now();
+    public final Instant fromTime;
     public final String mcuuid;
     public final PositionCommunityFeedback.ComGoalPosition position;
 
-    public ComGoalPositionExtendedData(PositionCommunityFeedback.ComGoalPosition data, String mcuuid) {
+    public ComGoalPositionExtendedData(PositionCommunityFeedback.ComGoalPosition data, String mcuuid, Instant time) {
         this.mcuuid = mcuuid;
         position = data;
+        fromTime = time;
     }
 
     public Instant getReferenceTime() {

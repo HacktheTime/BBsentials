@@ -22,6 +22,7 @@ public class TradeTypeEnvironmentRegistry {
     public static final TradeTypeEnvironmentRegistry GIFTS = new TradeTypeEnvironmentRegistry();
     public static final TradeTypeEnvironmentRegistry CARRY_INK_SACKS = new TradeTypeEnvironmentRegistry();
     public static final TradeTypeEnvironmentRegistry CRIMSON_ISLE_MAGE_FACTION = new TradeTypeEnvironmentRegistry();
+    public static final TradeTypeEnvironmentRegistry CHUM_BUCKET = new TradeTypeEnvironmentRegistry();
 
     TradeTypeEnvironmentRegistry() {
     }

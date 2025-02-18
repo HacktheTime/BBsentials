@@ -7,6 +7,7 @@ import java.util.function.IntUnaryOperator;
 public enum TradeType {
     ENCHANT_ITEMS("Item Enchanting", "Trading Grands to enchant Items.", "Have at least 2 Stacks of Grands available.", 1, TradeTypeEnvironmentRegistry.ENCHANT_ITEMS),
     DAILY_MAX_ENCHANTING("Daily Enchanting XP", "Splashing Grands to get 500k Enchanting XP.", "Have Enchanting XP Boost 3 Potion effect (on Bingo) and at least 6 Stacks of Grands available (on Carry profile)", 1, TradeTypeEnvironmentRegistry.DAILY_MAX_ENCHANTING),
+    CHUM_BUCKET("Fill Chum Buckets", "Carrier fills your Chum Buckets.", "Have at least 3 Stacks of Chum available to you.", 2, TradeTypeEnvironmentRegistry.CHUM_BUCKET),
     OPEN_VIKING("Open Viking", "Open Viking to obtain Raiders Axe", "Have at Magical Water Bucket, Fish Hat and 1 Raw Fish available.", -1, TradeTypeEnvironmentRegistry.OPEN_VIKING),
     KABOOM_ASSISTANCE("Kaboom Assistance", "Support for Kaboom Community Goal. Carrier Tanks for you.", "Survive Mini Bosses easily.", 1, TradeTypeEnvironmentRegistry.KABOOM_ASSISTANCE),
     AUTO_SLAYER_UNLOCK("Auto Slayer Unlock", "Carrier kills the Bosses for you. Warning Level 6 Slayers takes multiple Hours!", "Kill Zombie and Tara in under 30 Seconds and Wolf in under 90 Seconds", 2, TradeTypeEnvironmentRegistry.AUTO_SLAYER_UNLOCK),
@@ -25,8 +26,8 @@ public enum TradeType {
     MINING_COMMISSIONS("Mining Commissions", "Carrier helps you by mining out tita.", "Titanium Insanium 25+, 2000+ Mining Speed", h -> 3, TradeTypeEnvironmentRegistry.MINING_COMMISSIONS),
     SLAYER_TIER_4("Slayer Level 4 Goal", "Help for Slayer Level 4 Goal. Done with either Zombie or Spider Tier 4s.", "Be able to kill Zombie and Spider Tier 4s in 30 seconds or less.", 2, TradeTypeEnvironmentRegistry.SLAYER_TIER_4), //For Any Slayer Level 4
     SLAYER_TIER_5("Slayer Level 5 Goal", "Help for Slayer Level 5 Goal. Done with either Zombie or Spider Tier 4s.", "Be able to kill Zombie and Spider Tier 4s in 15 seconds or less.", 2, TradeTypeEnvironmentRegistry.SLAYER_TIER_5), //For Any Slayer Level 5
-    SPAWN_SCATHA("Spawn Scatha", "Carrier Spawns Worms / Scatha's for you.", "Instamine Hardstone and have Mole 90+", 1, TradeTypeEnvironmentRegistry.SPAWN_SCATHA);
-
+    SPAWN_SCATHA("Spawn Scatha", "Carrier Spawns Worms / Scatha's for you.", "Instamine Hardstone and have Mole 90+", 1, TradeTypeEnvironmentRegistry.SPAWN_SCATHA),
+    ;
     public final TradeTypeEnvironmentRegistry registry;
     public final String requirements;
     public final String name;

@@ -58,67 +58,66 @@ public class NumPadCodes {
         KeyBinding clear = new KeyBinding("Clear", GLFW.GLFW_KEY_KP_ADD, "bbsentials.numpad");
         KeyBinding remove = new KeyBinding("Remove", GLFW.GLFW_KEY_KP_DECIMAL, "bbsentials.numpad");
         Thread t = new Thread(() -> {
-            while (true) {
-                for (int i = 0; i < numpadKeybindings.length; i++) {
-                    if (numpadKeybindings[i].isPressed() && keyReleased[i]) {
-                        enteredCode = enteredCode + i;
-                        keyReleased[i] = false; // Mark key as not released
-                        lastKeyPressTime = System.currentTimeMillis();
-                        break;
-                    }
-                    else if (!numpadKeybindings[i].isPressed()) {
-                        keyReleased[i] = true; // Mark key as released
-                    }
-                }
-                if (enterKey.isPressed() && keyReleased[10]) {
-                    executeCode();
-                    keyReleased[10] = false;
-                }
-                else if (!enterKey.isPressed()) {
-                    keyReleased[10] = true;
-                }
-                if (clear.isPressed() && keyReleased[11]) {
-                    resetCode();
-                    keyReleased[11] = false;
-                }
-                else if (!clear.isPressed()) {
-                    keyReleased[11] = true;
-                }
-                if (remove.isPressed() && keyReleased[12]) {
-                    if (!enteredCode.isEmpty()) {
-                        enteredCode = enteredCode.substring(0, enteredCode.length() - 1);
-                        keyReleased[12] = false;
-                    }
-                }
-                else if (!remove.isPressed()) {
-                    keyReleased[12] = true;
-                }
-                // Reset key cooldowns after 5 seconds
-                if (System.currentTimeMillis() - lastKeyPressTime >= 5000) {
-                    resetCode();
-                }
-                if (!enteredCode.isEmpty()) {
-                    String actionbarText = getColorCode() + enteredCode;
-                    if (enterPresses > 0) {
-                        int count = getMorePressesNeeded();
-                        if (count != 0) {
-                            actionbarText = Formatting.GOLD + enteredCode + " (" + count + ")";
+            try {
+                while (true) {
+                    for (int i = 0; i < numpadKeybindings.length; i++) {
+                        if (numpadKeybindings[i].isPressed() && keyReleased[i]) {
+                            enteredCode = enteredCode + i;
+                            keyReleased[i] = false; // Mark key as not released
+                            lastKeyPressTime = System.currentTimeMillis();
+                            break;
+                        } else if (!numpadKeybindings[i].isPressed()) {
+                            keyReleased[i] = true; // Mark key as released
                         }
                     }
-                    BBsentials.funConfig.overwriteActionBar = actionbarText;
-                    overidedActionBar = true;
-                    EnvironmentCore.chat.showActionBar(Message.of(actionbarText));
-                }
-                else if (overidedActionBar) {
-                    BBsentials.funConfig.overwriteActionBar = "";
-                    overidedActionBar = false;
-                    EnvironmentCore.chat.showActionBar(Message.of(""));
-                }
+                    if (enterKey.isPressed() && keyReleased[10]) {
+                        executeCode();
+                        keyReleased[10] = false;
+                    } else if (!enterKey.isPressed()) {
+                        keyReleased[10] = true;
+                    }
+                    if (clear.isPressed() && keyReleased[11]) {
+                        resetCode();
+                        keyReleased[11] = false;
+                    } else if (!clear.isPressed()) {
+                        keyReleased[11] = true;
+                    }
+                    if (remove.isPressed() && keyReleased[12]) {
+                        if (!enteredCode.isEmpty()) {
+                            enteredCode = enteredCode.substring(0, enteredCode.length() - 1);
+                            keyReleased[12] = false;
+                        }
+                    } else if (!remove.isPressed()) {
+                        keyReleased[12] = true;
+                    }
+                    // Reset key cooldowns after 5 seconds
+                    if (System.currentTimeMillis() - lastKeyPressTime >= 5000) {
+                        resetCode();
+                    }
+                    if (!enteredCode.isEmpty()) {
+                        String actionbarText = getColorCode() + enteredCode;
+                        if (enterPresses > 0) {
+                            int count = getMorePressesNeeded();
+                            if (count != 0) {
+                                actionbarText = Formatting.GOLD + enteredCode + " (" + count + ")";
+                            }
+                        }
+                        BBsentials.funConfig.overwriteActionBar = actionbarText;
+                        overidedActionBar = true;
+                        EnvironmentCore.chat.showActionBar(Message.of(actionbarText));
+                    } else if (overidedActionBar) {
+                        BBsentials.funConfig.overwriteActionBar = "";
+                        overidedActionBar = false;
+                        EnvironmentCore.chat.showActionBar(Message.of(""));
+                    }
 
-                try {
-                    Thread.sleep(50);
-                } catch (Exception ignored) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (Exception ignored) {
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         t.start();

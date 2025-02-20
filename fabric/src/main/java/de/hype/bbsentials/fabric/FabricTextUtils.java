@@ -7,12 +7,15 @@ import net.minecraft.world.World;
 
 public class FabricTextUtils implements TextUtils {
     public static String textToJson(Text text) {
+        if (text == null) return null;
         World world = MinecraftClient.getInstance().world;
         if (world == null) return null;
         return Text.Serialization.toJsonString(text, world.getRegistryManager());
     }
 
     public static Text jsonToText(String textJson) {
+        if (textJson == null) return null;
+        if (textJson.isEmpty()) return Text.literal("");
         World world = MinecraftClient.getInstance().world;
         if (world == null) return null;
         return Text.Serialization.fromJson(textJson, world.getRegistryManager());
@@ -22,18 +25,14 @@ public class FabricTextUtils implements TextUtils {
      * The opposite method serializes or deserializes automatically dependent on the input
      */
     public static String opposite(Text text) {
-        World world = MinecraftClient.getInstance().world;
-        if (world == null) return null;
-        return Text.Serialization.toJsonString(text, world.getRegistryManager());
+        return textToJson(text);
     }
 
     /**
      * The opposite method serializes or deserializes automatically dependent on the input
      */
     public static Text opposite(String textJson) {
-        World world= MinecraftClient.getInstance().world;
-        if (world==null) return null;
-        return Text.Serialization.fromJson(textJson, world.getRegistryManager());
+        return jsonToText(textJson);
     }
 
     public static String literalJson(String literal) {
@@ -47,8 +46,8 @@ public class FabricTextUtils implements TextUtils {
 
     @Override
     public String getContentFromJson(String json) {
-        World world= MinecraftClient.getInstance().world;
-        if (world==null) return null;
+        World world = MinecraftClient.getInstance().world;
+        if (world == null) return null;
         return Text.Serialization.fromJson(json, world.getRegistryManager()).getString();
     }
 

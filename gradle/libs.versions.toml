@@ -31,7 +31,7 @@ gson = { module = "com.google.code.gson:gson", version = "latest.release" }
 lwjglGlfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjglModern" }
 discordJDA = { module = "net.dv8tion:JDA", version = "latest.release" }
 git = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "latest.release" }
-discordGameSDK = { module = "com.github.JnCrMx:discord-game-sdk4j", version = "latest.release" }
+discordGameSDK = { module = "com.github.JnCrMx:discord-game-sdk4j", version = "v0.5.5" }
 legacy_mcp = { module = "de.oceanlabs.mcp:mcp_stable", version.ref = "legacy_mcp" }
 legacy_minecraft = { module = "com.mojang:minecraft", version.ref = "legacy_minecraft" }
 legacy_forge = { module = "net.minecraftforge:forge", version.ref = "legacy_forge" }

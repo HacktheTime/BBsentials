@@ -460,7 +460,7 @@ public class BBsentialsConfigScreenFactory {
                 discordIntegration.addEntry(entryBuilder.startStrField(Text.of("DC Bot Token"), BBsentials.discordConfig.botToken)
                         .setDefaultValue("")
                         .requireRestart()
-                        .setTooltip(Text.of("The Token of your Discord Bot. You can get your own by creating a discord bot here: https://discord.com/developers/applications"))
+                        .setTooltip(Text.of("§4§lDO NOT ENTER SOMEONE ELSES TOKEN HERE! THE PERMISSION CHECK WE HAVE CHECK IF THE USER IS THE BOT OWNER!§rThe Token of your Discord Bot. You can get your own by creating a discord bot here: https://discord.com/developers/applications"))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.botToken = newValue)
                         .build());
                 discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Always silent"), BBsentials.discordConfig.alwaysSilent)
@@ -477,12 +477,6 @@ public class BBsentialsConfigScreenFactory {
                         .setDefaultValue(true)
                         .setTooltip(Text.of("Whether you want messages to be sent over to your discord as well."))
                         .setSaveConsumer(newValue -> BBsentials.discordConfig.useBridgeBot = newValue)
-                        .build());
-                discordIntegration.addEntry(entryBuilder.startLongField(Text.of("Bot Owner User ID"), Long.parseLong(BBsentials.discordConfig.botOwnerUserId))
-                        .setDefaultValue(-1)
-                        .requireRestart()
-                        .setTooltip(Text.of("The UserId of your discord account"))
-                        .setSaveConsumer(newValue -> BBsentials.discordConfig.botOwnerUserId = String.valueOf(newValue))
                         .build());
                 discordIntegration.addEntry(entryBuilder.startBooleanToggle(Text.of("Purge History on Restart"), BBsentials.discordConfig.deleteHistoryOnStart)
                         .setDefaultValue(true)

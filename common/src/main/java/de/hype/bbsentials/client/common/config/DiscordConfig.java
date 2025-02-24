@@ -11,7 +11,6 @@ public class DiscordConfig extends BBsentialsConfig {
     public boolean doStartupMessage = true;
     public boolean sdkMainToggle = false;
     public boolean useRichPresence = false;
-    public String botOwnerUserId = "-1";
     public boolean sendLobbyUpdateInfo = true;
     /**
      * disableTemporary can be modified by the Bot via a command so you dont get annoyed by its messages but can enable it from remote if you want so.

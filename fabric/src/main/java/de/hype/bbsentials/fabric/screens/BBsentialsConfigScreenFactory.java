@@ -175,7 +175,6 @@ public class BBsentialsConfigScreenFactory {
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Select if you want BBsentials to enable full bright"))
                     .setSaveConsumer(newValue -> BBsentials.visualConfig.doGammaOverride = newValue)
-                    .requireRestart()
                     .build());
             visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Chat"), BBsentials.visualConfig.showBingoChat)
                     .setDefaultValue(true)

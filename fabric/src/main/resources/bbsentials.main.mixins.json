@@ -12,6 +12,7 @@
     "ChestMixin",
     "ClientCommandSourceMixin",
     "CommandNodeAccessMixin",
+    "FulbrightMixin",
     "IncomingPacketListenerPatches",
     "InventoryKeyBinds",
     "LiteralCommandNodeMixin",

@@ -673,7 +673,7 @@ public class ModInitialiser implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         System.out.println("BBsentials : onInit called");
-        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new Options(), new DebugThread(), new FabricTextUtils(), new FabricWorldUtils());
+        EnvironmentCore core = EnvironmentCore.fabric(new Utils(), new MCEvents(), new FabricChat(), new Commands(), new DebugThread(), new FabricTextUtils(), new FabricWorldUtils());
         codes = new NumPadCodes();
         BBsentials.init();
         tutorialManager = new TutorialManager();
@@ -713,9 +713,6 @@ public class ModInitialiser implements ClientModInitializer {
             BBsentials.onServerLeave();
         });
         ServerSwitchTask.onServerJoinTask(() -> {
-            if (visualConfig.doGammaOverride) {
-                new Options().setGamma(10);
-            }
             if (EnvironmentCore.utils.getUsername().toLowerCase().equals("p0is")) {
                 funConfig.hub17To29Troll = true;
             }

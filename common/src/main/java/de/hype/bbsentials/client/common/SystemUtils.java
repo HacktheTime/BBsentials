@@ -22,22 +22,28 @@ public class SystemUtils {
     }
 
     public static void openInBrowser(String url) {
-        //For Security
-        if (url.contains("&") || url.contains("|")) return;
-        Runtime rt = Runtime.getRuntime();
-        if (getSystem() == SystemType.WINDOOF) {
-            try {
-                rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
-            } catch (IOException e) {
-                Chat.sendPrivateMessageToSelfError("Error trying to open %s in Browser".formatted(url));
-            }
+        // More comprehensive URL validation
+        if (!url.matches("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+            Chat.sendPrivateMessageToSelfError("Invalid URL format: " + url);
+            return;
         }
-        else
-            try {
-                rt.exec("open " + url);
-            } catch (IOException e) {
-                Chat.sendPrivateMessageToSelfError("Error trying to open %s in Browser".formatted(url));
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            SystemType system = getSystem();
+
+            if (system == SystemType.WINDOOF) {
+                processBuilder.command("rundll32", "url.dll,FileProtocolHandler", url);
+            } else if (system == SystemType.VERAEPPELT) {
+                processBuilder.command("open", url);
+            } else {
+                processBuilder.command("xdg-open", url);
             }
+
+            processBuilder.start();
+        } catch (IOException e) {
+            Chat.sendPrivateMessageToSelfError("Error trying to open %s in Browser".formatted(url));
+        }
     }
 
     public enum SystemType {
@@ -53,7 +59,7 @@ public class SystemUtils {
     }
 
 
-    public static void setClipboardContent(String text){
+    public static void setClipboardContent(String text) {
         Process process;
         try {
             switch (getSystem()) {
@@ -71,8 +77,8 @@ public class SystemUtils {
                 writer.write(text);
                 writer.flush();
             }
-        }catch (Exception ignored){
-            Chat.sendPrivateMessageToSelfError("Error Occur trying to copy the following Text into the clipboard: \n"+ text);
+        } catch (Exception ignored) {
+            Chat.sendPrivateMessageToSelfError("Error Occur trying to copy the following Text into the clipboard: \n" + text);
         }
 
     }

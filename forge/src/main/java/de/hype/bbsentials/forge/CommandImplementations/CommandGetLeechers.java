@@ -1,10 +1,10 @@
-package de.hype.bbsentials.forge.CommandImplementations;
+package de.hype.bingonet.forge.CommandImplementations;
 
-import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.updatelisteners.SplashStatusUpdateListener;
-import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
+import de.hype.bingonet.client.common.chat.Chat;
+import de.hype.bingonet.client.common.client.BingoNet;
+import de.hype.bingonet.client.common.client.updatelisteners.SplashStatusUpdateListener;
+import de.hype.bingonet.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bingonet.client.common.mclibraries.EnvironmentCore;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 
@@ -26,7 +26,7 @@ public class CommandGetLeechers extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         UpdateListenerManager.splashStatusUpdateListener.showOverlay = true;
         Chat.sendPrivateMessageToSelfDebug("Leechers: " + String.join(", ", EnvironmentCore.utils.getSplashLeechingPlayers()));
-        BBsentials.executionService.schedule(() -> UpdateListenerManager.splashStatusUpdateListener.showOverlay = false, 2, TimeUnit.MINUTES);
+        BingoNet.executionService.schedule(() -> UpdateListenerManager.splashStatusUpdateListener.showOverlay = false, 2, TimeUnit.MINUTES);
     }
 
     @Override

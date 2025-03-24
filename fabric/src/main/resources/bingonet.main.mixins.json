@@ -1,0 +1,31 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "de.hype.bingonet.fabric.mixins.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "BingoNetCommandSource",
+    "ChatHudMixin",
+    "ChestLidMixin",
+    "ChestMixin",
+    "ClientCommandSourceMixin",
+    "CommandNodeAccessMixin",
+    "FulbrightMixin",
+    "IncomingPacketListenerPatches",
+    "InventoryKeyBinds",
+    "LiteralCommandNodeMixin",
+    "MinecraftWindowTitleMixin",
+    "RootCommandNodeAccessMixin",
+    "ScreenHandlerMixin",
+    "SimpleOptionMixin",
+    "WorldRenderLastEventPatch",
+    "itemmixins.CustomItemData",
+    "itemmixins.CustomItemTooltip",
+    "itemmixins.ModifyCountAndTextureMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

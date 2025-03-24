@@ -1,6 +1,6 @@
-package de.hype.bbsentials.forge.CommandImplementations;
+package de.hype.bingonet.forge.CommandImplementations;
 
-import de.hype.bbsentials.client.common.chat.Chat;
+import de.hype.bingonet.client.common.chat.Chat;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 

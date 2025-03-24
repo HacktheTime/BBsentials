@@ -1,10 +1,10 @@
-package de.hype.bbsentials.forge;
+package de.hype.bingonet.forge;
 
-import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.mclibraries.Utils;
-import de.hype.bbsentials.shared.constants.Islands;
-import de.hype.bbsentials.shared.objects.Position;
+import de.hype.bingonet.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bingonet.client.common.mclibraries.EnvironmentCore;
+import de.hype.bingonet.client.common.mclibraries.Utils;
+import de.hype.bingonet.shared.constants.Islands;
+import de.hype.bingonet.shared.objects.Position;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
@@ -13,7 +13,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class MCEvents implements de.hype.bbsentials.client.common.mclibraries.MCEvents {
+public class MCEvents implements de.hype.bingonet.client.common.mclibraries.MCEvents {
     static Utils utils;
 
     @Override

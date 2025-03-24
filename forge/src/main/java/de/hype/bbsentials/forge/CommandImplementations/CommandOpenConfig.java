@@ -1,4 +1,4 @@
-package de.hype.bbsentials.forge.CommandImplementations;
+package de.hype.bingonet.forge.CommandImplementations;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;

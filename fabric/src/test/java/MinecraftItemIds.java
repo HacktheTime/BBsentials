@@ -1,4 +1,4 @@
-import de.hype.bbsentials.client.common.SystemUtils;
+import de.hype.bingonet.client.common.SystemUtils;
 import net.minecraft.item.Items;
 
 import java.lang.reflect.Field;
@@ -18,7 +18,7 @@ public class MinecraftItemIds {
         String enums = set.stream().sorted().map(v -> "    " + v.toString()).collect(Collectors.joining(",\n")) + ";";
 
         String fullClass = """
-                package de.hype.bbsentials.shared.constants;
+                package de.hype.bingonet.shared.constants;
                 \s
                 public enum VanillaItems {
                 %s

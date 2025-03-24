@@ -1,11 +1,11 @@
 [
   {
-    "modid": "bbsentials",
-    "name": "BBsentials",
+    "modid": "bingonet",
+    "name": "BingoNet",
     "description": "Bingo QOL Mod",
     "version": "${mod_version}",
     "mcversion": "1.8.9",
-    "url": "https://github.com/HacktheTime/BBsentials",
+    "url": "https://github.com/HacktheTime/BingoNet",
     "updateUrl": "",
     "authorList": [
       "Hype_the_Time/hackthetime",

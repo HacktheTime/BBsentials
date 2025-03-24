@@ -1,11 +1,11 @@
-package de.hype.bbsentials.forge;
+package de.hype.bingonet.forge;
 
 import net.minecraft.client.Minecraft;
 
 import java.util.Collections;
 import java.util.List;
 
-public class DebugThread extends de.hype.bbsentials.client.common.client.DebugThread {
+public class DebugThread extends de.hype.bingonet.client.common.client.DebugThread {
     public void unlockCursor() {
         Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
     }

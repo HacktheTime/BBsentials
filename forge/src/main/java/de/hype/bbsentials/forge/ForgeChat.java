@@ -1,8 +1,8 @@
-package de.hype.bbsentials.forge;
+package de.hype.bingonet.forge;
 
-import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.chat.Message;
-import de.hype.bbsentials.client.common.mclibraries.MCChat;
+import de.hype.bingonet.client.common.chat.Chat;
+import de.hype.bingonet.client.common.chat.Message;
+import de.hype.bingonet.client.common.mclibraries.MCChat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.IChatComponent;

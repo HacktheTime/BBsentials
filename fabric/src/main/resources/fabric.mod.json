@@ -1,28 +1,28 @@
 {
   "schemaVersion": 1,
-  "id": "bbsentials",
+  "id": "bingonet",
   "version": "${mod_version}",
-  "name": "BBsentials",
+  "name": "BingoNet",
   "icon": "logo.png",
-  "description": "Mod to connect to the BBsentials Network for Splashes and more",
+  "description": "Mod to connect to the Bingo Net Network for Splashes and more",
   "authors": [
     "Hype_the_Time/hackthetime"
   ],
   "contributors": ["hannibal2","nea89"],
   "contact": {
     "homepage": "https://hackthetime.de",
-    "issues": "https://github.com/HacktheTime/BBsentials1.20/issues",
+    "issues": "https://github.com/HacktheTime/BingoNet1.20/issues",
     "email": "s0844x76@duck.com",
-    "sources": "https://github.com/HacktheTime/BBsentials1.20"
+    "sources": "https://github.com/HacktheTime/BingoNet1.20"
   },
   "license": "Look on Github (Sources). a Modified \"CC BY-NC-ND 4.0\" License",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "de.hype.bbsentials.fabric.ModInitialiser"
+      "de.hype.bingonet.fabric.ModInitialiser"
     ],
     "modmenu": [
-      "de.hype.bbsentials.fabric.screens.ModMenueScreen"
+      "de.hype.bingonet.fabric.screens.ModMenueScreen"
     ]
   },
   "depends": {
@@ -32,13 +32,13 @@
     "minecraft": "${minecraft_versionsSupported}"
   },
   "mixins": [
-    "bbsentials.main.mixins.json",
-    "bbsentials.errorpatches.mixins.json"
+    "bingonet.main.mixins.json",
+    "bingonet.errorpatches.mixins.json"
   ],
   "custom": {
     "modmenu": {
       "links": {
-        "License": "https://github.com/HacktheTime/BBsentials1.20/blob/master/LICENSE",
+        "License": "https://github.com/HacktheTime/BingoNet/blob/master/LICENSE",
         "modmenu.discord": "discord.gg/qr5mPRq8uG",
         "Website": "https://hackthetime.de"
       },

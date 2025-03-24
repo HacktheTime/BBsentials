@@ -21,15 +21,15 @@
 //            property("mixin.debug", "true")
 //            arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
 //            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-//            arg("--mixin", "mixins.bbsentials.json")
+//            arg("--mixin", "mixins.bingonet.json")
 //        }
 //    }
 //    forge {
 //        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-//        mixinConfig("mixins.bbsentials.json")
+//        mixinConfig("mixins.bingonet.json")
 //    }
 //    mixin {
-//        defaultRefmapName.set("mixins.bbsentials.refmap.json")
+//        defaultRefmapName.set("mixins.bingonet.refmap.json")
 //    }
 //}
 //
@@ -47,7 +47,7 @@
 //                listOf(
 //                    "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker",
 //                    "--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker",
-//                    "--mixin", "mixins.bbsentials.json",
+//                    "--mixin", "mixins.bingonet.json",
 //                )
 //            )
 //        }
@@ -87,7 +87,7 @@
 //        this["FMLCorePluginContainsFMLMod"] = "true"
 //        this["ForceLoadAsMod"] = "true"
 //        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
-//        this["MixinConfigs"] = "mixins.bbsentials.json"
+//        this["MixinConfigs"] = "mixins.bingonet.json"
 //    }
 //}
 //
@@ -97,7 +97,7 @@
 //    //inputs.property("mod_version", libs.versions.modVersion)
 //    inputs.property("mod_version", libs.versions.version)
 //
-//    filesMatching(listOf("mcmod.info", "mixins.bbsentials.json")) {
+//    filesMatching(listOf("mcmod.info", "mixins.bingonet.json")) {
 //        expand(inputs.properties)
 //    }
 //
@@ -128,9 +128,9 @@
 //    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 //    archiveClassifier.set("all-dev")
 //    configurations = listOf(shadowImpl, shadowModImpl)
-//    relocate("io.github.moulberry.moulconfig", "de.hype.bbsentials.deps.moulconfig")
-//    relocate("net.dv8tion", "de.hype.bbsentials.deps.dcJDA")
-//    relocate("net.hypixel", "de.hype.bbsentials.deps.net.hypixel")
+//    relocate("io.github.moulberry.moulconfig", "de.hype.bingonet.deps.moulconfig")
+//    relocate("net.dv8tion", "de.hype.bingonet.deps.dcJDA")
+//    relocate("net.hypixel", "de.hype.bingonet.deps.net.hypixel")
 //
 //}
 //tasks.assemble.get().dependsOn(remapJar)

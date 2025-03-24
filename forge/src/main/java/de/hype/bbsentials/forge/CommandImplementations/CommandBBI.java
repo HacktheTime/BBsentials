@@ -1,13 +1,13 @@
-package de.hype.bbsentials.forge.CommandImplementations;
+package de.hype.bingonet.forge.CommandImplementations;
 
-import de.hype.bbsentials.client.common.config.ConfigManager;
+import de.hype.bingonet.client.common.config.ConfigManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-import static de.hype.bbsentials.client.common.client.BBsentials.connectToBBserver;
+import static de.hype.bingonet.client.common.client.BingoNet.connectToBBserver;
 
 
 

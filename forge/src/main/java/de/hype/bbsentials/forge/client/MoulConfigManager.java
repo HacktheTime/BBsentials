@@ -1,4 +1,4 @@
-package de.hype.bbsentials.forge.client;
+package de.hype.bingonet.forge.client;
 
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper;
 import io.github.moulberry.moulconfig.gui.MoulConfigEditor;

@@ -1,9 +1,9 @@
-package de.hype.bbsentials.forge;
+package de.hype.bingonet.forge;
 
-import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.mclibraries.TextUtils;
-import de.hype.bbsentials.forge.client.MoulConfig;
+import de.hype.bingonet.client.common.client.BingoNet;
+import de.hype.bingonet.client.common.mclibraries.EnvironmentCore;
+import de.hype.bingonet.client.common.mclibraries.TextUtils;
+import de.hype.bingonet.forge.client.MoulConfig;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -11,10 +11,10 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
-@Mod(modid = "bbsentials", useMetadata = true)
+@Mod(modid = "bingonet", useMetadata = true)
 public class ForgeMod {
     static boolean alreadyInialised = false;
-    static BBsentials sentials;
+    static Bingo Net sentials;
     public static MoulConfig config = new MoulConfig();
 
     @Mod.EventHandler
@@ -32,8 +32,8 @@ public class ForgeMod {
             }
         });
         MinecraftForge.EVENT_BUS.register(this);
-        sentials = new BBsentials();
-        BBsentials.init();
+        sentials = new BingoNet();
+        BingoNet.init();
     }
     public void printLocation() {
 //        try {
@@ -53,7 +53,7 @@ public class ForgeMod {
     }
     @SubscribeEvent
     public void onClientConnected(PlayerEvent.PlayerRespawnEvent event) {
-        BBsentials.onServerJoin();
+        BingoNet.onServerJoin();
     }
 
 }

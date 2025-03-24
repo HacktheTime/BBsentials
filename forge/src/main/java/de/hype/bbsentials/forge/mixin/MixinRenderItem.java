@@ -1,4 +1,4 @@
-package de.hype.bbsentials.forge.mixin;
+package de.hype.bingonet.forge.mixin;
 
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
@@ -28,7 +28,7 @@ public abstract class MixinRenderItem {
 //    @Inject(method = "renderItemIntoGUI", at = @At("HEAD"), cancellable = true)
 //    private void overrideItemTextureForHubs(ItemStack stack, int x, int y, CallbackInfo ci) {
 //        try {
-//            for (CustomItemTexture itemTexture : BBsentials.customItemTextures.values()) {
+//            for (CustomItemTexture itemTexture : BingoNet.customItemTextures.values()) {
 //                if (itemTexture.isItem(stack.getDisplayName(), stack.getTagCompound().toString())) {
 //                    textureManager.bindTexture(new ResourceLocation(itemTexture.nameSpace, "textures/gui/sprites/" + itemTexture.renderTextureId + ".png"));
 //                    Gui.drawModalRectWithCustomSizedTexture(

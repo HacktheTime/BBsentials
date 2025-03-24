@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "de.hype.bingonet.fabric.mixins.errorspampatches",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "HypixelLoggerSpamPatcherClientPlayNetworkListener",
+    "PlayerTexturePropertyErrorSpamPlayerSkinProviderPatch",
+    "SignaturePropertyErrorIgnoreMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

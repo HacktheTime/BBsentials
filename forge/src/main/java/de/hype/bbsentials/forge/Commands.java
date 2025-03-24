@@ -1,19 +1,19 @@
-package de.hype.bbsentials.forge;
+package de.hype.bingonet.forge;
 
-import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.client.common.mclibraries.MCCommand;
-import de.hype.bbsentials.environment.packetconfig.AbstractPacket;
-import de.hype.bbsentials.forge.CommandImplementations.*;
-import de.hype.bbsentials.shared.objects.SplashData;
-import de.hype.bbsentials.shared.objects.SplashLocation;
-import de.hype.bbsentials.shared.packets.function.SplashNotifyPacket;
+import de.hype.bingonet.client.common.chat.Chat;
+import de.hype.bingonet.client.common.client.BingoNet;
+import de.hype.bingonet.client.common.mclibraries.EnvironmentCore;
+import de.hype.bingonet.client.common.mclibraries.MCCommand;
+import de.hype.bingonet.environment.packetconfig.AbstractPacket;
+import de.hype.bingonet.forge.CommandImplementations.*;
+import de.hype.bingonet.shared.objects.SplashData;
+import de.hype.bingonet.shared.objects.SplashLocation;
+import de.hype.bingonet.shared.packets.function.SplashNotifyPacket;
 import net.minecraftforge.client.ClientCommandHandler;
 
 public class Commands implements MCCommand {
     public static <T extends AbstractPacket> void sendPacket(T packet) {
-        BBsentials.connection.sendPacket(packet);
+        BingoNet.connection.sendPacket(packet);
     }
 
     public void registerMain() {
@@ -47,13 +47,13 @@ public class Commands implements MCCommand {
             Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");
             return;
         }
-        if (hubNumber == null) hubNumber = BBsentials.temporaryConfig.getHubNumberFromCache(serverid);
+        if (hubNumber == null) hubNumber = BingoNet.temporaryConfig.getHubNumberFromCache(serverid);
         if (hubNumber == null) {
             Chat.sendPrivateMessageToSelfError("Cache is either outdated or missing the current hub. Open the Hub Selector and try again.");
             return;
         }
         try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BBsentials.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste, serverid)));
+            sendPacket(new SplashNotifyPacket(new SplashData(BingoNet.generalConfig.getUsername(), hubNumber, locationInHub, EnvironmentCore.utils.getCurrentIsland(), extramessage, lessWaste, serverid)));
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
         }

@@ -1,16 +1,16 @@
-package de.hype.bbsentials.forge;
+package de.hype.bingonet.forge;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
-import de.hype.bbsentials.client.common.chat.Chat;
-import de.hype.bbsentials.client.common.client.BBsentials;
-import de.hype.bbsentials.client.common.client.updatelisteners.ChChestUpdateListener;
-import de.hype.bbsentials.client.common.client.updatelisteners.UpdateListenerManager;
-import de.hype.bbsentials.client.common.mclibraries.EnvironmentCore;
-import de.hype.bbsentials.shared.constants.ChChestItem;
-import de.hype.bbsentials.shared.constants.EnumUtils;
-import de.hype.bbsentials.shared.constants.Islands;
-import de.hype.bbsentials.shared.objects.ChChestData;
-import de.hype.bbsentials.shared.objects.Position;
+import de.hype.bingonet.client.common.chat.Chat;
+import de.hype.bingonet.client.common.client.BingoNet;
+import de.hype.bingonet.client.common.client.updatelisteners.ChChestUpdateListener;
+import de.hype.bingonet.client.common.client.updatelisteners.UpdateListenerManager;
+import de.hype.bingonet.client.common.mclibraries.EnvironmentCore;
+import de.hype.bingonet.shared.constants.ChChestItem;
+import de.hype.bingonet.shared.constants.EnumUtils;
+import de.hype.bingonet.shared.constants.Islands;
+import de.hype.bingonet.shared.objects.ChChestData;
+import de.hype.bingonet.shared.objects.Position;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils {
+public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
     public static boolean isBingo(EntityPlayer player) {
         try {
             return player.getDisplayNameString().contains("Ⓑ");
@@ -67,18 +67,18 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
     public File getConfigPath() {
         File configDir = Minecraft.getMinecraft().mcDataDir;
-        File bbsentialsDir = new File(configDir, "BBsentials");
+        File bingonetDir = new File(configDir, "BingoNet");
 
         // Create the folder if it doesn't exist
-        if (!bbsentialsDir.exists()) {
-            boolean created = bbsentialsDir.mkdirs();
+        if (!bingonetDir.exists()) {
+            boolean created = bingonetDir.mkdirs();
             if (!created) {
                 // Handle the case where folder creation fails
-                throw new RuntimeException("Failed to create BBsentials folder");
+                throw new RuntimeException("Failed to create Bingo Net folder");
             }
         }
 
-        return bbsentialsDir;
+        return bingonetDir;
     }
 
     public String getUsername() {
@@ -265,7 +265,7 @@ public class Utils implements de.hype.bbsentials.client.common.mclibraries.Utils
 
             List<IChatComponent> toDisplay = new ArrayList<>();
             toDisplay.add(new ChatComponentText("§6Total: " + allParticipants.size() + " | Bingos: " + (allParticipants.size() - splashLeechers.size()) + " | Leechers: " + splashLeechers.size()));
-            boolean doPants = BBsentials.splashConfig.showMusicPantsUsers;
+            boolean doPants = BingoNet.splashConfig.showMusicPantsUsers;
             for (EntityPlayer participant : allParticipants) {
                 if (doPants) {
                     boolean hasPants = false;

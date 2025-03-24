@@ -1,4 +1,4 @@
-package de.hype.bbsentials.forge.client.categories;
+package de.hype.bingonet.forge.client.categories;
 
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.ChromaColour;

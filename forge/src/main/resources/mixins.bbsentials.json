@@ -1,6 +1,6 @@
 {
-  "package": "de.hype.bbsentials.forge.mixin",
-  "refmap": "mixins.bbsentials.refmap.json",
+  "package": "de.hype.bingonet.forge.mixin",
+  "refmap": "mixins.bingonet.refmap.json",
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",
   "mixins": [

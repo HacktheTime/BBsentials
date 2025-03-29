@@ -123,7 +123,7 @@ public class DiscordIntegration extends ListenerAdapter {
         if (BingoNet.discordConfig.doStartupMessage)
             dms.sendMessage("Bot is now online").setSuppressedNotifications(true).queue();
         registerGlobalCommands();
-        Chat.sendPrivateMessageToSelfSuccess("BB DC-Bot is up!");
+        Chat.sendPrivateMessageToSelfSuccess("Bingo Net DC-Bot is up!");
     }
 
     public void receivedInGameMessage(de.hype.bingonet.client.common.chat.Message message) {

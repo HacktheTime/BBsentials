@@ -770,7 +770,9 @@ public class ModInitialiser implements ClientModInitializer {
 
 
     public void joinHypixel() {
-        Map<String, Double> commands = Map.of("/skyblock", 3.5);
-        EnvironmentCore.utils.connectToServer("mc.hypixel.net", commands);
+        executionService.execute(() -> {
+            Map<String, Double> commands = Map.of("/skyblock", 3.5);
+            EnvironmentCore.utils.connectToServer("mc.hypixel.net", commands);
+        });
     }
 }

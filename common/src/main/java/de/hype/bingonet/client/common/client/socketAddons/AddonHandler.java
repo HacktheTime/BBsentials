@@ -2,6 +2,7 @@ package de.hype.bingonet.client.common.client.socketAddons;
 
 import de.hype.bingonet.client.common.chat.Chat;
 import de.hype.bingonet.client.common.chat.Message;
+import de.hype.bingonet.client.common.client.BBDataStorage;
 import de.hype.bingonet.client.common.client.BingoNet;
 import de.hype.bingonet.client.common.mclibraries.EnvironmentCore;
 import de.hype.bingonet.client.common.objects.ChatPrompt;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class AddonHandler implements Runnable {
@@ -140,5 +142,36 @@ public class AddonHandler implements Runnable {
     }
 
     public void onStatusUpdateAddonPacket(StatusUpdateAddonPacket packet) {
+    }
+
+    public void onGoToIslandAddonPacket(GoToIslandAddonPacket packet) {
+        if (packet.island.getWarpArgument() == null) throw new IllegalArgumentException("Island has no warp command.");
+        BBDataStorage dataStorage = BingoNet.dataStorage;
+        if (dataStorage == null) {
+            EnvironmentCore.utils.connectToServer("mc.hypixel.net", new HashMap<>());
+        }
+        if (!dataStorage.isInSkyblock()) {
+            BingoNet.sender.addHiddenSendTask("/skyblock", 0);
+        } else if (packet.island == null) {
+            BingoNet.sender.addHiddenSendTask("/l", 0);
+            return;
+        }
+        while (!dataStorage.isInSkyblock()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (BingoNet.dataStorage.getIsland() != packet.island) {
+            BingoNet.sender.addHiddenSendTask("/warp " + packet.island.getWarpArgument(), 0);
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+        }
+        if (BingoNet.dataStorage.getIsland() != packet.island) {
+            throw new IllegalStateException("Warp failed it seems. Are you sure you have the Travel Scroll to use `/warp %s`".formatted(packet.island.getWarpArgument()));
+        }
     }
 }

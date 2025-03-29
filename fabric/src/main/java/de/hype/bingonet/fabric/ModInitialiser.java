@@ -447,6 +447,21 @@ public class ModInitialiser implements ClientModInitializer {
                                                             }))).executes((context) -> {
                                                 return 1;
                                             })
+                                    ).then(literal("other")
+                                            .then(argument("command", StringArgumentType.greedyString())
+                                                    .executes(context -> {
+                                                        String command = StringArgumentType.getString(context, "command");
+                                                        if (command.equals("setup-pojav")) {
+                                                            //Hidden because the setup is a bit sketchy
+                                                            socketAddonConfig.useSocketAddons = true;
+                                                            ConfigManager.saveAll();
+                                                        } else {
+                                                            Chat.sendPrivateMessageToSelfInfo("Internal Command not found. These Commands are hidden for a reason.");
+                                                            return 1;
+                                                        }
+                                                        return 0;
+                                                    })
+                                            )
                                     )
                             )
                             .then(literal("waypoint")

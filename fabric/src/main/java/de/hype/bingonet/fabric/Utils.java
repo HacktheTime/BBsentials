@@ -242,6 +242,12 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
     @Override
     public void connectToServer(String serverAddress, Map<String, Double> commands) {
         MinecraftClient client = MinecraftClient.getInstance();
+        while (!client.isFinishedLoading()) {
+            try {
+                Thread.sleep(1_000);
+            } catch (InterruptedException e) {
+            }
+        }
         try {
             MinecraftClient.getInstance().executeAsync((t) -> {
                 ServerList serverList = new ServerList(client);

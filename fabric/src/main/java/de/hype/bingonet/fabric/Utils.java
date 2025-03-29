@@ -75,6 +75,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
@@ -241,20 +242,24 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
     @Override
     public void connectToServer(String serverAddress, Map<String, Double> commands) {
         MinecraftClient client = MinecraftClient.getInstance();
-        MinecraftClient.getInstance().execute(() -> {
-            ServerList serverList = new ServerList(client);
-            serverList.loadFile();
-            ServerInfo serverInfo = serverList.get(serverAddress);
-            if (serverInfo == null) {
-                serverInfo = new ServerInfo(serverAddress, serverAddress, ServerInfo.ServerType.OTHER);
-                serverList.add(serverInfo, true);
-                serverList.saveFile();
-            }
-            ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
+        try {
+            MinecraftClient.getInstance().executeAsync((t) -> {
+                ServerList serverList = new ServerList(client);
+                serverList.loadFile();
+                ServerInfo serverInfo = serverList.get(serverAddress);
+                if (serverInfo == null) {
+                    serverInfo = new ServerInfo(serverAddress, serverAddress, ServerInfo.ServerType.OTHER);
+                    serverList.add(serverInfo, true);
+                    serverList.saveFile();
+                }
+                ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
 
-            ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
-            commands.forEach(sender::addSendTask);
-        });
+                ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
+                commands.forEach(sender::addSendTask);
+            }).get();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to connect to Hypixel", e);
+        }
 
     }
 

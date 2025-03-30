@@ -459,6 +459,7 @@ public class ModInitialiser implements ClientModInitializer {
                                                             Chat.sendPrivateMessageToSelfInfo("Internal Command not found. These Commands are hidden for a reason.");
                                                             return 1;
                                                         }
+                                                        Chat.sendPrivateMessageToSelfSuccess("Command executed successfully");
                                                         return 0;
                                                     })
                                             )

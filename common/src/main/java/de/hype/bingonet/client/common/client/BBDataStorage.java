@@ -83,4 +83,8 @@ public class BBDataStorage {
     public boolean isOnMain() {
         return environment == Environment.PRODUCTION;
     }
+
+    public boolean isInLimbo() {
+        return serverId != null && serverId.equals("limbo");
+    }
 }

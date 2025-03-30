@@ -44,7 +44,9 @@ public class AddonHandler implements Runnable {
     }
 
     public void onReceive(String message) {
-        AddonPacketUtils.handleIfPacket(this, message);
+        BingoNet.executionService.execute(() -> {
+            AddonPacketUtils.handleIfPacket(this, message);
+        });
     }
 
     @Override
@@ -105,15 +107,13 @@ public class AddonHandler implements Runnable {
     public void onWaypointAddonPacket(WaypointAddonPacket packet) {
         if (packet.operation.equals(WaypointAddonPacket.Operation.ADD)) {
             new Waypoints(packet.waypoint);
-        }
-        else if (packet.operation.equals(WaypointAddonPacket.Operation.REMOVE)) {
+        } else if (packet.operation.equals(WaypointAddonPacket.Operation.REMOVE)) {
             try {
                 Waypoints.waypoints.get(packet.waypointId).removeFromPool();
             } catch (Exception ignored) {
 
             }
-        }
-        else if (packet.operation.equals(WaypointAddonPacket.Operation.EDIT)) {
+        } else if (packet.operation.equals(WaypointAddonPacket.Operation.EDIT)) {
             try {
                 Waypoints oldWaypoint = Waypoints.waypoints.get(packet.waypointId);
                 oldWaypoint.replaceWithNewWaypoint(packet.waypoint, packet.waypointId);
@@ -135,8 +135,7 @@ public class AddonHandler implements Runnable {
                 Chat.sendPrivateMessageToSelfDebug("BBDev-AsP: " + packetName + ": " + rawjson);
             }
             writer.println(packetName + "." + rawjson);
-        }
-        else {
+        } else {
             Chat.sendPrivateMessageToSelfError("BB: Couldn't send a " + packetName + "! did you get disconnected?");
         }
     }
@@ -145,29 +144,48 @@ public class AddonHandler implements Runnable {
     }
 
     public void onGoToIslandAddonPacket(GoToIslandAddonPacket packet) {
-        if (packet.island.getWarpArgument() == null) throw new IllegalArgumentException("Island has no warp command.");
-        BBDataStorage dataStorage = BingoNet.dataStorage;
-        if (dataStorage == null) {
-            EnvironmentCore.utils.connectToServer("mc.hypixel.net", new HashMap<>());
+        if (packet.island != null && packet.island.getWarpArgument() == null)
+            throw new IllegalArgumentException("Island has no warp command.");
+        BBDataStorage dataStorage = null;
+        boolean firstTry = true;
+        while (!EnvironmentCore.utils.isInGame() || dataStorage == null) {
+            System.out.println("Waiting for the game to load... (%b), (%b)".formatted(EnvironmentCore.utils.isScreenGame(), dataStorage == null));
+            dataStorage = BingoNet.dataStorage;
+            if (firstTry) EnvironmentCore.utils.connectToServer("mc.hypixel.net", new HashMap<>());
+            firstTry = false;
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {
+            }
         }
+
+        EnvironmentCore.utils.displayToast("Launch Update", "Fully Loaded", false);
         if (!dataStorage.isInSkyblock()) {
-            BingoNet.sender.addHiddenSendTask("/skyblock", 0);
+            if (dataStorage.isInLimbo()) {
+                BingoNet.sender.addSendTask("/l", 0.5);
+                BingoNet.sender.addSendTask("/skyblock", 1.5);
+            } else BingoNet.sender.addSendTask("/skyblock", 0.5);
         } else if (packet.island == null) {
-            BingoNet.sender.addHiddenSendTask("/l", 0);
+            BingoNet.sender.addSendTask("/l", 0);
             return;
         }
-        while (!dataStorage.isInSkyblock()) {
+        dataStorage = BingoNet.dataStorage;
+        while (dataStorage == null || !dataStorage.isInSkyblock()) {
+            dataStorage = BingoNet.dataStorage;
+            System.out.println("Waiting to get into Skyblock...");
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        EnvironmentCore.utils.displayToast("Launch Update", "In Skyblock Detected", false);
         if (BingoNet.dataStorage.getIsland() != packet.island) {
-            BingoNet.sender.addHiddenSendTask("/warp " + packet.island.getWarpArgument(), 0);
+            System.out.println("Warping too " + packet.island.getDisplayName());
+            BingoNet.sender.addSendTask("/warp " + packet.island.getWarpArgument(), 3);
         }
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
         }
         if (BingoNet.dataStorage.getIsland() != packet.island) {

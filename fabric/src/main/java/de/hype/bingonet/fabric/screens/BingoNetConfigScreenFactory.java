@@ -28,42 +28,6 @@ public class BingoNetConfigScreenFactory {
                 .setTitle(Text.of("Bingo Net Config"));
         builder.setSavingRunnable(ConfigManager::saveAll);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        if (BingoNet.developerConfig.doDevDashboardConfig && BingoNet.generalConfig.hasBBRoles(BBRole.DEVELOPER)) {
-            {
-                ConfigCategory dev = builder.getOrCreateCategory(Text.of("§3Developing Dashboard"));
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Mode"), BingoNet.developerConfig.devMode)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Dev Mode"))
-                        .setSaveConsumer(newValue -> BingoNet.developerConfig.devMode = newValue)
-                        .build());
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Detailed Dev Mode"), BingoNet.developerConfig.detailedDevMode)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Detailed Dev Mode"))
-                        .setSaveConsumer(newValue -> BingoNet.developerConfig.detailedDevMode = newValue)
-                        .build());
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Bingo Time Override"), BingoNet.bbServerConfig.overrideBingoTime)
-                        .setDefaultValue(true)
-                        .setTooltip(Text.of("Always connect to the Server whether Bingo is going on or not."))
-                        .setSaveConsumer(newValue -> BingoNet.bbServerConfig.overrideBingoTime = newValue)
-                        .build());
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Join Test server"), BingoNet.bbServerConfig.connectToBeta)
-                        .setDefaultValue(true)
-                        .setTooltip(Text.of("§cWhen enabled join the testserver instead of the main. This Server is used for testing! Youre risking wrong invites etc."))
-                        .setSaveConsumer(newValue -> BingoNet.bbServerConfig.connectToBeta = newValue)
-                        .build());
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Security"), BingoNet.developerConfig.devSecurity)
-                        .setDefaultValue(true)
-                        .setTooltip(Text.of("Shows dev debug even when its sensetive information"))
-                        .setSaveConsumer(newValue -> BingoNet.developerConfig.devSecurity = newValue)
-                        .build());
-                dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Item Debug"), BingoNet.developerConfig.hypixelItemInfo)
-                        .setDefaultValue(false)
-                        .setTooltip(Text.of("Shows Hypixels Item Information"))
-                        .setSaveConsumer(newValue -> BingoNet.developerConfig.hypixelItemInfo = newValue)
-                        .build());
-
-            }
-        }
         ConfigCategory server = builder.getOrCreateCategory(Text.of("Server"));
         {
             if (BingoNet.generalConfig.getUsername().equalsIgnoreCase("Hype_the_Time")) {
@@ -111,6 +75,23 @@ public class BingoNetConfigScreenFactory {
                     .setTooltip(Text.of("Override the Bingo Time and connect always to the Server. (Bingo time is 14 days cause Extreme Bingo)"))
                     .setSaveConsumer(newValue -> BingoNet.bbServerConfig.overrideBingoTime = newValue)
                     .build());
+            BooleanListEntry connectToBingoBrewers = entryBuilder.startBooleanToggle(Text.of("Use Bingo Brewers Integration"), BingoNet.generalConfig.useBingoBrewersIntegration)
+                    .setDefaultValue(false)
+                    .requireRestart()
+                    .setTooltip(Text.of("If Enabled Bingo Net will use an Internal Connection to connect your Client to the System by Bingo Brewers. For example to show Splashes.\n§4§lSUBJECT TO BINGO BREWERS PRIVACY POLICY"))
+                    .setSaveConsumer(newValue -> {
+                        BingoNet.generalConfig.useBingoBrewersIntegration = newValue;
+                        if (!newValue) BingoNet.bingoBrewersClient.stop();
+                        else {
+                            try {
+                                BingoNet.bingoBrewersClient = new BingoBrewersClient();
+                            } catch (IOException e) {
+                                Chat.sendPrivateMessageToSelfError("Error Trying to connect to Bingo Brewers. Please report this to BINGO NET!");
+                            }
+                        }
+                    })
+                    .build();
+            server.addEntry(connectToBingoBrewers);
         } // server
         ConfigCategory party = builder.getOrCreateCategory(Text.of("§6Party"));
         {
@@ -239,22 +220,6 @@ public class BingoNetConfigScreenFactory {
                     .setTooltip(Text.of("Select if you want Bingo Net to automatically accept reparties"))
                     .setSaveConsumer(newValue -> BingoNet.generalConfig.doDesktopNotifications = newValue)
                     .build();
-            BooleanListEntry connectToBingoBrewers = entryBuilder.startBooleanToggle(Text.of("Use Bingo Brewers Integration"), BingoNet.generalConfig.useBingoBrewersIntegration)
-                    .setDefaultValue(false)
-                    .requireRestart()
-                    .setTooltip(Text.of("If Enabled Bingo Net will use an Internal Connection to connect your Client to the System by Bingo Brewers. For example to show Splashes.\n§4§lSUBJECT TO BINGO BREWERS PRIVACY POLICY"))
-                    .setSaveConsumer(newValue -> {
-                        BingoNet.generalConfig.useBingoBrewersIntegration = newValue;
-                        if (!newValue) BingoNet.bingoBrewersClient.stop();
-                        else {
-                            try {
-                                BingoNet.bingoBrewersClient = new BingoBrewersClient();
-                            } catch (IOException e) {
-                                Chat.sendPrivateMessageToSelfError("Error Trying to connect to Bingo Brewers. Please report this to BINGO NET!");
-                            }
-                        }
-                    })
-                    .build();
             DropdownBoxEntry<String> notificationOn = entryBuilder.startStringDropdownMenu(Text.of("Notification on"), BingoNet.generalConfig.notifForMessagesType) // Start the StringDropdownMenu entry
                     .setSelections(List.of("all", "nick", "none"))
                     .setTooltip(Text.of("When do you want to receive Desktop Notifications? on all party, messages containing nickname"))
@@ -275,7 +240,6 @@ public class BingoNetConfigScreenFactory {
             notifications.addEntry(doNotifications);
             notifications.addEntry(notificationOn);
             notifications.addEntry(nickname);
-            notifications.addEntry(connectToBingoBrewers);
         }
         //Notifications
         ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));
@@ -580,10 +544,15 @@ public class BingoNetConfigScreenFactory {
                     .setTooltip(Text.of("Shows dev debug even when its sensetive information"))
                     .setSaveConsumer(newValue -> BingoNet.developerConfig.devSecurity = newValue)
                     .build());
-            dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Dev Dashboard"), BingoNet.developerConfig.doDevDashboardConfig)
-                    .setDefaultValue(true)
-                    .setTooltip(Text.of("When opening the Config have a combined view for developer most used configs"))
-                    .setSaveConsumer(newValue -> BingoNet.developerConfig.doDevDashboardConfig = newValue)
+            dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Item Debug"), BingoNet.developerConfig.hypixelItemInfo)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Shows Hypixels Item Information"))
+                    .setSaveConsumer(newValue -> BingoNet.developerConfig.hypixelItemInfo = newValue)
+                    .build());
+            dev.addEntry(entryBuilder.startBooleanToggle(Text.of("Skyblock Quick launch"), BingoNet.developerConfig.quickLaunch)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Will connect you to Hypixel Skyblock when launching the game immediately"))
+                    .setSaveConsumer(newValue -> BingoNet.developerConfig.quickLaunch = newValue)
                     .build());
         }
         if (BingoNet.generalConfig.hasBBRoles(BBRole.SPLASHER)) {

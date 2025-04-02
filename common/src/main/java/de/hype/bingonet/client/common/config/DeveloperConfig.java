@@ -15,7 +15,6 @@ public class DeveloperConfig extends BingoNetConfig {
 
     public boolean devMode = false;
     public boolean detailedDevMode = false;
-    public boolean doDevDashboardConfig = true;
     public boolean devSecurity = true;
     public boolean hypixelItemInfo = false;
     public boolean quickLaunch = false;

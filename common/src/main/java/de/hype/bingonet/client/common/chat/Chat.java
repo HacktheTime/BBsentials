@@ -355,9 +355,9 @@ public class Chat {
                     BingoNet.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
                 }
                 if ((message.getMessageContent().equals("warp") || message.getMessageContent().equals("!warp")) && !message.isFromSelf()) {
-                    PartyManager.handleWarpRequest(username);
+                    if (PartyManager.isPartyLeader()) PartyManager.handleWarpRequest(username);
                 } else if (message.getMessageContent().equals("!ptme") && !message.isFromSelf()) {
-                    PartyManager.handlePartyTransferRequest(username);
+                    if (PartyManager.isPartyLeader()) PartyManager.handlePartyTransferRequest(username);
                 } else if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
                     Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", StringEscapeUtils.escapeJson(username)));
                     setChatCommand("/pc r " + username, 10);

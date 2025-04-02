@@ -34,6 +34,11 @@ public class SplashData {
         this(user, locationInHub, extraMessage, lessWaste, serverID, hubSelectorData, StatusConstants.WAITING);
     }
 
+    public SplashData(SplashData packet) {
+        this(packet.announcer, packet.locationInHub, packet.extraMessage, packet.lessWaste, packet.serverID, packet.hubSelectorData, packet.status);
+        this.splashId = packet.splashId;
+    }
+
 
     public static class HubSelectorData {
         public int hubNumber;

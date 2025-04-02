@@ -1,6 +1,7 @@
 package de.hype.bingonet.client.common.client;
 
 import de.hype.bingonet.client.common.annotations.AnnotationProcessor;
+import de.hype.bingonet.client.common.bingobrewers.BingoBrewersClient;
 import de.hype.bingonet.client.common.chat.Chat;
 import de.hype.bingonet.client.common.chat.Sender;
 import de.hype.bingonet.client.common.client.commands.Commands;
@@ -47,6 +48,7 @@ public class BingoNet {
     public static Thread debugThread;
     //General Config needs to be first config!
     public static GeneralConfig generalConfig = new GeneralConfig();
+    public static BingoBrewersClient bingoBrewersClient;
     //All Other Configs
     public static DeveloperConfig developerConfig = new DeveloperConfig();
     public static DiscordConfig discordConfig = new DiscordConfig();
@@ -110,8 +112,7 @@ public class BingoNet {
                 coms = new Commands();
                 if (beta) {
                     connection.connect(bbServerConfig.bbServerURL, 5011);
-                }
-                else {
+                } else {
                     connection.connect(bbServerConfig.bbServerURL, 5000);
                 }
             });
@@ -242,7 +243,14 @@ public class BingoNet {
         }
         hpModAPICore = new HypixelModAPICore();
         EnvironmentCore.utils.registerNetworkHandlers();
-
+        if (generalConfig.useBingoBrewersIntegration) {
+            try {
+                bingoBrewersClient = new BingoBrewersClient();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Chat.sendPrivateMessageToSelfError("Could not connect to Bingobrewers");
+            }
+        }
     }
 
     public static String downloadJson(String urlString) throws Exception {

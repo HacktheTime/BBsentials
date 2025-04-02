@@ -1,5 +1,7 @@
 package de.hype.bingonet.fabric.screens;
 
+import de.hype.bingonet.client.common.bingobrewers.BingoBrewersClient;
+import de.hype.bingonet.client.common.chat.Chat;
 import de.hype.bingonet.client.common.client.BingoNet;
 import de.hype.bingonet.client.common.config.ConfigManager;
 import de.hype.bingonet.shared.constants.Islands;
@@ -16,6 +18,7 @@ import me.shedaniel.math.Color;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
+import java.io.IOException;
 import java.util.List;
 
 public class BingoNetConfigScreenFactory {
@@ -70,14 +73,12 @@ public class BingoNetConfigScreenFactory {
                         .setSaveConsumer((newValue) -> {
                             if (newValue.replace("*", "").trim().isEmpty()) {
                                 return;
-                            }
-                            else {
+                            } else {
                                 BingoNet.bbServerConfig.bbServerURL = newValue;
                             }
                         })
                         .build());
-            }
-            else {
+            } else {
                 server.addEntry(entryBuilder.startTextField(Text.of("Server URL"), BingoNet.bbServerConfig.bbServerURL)
                         .setDefaultValue("hackthetime.de")
                         .setTooltip(Text.of("Place the Server URL of the Bingo Net Server here"))
@@ -90,8 +91,7 @@ public class BingoNetConfigScreenFactory {
                     .setSaveConsumer((newValue) -> {
                         if (newValue.replace("*", "").trim().isEmpty()) {
                             return;
-                        }
-                        else {
+                        } else {
                             BingoNet.bbServerConfig.apiKey = newValue;
                         }
                     })
@@ -239,6 +239,22 @@ public class BingoNetConfigScreenFactory {
                     .setTooltip(Text.of("Select if you want Bingo Net to automatically accept reparties"))
                     .setSaveConsumer(newValue -> BingoNet.generalConfig.doDesktopNotifications = newValue)
                     .build();
+            BooleanListEntry connectToBingoBrewers = entryBuilder.startBooleanToggle(Text.of("Use Bingo Brewers Integration"), BingoNet.generalConfig.useBingoBrewersIntegration)
+                    .setDefaultValue(false)
+                    .requireRestart()
+                    .setTooltip(Text.of("If Enabled Bingo Net will use an Internal Connection to connect your Client to the System by Bingo Brewers. For example to show Splashes.\n§4§lSUBJECT TO BINGO BREWERS PRIVACY POLICY"))
+                    .setSaveConsumer(newValue -> {
+                        BingoNet.generalConfig.useBingoBrewersIntegration = newValue;
+                        if (!newValue) BingoNet.bingoBrewersClient.stop();
+                        else {
+                            try {
+                                BingoNet.bingoBrewersClient = new BingoBrewersClient();
+                            } catch (IOException e) {
+                                Chat.sendPrivateMessageToSelfError("Error Trying to connect to Bingo Brewers. Please report this to BINGO NET!");
+                            }
+                        }
+                    })
+                    .build();
             DropdownBoxEntry<String> notificationOn = entryBuilder.startStringDropdownMenu(Text.of("Notification on"), BingoNet.generalConfig.notifForMessagesType) // Start the StringDropdownMenu entry
                     .setSelections(List.of("all", "nick", "none"))
                     .setTooltip(Text.of("When do you want to receive Desktop Notifications? on all party, messages containing nickname"))
@@ -259,6 +275,7 @@ public class BingoNetConfigScreenFactory {
             notifications.addEntry(doNotifications);
             notifications.addEntry(notificationOn);
             notifications.addEntry(nickname);
+            notifications.addEntry(connectToBingoBrewers);
         }
         //Notifications
         ConfigCategory other = builder.getOrCreateCategory(Text.of("Other"));

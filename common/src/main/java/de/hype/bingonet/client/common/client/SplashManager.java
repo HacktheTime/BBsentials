@@ -21,10 +21,10 @@ import java.util.concurrent.TimeUnit;
 public class SplashManager {
     public static Map<Integer, DisplaySplash> splashPool = new HashMap<>();
 
-    public static void addSplash(SplashNotifyPacket packet) {
+    public static void addSplash(SplashData splash) {
         try {
-            splashPool.put(packet.splash.splashId, new DisplaySplash(packet));
-            BingoNet.executionService.schedule(() -> splashPool.remove(packet.splash.splashId), 5, TimeUnit.MINUTES);
+            splashPool.put(splash.splashId, new DisplaySplash(splash));
+            BingoNet.executionService.schedule(() -> splashPool.remove(splash.splashId), 5, TimeUnit.MINUTES);
         } catch (Exception ignored) {
             //cant happen anyway
         }
@@ -69,7 +69,7 @@ public class SplashManager {
             //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"light_purple","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@splasher "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"is splashing in "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@island "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"#"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@hubnumber"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":" Press ("},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"keybind":"Chat Prompt Yes / Open Menu"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":") to warp to @island "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"at Location: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@location "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"| "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@extramessage"}],"command":"%s","jtemplate":"tellraw"}
             tellraw = "[{\"text\":\"\"},{\"text\":\"@splasher \",\"color\":\"light_purple\"},{\"text\":\"is splashing in \"},{\"text\":\"@island \"},{\"text\":\"#\"},{\"text\":\"@hubnumber\",\"color\":\"gold\"},{\"text\":\" Press (\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},{\"text\":\") to warp to @island \"},{\"text\":\"at Location: \"},{\"text\":\"@location \",\"color\":\"green\"},{\"text\":\"| \"},{\"text\":\"@extramessage\",\"color\":\"gold\"}]";
             BingoNet.temporaryConfig.lastChatPromptAnswer = new ChatPrompt(() -> {
-                BingoNet.sender.addSendTask("/warp " + splash.hubSelectorData.hubType.getWarpArgument());
+                BingoNet.sender.addSendTask("/warp " + splash.hubSelectorData.hubType.getWarpArgument(), 0);
                 if (splash.hubSelectorData.hubType.equals(Islands.HUB)) {
                     Islands currentIsland = BingoNet.dataStorage.getIsland();
                     switch (currentIsland) {
@@ -95,8 +95,8 @@ public class SplashManager {
         public boolean alreadyDisplayed;
         public Instant receivedTime = Instant.now();
 
-        public DisplaySplash(SplashNotifyPacket packet) {
-            super(packet.splash.announcer, packet.splash.locationInHub, packet.splash.extraMessage, packet.splash.lessWaste, packet.splash.serverID, packet.splash.hubSelectorData, packet.splash.status);
+        public DisplaySplash(SplashData packet) {
+            super(packet);
             alreadyDisplayed = false;
         }
 

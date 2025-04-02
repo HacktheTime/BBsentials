@@ -58,4 +58,4 @@ javazoom = { module = "javazoom:jlayer", version = "latest.release" }
 hypixelModApi = { module = "net.hypixel:mod-api", version = "latest.release" }
 neditNBT = { module = "me.nullicorn:Nedit", version = "latest.release" }
 neurepoparser = { module = "moe.nea:neurepoparser", version = "latest.release" }
-
+kyronet = { module = "com.esotericsoftware:kryonet", version = "2.22.0-RC1" }

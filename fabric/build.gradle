@@ -66,6 +66,8 @@ dependencies {
     transitiveInclude(modImplementation(libs.javazoom.get())) // Music Player
     transitiveInclude(modImplementation(libs.reflection.get())) // Music Player
 
+    transitiveInclude(modImplementation(libs.kyronet.get())) // Needed for Bingo Brewers Integration
+
     configurations.transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
         modImplementation(it.moduleVersion.id.toString())
         include(it.moduleVersion.id.toString())

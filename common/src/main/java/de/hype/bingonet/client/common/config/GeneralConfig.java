@@ -18,6 +18,7 @@ public class GeneralConfig extends BingoNetConfig {
     public boolean doGuildChatCustomMenu = true;
     public boolean doAllChatCustomMenu = true;
     public boolean doPartyChatCustomMenu = true;
+    public boolean useBingoBrewersIntegration = false;
     public boolean doDesktopNotifications = false;
     public String nickname = "";
     public String notifForMessagesType = "NONE";

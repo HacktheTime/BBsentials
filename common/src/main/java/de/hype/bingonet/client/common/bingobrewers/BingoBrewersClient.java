@@ -52,7 +52,8 @@ public class BingoBrewersClient {
                 BingoNet.executionService.execute(() -> {
                     if (object.getClass().getPackageName().contains("com.esotericsoftware.kryonet")) return;
                     if (object instanceof BingoBrewersPacket) {
-                        System.out.println("BN Bingobrewrs: %s".formatted(gson.toJson(object)));
+                        if (BingoNet.developerConfig.devMode)
+                            System.out.println("BN Bingobrewrs: %s".formatted(gson.toJson(object)));
                         try {
                             BingoBrewersPacket<?> packet = ((BingoBrewersPacket<?>) object);
                             packet.executeUnparsed(packet, client);
@@ -61,7 +62,8 @@ public class BingoBrewersClient {
                             e.printStackTrace();
                         }
                     } else {
-                        System.out.println("Received unknown object: " + object.getClass().getName());
+                        if (BingoNet.developerConfig.devMode)
+                            System.out.println("Received unknown object: " + object.getClass().getName());
                     }
                 });
             }

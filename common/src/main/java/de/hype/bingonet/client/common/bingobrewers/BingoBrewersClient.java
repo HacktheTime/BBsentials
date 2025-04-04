@@ -3,6 +3,7 @@ package de.hype.bingonet.client.common.bingobrewers;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.google.gson.Gson;
 import de.hype.bingonet.client.common.chat.Chat;
 import de.hype.bingonet.client.common.client.BingoNet;
 
@@ -15,6 +16,7 @@ public class BingoBrewersClient {
     public static BingoBrewersClient INSTANCE;
     private Client client;
     private Listener listener;
+    private static final Gson gson = new Gson();
 
     public BingoBrewersClient() throws IOException {
         init();
@@ -50,7 +52,7 @@ public class BingoBrewersClient {
                 BingoNet.executionService.execute(() -> {
                     if (object.getClass().getPackageName().contains("com.esotericsoftware.kryonet")) return;
                     if (object instanceof BingoBrewersPacket) {
-                        System.out.println("Received known object: " + object.getClass().getName());
+                        System.out.println("BN Bingobrewrs: %s".formatted(gson.toJson(object)));
                         try {
                             BingoBrewersPacket<?> packet = ((BingoBrewersPacket<?>) object);
                             packet.executeUnparsed(packet, client);

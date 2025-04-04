@@ -114,7 +114,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                             BlockPos pos = new BlockPos(nodes.get(i).getPositionBlockPos());
                             it.block(pos, color);
                             if (i == 0 && !ModInitialiser.tutorialManager.recording) {
-                                it.tracer(pos.toCenterPos(), 3f);
+                                it.tracer(pos.toCenterPos(), 3f, color);
                             }
                             it.doWaypointIcon(pos.toCenterPos(), new ArrayList<>(), 25, 25);
                         }
@@ -127,8 +127,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                         it.block(pos, color);
                         it.waypoint(pos, color, FabricTextUtils.jsonToText(waypoint.jsonToRenderText));
                         if (waypoint.doTracer) {
-                            Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
-                            it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                            it.tracer(pos.toCenterPos(), 3f, color);
                         }
                         it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 25, 25);
 

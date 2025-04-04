@@ -13,6 +13,7 @@ public class SplashData {
 
     public String extraMessage;
     public boolean lessWaste;
+    @Nullable
     public String serverID;
     /**
      * If null the Splash is in a private Mega → Request Invite.

@@ -9,10 +9,7 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static de.hype.bingonet.client.common.SystemUtils.sendNotification;
 import static de.hype.bingonet.client.common.chat.Chat.setChatCommand;
@@ -24,9 +21,11 @@ public class PartyManager {
     private static boolean isPartyLeader;
     private static boolean isModerator;
     private static List<String> partyMembers;
+    private static Map<PartyFeatures, Object> flags;
 
     static {
         isInParty = false;
+        flags = new HashMap<>();
         isPartyLeader = false;
         isModerator = false;
         selfUsername = BingoNet.generalConfig.getUsername();
@@ -42,6 +41,7 @@ public class PartyManager {
         if (messageUnformatted.matches(".*disbanded the party\\.")) {
             conf.partyAcceptConfig.put(noRanks.split(" ")[0], new PartyConfig.AcceptPartyInvites(false, Instant.now().plus(5, ChronoUnit.MINUTES)));
             isInParty = false;
+            flags = new HashMap<>();
             isPartyLeader = false;
             partyMembers = new ArrayList<>();
         } else if (messageUnformatted.matches(".*joined the party\\.")) {
@@ -49,6 +49,7 @@ public class PartyManager {
             partyMembers.add(noRanks.split(" ")[0]);
         } else if (messageUnformatted.matches("You left the party\\.")) {
             isInParty = false;
+            flags = new HashMap<>();
             isPartyLeader = false;
             partyMembers = new ArrayList<>();
         } else if (messageUnformatted.matches(".*left the party\\.")) {
@@ -98,6 +99,7 @@ public class PartyManager {
             partyMembers.add(noRanks.split(" ")[2]);
         } else if (messageUnformatted.matches("You are not in a party\\.")) {
             isInParty = false;
+            flags = new HashMap<>();
             isPartyLeader = false;
             partyMembers = new ArrayList<>();
         } else if (noRanks.matches("[a-zA-Z0-9_]+ has promoted %s to Party Moderator".formatted(selfUsername))) {
@@ -110,6 +112,7 @@ public class PartyManager {
             isInParty = true;
         } else if (messageUnformatted.matches("The party was disbanded.*") || messageUnformatted.matches(".* disbanded the party!")) {
             isInParty = false;
+            flags = new HashMap<>();
             isPartyLeader = false;
             isModerator = false;
         } else if (noRanks.matches("[a-zA-Z0-9_]+ has promoted [a-zA-Z0-9_]+ to Party Leader")) {
@@ -139,6 +142,32 @@ public class PartyManager {
             Chat.sendPrivateMessageToSelfDebug("In Party: %b | Is Party Leader: %b | Is Moderator: %b | Party Members: %s".formatted(isInParty, isPartyLeader, isModerator, partyMembers));
         }
         return true;
+    }
+
+    public static void handleContentMessage(Message message, String messageUnformatted, String content) {
+        if ((messageUnformatted.equals("warp") || content.equals("!warp")) && !message.isFromSelf()) {
+            if (PartyManager.isPartyLeader()) PartyManager.handleWarpRequest(message.getPlayerName());
+        } else if ((content.equals("!ptme") || content.equals("!pt me")) && !message.isFromSelf()) {
+            if (PartyManager.isPartyLeader()) PartyManager.handlePartyTransferRequest(message.getPlayerName());
+        }
+        if (content.equals("!splash auto warp") && (PartyManager.isPartyLeader() || message.isFromSelf())) {
+            flags.put(PartyFeatures.SPLASH_AUTO_WARP, !(Boolean) flags.getOrDefault(PartyFeatures.SPLASH_AUTO_WARP, false));
+            sendFlagChangeInfo(PartyFeatures.SPLASH_AUTO_WARP);
+        }
+        if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
+            setChatCommand("/pc r " + message.getPlayerName(), 10);
+        }
+    }
+
+    private static void sendFlagChangeInfo(PartyFeatures key) {
+        Object value = flags.getOrDefault(key, null);
+        if (value == null) {
+            BingoNet.sender.addSendTask("/pc Feature `%s` not set".formatted(key.getKey()), 2);
+            return;
+        } else if (value instanceof Boolean) {
+            value = ((Boolean) value) ? "enabled" : "disabled";
+        }
+        BingoNet.sender.addSendTask("/pc `%s` is now %s".formatted(key.getKey(), value), 2);
     }
 
     public static void handleWarpRequest(String playerName) {
@@ -187,6 +216,10 @@ public class PartyManager {
     public static boolean hidePartyJoinOrLeave() {
         Integer hidePartyJoinAndLeave = BingoNet.partyConfig.hidePartyJoinAndLeave;
         return hidePartyJoinAndLeave < partyMembers.size() && hidePartyJoinAndLeave > 0;
+    }
+
+    public static Boolean getFlag(String key, boolean defaultValue) {
+        return (Boolean) flags.getOrDefault(key, defaultValue);
     }
 
     public String warpParty() {
@@ -241,6 +274,21 @@ public class PartyManager {
 
     public boolean canInviteMembersToParty() {
         return isInParty && (isPartyLeader || isModerator || allInvite);
+    }
+
+    public enum PartyFeatures {
+        SPLASH_AUTO_WARP("splash auto warp"),
+        ;
+
+        private final String key;
+
+        PartyFeatures(String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
     }
 
 }

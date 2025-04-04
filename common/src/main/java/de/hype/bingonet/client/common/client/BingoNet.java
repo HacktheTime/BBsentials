@@ -18,6 +18,7 @@ import de.hype.bingonet.client.common.objects.WaypointRoute;
 import de.hype.bingonet.client.common.objects.Waypoints;
 import de.hype.bingonet.shared.constants.Islands;
 import de.hype.bingonet.shared.objects.RenderInformation;
+import de.hype.bingonet.shared.objects.SplashData;
 import io.github.moulberry.repo.NEURepositoryException;
 
 import java.awt.*;
@@ -191,10 +192,29 @@ public class BingoNet {
             BingoNet.discordIntegration.setNewStatus(status);
         }, true);
         ServerSwitchTask.onServerJoinTask(() -> {
-            if (BingoNet.visualConfig.addSplashWaypoint) {
-                String serverId = EnvironmentCore.utils.getServerId();
-                for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
-                    if (value.serverID.equals(serverId) && value.receivedTime.isAfter(Instant.now().minusSeconds(60))) {
+            String serverId = EnvironmentCore.utils.getServerId();
+            for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
+                if (value.serverID == null) {
+                    SplashData.HubSelectorData hubSelectorData = value.hubSelectorData;
+                    if (hubSelectorData == null) continue;
+                    Map<String, Integer> serverIdToHubNumber = temporaryConfig.serverIdToHubNumber.get(hubSelectorData.hubType);
+                    for (Map.Entry<String, Integer> entry : serverIdToHubNumber.entrySet()) {
+                        if (entry.getValue().equals(hubSelectorData.hubNumber)) {
+                            value.serverID = serverId;
+                        }
+                    }
+                }
+                if (value.serverID == null) continue;
+                if (value.serverID.equals(serverId) && value.receivedTime.isAfter(Instant.now().minusSeconds(60))) {
+                    if (PartyManager.getFlag("splash auto warp", false)) {
+                        if (PartyManager.isPartyLeader()) {
+                            BingoNet.sender.addImmediateSendTask("/p warp");
+                        } else {
+                            BingoNet.sender.addImmediateSendTask("/pc ↑ CHAT FOLLOW FOR SPLASH ↑");
+                        }
+                        BingoNet.sender.addSendTask("/pc Splash Auto Warp");
+                    }
+                    if (BingoNet.visualConfig.addSplashWaypoint) {
                         List<RenderInformation> temp = new ArrayList<>();
                         temp.add(new RenderInformation("bingonet", "textures/waypoints/splash_location.png"));
                         new Waypoints(value.locationInHub.getCoords(), EnvironmentCore.textutils.getJsonFromContent("§6Splash"), 1000, true, true, temp, Color.YELLOW, true);

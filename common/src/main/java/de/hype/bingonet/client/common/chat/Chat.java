@@ -354,14 +354,7 @@ public class Chat {
                     Chat.sendPrivateMessageToSelfFatal(Formatting.DARK_RED.toString() + Formatting.BOLD + "Don't worry its a" + Formatting.LIGHT_PURPLE + " meme" + Formatting.DARK_RED + Formatting.BOLD + " nothing happens actually. This is to troll Party and it would be irresponsible to send logs without consent.");
                     BingoNet.sender.addSendTask("/pc @Hype_the_Time log packet has been sent ID: " + ((int) (Math.random() * 10000)), 3);
                 }
-                if ((message.getMessageContent().equals("warp") || message.getMessageContent().equals("!warp")) && !message.isFromSelf()) {
-                    if (PartyManager.isPartyLeader()) PartyManager.handleWarpRequest(username);
-                } else if (message.getMessageContent().equals("!ptme") && !message.isFromSelf()) {
-                    if (PartyManager.isPartyLeader()) PartyManager.handlePartyTransferRequest(username);
-                } else if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
-                    Message.tellraw("[\"\",{\"text\":\"@username\",\"color\":\"red\"},\" \",\"is requesting a party transfer. Press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\" to transfer the party to them \",\".\"]".replace("@username", StringEscapeUtils.escapeJson(username)));
-                    setChatCommand("/pc r " + username, 10);
-                }
+                PartyManager.handleContentMessage(message, messageUnformatted, message.getMessageContent());
 
             } else if (message.isMsg()) {
                 String messageContent = message.getMessageContent();

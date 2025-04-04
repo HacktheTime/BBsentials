@@ -405,7 +405,8 @@ public class Commands implements MCCommand {
             Chat.sendPrivateMessageToSelfError("Could not get the Server ID from Tablist.");
             return;
         }
-        Integer hubNumber = BingoNet.temporaryConfig.getHubNumberFromCache(serverid);
+        Islands currentIsland = EnvironmentCore.utils.getCurrentIsland();
+        Integer hubNumber = BingoNet.temporaryConfig.getHubNumberFromCache(currentIsland, serverid);
         if (hubNumber == null) {
             Chat.sendPrivateMessageToSelfError("Cache is either outdated or missing the current hub. Open the Hub Selector and try again.");
             return;
@@ -420,7 +421,7 @@ public class Commands implements MCCommand {
         if (loc == null)
             loc = new SplashLocation(new Position(playerPos.x, playerPos.y + 1, playerPos.z), null);
         try {
-            sendPacket(new SplashNotifyPacket(new SplashData(BingoNet.generalConfig.getUsername(), loc, extramessage, lessWaste, serverid, new SplashData.HubSelectorData(hubNumber, EnvironmentCore.utils.getCurrentIsland()))));
+            sendPacket(new SplashNotifyPacket(new SplashData(BingoNet.generalConfig.getUsername(), loc, extramessage, lessWaste, serverid, new SplashData.HubSelectorData(hubNumber, currentIsland))));
         } catch (Exception e) {
             Chat.sendPrivateMessageToSelfError(e.getMessage());
         }

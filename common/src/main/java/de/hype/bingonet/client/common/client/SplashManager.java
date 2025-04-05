@@ -30,6 +30,15 @@ public class SplashManager {
         }
     }
 
+    public static void handleSplash(SplashData data) {
+        if (splashPool.containsKey(data.splashId)) {
+            splashPool.get(data.splashId).update(data);
+        } else {
+            addSplash(data);
+            display(data.splashId);
+        }
+    }
+
     public static void updateSplash(SplashUpdatePacket packet) {
         DisplaySplash splash = splashPool.get(packet.splashId);
         if (splash != null) {
@@ -74,7 +83,7 @@ public class SplashManager {
                     Islands currentIsland = BingoNet.dataStorage.getIsland();
                     switch (currentIsland) {
                         case GOLD_MINE, The_Park, SPIDERS_DEN -> {
-                            BingoNet.sender.addSendTask("/warp " + splash.hubSelectorData.hubType.getWarpArgument(), 3);
+                            BingoNet.sender.addSendTask("/warp " + splash.hubSelectorData.hubType.getWarpArgument(), 0.5);
                         }
                         default -> {
 

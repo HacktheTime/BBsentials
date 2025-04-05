@@ -40,6 +40,17 @@ public class SplashData {
         this.splashId = packet.splashId;
     }
 
+    public void update(SplashData data) {
+        this.announcer = data.announcer;
+        this.locationInHub = data.locationInHub;
+        this.extraMessage = data.extraMessage;
+        this.lessWaste = data.lessWaste;
+        this.serverID = data.serverID;
+        this.hubSelectorData = data.hubSelectorData;
+        this.status = data.status;
+        this.splashId = data.splashId;
+    }
+
 
     public static class HubSelectorData {
         public int hubNumber;

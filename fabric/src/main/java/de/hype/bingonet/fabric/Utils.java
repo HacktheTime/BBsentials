@@ -267,7 +267,6 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                 ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
 
                 ConnectScreen.connect(client.currentScreen, client, serverAddress2, serverInfo, true, null);
-                commands.forEach(sender::addSendTask);
             });
             while ((client.currentScreen instanceof ConnectScreen)) {
                 try {
@@ -275,6 +274,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                 } catch (InterruptedException e) {
                 }
             }
+            commands.forEach(sender::addSendTask);
         } catch (Exception e) {
             throw new RuntimeException("Failed to connect to Hypixel", e);
         }

@@ -200,9 +200,9 @@ public class PartyManager {
 
     public static void leechData(ClientboundPartyInfoPacket packet) {
         isInParty = packet.isInParty();
-        isPartyLeader = packet.getLeader().get().equals(selfMCUUID);
-        isModerator = packet.getMemberMap().get(selfMCUUID).getRole().equals(ClientboundPartyInfoPacket.PartyRole.MOD);
-        if (packet.getMembers().size() != (partyMembers.size())) {
+        isPartyLeader = isInParty && packet.getLeader().get().equals(selfMCUUID);
+        isModerator = isInParty && packet.getMemberMap().get(selfMCUUID).getRole().equals(ClientboundPartyInfoPacket.PartyRole.MOD);
+        if (isInParty && packet.getMembers().size() != (partyMembers.size())) {
             Chat.sendPrivateMessageToSelfDebug("Party Member count detected. Resyncing");
             BingoNet.sender.addSendTask("/pl");
         }

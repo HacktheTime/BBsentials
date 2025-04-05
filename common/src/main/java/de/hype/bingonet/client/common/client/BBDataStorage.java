@@ -8,6 +8,8 @@ import net.hypixel.data.type.ServerType;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 
+import java.time.Instant;
+
 public class BBDataStorage {
     public final String serverId;
     public final String lobbyName;
@@ -19,6 +21,7 @@ public class BBDataStorage {
     public String profileType = null;
     public String currentProfileCuteName = null;
     public Environment environment;
+    public Instant joinTime;
 //    public final String proxyName;
 //    public final Environment environment;
 
@@ -32,8 +35,7 @@ public class BBDataStorage {
         if (packet.getMap().isPresent()) {
             this.map = packet.getMap().get();
             this.island = EnumUtils.getEnumByValue(Islands.class, map);
-        }
-        else {
+        } else {
             map = null;
             island = null;
         }
@@ -51,10 +53,10 @@ public class BBDataStorage {
 //        this.environment = packet.getEnvironment();
         if (packet.getMode().isPresent()) {
             this.mode = packet.getMode().get();
-        }
-        else {
+        } else {
             mode = null;
         }
+        joinTime = Instant.now();
     }
 
     public BBDataStorage(ClientboundHelloPacket packet) {
@@ -65,6 +67,7 @@ public class BBDataStorage {
         mode = null;
         lobbyName = null;
         serverId = null;
+        joinTime = Instant.now();
     }
 
     public Islands getIsland() {
@@ -86,5 +89,12 @@ public class BBDataStorage {
 
     public boolean isInLimbo() {
         return serverId != null && serverId.equals("limbo");
+    }
+
+    /**
+     * @return The time when you joined the lobby (like sb hub) your currently in.
+     */
+    public Instant getServerJoinTime() {
+        return joinTime;
     }
 }

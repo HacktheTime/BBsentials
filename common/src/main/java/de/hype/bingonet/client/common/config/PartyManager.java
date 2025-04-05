@@ -243,7 +243,7 @@ public class PartyManager {
         } else return "Insufficient permissions";
     }
 
-    public String leaveParty() {
+    public static String leaveParty() {
         if (!isInParty) {
             return "You are not in a party";
         }

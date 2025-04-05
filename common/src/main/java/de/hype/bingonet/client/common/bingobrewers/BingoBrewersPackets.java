@@ -4,10 +4,13 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.google.gson.Gson;
 import de.hype.bingonet.client.common.chat.Chat;
+import de.hype.bingonet.client.common.client.BingoNet;
 import de.hype.bingonet.client.common.client.SplashManager;
+import de.hype.bingonet.client.common.config.PartyManager;
 import de.hype.bingonet.shared.constants.Formatting;
 import de.hype.bingonet.shared.constants.Islands;
 import de.hype.bingonet.shared.constants.StatusConstants;
+import de.hype.bingonet.shared.objects.Message;
 import de.hype.bingonet.shared.objects.SplashData;
 import de.hype.bingonet.shared.objects.SplashLocation;
 
@@ -89,6 +92,19 @@ public class BingoBrewersPackets {
         @Override
         public void execute(SplashNotification packet, Client client) {
             try {
+                if ((message == null || message.equals("0")) && partyHost != null && !partyHost.equals("No Party")) {
+                    String json = "[{\"text\":\"\"},{\"text\":\"@splasher \",\"color\":\"light_purple\"},{\"text\":\"is splashing in a Private Server. \"},{\"text\":\"Press (\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},{\"text\":\") to join their Party. \"},{\"text\":\"Location: \"},{\"text\":\"@location \",\"color\":\"green\"},{\"text\":\"|\"},{\"text\":\" @extramessage\",\"color\":\"gold\"}]";
+                    json = json.replace("@splasher", splasher);
+                    json = json.replace("@location", location);
+                    json = json.replace("@extramessage", note != null ? String.join("\n", note) : "");
+                    Chat.sendPrivateMessageToSelfText(Message.tellraw(json));
+                    Chat.setChatCommand(() -> {
+                        PartyManager.leaveParty();
+                        BingoNet.sender.addImmediateSendTask("/p join %s".formatted(partyHost));
+                        BingoNet.sender.addSendTask("/p leave", 20);
+                    }, 10);
+                    return;
+                }
                 String regex = "(?i)(mega|mini)\\d+[A-Z]+";
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(packet.message);

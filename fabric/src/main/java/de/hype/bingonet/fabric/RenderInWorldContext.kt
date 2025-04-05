@@ -121,14 +121,25 @@ class RenderInWorldContext(
         )
     }
 
-    fun renderTextures(position: Vec3d, textures: List<Identifier?>, width: Int, height: Int, padding: Float) {
+    fun renderTextures(
+        position: Vec3d,
+        textures: List<Identifier?>,
+        width: Int,
+        height: Int,
+        padding: Float
+    ) {
         if (textures.isEmpty()) return
-        val totalWidth = width * textures.size + padding * (textures.size - 1)
-        val left = -totalWidth / 2
+        val count = textures.size
+        // padding applies only between textures, so only add it when there are > 1 texture
+        val totalWidth = width * count + if (count > 1) padding * (count - 1) else 0f
+        // center by subtracting half the total width, then add half the texture width so that each texture is centered
+        val left = -totalWidth / 2 + width / 2.0
         for ((index, texture) in textures.withIndex()) {
             if (texture == null || texture.path.isEmpty()) continue
+            // For each texture, apply the left offset and move the y coordinate up by 1
+            val xOffset = left + index * (width + if (count > 1) padding else 0f)
             texture(
-                position.add(left + index * (width + padding).toDouble(), 0.0, 0.0),
+                position.add(xOffset.toDouble(), 0.0, 0.0),
                 texture, width, height
             )
         }

@@ -151,8 +151,10 @@ public class PartyManager {
             if (PartyManager.isPartyLeader()) PartyManager.handlePartyTransferRequest(message.getPlayerName());
         }
         if (content.equals("!splash auto warp") && (PartyManager.isPartyLeader() || message.isFromSelf())) {
-            flags.put(PartyFeatures.SPLASH_AUTO_WARP, !(Boolean) flags.getOrDefault(PartyFeatures.SPLASH_AUTO_WARP, false));
-            sendFlagChangeInfo(PartyFeatures.SPLASH_AUTO_WARP);
+            Boolean newState = !(Boolean) flags.getOrDefault(PartyFeatures.SPLASH_AUTO_WARP, false);
+            flags.put(PartyFeatures.SPLASH_AUTO_WARP, newState);
+            String string = "Warping Party to Splashes is now %s".formatted(newState ? "enabled" : "disabled");
+            BingoNet.sender.addSendTask("/pc %s".formatted(string), 2);
         }
         if (message.getMessageContent().equals("r?") || message.getMessageContent().equals("ready?")) {
             setChatCommand("/pc r " + message.getPlayerName(), 10);

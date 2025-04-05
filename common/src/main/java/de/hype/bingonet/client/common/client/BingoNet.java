@@ -199,11 +199,11 @@ public class BingoNet {
                     if (hubSelectorData == null) continue;
                     Map<String, Integer> serverIdToHubNumber = temporaryConfig.serverIdToHubNumber.get(hubSelectorData.hubType);
                     if (serverIdToHubNumber == null) {
-                        break;
+                        return;
                     }
                     for (Map.Entry<String, Integer> entry : serverIdToHubNumber.entrySet()) {
                         if (entry.getValue().equals(hubSelectorData.hubNumber)) {
-                            value.serverID = serverId;
+                            value.serverID = entry.getKey();
                             break;
                         }
                     }

@@ -133,7 +133,7 @@ public class BingoBrewersPackets {
                     }
                 }
                 SplashData splashData = new SplashData(splashUsername, splashLocation, extraMessage, false, serverId, hubSelectorData, StatusConstants.OPEN);
-                splashData.splashId = -Integer.parseInt(splash);
+                splashData.splashId = -(int) (Long.parseLong(splash) & 0xFFFFFFFFL);
                 SplashManager.handleSplash(splashData);
             } catch (Exception e) {
                 Chat.sendPrivateMessageToSelfError("Bingo Net: We had an Error Processing a Splash received from Bingo Brewers. Please Report this (TO BINGO NET) along side the following info (or Screenshot)\n" + new Gson().toJson(this));

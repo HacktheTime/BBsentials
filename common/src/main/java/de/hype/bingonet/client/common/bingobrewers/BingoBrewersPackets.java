@@ -14,10 +14,7 @@ import de.hype.bingonet.shared.objects.Message;
 import de.hype.bingonet.shared.objects.SplashData;
 import de.hype.bingonet.shared.objects.SplashLocation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,13 +91,15 @@ public class BingoBrewersPackets {
             try {
                 if ((message == null || message.equals("0")) && partyHost != null && !partyHost.equals("No Party")) {
                     String json = "[{\"text\":\"\"},{\"text\":\"@splasher \",\"color\":\"light_purple\"},{\"text\":\"is splashing in a Private Server. \"},{\"text\":\"Press (\"},{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},{\"text\":\") to join their Party. \"},{\"text\":\"Location: \"},{\"text\":\"@location \",\"color\":\"green\"},{\"text\":\"|\"},{\"text\":\" @extramessage\",\"color\":\"gold\"}]";
-                    json = json.replace("@splasher", splasher);
+                    json = json.replace("@splasher", "%sBingo Brewers(%s%s%s)".formatted(Formatting.LIGHT_PURPLE.getMCCode(), Formatting.GOLD.getMCCode(), splasher, Formatting.LIGHT_PURPLE.getMCCode()));
                     json = json.replace("@location", location);
                     json = json.replace("@extramessage", note != null ? String.join("\n", note) : "");
                     Chat.sendPrivateMessageToSelfText(Message.tellraw(json));
                     Chat.setChatCommand(() -> {
-                        PartyManager.leaveParty();
-                        BingoNet.sender.addImmediateSendTask("/p join %s".formatted(partyHost));
+                        if (PartyManager.isInParty()) {
+                            BingoNet.sender.addImmediateSendTask("/p leave");
+                        }
+                        BingoNet.sender.addSendTask("/p join %s".formatted(partyHost));
                         BingoNet.sender.addSendTask("/p leave", 20);
                     }, 10);
                     return;

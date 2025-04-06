@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(HandledScreen.class)
 public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
@@ -77,10 +78,11 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
                     SystemUtils.openInBrowser("https://wiki.hypixel.net/%s".formatted(path));
                 } else if (keyCode == KeyBindingHelper.getBoundKeyOf(ModInitialiser.promptKeyBind).getCode()) {
                     if (getTitle().getString().endsWith("Selector")) {
+                        List<Slot> slots = new ArrayList<>(handler.slots);
                         if (BingoNet.dataStorage.getServerJoinTime().plus(3, ChronoUnit.SECONDS).isBefore(Instant.now())) {
                             for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
                                 if (value.serverID != null) {
-                                    for (Slot slot : handler.slots) {
+                                    for (Slot slot : slots) {
                                         for (Text line : slot.getStack().get(DataComponentTypes.LORE).lines()) {
                                             if (line.getString().matches("Server: %s".formatted(value.serverID))) {
                                                 clickSlot(slot, SlotActionType.PICKUP, ClickType.LEFT);
@@ -89,7 +91,7 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
                                         }
                                     }
                                 } else if (value.hubSelectorData != null) {
-                                    for (Slot slot : handler.slots) {
+                                    for (Slot slot : slots) {
                                         if (slot.getStack().getName().getString().endsWith("#%s".formatted(value.hubSelectorData.hubNumber))) {
                                             clickSlot(slot, SlotActionType.PICKUP, ClickType.LEFT);
                                             return;
@@ -123,6 +125,9 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
     }
 
     protected void clickSlot(Slot slot, SlotActionType slotActionType, ClickType clickType) {
+        if (client.currentScreen != this) {
+            return; // Prevents clicking when the screen is not open
+        }
         int button = switch (clickType) {
             case LEFT -> 0;
             case RIGHT -> 1;

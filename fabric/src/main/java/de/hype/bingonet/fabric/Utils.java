@@ -676,7 +676,9 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
     }
 
     public boolean isOnMegaServer() {
-        return getServerId().toLowerCase().startsWith("mega");
+        String serverId = getServerId();
+        if (serverId == null) return false;
+        return serverId.toLowerCase().startsWith("mega");
     }
 
     public boolean isOnMiniServer() {

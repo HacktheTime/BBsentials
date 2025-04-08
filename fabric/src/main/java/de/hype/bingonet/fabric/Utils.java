@@ -664,7 +664,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
         Islands island = getCurrentIsland();
         if (island == null) return 100;
         if (island.equals(Islands.HUB)) {
-            if (mega) return 81;
+            if (mega) return 60;
             else return 25;
         }
         return 25;

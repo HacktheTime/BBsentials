@@ -41,7 +41,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -472,7 +471,7 @@ public class BBsentialConnection {
                     Chat.sendCommand("/p leave");
                 }
             } else if (packet.type == PartyConstants.INVITE) {
-                if (leader || moderator) {
+                if (!isInParty || leader || moderator) {
                     Chat.sendPrivateMessageToSelfInfo("Bingo Net Server requested party invite");
                     List<String> users = packet.users;
                     int chunkSize = 5;

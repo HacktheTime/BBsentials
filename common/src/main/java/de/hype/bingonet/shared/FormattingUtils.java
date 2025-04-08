@@ -118,7 +118,7 @@ public class FormattingUtils {
 
     public static String formatTime(Duration src) {
         long seconds = src.getSeconds();
-        String prefix = seconds < 0 ? "in %s" : "%s ago";
+        String prefix = seconds > 0 ? "in %s" : "%s ago";
         int days = (int) (seconds / 86400);
         int hours = (int) ((seconds % 86400) / 3600);
         int minutes = (int) ((seconds % 3600) / 60);

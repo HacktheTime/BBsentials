@@ -79,9 +79,7 @@ public class AddonPacketUtils {
                     Chat.sendPrivateMessageToSelfDebug(packetName + ":" + rawJson);
                 tryToProcessPacket(addonPacket, rawJson);
                 return true;
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception t) {
+            } catch (Throwable t) {
                 showError(t, "Could not process Addon packet '" + packetName + "' from " + AddonEnvironmentPacketConfig.notEnviroment);
             }
         }

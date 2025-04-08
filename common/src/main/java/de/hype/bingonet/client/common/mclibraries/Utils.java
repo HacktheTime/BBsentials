@@ -9,6 +9,7 @@ import javazoom.jl.player.advanced.AdvancedPlayer;
 import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
 import net.hypixel.modapi.packet.HypixelPacket;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -64,6 +65,8 @@ public interface Utils {
     int getPotTime();
 
     String mojangAuth(String serverId);
+
+    void displayToast(String title, String description, @Nullable Boolean challengeSound);
 
     // Leechers was originally inveneted by Calva but redone by me without access to the code, I made it since Calvas mod was private at that date
     List<String> getSplashLeechingPlayers();
@@ -210,4 +213,6 @@ public interface Utils {
     void connectToServer(String s, Map<String, Double> commands);
 
     void disconnectFromServer();
+
+    boolean isScreenGame();
 }

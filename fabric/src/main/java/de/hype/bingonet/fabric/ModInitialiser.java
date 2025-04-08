@@ -447,6 +447,22 @@ public class ModInitialiser implements ClientModInitializer {
                                                             }))).executes((context) -> {
                                                 return 1;
                                             })
+                                    ).then(literal("other")
+                                            .then(argument("command", StringArgumentType.greedyString())
+                                                    .executes(context -> {
+                                                        String command = StringArgumentType.getString(context, "command");
+                                                        if (command.equals("setup-pojav")) {
+                                                            //Hidden because the setup is a bit sketchy
+                                                            socketAddonConfig.useSocketAddons = true;
+                                                            ConfigManager.saveAll();
+                                                        } else {
+                                                            Chat.sendPrivateMessageToSelfInfo("Internal Command not found. These Commands are hidden for a reason.");
+                                                            return 1;
+                                                        }
+                                                        Chat.sendPrivateMessageToSelfSuccess("Command executed successfully");
+                                                        return 0;
+                                                    })
+                                            )
                                     )
                             )
                             .then(literal("waypoint")
@@ -755,7 +771,9 @@ public class ModInitialiser implements ClientModInitializer {
 
 
     public void joinHypixel() {
-        Map<String, Double> commands = Map.of("/skyblock", 3.5);
-        EnvironmentCore.utils.connectToServer("mc.hypixel.net", commands);
+        executionService.execute(() -> {
+            Map<String, Double> commands = Map.of("/skyblock", 3.5);
+            EnvironmentCore.utils.connectToServer("mc.hypixel.net", commands);
+        });
     }
 }

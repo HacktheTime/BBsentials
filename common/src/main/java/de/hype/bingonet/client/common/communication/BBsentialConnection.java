@@ -297,7 +297,7 @@ public class BBsentialConnection {
             UpdateListenerManager.splashStatusUpdateListener = splashStatusUpdateListener;
             BingoNet.executionService.execute(splashStatusUpdateListener);
         } else {
-            SplashManager.addSplash(packet);
+            SplashManager.addSplash(packet.splash);
             if (packet.splash.lessWaste) {
                 waitTime = Math.min(((EnvironmentCore.utils.getPotTime() * 1000) / 80), 25 * 1000);
             } else {

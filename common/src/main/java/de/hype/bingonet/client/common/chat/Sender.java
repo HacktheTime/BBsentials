@@ -23,8 +23,8 @@ public class Sender {
     }
 
     public void addSendTask(String task, double timing) {
+        sendPrivateMessageToSelfText(Message.of(Formatting.GREEN + "Scheduled send-task (as " + sendQueueTiming.size() + " in line): " + task + " | Delay: " + timing));
         synchronized (sendQueue) {
-            sendPrivateMessageToSelfText(Message.of(Formatting.GREEN + "Scheduled send-task (as " + sendQueueTiming.size() + " in line): " + task + " | Delay: " + timing));
             sendQueueTiming.add(timing);
             sendQueue.add(task);
             hidden.add(false);
@@ -59,14 +59,17 @@ public class Sender {
     public void startSendingThread() {
         Thread sendingThread = new Thread(new SendingRunnable());
         sendingThread.start();
+        System.out.println("Sender thread started.");
     }
 
     private class SendingRunnable implements Runnable {
         @Override
         public void run() {
             while (true) {
+                System.out.println("Sender thread waiting for tasks...");
                 String task = getNextTask();
                 if (task != null) {
+                    System.out.println("Sender thread processing task: " + task);
                     send(task, sendQueueTiming.remove(0), hidden.remove(0));
                 }
                 else {

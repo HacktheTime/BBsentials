@@ -1,6 +1,7 @@
 package de.hype.bingonet.client.common.client;
 
 import de.hype.bingonet.client.common.annotations.AnnotationProcessor;
+import de.hype.bingonet.client.common.bingobrewers.BingoBrewersClient;
 import de.hype.bingonet.client.common.chat.Chat;
 import de.hype.bingonet.client.common.chat.Sender;
 import de.hype.bingonet.client.common.client.commands.Commands;
@@ -17,6 +18,7 @@ import de.hype.bingonet.client.common.objects.WaypointRoute;
 import de.hype.bingonet.client.common.objects.Waypoints;
 import de.hype.bingonet.shared.constants.Islands;
 import de.hype.bingonet.shared.objects.RenderInformation;
+import de.hype.bingonet.shared.objects.SplashData;
 import de.hype.bingonet.shared.packets.network.LowPlayerMegaReport;
 import io.github.moulberry.repo.NEURepositoryException;
 
@@ -48,6 +50,7 @@ public class BingoNet {
     public static Thread debugThread;
     //General Config needs to be first config!
     public static GeneralConfig generalConfig = new GeneralConfig();
+    public static BingoBrewersClient bingoBrewersClient;
     //All Other Configs
     public static DeveloperConfig developerConfig = new DeveloperConfig();
     public static DiscordConfig discordConfig = new DiscordConfig();
@@ -190,10 +193,33 @@ public class BingoNet {
             BingoNet.discordIntegration.setNewStatus(status);
         }, true);
         ServerSwitchTask.onServerJoinTask(() -> {
-            if (BingoNet.visualConfig.addSplashWaypoint) {
-                String serverId = EnvironmentCore.utils.getServerId();
-                for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
-                    if (value.serverID.equals(serverId) && value.receivedTime.isAfter(Instant.now().minusSeconds(60))) {
+            String serverId = EnvironmentCore.utils.getServerId();
+            for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
+                if (value.serverID == null) {
+                    SplashData.HubSelectorData hubSelectorData = value.hubSelectorData;
+                    if (hubSelectorData == null) continue;
+                    Map<String, Integer> serverIdToHubNumber = temporaryConfig.serverIdToHubNumber.get(hubSelectorData.hubType);
+                    if (serverIdToHubNumber == null) {
+                        return;
+                    }
+                    for (Map.Entry<String, Integer> entry : serverIdToHubNumber.entrySet()) {
+                        if (entry.getValue().equals(hubSelectorData.hubNumber)) {
+                            value.serverID = entry.getKey();
+                            break;
+                        }
+                    }
+                }
+                if (value.serverID == null) continue;
+                if (value.serverID.equals(serverId) && value.receivedTime.isAfter(Instant.now().minusSeconds(60))) {
+                    if (PartyManager.getFlag("splash auto warp", false)) {
+                        if (PartyManager.isPartyLeader()) {
+                            BingoNet.sender.addImmediateSendTask("/p warp");
+                        } else {
+                            BingoNet.sender.addImmediateSendTask("/pc ↑ CHAT FOLLOW FOR SPLASH ↑");
+                        }
+                        BingoNet.sender.addSendTask("/pc Splash Auto Warp");
+                    }
+                    if (BingoNet.visualConfig.addSplashWaypoint) {
                         List<RenderInformation> temp = new ArrayList<>();
                         temp.add(new RenderInformation("bingonet", "textures/waypoints/splash_location.png"));
                         new Waypoints(value.locationInHub.getCoords(), EnvironmentCore.textutils.getJsonFromContent("§6Splash"), 1000, true, true, temp, Color.YELLOW, true);
@@ -250,7 +276,14 @@ public class BingoNet {
         }
         hpModAPICore = new HypixelModAPICore();
         EnvironmentCore.utils.registerNetworkHandlers();
-
+        if (generalConfig.useBingoBrewersIntegration) {
+            try {
+                bingoBrewersClient = new BingoBrewersClient();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Chat.sendPrivateMessageToSelfError("Could not connect to Bingobrewers");
+            }
+        }
     }
 
     public static String downloadJson(String urlString) throws Exception {

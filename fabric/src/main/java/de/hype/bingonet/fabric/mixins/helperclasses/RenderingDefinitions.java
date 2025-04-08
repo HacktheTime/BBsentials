@@ -75,25 +75,40 @@ public abstract class RenderingDefinitions {
                     if (!SplashManager.splashPool.isEmpty()) {
                         for (SplashManager.DisplaySplash value : SplashManager.splashPool.values()) {
                             if (value.receivedTime.isAfter(Instant.now().minusSeconds(20))) {
-                                if (value.serverID.equalsIgnoreCase(serverid)) {
-                                    if (full) check.texturePath = "bingonet:hub-items/splash_hub_full";
-                                    else check.texturePath = "bingonet:hub-items/splash_hub";
-                                } else if (value.serverID.isEmpty()) {
+                                if (value.serverID != null) {
+                                    if (value.serverID.equalsIgnoreCase(serverid)) {
+                                        if (full) check.texturePath = "bingonet:hub-items/splash_hub_full";
+                                        else check.texturePath = "bingonet:hub-items/splash_hub";
+                                    } else if (value.serverID.isEmpty()) {
+                                        if (value.hubSelectorData != null && value.hubSelectorData.hubNumber == hubNumber) {
+                                            if (full) check.texturePath = "bingonet:hub-items/splash_hub_full";
+                                            else check.texturePath = "bingonet:hub-items/splash_hub";
+                                        }
+                                    } else {
+                                        return false;
+                                    }
+                                } else {
                                     if (value.hubSelectorData != null && value.hubSelectorData.hubNumber == hubNumber) {
                                         if (full) check.texturePath = "bingonet:hub-items/splash_hub_full";
                                         else check.texturePath = "bingonet:hub-items/splash_hub";
                                     }
-                                } else {
-                                    return false;
                                 }
+
                                 List<Text> textList = check.getTextTooltip();
                                 textList.getFirst().setStringText("%s(Splash) %s".formatted(Formatting.GOLD, check.getItemStackName()));
                                 textList.add(4, EnvironmentCore.textutils.createText("%sSplasher: %s%s".formatted(Formatting.GRAY, Formatting.LIGHT_PURPLE, value.announcer)));
-                                textList.add(5, EnvironmentCore.textutils.createText(""));
-                                if (value.extraMessage != null && !value.extraMessage.isEmpty()) {
-                                    textList.add(5, EnvironmentCore.textutils.createText("%sMessage: %s".formatted(Formatting.GRAY, value.extraMessage)));
-                                }
                                 textList.add(5, EnvironmentCore.textutils.createText("%sLocation: %s".formatted(Formatting.GRAY, value.locationInHub.getDisplayString())));
+                                textList.add(6, EnvironmentCore.textutils.createText(""));
+                                if (value.extraMessage != null && !value.extraMessage.isEmpty()) {
+                                    String[] extras = value.extraMessage.split("\n");
+                                    if (extras.length == 1) {
+                                        textList.add(7, EnvironmentCore.textutils.createText("%sMessage: %s".formatted(Formatting.GRAY, value.extraMessage)));
+                                    } else {
+                                        for (int i = 0; i < extras.length; i++) {
+                                            textList.add(7 + i, EnvironmentCore.textutils.createText("%s%s".formatted(Formatting.GRAY, extras[i])));
+                                        }
+                                    }
+                                }
                                 return true;
                             }
                         }

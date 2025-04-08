@@ -21,7 +21,7 @@ public class AddonManager {
             while (true) {
                 try {
                     Socket client = serverSocket.accept();
-                    if (client.getInetAddress().isLoopbackAddress()) {
+                    if (client.getInetAddress().isLoopbackAddress() && BingoNet.socketAddonConfig.useSocketAddons) {
                         AddonHandler handler = new AddonHandler(client);
                         clients.add(handler);
                         BingoNet.executionService.execute(handler);

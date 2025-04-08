@@ -3,7 +3,6 @@ package de.hype.bingonet.fabric;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import de.hype.bingonet.client.common.chat.Chat;
-import de.hype.bingonet.client.common.client.BingoNet;
 import de.hype.bingonet.client.common.client.updatelisteners.ChChestUpdateListener;
 import de.hype.bingonet.client.common.client.updatelisteners.UpdateListenerManager;
 import de.hype.bingonet.client.common.mclibraries.EnvironmentCore;
@@ -34,9 +33,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.*;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.client.render.RenderLayer;
@@ -64,6 +61,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.awt.*;
@@ -73,8 +71,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Predicate;
@@ -108,7 +106,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
         if (!waypoints.isEmpty() || ModInitialiser.tutorialManager.current != null) {
             try {
                 RenderInWorldContext.Companion.renderInWorld(event, (it) -> {
-                    Color color = BingoNet.visualConfig.waypointDefaultColor;
+                    Color color = visualConfig.waypointDefaultColor;
                     color = new Color(color.getRed() / 16, color.getGreen() / 16, color.getBlue() / 16, 50);
                     if (ModInitialiser.tutorialManager.current != null) {
                         List<CoordinateNode> nodes = ModInitialiser.tutorialManager.current.getCoordinateNodesToRender();
@@ -116,7 +114,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                             BlockPos pos = new BlockPos(nodes.get(i).getPositionBlockPos());
                             it.block(pos, color);
                             if (i == 0 && !ModInitialiser.tutorialManager.recording) {
-                                it.tracer(pos.toCenterPos(), 3f);
+                                it.tracer(pos.toCenterPos(), 3f, color);
                             }
                             it.doWaypointIcon(pos.toCenterPos(), new ArrayList<>(), 25, 25);
                         }
@@ -129,8 +127,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                         it.block(pos, color);
                         it.waypoint(pos, color, FabricTextUtils.jsonToText(waypoint.jsonToRenderText));
                         if (waypoint.doTracer) {
-                            Vector3f cameraForward = new Vector3f(0f, 0f, 1f).rotate(event.camera.getRotation());
-                            it.line(new Vec3d[]{event.camera.getPos().add(new Vec3d(cameraForward)), pos.toCenterPos()}, 3f);
+                            it.tracer(pos.toCenterPos(), 3f, color);
                         }
                         it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 25, 25);
 
@@ -142,11 +139,11 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
             }
         }
         try {
-            if (BingoNet.temporaryConfig.route != null) {
+            if (temporaryConfig.route != null) {
                 RenderInWorldContext.Companion.renderInWorld(event, (it) -> {
-                    RouteNode node = BingoNet.temporaryConfig.route.getCurrentNode();
+                    RouteNode node = temporaryConfig.route.getCurrentNode();
                     BlockPos pos = new BlockPos(node.coords.x, node.coords.y, node.coords.z);
-                    BingoNet.temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
+                    temporaryConfig.route.doNextNodeCheck(playerPos.toCenterPos().distanceTo(pos.toCenterPos()));
                     it.block(pos, node.color);
                     it.waypoint(pos, Text.of(node.name));
 
@@ -221,9 +218,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
             if (string.startsWith("Minions:")) {
                 inMinionData = true;
                 slots = Integer.parseInt(string.split("/")[1].replaceAll("\\D+", ""));
-            }
-            else
-                if (inMinionData && string.trim().isEmpty()) return new MinionDataResponse(minions, slots);
+            } else if (inMinionData && string.trim().isEmpty()) return new MinionDataResponse(minions, slots);
             if (!(inMinionData)) continue;
             try {
                 String[] arguments = string.split(" ");
@@ -241,20 +236,48 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
     @Override
     public void connectToServer(String serverAddress, Map<String, Double> commands) {
         MinecraftClient client = MinecraftClient.getInstance();
-        MinecraftClient.getInstance().execute(() -> {
-            ServerList serverList = new ServerList(client);
-            serverList.loadFile();
-            ServerInfo serverInfo = serverList.get(serverAddress);
-            if (serverInfo == null) {
-                serverInfo = new ServerInfo(serverAddress, serverAddress, ServerInfo.ServerType.OTHER);
-                serverList.add(serverInfo, true);
-                serverList.saveFile();
+        while (!client.isFinishedLoading()) {
+            try {
+                Thread.sleep(1_000);
+            } catch (InterruptedException e) {
             }
-            ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
+        }
+        try {
+            client.execute(() -> {
+                try {
+                    String connection = client.getNetworkHandler().getConnection().getAddress().toString();
+                    connection = connection.replaceAll("/.*:", ":");
+                    if (connection.replace(":25565", "").equals(serverAddress.replace(":25565", ""))) {
+                        commands.forEach(sender::addSendTask);
+                        return;
+                    }
+                    client.disconnect();
+                    Thread.sleep(100);
+                } catch (Exception ignored) {
 
-            ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), client, serverAddress2, serverInfo, true, null);
+                }
+                ServerList serverList = new ServerList(client);
+                serverList.loadFile();
+                ServerInfo serverInfo = serverList.get(serverAddress);
+                if (serverInfo == null) {
+                    serverInfo = new ServerInfo(serverAddress, serverAddress, ServerInfo.ServerType.OTHER);
+                    serverList.add(serverInfo, true);
+                    serverList.saveFile();
+                }
+                ServerAddress serverAddress2 = ServerAddress.parse(serverAddress);
+
+                ConnectScreen.connect(client.currentScreen, client, serverAddress2, serverInfo, true, null);
+            });
+            while ((client.currentScreen instanceof ConnectScreen)) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+            }
             commands.forEach(sender::addSendTask);
-        });
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to connect to Hypixel", e);
+        }
 
     }
 
@@ -263,6 +286,11 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
         MinecraftClient.getInstance().execute(() -> {
             MinecraftClient.getInstance().disconnect();
         });
+    }
+
+    @Override
+    public boolean isScreenGame() {
+        return MinecraftClient.getInstance().currentScreen == null;
     }
 
     public void playsound(String eventName) {
@@ -331,7 +359,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
 
     public List<String> toDisplayStringLeecherOverlay() {
         List<String> stringList = new ArrayList();
-        boolean doPants = BingoNet.splashConfig.showMusicPantsUsers;
+        boolean doPants = splashConfig.showMusicPantsUsers;
         for (PlayerEntity player : getAllPlayers()) {
             String prefix = "";
             boolean display = false;
@@ -363,13 +391,11 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                     if (entry.getValue().getDuration() >= 60000) {
                         leechPotions++;
                     }
-                }
-                else
-                    if (effect == StatusEffects.JUMP_BOOST && amplifier >= 5) {
-                        if (entry.getValue().getDuration() >= 60000) {
-                            leechPotions++;
-                        }
+                } else if (effect == StatusEffects.JUMP_BOOST && amplifier >= 5) {
+                    if (entry.getValue().getDuration() >= 60000) {
+                        leechPotions++;
                     }
+                }
             }
             if (leechPotions >= 2) {
                 prefix += "§4[⏳] §r";
@@ -400,6 +426,13 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
 
     public void displayToast(BBToast toast) {
         MinecraftClient.getInstance().getToastManager().add(toast);
+    }
+
+    @Override
+    public void displayToast(String title, String description, @Nullable Boolean challengeSound) {
+        BBToast toast = new BBToast(title, description, challengeSound);
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.execute(() -> client.getToastManager().add(toast));
     }
 
     private List<PlayerEntity> getSplashLeechingPlayersPlayerEntity() {
@@ -512,72 +545,65 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                 drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
                 y += 10; // Adjust the vertical position for the next string
             }
-        }
-        else
-            if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
-                ChChestUpdateListener listener = UpdateListenerManager.chChestUpdateListener;
+        } else if (UpdateListenerManager.chChestUpdateListener.showOverlay()) {
+            ChChestUpdateListener listener = UpdateListenerManager.chChestUpdateListener;
 
-                int x = 10;
-                int y = 15;
-                List<Text> toRender = new ArrayList<>();
-                if (listener.isHoster) {
-                    String status = listener.lobby.getStatus();
-                    switch (status) {
-                        case "Open":
-                            status = "§aOpen";
-                            break;
-                        case "Closed":
-                            status = "§4Closed";
-                            break;
-                        case "Full":
-                            status = "Full";
-                            break;
-                    }
-                    String warpInfo = "§cFull";
-                    int playerThatCanBeWarped = EnvironmentCore.utils.getMaximumPlayerCount() - EnvironmentCore.utils.getPlayerCount();
-                    if (playerThatCanBeWarped >= 1) {
-                        warpInfo = "§a(" + playerThatCanBeWarped + ")";
-                    }
+            int x = 10;
+            int y = 15;
+            List<Text> toRender = new ArrayList<>();
+            if (listener.isHoster) {
+                String status = listener.lobby.getStatus();
+                switch (status) {
+                    case "Open":
+                        status = "§aOpen";
+                        break;
+                    case "Closed":
+                        status = "§4Closed";
+                        break;
+                    case "Full":
+                        status = "Full";
+                        break;
+                }
+                String warpInfo = "§cFull";
+                int playerThatCanBeWarped = EnvironmentCore.utils.getMaximumPlayerCount() - EnvironmentCore.utils.getPlayerCount();
+                if (playerThatCanBeWarped >= 1) {
+                    warpInfo = "§a(" + playerThatCanBeWarped + ")";
+                }
 
-                    toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
-                    long closingTimeInMinutes = Duration.between(Instant.now(), getLobbyClosingTime()).toMinutes();
-                    if (closingTimeInMinutes <= 0) {
-                        toRender.add(Text.of("§4Lobby Closed"));
-                    }
-                    else {
-                        toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
-                    }
-                    for (ChChestData chest : listener.getUnopenedChests()) {
-                        if (chest.finder.equals(BingoNet.generalConfig.getUsername())) continue;
-                        toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.finder)));
-                        chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
-                    }
+                toRender.add(Text.of("§6Status:§0 " + status + "§6 | Slots: " + warpInfo + "§6"));
+                long closingTimeInMinutes = Duration.between(Instant.now(), getLobbyClosingTime()).toMinutes();
+                if (closingTimeInMinutes <= 0) {
+                    toRender.add(Text.of("§4Lobby Closed"));
+                } else {
+                    toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
                 }
-                else {
-                    toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
-                    for (ChChestData chest : listener.getUnopenedChests()) {
-                        String author = "";
-                        if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder))
-                            author = " [" + chest.finder + "]";
-                        toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
-                        chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
-                    }
+                for (ChChestData chest : listener.getUnopenedChests()) {
+                    if (chest.finder.equals(generalConfig.getUsername())) continue;
+                    toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.finder)));
+                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
-                for (Text text : toRender) {
-                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
-                    y += 10; // Adjust the vertical position for the next string
+            } else {
+                toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
+                for (ChChestData chest : listener.getUnopenedChests()) {
+                    String author = "";
+                    if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder))
+                        author = " [" + chest.finder + "]";
+                    toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
+                    chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
             }
-            else if (BingoNet.funConfig.lowPlayTimeHelpers && BingoNet.funConfig.lowPlaytimeHelperJoinDate != null) {
-                long differece = ((Instant.now().getEpochSecond() - BingoNet.funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
-                    String colorCode = "§a";
-                    if (differece > 50) colorCode = "§4§l";
-                    else
-                        if (differece > 45) colorCode = "§4";
-                        else
-                            if (differece > 40) colorCode = "§6";
-                    drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
-                }
+            for (Text text : toRender) {
+                drawContext.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
+                y += 10; // Adjust the vertical position for the next string
+            }
+        } else if (funConfig.lowPlayTimeHelpers && funConfig.lowPlaytimeHelperJoinDate != null) {
+            long differece = ((Instant.now().getEpochSecond() - funConfig.lowPlaytimeHelperJoinDate.getEpochSecond()));
+            String colorCode = "§a";
+            if (differece > 50) colorCode = "§4§l";
+            else if (differece > 45) colorCode = "§4";
+            else if (differece > 40) colorCode = "§6";
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(colorCode + "Time in Lobby: " + differece), 10, 10, 0xFFFFFF, true);
+        }
         if (ModInitialiser.tutorialManager.current != null) {
             TutorialManager manager = ModInitialiser.tutorialManager;
             Tutorial current = manager.current;
@@ -587,8 +613,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                     drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Tutorial (§cRecording§r): "), 10, 30, 0xFFFFFF, true);
                     drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(node.getDescriptionString()), 10, 40, 0xFFFFFF, true);
 
-                }
-                else {
+                } else {
                     drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of("Tutorial: "), 10, 30, 0xFFFFFF, true);
                     drawContext.drawText(MinecraftClient.getInstance().textRenderer, Text.of(node.getDescriptionString()), 10, 40, 0xFFFFFF, true);
                 }
@@ -597,8 +622,8 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
     }
 
     public Islands getCurrentIsland() {
-        if (BingoNet.dataStorage == null) return null;
-        return BingoNet.dataStorage.getIsland();
+        if (dataStorage == null) return null;
+        return dataStorage.getIsland();
 //        try {
 //            ClientPlayNetworkHandler t = MinecraftClient.getInstance().getNetworkHandler();
 //            if (t == null) return null;
@@ -643,8 +668,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
         PlayerListEntry entry;
         if (isSecondRowInfoRow()) {
             entry = t.getPlayerListEntry("!B-c");
-        }
-        else {
+        } else {
             entry = t.getPlayerListEntry("!C-c");
         }
         if (entry == null) return null;
@@ -750,11 +774,26 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
         Integer integerToWrap = getWidth() - imageSize * 3;
         Color color;
         private boolean soundPlayed;
-        private Toast.Visibility visibility = Toast.Visibility.HIDE;
+        private Visibility visibility = Visibility.HIDE;
 
 
-        public BBToast(String title, String description) {
-            this(title, description, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, VanillaItems.DIAMOND, Color.WHITE);
+        /**
+         * @param title          Title of the toast
+         * @param description    Description of the toast
+         * @param challengeSound true if you want the challenge sound, false if you want a popup sound, null for no sound
+         */
+        public BBToast(String title, String description, @Nullable Boolean challengeSound) {
+            this(title, description, getSoundEvent(challengeSound), VanillaItems.DIAMOND, Color.WHITE);
+        }
+
+        private static SoundEvent getSoundEvent(Boolean challengeSound) {
+            if (Boolean.TRUE.equals(challengeSound)) {
+                return SoundEvents.UI_TOAST_CHALLENGE_COMPLETE;
+            } else if (Boolean.FALSE.equals(challengeSound)) {
+                return SoundEvents.UI_TOAST_IN;
+            } else {
+                return SoundEvents.UI_TOAST_CHALLENGE_COMPLETE;
+            }
         }
 
         /**
@@ -787,7 +826,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                 manager.getClient().getSoundManager().play(PositionedSoundInstance.master(SoundEvent.of(sound), 1.0F, 1.0F));
 
             }
-            this.visibility = (double) time >= 5000.0 * manager.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+            this.visibility = (double) time >= 5000.0 * manager.getNotificationDisplayTimeMultiplier() ? Visibility.HIDE : Visibility.SHOW;
 
         }
 
@@ -799,15 +838,13 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
             if (list.size() == 1) {
                 context.drawText(textRenderer, Text.literal(description), 30, 7, i, false);
                 context.drawText(textRenderer, (OrderedText) list.get(0), 30, 18, -1, false);
-            }
-            else {
+            } else {
                 int j = 1500;
                 float f = 300.0F;
                 if (startTime < 1500L) {
                     int k = MathHelper.floor(MathHelper.clamp((float) (1500L - startTime) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 67108864;
                     context.drawText(textRenderer, Text.literal(description), 30, 11, i | k, false);
-                }
-                else {
+                } else {
                     int k = MathHelper.floor(MathHelper.clamp((float) (startTime - 1500L) / 300.0F, 0.0F, 1.0F) * 252.0F) << 24 | 67108864;
                     int l = this.getHeight() / 2 - list.size() * 9 / 2;
 

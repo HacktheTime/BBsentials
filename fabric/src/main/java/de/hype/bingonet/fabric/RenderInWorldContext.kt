@@ -121,14 +121,25 @@ class RenderInWorldContext(
         )
     }
 
-    fun renderTextures(position: Vec3d, textures: List<Identifier?>, width: Int, height: Int, padding: Float) {
+    fun renderTextures(
+        position: Vec3d,
+        textures: List<Identifier?>,
+        width: Int,
+        height: Int,
+        padding: Float
+    ) {
         if (textures.isEmpty()) return
-        val totalWidth = width * textures.size + padding * (textures.size - 1)
-        val left = -totalWidth / 2
+        val count = textures.size
+        // padding applies only between textures, so only add it when there are > 1 texture
+        val totalWidth = width * count + if (count > 1) padding * (count - 1) else 0f
+        // center by subtracting half the total width, then add half the texture width so that each texture is centered
+        val left = -totalWidth / 2 + width / 2.0
         for ((index, texture) in textures.withIndex()) {
             if (texture == null || texture.path.isEmpty()) continue
+            // For each texture, apply the left offset and move the y coordinate up by 1
+            val xOffset = left + index * (width + if (count > 1) padding else 0f)
             texture(
-                position.add(left + index * (width + padding).toDouble(), 0.0, 0.0),
+                position.add(xOffset.toDouble(), 0.0, 0.0),
                 texture, width, height
             )
         }
@@ -183,7 +194,7 @@ class RenderInWorldContext(
         background: Int = 0x70808080
     ) {
         withFacingThePlayer(position) {
-            text(*texts, verticalAlign = verticalAlign)
+            text(*texts, verticalAlign = verticalAlign, background = background)
         }
     }
 
@@ -208,16 +219,16 @@ class RenderInWorldContext(
         vertexConsumers.draw()
     }
 
-    fun line(vararg points: Vec3d, lineWidth: Float = 10F) {
-        line(points.toList(), lineWidth)
+    fun line(vararg points: Vec3d, lineWidth: Float = 10F, color: Color = Color.WHITE) {
+        line(points.toList(), lineWidth, color)
     }
 
-    fun tracer(toWhere: Vec3d, lineWidth: Float = 3f) {
+    fun tracer(toWhere: Vec3d, lineWidth: Float = 3f, color: Color = Color.WHITE) {
         val cameraForward = Vector3f(0f, 0f, -1f).rotate(camera.rotation)
-        line(camera.pos.add(Vec3d(cameraForward)), toWhere, lineWidth = lineWidth)
+        line(camera.pos.add(Vec3d(cameraForward)), toWhere, lineWidth = lineWidth, color = color)
     }
 
-    fun line(points: List<Vec3d>, lineWidth: Float = 10F) {
+    fun line(points: List<Vec3d>, lineWidth: Float = 10F, color: Color = Color.WHITE) {
         RenderSystem.lineWidth(lineWidth)
         // TODO: replace with renderlayers
         val buffer = tesselator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
@@ -230,10 +241,10 @@ class RenderInWorldContext(
                     .normalize()
             val lastNormal0 = lastNormal ?: normal
             lastNormal = normal
-            buffer.vertex(matrix.positionMatrix, a.x.toFloat(), a.y.toFloat(), a.z.toFloat()).color(-1)
-                .normal(matrix, lastNormal0.x, lastNormal0.y, lastNormal0.z).next()
-            buffer.vertex(matrix.positionMatrix, b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).color(-1)
-                .normal(matrix, normal.x, normal.y, normal.z).next()
+            buffer.vertex(matrix.positionMatrix, a.x.toFloat(), a.y.toFloat(), a.z.toFloat())
+                .normal(matrix, lastNormal0.x, lastNormal0.y, lastNormal0.z).color(color.rgb).next()
+            buffer.vertex(matrix.positionMatrix, b.x.toFloat(), b.y.toFloat(), b.z.toFloat())
+                .normal(matrix, normal.x, normal.y, normal.z).color(color.rgb).next()
         }
 
         RenderLayers.LINES.draw(buffer.end())
@@ -341,12 +352,7 @@ class RenderInWorldContext(
  */
 class FacingThePlayerContext(val worldContext: RenderInWorldContext) {
     val matrixStack by worldContext::matrixStack
-    fun waypoint(position: BlockPos, label: Text) {
-        text(
-            label,
-            Text.literal("§e${formatDistance(MinecraftClient.getInstance().player?.pos?.distanceTo(position.toCenterPos()) ?: 42069.0)}")
-        )
-    }
+
 
     fun formatDistance(distance: Double): String {
         if (distance < 10) return "%.1fm".format(distance)
@@ -355,8 +361,12 @@ class FacingThePlayerContext(val worldContext: RenderInWorldContext) {
 
     fun text(
         vararg texts: Text,
-        verticalAlign: RenderInWorldContext.VerticalAlign = RenderInWorldContext.VerticalAlign.CENTER
+        verticalAlign: RenderInWorldContext.VerticalAlign = RenderInWorldContext.VerticalAlign.CENTER,
+        background: Int = 0x70808080,
     ) {
+        if (!texts.isNotEmpty()) {
+            return@text
+        }
         for ((index, text) in texts.withIndex()) {
             worldContext.matrixStack.push()
             val width = MinecraftClient.getInstance().textRenderer.getWidth(text)
@@ -364,13 +374,13 @@ class FacingThePlayerContext(val worldContext: RenderInWorldContext) {
             val vertexConsumer: VertexConsumer =
                 worldContext.vertexConsumers.getBuffer(RenderLayer.getTextBackgroundSeeThrough())
             val matrix4f = worldContext.matrixStack.peek().positionMatrix
-            vertexConsumer.vertex(matrix4f, -1.0f, -1.0f, 0.0f).color(0x70808080)
+            vertexConsumer.vertex(matrix4f, -1.0f, -1.0f, 0.0f).color(background)
                 .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
-            vertexConsumer.vertex(matrix4f, -1.0f, getFontHeight(), 0.0f).color(0x70808080)
+            vertexConsumer.vertex(matrix4f, -1.0f, getFontHeight(), 0.0f).color(background)
                 .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
-            vertexConsumer.vertex(matrix4f, width.toFloat(), getFontHeight(), 0.0f).color(0x70808080)
+            vertexConsumer.vertex(matrix4f, width.toFloat(), getFontHeight(), 0.0f).color(background)
                 .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
-            vertexConsumer.vertex(matrix4f, width.toFloat(), -1.0f, 0.0f).color(0x70808080)
+            vertexConsumer.vertex(matrix4f, width.toFloat(), -1.0f, 0.0f).color(background)
                 .light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE).next()
             worldContext.matrixStack.translate(0F, 0F, 0.01F)
 

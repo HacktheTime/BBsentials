@@ -4,6 +4,7 @@ import de.hype.bingonet.client.common.client.BingoNet;
 import de.hype.bingonet.fabric.ModInitialiser;
 import de.hype.bingonet.fabric.mixins.mixinaccessinterfaces.FabricICusomItemDataAccess;
 import de.hype.bingonet.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess;
+import de.hype.bingonet.shared.constants.Islands;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
@@ -83,7 +84,12 @@ public abstract class CustomItemTooltip<T extends ScreenHandler> extends Screen 
                         }
                         hubNumber = stack.getCount();
                         if (!serverid.isEmpty()) {
-                            BingoNet.temporaryConfig.serverIdToHubNumber.put(serverid, hubNumber);
+                            String finalServerid = serverid;
+                            BingoNet.temporaryConfig.serverIdToHubNumber.compute(Islands.HUB, (island, map) -> {
+                                if (map == null) map = new java.util.HashMap<>();
+                                map.put(finalServerid, hubNumber);
+                                return map;
+                            });
                         }
 
                         if (playerCount < lowestYetAmount && !full) {

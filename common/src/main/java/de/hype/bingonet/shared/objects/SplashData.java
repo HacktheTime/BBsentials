@@ -13,6 +13,7 @@ public class SplashData {
 
     public String extraMessage;
     public boolean lessWaste;
+    @Nullable
     public String serverID;
     /**
      * If null the Splash is in a private Mega → Request Invite.
@@ -32,6 +33,22 @@ public class SplashData {
 
     public SplashData(String user, SplashLocation locationInHub, String extraMessage, boolean lessWaste, String serverID, @Nullable HubSelectorData hubSelectorData) {
         this(user, locationInHub, extraMessage, lessWaste, serverID, hubSelectorData, StatusConstants.WAITING);
+    }
+
+    public SplashData(SplashData packet) {
+        this(packet.announcer, packet.locationInHub, packet.extraMessage, packet.lessWaste, packet.serverID, packet.hubSelectorData, packet.status);
+        this.splashId = packet.splashId;
+    }
+
+    public void update(SplashData data) {
+        this.announcer = data.announcer;
+        this.locationInHub = data.locationInHub;
+        this.extraMessage = data.extraMessage;
+        this.lessWaste = data.lessWaste;
+        this.serverID = data.serverID;
+        this.hubSelectorData = data.hubSelectorData;
+        this.status = data.status;
+        this.splashId = data.splashId;
     }
 
 

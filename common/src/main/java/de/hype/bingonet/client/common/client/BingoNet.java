@@ -17,6 +17,7 @@ import de.hype.bingonet.client.common.objects.WaypointRoute;
 import de.hype.bingonet.client.common.objects.Waypoints;
 import de.hype.bingonet.shared.constants.Islands;
 import de.hype.bingonet.shared.objects.RenderInformation;
+import de.hype.bingonet.shared.packets.network.LowPlayerMegaReport;
 import io.github.moulberry.repo.NEURepositoryException;
 
 import java.awt.*;
@@ -110,8 +111,7 @@ public class BingoNet {
                 coms = new Commands();
                 if (beta) {
                     connection.connect(bbServerConfig.bbServerURL, 5011);
-                }
-                else {
+                } else {
                     connection.connect(bbServerConfig.bbServerURL, 5000);
                 }
             });
@@ -197,6 +197,14 @@ public class BingoNet {
                         List<RenderInformation> temp = new ArrayList<>();
                         temp.add(new RenderInformation("bingonet", "textures/waypoints/splash_location.png"));
                         new Waypoints(value.locationInHub.getCoords(), EnvironmentCore.textutils.getJsonFromContent("§6Splash"), 1000, true, true, temp, Color.YELLOW, true);
+                    }
+                }
+            }
+            if (BingoNet.dataStorage.getIsland() == Islands.HUB && EnvironmentCore.utils.isOnMegaServer()) {
+                int playerCount = EnvironmentCore.utils.getPlayerCount();
+                if (playerCount <= 30) {
+                    if (connection != null && connection.isConnected()) {
+                        connection.sendPacket(new LowPlayerMegaReport(playerCount, BingoNet.dataStorage.serverId));
                     }
                 }
             }

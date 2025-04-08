@@ -53,9 +53,7 @@ public class WantedSearchPacket extends AbstractPacket {
     }
 
     public static WantedSearchPacket findPrivateMegaHubServer() {
-        WantedSearchPacket packet = new WantedSearchPacket(null, "private-hub-mega");
-        packet.targetFound = false;
-        return packet;
+        return findPrivateMega(Islands.HUB);
     }
 
     public static class WantedSearchPacketReply extends AbstractPacket {

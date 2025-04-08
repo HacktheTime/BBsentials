@@ -646,8 +646,8 @@ public class BBsentialConnection {
         if (packet.serverId != null && !(EnvironmentCore.utils.getServerId().matches(packet.serverId))) return;
         if (packet.mega != null && packet.mega != EnvironmentCore.utils.isOnMegaServer()) return;
         List<String> playerCount = EnvironmentCore.utils.getPlayers();
-        if (packet.maximumPlayerCount != null && packet.maximumPlayerCount > playerCount.size()) return;
-        if (packet.minimumPlayerCount != null && packet.minimumPlayerCount < playerCount.size()) return;
+        if (packet.maximumPlayerCount != null && packet.maximumPlayerCount <= playerCount.size()) return;
+        if (packet.minimumPlayerCount != null && packet.minimumPlayerCount >= playerCount.size()) return;
         if (packet.username != null && !playerCount.contains(packet.username)) return;
         sendPacket(packet.preparePacketToReplyToThis(new WantedSearchPacket.WantedSearchPacketReply(BingoNet.generalConfig.getUsername(), EnvironmentCore.utils.getPlayers(), EnvironmentCore.utils.isOnMegaServer(), EnvironmentCore.utils.getServerId())));
     }

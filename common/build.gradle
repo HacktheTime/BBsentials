@@ -19,7 +19,7 @@ repositories {
     maven { url = uri("https://maven.fabricmc.net") }
     maven { url = uri("https://maven.minecraftforge.net/") }
     maven { url = uri("https://repo.spongepowered.org/maven/") }
-    maven { url = uri("https://repo.sk1er.club/repository/maven-releases/") }
+//    maven { url = uri("https://repo.sk1er.club/repository/maven-releases/") }
     maven { url = uri("https://maven.wagyourtail.xyz/releases") }
     maven { url = uri("https://maven.wagyourtail.xyz/snapshots") }
     maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
@@ -54,6 +54,9 @@ dependencies {
 
     //Other Dependencies
     implementation(libs.javazoom)
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 configurations {

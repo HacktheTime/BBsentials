@@ -1,43 +1,76 @@
-package de.hype.bingonet.shared.objects;
+package de.hype.bingonet.shared.objects
 
-import java.awt.*;
-import java.util.List;
+import java.awt.Color
+import java.util.List
 
-public class WaypointData {
-    public Position position;
-    public int renderDistance;
-    public String jsonToRenderText;
-    public boolean deleteOnServerSwap;
-    public boolean visible;
-    public List<RenderInformation> render;
-    public Color color;
-    public boolean doTracer = true;
+open class WaypointData(
+    var position: Position,
+    jsonTextToRender: String,
+    var renderDistance: Int,
+    var visible: Boolean,
+    var deleteOnServerSwap: Boolean,
+    var render: MutableList<RenderInformation>?,
+    var color: Color,
+    doTracer: Boolean
+) {
+    var jsonToRenderText: String? = null
+    var doTracer: Boolean = true
 
-    public WaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render, boolean doTracer) {
-        this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, List.of(render), new Color(1f, 1f, 1f), doTracer);
-    }
+    constructor(
+        pos: Position,
+        jsonTextToRender: String,
+        renderDistance: Int,
+        visible: Boolean,
+        deleteOnServerSwap: Boolean,
+        render: RenderInformation,
+        doTracer: Boolean
+    ) : this(
+        pos,
+        jsonTextToRender,
+        renderDistance,
+        visible,
+        deleteOnServerSwap,
+        List.of<RenderInformation?>(render),
+        Color(1f, 1f, 1f),
+        doTracer
+    )
 
-    public WaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render, Color color, boolean doTracer) {
-        this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, List.of(render), color, doTracer);
-    }
+    constructor(
+        pos: Position,
+        jsonTextToRender: String,
+        renderDistance: Int,
+        visible: Boolean,
+        deleteOnServerSwap: Boolean,
+        render: RenderInformation,
+        color: Color,
+        doTracer: Boolean
+    ) : this(
+        pos,
+        jsonTextToRender,
+        renderDistance,
+        visible,
+        deleteOnServerSwap,
+        List.of<RenderInformation?>(render),
+        color,
+        doTracer
+    )
 
-    public WaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render, boolean doTracer) {
-        this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, new Color(1f, 1f, 1f), doTracer);
-    }
+    constructor(
+        pos: Position,
+        jsonTextToRender: String,
+        renderDistance: Int,
+        visible: Boolean,
+        deleteOnServerSwap: Boolean,
+        render: MutableList<RenderInformation>?,
+        doTracer: Boolean
+    ) : this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, Color(1f, 1f, 1f), doTracer)
 
-    public WaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render, Color color, boolean doTracer) {
-        this.position = pos;
-        this.renderDistance = renderDistance;
-        this.deleteOnServerSwap = deleteOnServerSwap;
-        this.visible = visible;
-        this.render = render;
-        this.color = color;
-        this.doTracer = doTracer;
-        if (jsonTextToRender == null || jsonTextToRender.isEmpty()) {
-            this.jsonToRenderText = "{\"text\":\"Unnamed\"}";
-        }
-        else {
-            this.jsonToRenderText = jsonTextToRender;
+    init {
+        this.doTracer = doTracer
+        if (jsonTextToRender.isEmpty()) {
+            this.jsonToRenderText = "{\"text\":\"Unnamed\"}"
+        } else {
+            this.jsonToRenderText = jsonTextToRender
         }
     }
 }

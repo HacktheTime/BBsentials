@@ -1,23 +1,13 @@
-package de.hype.bingonet.shared.packets.function;
+package de.hype.bingonet.shared.packets.function
 
-import de.hype.bingonet.environment.packetconfig.AbstractPacket;
-import de.hype.bingonet.shared.constants.StatusConstants;
+import de.hype.bingonet.environment.packetconfig.AbstractPacket
+import de.hype.bingonet.shared.constants.StatusConstants
 
 /**
  * Client and Server. Updates Splash Status.
  */
-public class SplashUpdatePacket extends AbstractPacket {
-
-    /**
-     * @param splashId id of the splash
-     * @param status   one of the following types: {@link StatusConstants#WAITING}, {@link StatusConstants#FULL}, {@link StatusConstants#SPLASHING}, {@link StatusConstants#CANCELED}, {@link StatusConstants#DONEBAD}
-     */
-    public SplashUpdatePacket(int splashId, StatusConstants status) {
-        super(1, 1); //Min and Max supported Version
-        this.splashId = splashId;
-        this.status = status;
-    }
-
-    public final int splashId;
-    public final StatusConstants status;
-}
+class SplashUpdatePacket
+/**
+ * @param splashId id of the splash
+ * @param status   one of the following types: [StatusConstants.WAITING], [StatusConstants.FULL], [StatusConstants.SPLASHING], [StatusConstants.CANCELED], [StatusConstants.DONEBAD]
+ */(@JvmField val splashId: Int, @JvmField val status: StatusConstants) : AbstractPacket(1, 1)

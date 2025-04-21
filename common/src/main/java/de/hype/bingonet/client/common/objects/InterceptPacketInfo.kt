@@ -2,11 +2,11 @@ package de.hype.bingonet.client.common.objects
 
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
 
-internal fun interface PacketRunnable<T : AbstractPacket?> {
+internal fun interface PacketRunnable<T : AbstractPacket> {
     fun run(packet: T)
 }
 
-abstract class InterceptPacketInfo<T : AbstractPacket?>(
+abstract class InterceptPacketInfo<T : AbstractPacket>(
     val clazz: Class<T>,
     val cancelPacket: Boolean,
     val blockIntercepts: Boolean,

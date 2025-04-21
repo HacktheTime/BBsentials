@@ -1,6 +1,6 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
-public enum Formatting {
+enum class Formatting(val mCCode: String, @JvmField val discordFormattingCode: String) {
     BLACK("§0", "\u001b[30m"),
     DARK_BLUE("§1", "\u001b[34m"),
     DARK_GREEN("§2", "\u001b[32m"),
@@ -24,38 +24,25 @@ public enum Formatting {
     OBFUSCATED("§k", "\u001b[6m"),
     RESET("§r", "\u001b[0m");
 
-    private final String code;
-    private final String discordFormattingCode;
-
-    Formatting(String code, String discordFormattingCode) {
-        this.code = code;
-        this.discordFormattingCode = discordFormattingCode;
-    }
-
-    public static String covertToDiscordAnsi(String goalString) {
-        for (Formatting formatting : Formatting.values()) {
-            goalString = goalString.replaceAll(formatting.code, formatting.discordFormattingCode);
-        }
-        return goalString;
-    }
-
-    @Override
-    public String toString() {
-        return code;
-    }
-
-    public String getDiscordFormattingCode() {
-        return discordFormattingCode;
+    override fun toString(): String {
+        return this.mCCode
     }
 
     /**
      * short for discordFormattingCode
      */
-    public String dc() {
-        return discordFormattingCode;
+    fun dc(): String {
+        return discordFormattingCode
     }
 
-    public String getMCCode() {
-        return code;
+    companion object {
+        @JvmStatic
+        fun covertToDiscordAnsi(goalString: String): String {
+            var goalString = goalString
+            for (formatting in entries) {
+                goalString = goalString.replace(formatting.mCCode.toRegex(), formatting.discordFormattingCode)
+            }
+            return goalString
+        }
     }
 }

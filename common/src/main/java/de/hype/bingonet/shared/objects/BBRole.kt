@@ -1,10 +1,6 @@
-package de.hype.bingonet.shared.objects;
+package de.hype.bingonet.shared.objects
 
-import java.util.HashMap;
-import java.util.Map;
-
-
-public enum BBRole {
+enum class BBRole(dbRoleName: String, visualRoleName: String) {
     DEVELOPER("dev", "Developer"),
     MODERATOR("mod", "Moderator"),
     CHCHEST_ANNOUNCE_PERM("chchest", "Ch Chest"),
@@ -17,34 +13,30 @@ public enum BBRole {
     ADVANCEDINFO("advancedinfo", "Advanced Info"),
     STRATMAKER("strat_maker", "Strat Maker"),
     DEBUG("debug", "Debug");
-    public static Map<String, BBRole> roles;
-    public final String dbRoleName;
-    public final String visulaRoleName;
+
+    val dBRoleName: String
+    val visualName: String
 
 
-    BBRole(String dbRoleName, String visulaRoleName) {
-        this.dbRoleName = dbRoleName;
-        this.visulaRoleName = visulaRoleName;
+    init {
+        this.dBRoleName = dbRoleName
+        this.visualName = visualRoleName
     }
 
-    public static BBRole getRoleByDBName(String dbRoleName) {
-        if (roles != null) return roles.get(dbRoleName);
-        roles = new HashMap<>();
-        for (BBRole value : BBRole.values()) {
-            roles.put(value.dbRoleName, value);
+    val description: String?
+        get() = null
+
+    companion object {
+        var roles: MutableMap<String, BBRole>? = null
+
+        @JvmStatic
+        fun getRoleByDBName(dbRoleName: String): BBRole? {
+            roles?.let { return it[dbRoleName]!! }
+            roles = HashMap()
+            for (value in entries) {
+                roles!!.put(value.dBRoleName, value)
+            }
+            return roles?.get(dbRoleName)
         }
-        return roles.get(dbRoleName);
-    }
-
-    public String getDBRoleName() {
-        return dbRoleName;
-    }
-
-    public String getVisualName() {
-        return visulaRoleName;
-    }
-
-    public String getDescription() {
-        return null;
     }
 }

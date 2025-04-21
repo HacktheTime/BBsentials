@@ -1,6 +1,6 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
-public enum Rarity {
+enum class Rarity(@JvmField val brank: Int?) {
     COMMON(0),
     UNCOMMON(1),
     RARE(2),
@@ -8,18 +8,9 @@ public enum Rarity {
     LEGENDARY(4),
     MYTHIC(5),
     DIVINE(6),
-    SPECIAL(-1),
-    VERY_SPECIAL(-1),
-    ULTIMATE(-1),
-    ADMIN(-1);
+    SPECIAL(null),
+    VERY_SPECIAL(null),
+    ULTIMATE(null),
+    ADMIN(null);
 
-    public final Integer brank;
-
-    Rarity(Integer brank) {
-        this.brank = brank;
-    }
-
-    public Integer getBrank() {
-        return brank;
-    }
 }

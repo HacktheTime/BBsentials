@@ -1,57 +1,67 @@
-package de.hype.bingonet.shared.objects.json;
+package de.hype.bingonet.shared.objects.json
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonElement
+import de.hype.bingonet.shared.objects.json.ApiJson.Companion.of
 
-public class ApiJsonElement {
-    JsonElement element;
-    boolean isOffPath;
+class ApiJsonElement(var element: JsonElement?) {
+    var isOffPath: Boolean = false
 
-    public ApiJsonElement(JsonElement element) {
-        this.element = element;
-        if (element == null) isOffPath = true;
+    init {
+        if (element == null) isOffPath = true
     }
 
-    public ApiJson getAsObject() {
-        return ApiJson.of(element.getAsJsonObject());
+    val asObject: ApiJson
+        get() = of(element!!.getAsJsonObject())
+
+    fun getStringNullable(def: String?): String? {
+        if (isOffPath) return def
+        if (element == null || element!!.isJsonNull) return def
+        return element!!.asString
     }
 
-    public String getString() {
-        return getString("");
+    fun getString(def: String): String {
+        if (isOffPath) return def
+        if (element == null || element!!.isJsonNull) return def
+        return element!!.asString
     }
 
-    public Long getLong() {
-        return getLong(0L);
+    fun getInt(def: Int?): Int? {
+        if (isOffPath) return def
+        if (element == null || element!!.isJsonNull) return def
+        return element!!.asInt
     }
 
-    public int getInt() {
-        return getInt(0);
+    fun getLong(def: Long?): Long? {
+        if (isOffPath) return def
+        if (element == null || element!!.isJsonNull) return def
+        return element!!.asLong
     }
 
-    public Boolean getBoolean() {
+    fun getLong(def: Long): Long {
+        if (isOffPath) return def
+        if (element == null || element!!.isJsonNull) return def
+        return element!!.asLong
+    }
+
+    fun getBoolean(def: Boolean): Boolean {
+        if (isOffPath) return def
+        if (element == null || element!!.isJsonNull) return def
+        return element!!.asBoolean
+    }
+
+    fun getString(): String {
+        return getString("")
+    }
+
+    fun getInt(): Int {
+        return getInt(0) ?: 0
+    }
+
+    fun getLong(): Long {
+        return getLong(0L) ?: 0L
+    }
+
+    fun getBoolean(): Boolean {
         return getBoolean(false);
-    }
-
-    public String getString(String def) {
-        if (isOffPath) return def;
-        if (element == null || element.isJsonNull()) return def;
-        return element.getAsString();
-    }
-
-    public int getInt(int def) {
-        if (isOffPath) return def;
-        if (element == null || element.isJsonNull()) return def;
-        return element.getAsInt();
-    }
-
-    public Long getLong(Long def) {
-        if (isOffPath) return def;
-        if (element == null || element.isJsonNull()) return def;
-        return element.getAsLong();
-    }
-
-    public boolean getBoolean(boolean def) {
-        if (isOffPath) return def;
-        if (element == null || element.isJsonNull()) return def;
-        return element.getAsBoolean();
     }
 }

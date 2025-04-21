@@ -1,6 +1,6 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
-public enum VanillaBlocks {
+enum class VanillaBlocks {
     PURPLE_BED,
     BLUE_WOOL,
     CYAN_BANNER,
@@ -1060,5 +1060,5 @@ public enum VanillaBlocks {
     RED_NETHER_BRICKS,
     COBBLED_DEEPSLATE,
     WITHER_SKELETON_SKULL,
-    MUD_BRICK_SLAB;
+    MUD_BRICK_SLAB
 }

@@ -19,7 +19,7 @@ public class DummyDataStorage {
     public static volatile AtomicReference<ScheduledFuture<?>> comGoalDataPacketSendFuture = new AtomicReference<>();
 
     public static synchronized void addComGoalDataToPacket(PositionCommunityFeedback.ComGoalPosition positioning) {
-        if (positioning.position == null && comGoalDataPacketInstance == null) return;
+        if (comGoalDataPacketInstance == null) return;
         if (comGoalDataPacketSendFuture.get() != null) comGoalDataPacketSendFuture.get().cancel(false);
         comGoalDataPacketSendFuture.set(BingoNet.executionService.schedule(() -> {
             if (BingoNet.connection != null && BingoNet.connection.isConnected())

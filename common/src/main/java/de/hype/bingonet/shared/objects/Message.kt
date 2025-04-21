@@ -1,196 +1,175 @@
-package de.hype.bingonet.shared.objects;
+package de.hype.bingonet.shared.objects
 
-import com.google.gson.JsonObject;
-import de.hype.bingonet.environment.packetconfig.EnvironmentPacketConfig;
-import org.apache.commons.text.StringEscapeUtils;
+import com.google.gson.JsonObject
+import de.hype.bingonet.environment.packetconfig.EnvironmentPacketConfig
+import org.apache.commons.text.StringEscapeUtils
+import java.util.function.Predicate
 
-import java.util.function.Predicate;
+open class Message @JvmOverloads constructor(textJson: String, string: String, actionbar: Boolean = false) {
+    var isActionBar: Boolean
+    var source: MessageSource
+    var json: String
+        protected set
+    private var unformattedString: String? = null
+    private var playerName: String? = null
+    var string: String
+        protected set
+    private lateinit var unformattedStringJsonEscape: String
+    private var noRanks: String? = null
+    private var isFromSelf: Boolean? = null
+    private var selfUserName: String
 
-import static de.hype.bingonet.shared.objects.Message.MessageSource.*;
-
-
-public class Message {
-    public boolean actionBar;
-    public MessageSource source = null;
-    protected String text;
-    protected String unformattedString = null;
-    protected String playerName;
-    protected String string;
-    protected String unformattedStringJsonEscape = null;
-    protected String noRanks;
-    protected Boolean isFromSelf;
-    protected String selfUserName;
-
-    public Message(String textJson, String string) {
-        this(textJson, string, false);
+    init {
+        var string = string
+        selfUserName = this.selfUsername
+        this.json = textJson
+        this.string = string
+        this.isActionBar = actionbar
+        if (actionbar) this.source = MessageSource.SERVER
+        else this.source = MessageSource.Companion.getMessageSource(this)
+        if (source == MessageSource.PRIVATE_MESSAGE_SENT) isFromSelf = true
     }
 
-    public Message(String textJson, String string, boolean actionbar) {
-        selfUserName = getSelfUsername();
-        this.text = textJson;
-        if (string == null) string = "";
-        this.string = string;
-        this.actionBar = actionbar;
-        if (actionbar) this.source = MessageSource.SERVER;
-        else this.source = getMessageSource(this);
-        if (source == MessageSource.PRIVATE_MESSAGE_SENT) isFromSelf = true;
+    open val selfUsername: String
+        get() = EnvironmentPacketConfig.selfUsername
+
+    fun getUnformattedString(): String {
+        if (unformattedString != null) return unformattedString!!
+        unformattedString = string.replace("§.".toRegex(), "").trim { it <= ' ' }
+        return unformattedString!!
     }
 
-    public static Message of(String string) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("text", string);
-        Message message = new Message(obj.toString(), string);
-        message.source = SELFCREATED;
-        return message;
-    }
-
-    public static Message tellraw(String json) {
-        Message message = new Message(json, "");
-        message.source = SELFCREATED;
-        return message;
-    }
-
-    public String getSelfUsername() {
-        return EnvironmentPacketConfig.getSelfUsername();
-    }
-
-    public String getJson() {
-        return text;
-    }
-
-    public String getString() {
-        return string;
-    }
-
-    public String getUnformattedString() {
-        if (unformattedString != null) return unformattedString;
-        unformattedString = string.replaceAll("§.", "").trim();
-        return unformattedString;
-    }
-
-    public String getMessageContent() {
-        if (source == SERVER) return getUnformattedString();
-        return getUnformattedString().split(":", 2)[1].trim();
-    }
-
-    public String getPlayerName() {
-        if (playerName != null) return playerName;
-        playerName = getUnformattedString();
-        int columnIndex = playerName.indexOf(":");
-        if (columnIndex == -1) {
-            playerName = "";
-            return "";
+    val messageContent: String
+        get() {
+            if (source == MessageSource.SERVER) return getUnformattedString()
+            return getUnformattedString().split(":".toRegex(), limit = 2).toTypedArray()[1].trim { it <= ' ' }
         }
-        playerName = playerName.split(":", 2)[0];
+
+    fun getPlayerName(): String {
+        if (playerName != null) return playerName!!
+        var playerName = getUnformattedString()
+        val columnIndex = playerName.indexOf(":")
+        if (columnIndex == -1) {
+            playerName = ""
+            return ""
+        }
+        playerName = playerName.split(":".toRegex(), limit = 2).toTypedArray()[0]
         if (playerName.startsWith("From") || playerName.startsWith("To")) {
-            playerName = playerName.replaceFirst("From", "").replace("To", "").trim();
+            playerName = playerName.replaceFirst("From".toRegex(), "").replace("To", "").trim { it <= ' ' }
         }
         if (playerName.contains(">")) {
-            playerName = playerName.split(">", 2)[1];
+            playerName = playerName.split(">".toRegex(), limit = 2).toTypedArray()[1]
         }
-//        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?[^\\x00-\\x7F]+\\s*?\\s?\\[[^\\]]*\\])*", "").trim()// replaces every [] and unicode character before a asci character.
-        playerName = playerName.replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim();
-        if (playerName.contains(" ")) playerName = "";
-        if (playerName.matches("[^a-zA-Z0-9_-]+")) playerName = "";
-        return playerName;
+        //        playerName = playerName.replaceFirst("\\[[^\\]]*\\](?:\\s?[^\\x00-\\x7F]+\\s*?\\s?\\[[^\\]]*\\])*", "").trim()// replaces every [] and unicode character before a asci character.
+        playerName = playerName.replace("[^\\x00-\\x7F]+\\s*".toRegex(), "").replace("\\[[^\\]]*\\]".toRegex(), "")
+            .trim { it <= ' ' }
+        if (playerName.contains(" ")) playerName = ""
+        if (playerName.matches("[^a-zA-Z0-9_-]+".toRegex())) playerName = ""
+        this.playerName = playerName
+        return playerName
     }
 
-    public String getNoRanks() {
-        if (noRanks != null) return noRanks;
-        return getUnformattedString().replaceAll("[^\\x00-\\x7F]+\\s*", "").replaceAll("\\[[^\\]]*\\]", "").trim().replaceAll("\\s+", " ");
+    fun getNoRanks(): String {
+        if (noRanks != null) return noRanks!!
+        return getUnformattedString().replace("[^\\x00-\\x7F]+\\s*".toRegex(), "")
+            .replace("\\[[^\\]]*\\]".toRegex(), "").trim { it <= ' ' }.replace("\\s+".toRegex(), " ")
     }
 
-    public void replaceInJson(String replace, String replaceWith) {
+    fun replaceInJson(replace: String, replaceWith: String) {
         try {
-            text = text.replaceFirst(replace, StringEscapeUtils.escapeJson(replaceWith));
-        } catch (Exception e) {
-            System.err.println("String that caused the problems: Replace: %s | Replace With: %s | Test: %s".formatted(replace, StringEscapeUtils.escapeJson(replaceWith), text));
-            e.printStackTrace();
+            this.json = json.replaceFirst(replace.toRegex(), StringEscapeUtils.escapeJson(replaceWith))
+        } catch (e: Exception) {
+            System.err.println(
+                "String that caused the problems: Replace: $replace | Replace With: ${
+                    StringEscapeUtils.escapeJson(
+                        replaceWith
+                    )
+                } | Test: $json"
+            )
+            e.printStackTrace()
         }
     }
 
-    public boolean contains(String string) {
-        return getUnformattedString().contains(string);
+    fun contains(string: String): Boolean {
+        return getUnformattedString().contains(string)
     }
 
-    public boolean startsWith(String string) {
-        return getUnformattedString().startsWith(string);
+    fun startsWith(string: String): Boolean {
+        return getUnformattedString().startsWith(string)
     }
 
-    public boolean endsWith(String string) {
-        return getUnformattedString().endsWith(string);
+    fun endsWith(string: String): Boolean {
+        return getUnformattedString().endsWith(string)
     }
 
-    @Override
-    public String toString() {
-        return getUnformattedString();
+    override fun toString(): String {
+        return getUnformattedString()
     }
 
-    public Boolean isFromSelf() {
-        if (isFromSelf == null) isFromSelf = getPlayerName().equals(selfUserName);
-        return isFromSelf;
+    fun isFromSelf(): Boolean {
+        if (isFromSelf == null) isFromSelf = getPlayerName() == selfUserName
+        return isFromSelf!!
     }
 
-    public boolean isFromParty() {
-        return source == PARTY_CHAT;
-    }
+    val isFromParty: Boolean
+        get() = source == MessageSource.PARTY_CHAT
 
-    public boolean isFromGuild() {
-        return source == GUILD_CHAT || source == OFFICER_CHAT;
-    }
+    val isFromGuild: Boolean
+        get() = source == MessageSource.GUILD_CHAT || source == MessageSource.OFFICER_CHAT
 
-    public boolean isServerMessage() {
-        return source == SERVER;
-    }
+    val isServerMessage: Boolean
+        get() = source == MessageSource.SERVER
 
-    /**
-     * returns true if message is a RECEIVING msg! for either type use {@link #isAnyMsg()}
-     */
-    public boolean isMsg() {
-        return source == PRIVATE_MESSAGE_RECEIVE;
-    }
+    val isMsg: Boolean
+        /**
+         * returns true if message is a RECEIVING msg! for either type use [.isAnyMsg]
+         */
+        get() = source == MessageSource.PRIVATE_MESSAGE_RECEIVE
 
-    public boolean isAnyMsg() {
-        return source == PRIVATE_MESSAGE_RECEIVE;
-    }
+    val isAnyMsg: Boolean
+        get() = source == MessageSource.PRIVATE_MESSAGE_RECEIVE
 
-    public boolean isActionBar() {
-        return actionBar;
-    }
-
-    public enum MessageSource {
-        COOP("Coop Chat", s -> s.startsWith("Co-op >"), "/cc @"),
-        GUILD_CHAT("Guild Chat", s -> s.startsWith("Guild >"), "/gc @"),
-        OFFICER_CHAT("Guild Officer Chat", s -> s.startsWith("Officer >"), "/oc @"),
-        PARTY_CHAT("Party Chat", s -> s.startsWith("Party >"), "/pc @"),
-        PRIVATE_MESSAGE_RECEIVE("Private Message", s -> s.startsWith("From "), "/msg "),
-        PRIVATE_MESSAGE_SENT("Private Message", s -> s.startsWith("To "), null),
-        NPC("Server Chat (NPC)", s -> s.startsWith("[NPC]"), null),
+    enum class MessageSource(val sourceName: String, val detection: Predicate<String>?, val replyCommandStart: String) {
+        COOP("Coop Chat", Predicate { it.startsWith("Co-op >") }, "/cc @"),
+        GUILD_CHAT("Guild Chat", Predicate { it.startsWith("Guild >") }, "/gc @"),
+        OFFICER_CHAT("Guild Officer Chat", Predicate { it.startsWith("Officer >") }, "/oc @"),
+        PARTY_CHAT("Party Chat", Predicate { it.startsWith("Party >") }, "/pc @"),
+        PRIVATE_MESSAGE_RECEIVE("Private Message", Predicate { it.startsWith("From ") }, "/msg "),
+        PRIVATE_MESSAGE_SENT("Private Message", Predicate { it.startsWith("To ") }, ""),
+        NPC("Server Chat (NPC)", Predicate { it.startsWith("[NPC]") }, ""),
         ALL_CHAT("All Chat", null, "@"),
         SERVER("Server Message", null, "@"),
-        SELFCREATED("Generated by Client Code", null, null),
-
+        SELFCREATED("Generated by Client Code", null, ""),
         ;
-        public final String sourceName;
-        public final String replyCommandStart;
-        public final Predicate<String> detection;
 
-        MessageSource(String sourceName, Predicate<String> detection, String replyCommandStart) {
-            this.sourceName = sourceName;
-            this.replyCommandStart = replyCommandStart;
-            this.detection = detection;
-        }
-
-        public static MessageSource getMessageSource(Message message) {
-            String string = message.getUnformattedString();
-            for (MessageSource value : MessageSource.values()) {
-                if (value.detection == null) continue;
-                if (value.detection.test(string)) return value;
+        companion object {
+            fun getMessageSource(message: Message): MessageSource {
+                val string = message.getUnformattedString()
+                for (value in entries) {
+                    if (value.detection == null) continue
+                    if (value.detection.test(string)) return value
+                }
+                if (message.getPlayerName().isEmpty()) return SERVER
+                return ALL_CHAT
             }
-            if (message.getPlayerName() != null && message.getPlayerName().isEmpty()) return SERVER;
-            return ALL_CHAT;
+        }
+    }
 
+    companion object {
+        @JvmStatic
+        fun of(string: String): Message {
+            val obj = JsonObject()
+            obj.addProperty("text", string)
+            val message = Message(obj.toString(), string)
+            message.source = MessageSource.SELFCREATED
+            return message
         }
 
+        @JvmStatic
+        fun tellraw(json: String): Message {
+            val message = Message(json, "")
+            message.source = MessageSource.SELFCREATED
+            return message
+        }
     }
 }

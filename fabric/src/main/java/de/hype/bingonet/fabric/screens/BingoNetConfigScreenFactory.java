@@ -115,10 +115,10 @@ public class BingoNetConfigScreenFactory {
                     .setDefaultValue(false)
                     .setTooltip(Text.of("""
                             Requirement for other party hide options
-                            
+
                             This hides the
                             §9§m-----------------------------------------------------§r
-                            
+
                             before and after party command feedbacks.
                             """))
                     .setSaveConsumer(newValue -> BingoNet.partyConfig.hidePartyPreAndSuffix = newValue)
@@ -132,7 +132,7 @@ public class BingoNetConfigScreenFactory {
                             Hide the party disconnects in parties.
                             0 Never Hide
                             1 Always Hide
-                            
+
                             The party member size must be higher than the value set here to hide it.
                             """))
                     .setSaveConsumer(newValue -> BingoNet.partyConfig.hidePartyDisconnect = newValue)
@@ -143,7 +143,7 @@ public class BingoNetConfigScreenFactory {
                             Hide when a player join or leaves the party. Does not affect invite messages.
                             0 Never Hide
                             1 Always Hide
-                            
+
                             The party member size must be higher than the value set here to hide it.
                             """))
                     .setSaveConsumer(newValue -> BingoNet.partyConfig.hidePartyJoinAndLeave = newValue)
@@ -186,10 +186,10 @@ public class BingoNetConfigScreenFactory {
                     .setTooltip(Text.of("Will remove Minecraft Artificial 100 lines limit."))
                     .setSaveConsumer(newValue -> BingoNet.visualConfig.infiniteChatHistory = newValue)
                     .build());
-            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Position as Item Count"), BingoNet.visualConfig.waypointDefaultWithTracer)
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Bingo Position as Item Count"), BingoNet.visualConfig.showContributorPositionInCount)
                     .setDefaultValue(true)
                     .setTooltip(Text.of("Will show your leaderboard postion for the community goals as item count"))
-                    .setSaveConsumer(newValue -> BingoNet.visualConfig.waypointDefaultWithTracer = newValue)
+                    .setSaveConsumer(newValue -> BingoNet.visualConfig.showContributorPositionInCount = newValue)
                     .build());
             visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show Card completions"), BingoNet.visualConfig.showCardCompletions)
                     .setDefaultValue(true)
@@ -206,13 +206,46 @@ public class BingoNetConfigScreenFactory {
                     .setTooltip(Text.of("Whether you want that your goal completions are shared with everyone. Cards will always be shared!"))
                     .setSaveConsumer(newValue -> BingoNet.visualConfig.broadcastGoalAndCardCompletion = newValue)
                     .build());
+            visual.addEntry(entryBuilder.startBooleanToggle(Text.of("Show MOD Solver"), BingoNet.visualConfig.showMODSolver)
+                    .setDefaultValue(false)
+                    .setTooltip(Text.of("Whether you want to show the MOD puzzle solver"))
+                    .setSaveConsumer(newValue -> BingoNet.visualConfig.showMODSolver = newValue)
+                    .build());
             visual.addEntry(entryBuilder.startStrField(Text.of("Minecraft Window Title"), BingoNet.visualConfig.appendMinecraftWindowTitle)
                     .setDefaultValue("%default%")
                     .setTooltip(Text.of("You can set a new Minecraft Window Title here. %default% will be replaced by the value with no changes from BingoNet. %username% will be replaced with your Minecraft Username"))
                     .setSaveConsumer(newValue -> BingoNet.visualConfig.appendMinecraftWindowTitle = newValue)
                     .build());
+
+            SubCategoryBuilder chatMenuSubCat = entryBuilder.startSubCategory(Text.of("Custom Chat Menus"));
+            chatMenuSubCat.add(entryBuilder.startBooleanToggle(Text.of("Guild Chat Custom Menu"), BingoNet.generalConfig.doGuildChatCustomMenu)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Enable custom menu options for guild chat"))
+                    .setSaveConsumer(newValue -> BingoNet.generalConfig.doGuildChatCustomMenu = newValue)
+                    .build());
+            chatMenuSubCat.add(entryBuilder.startBooleanToggle(Text.of("All Chat Custom Menu"), BingoNet.generalConfig.doAllChatCustomMenu)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Enable custom menu options for all chat"))
+                    .setSaveConsumer(newValue -> BingoNet.generalConfig.doAllChatCustomMenu = newValue)
+                    .build());
+            chatMenuSubCat.add(entryBuilder.startBooleanToggle(Text.of("Party Chat Custom Menu"), BingoNet.generalConfig.doPartyChatCustomMenu)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Enable custom menu options for party chat"))
+                    .setSaveConsumer(newValue -> BingoNet.generalConfig.doPartyChatCustomMenu = newValue)
+                    .build());
+            visual.addEntry(chatMenuSubCat.build());
         }
         //Visual
+        ConfigCategory hud = builder.getOrCreateCategory(Text.of("HUD"));
+        {
+            hud.addEntry(entryBuilder.startBooleanToggle(Text.of("Use ChChest HUD Overlay"), BingoNet.hudConfig.useChChestHudOverlay)
+                    .setDefaultValue(true)
+                    .setTooltip(Text.of("Enable the HUD overlay for Crystal Hollows Chests"))
+                    .setSaveConsumer(newValue -> BingoNet.hudConfig.useChChestHudOverlay = newValue)
+                    .build());
+        }
+        //HUD
+
         ConfigCategory notifications = builder.getOrCreateCategory(Text.of("Notifications"));
         {
             BooleanListEntry doNotifications = entryBuilder.startBooleanToggle(Text.of("Do Desktop Notifications"), BingoNet.generalConfig.doDesktopNotifications)

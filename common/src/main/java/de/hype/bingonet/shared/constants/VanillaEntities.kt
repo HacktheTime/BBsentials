@@ -1,6 +1,6 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
-public enum VanillaEntities {
+enum class VanillaEntities {
     ALLAY,
     AREA_EFFECT_CLOUD,
     ARMADILLO,
@@ -130,5 +130,5 @@ public enum VanillaEntities {
     ZOMBIE_VILLAGER,
     ZOMBIFIED_PIGLIN,
     PLAYER,
-    FISHING_BOBBER;
+    FISHING_BOBBER
 }

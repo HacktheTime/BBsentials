@@ -45,16 +45,16 @@ public class ChChestUpdateListener extends UpdateListener {
             Waypoints waypoint = waypoints.get(chest.coords);
             boolean shouldDisplay = !(chestsOpened.contains(chest.coords) || chest.finder.equals(username));
             if (waypoint != null) {
-                waypoint.visible = shouldDisplay;
+                waypoint.setVisible(shouldDisplay);
                 continue;
             }
             List<ChChestItem> chestItems = new ArrayList<>();
             lobby.chests.stream().forEach(chChestData -> chestItems.addAll(chChestData.items));
             List<RenderInformation> renderInformationList = new ArrayList<>();
             chestItems.stream().filter(ChChestItem::hasDisplayPath).forEach((item) -> renderInformationList.add(new RenderInformation("bingonet", "textures/waypoints/" + item.getDisplayPath() + ".png")));
-            if (Waypoints.waypoints.values().stream().noneMatch(waypointFiltered -> waypointFiltered.position.equals(chest.coords))) {
+            if (Waypoints.waypoints.values().stream().noneMatch(waypointFiltered -> waypointFiltered.getPosition().equals(chest.coords))) {
                 Waypoints newpoint = new Waypoints(chest.coords, "{\"text\":\"" + chestItems.subList(0, Math.min(chestItems.size(), 3)).stream().map(ChChestItem::getDisplayName).collect(Collectors.joining(", ")) + "\"}", 1000, shouldDisplay, true, renderInformationList, BingoNet.chChestConfig.defaultWaypointColor, BingoNet.chChestConfig.doChestWaypointsTracers);
-                waypoints.put(newpoint.position, newpoint);
+                waypoints.put(newpoint.getPosition(), newpoint);
             }
         }
     }
@@ -75,8 +75,7 @@ public class ChChestUpdateListener extends UpdateListener {
             List<String> players = EnvironmentCore.utils.getPlayers();
             if ((players.size() >= maxPlayerCount)) {
                 setStatus(StatusConstants.FULL);
-            }
-            else if ((EnvironmentCore.utils.getPlayerCount() < maxPlayerCount - 3) && lobby.getStatus().equals(StatusConstants.FULL.getDisplayName())) {
+            } else if ((EnvironmentCore.utils.getPlayerCount() < maxPlayerCount - 3) && lobby.getStatus().equals(StatusConstants.FULL.displayName)) {
                 setStatus(StatusConstants.OPEN);
             }
             try {
@@ -98,7 +97,7 @@ public class ChChestUpdateListener extends UpdateListener {
     }
 
     public void setStatusNoUpdate(StatusConstants newStatus) {
-        if (lobby.getStatus().equals(newStatus.getDisplayName())) return;
+        if (lobby.getStatus().equals(newStatus.displayName)) return;
         try {
             lobby.setStatus(newStatus);
         } catch (SQLException e) {

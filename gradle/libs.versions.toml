@@ -1,10 +1,10 @@
 [versions]
 modVersion = "0.99.3.7"
-kotlinVersion = "1.9.0"
+kotlinVersion = "2.1.0"
 apache_httpcomponents = "4.5.13"
 lwjglModern = "3.3.3"
 
-minecraft_versionSupported = "1.21.*"
+minecraft_versionSupported = "1.21.4"
 
 modern_minecraft = "1.21.4"
 modern_yarn = "1.21.4+build.8"
@@ -17,8 +17,8 @@ legacy_forge = "1.8.9-11.15.1.2318-1.8.9"
 legacy_mixin_rt = "0.7.11-SNAPSHOT"
 legacy_mixin_processor = "0.8.5-SNAPSHOT"
 
-modmenu = "11.0.1"
-cloth = "15.0.127"
+modmenu = "13.0.3"
+cloth = "17.0.144"
 
 devauth = "1.1.2"
 
@@ -56,6 +56,7 @@ reflection = {module = "org.reflections:reflections", version = "latest.release"
 javazoom = { module = "javazoom:jlayer", version = "latest.release" }
 #Hypixel Related Dependencies
 hypixelModApi = { module = "net.hypixel:mod-api", version = "latest.release" }
+fabricKotlin = { module = "net.fabricmc:fabric-language-kotlin", version = "latest.release" }
 neditNBT = { module = "me.nullicorn:Nedit", version = "latest.release" }
 neurepoparser = { module = "moe.nea:neurepoparser", version = "latest.release" }
 kyronet = { module = "com.esotericsoftware:kryonet", version = "2.22.0-RC1" }

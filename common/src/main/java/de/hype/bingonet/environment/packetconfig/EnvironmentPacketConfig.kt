@@ -1,22 +1,22 @@
-package de.hype.bingonet.environment.packetconfig;
+package de.hype.bingonet.environment.packetconfig
 
-import de.hype.bingonet.client.common.client.BingoNet;
+import de.hype.bingonet.client.common.client.BingoNet
+import java.awt.Color
 
-import java.awt.*;
+object EnvironmentPacketConfig {
+    const val enviroment: String = "Client"
+    const val notEnviroment: String = "Server"
+    const val apiVersion: Int = 1
 
-public class EnvironmentPacketConfig {
-    public static final String enviroment = "Client";
-    public static final String notEnviroment = "Server";
-    public static final int apiVersion = 1;
-    public static Color getDefaultWaypointColor() {
-        return BingoNet.visualConfig.waypointDefaultColor;
-    }
+    @JvmStatic
+    val defaultWaypointColor: Color
+        get() = BingoNet.visualConfig.waypointDefaultColor
 
-    public static boolean getWaypointDefaultWithTracer() {
-        return BingoNet.visualConfig.waypointDefaultWithTracer;
-    }
+    @JvmStatic
+    val waypointDefaultWithTracer: Boolean
+        get() = BingoNet.visualConfig.waypointDefaultWithTracer
 
-    public static String getSelfUsername() {
-        return BingoNet.generalConfig.getUsername();
-    }
+    @JvmStatic
+    val selfUsername: String
+        get() = BingoNet.generalConfig.getUsername()
 }

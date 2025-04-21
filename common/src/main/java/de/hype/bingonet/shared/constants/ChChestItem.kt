@@ -1,64 +1,58 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
 /**
- * chchest Items. used to create custom ones which aren't in the {@link ChChestItems default list}
+ * chchest Items. used to create custom ones which aren't in the [default list][ChChestItems]
  */
-public class ChChestItem {
-    private String displayName;
-    private String displayPath;
-    private boolean custom;
+class ChChestItem {
+    var displayName: String
+        private set
+    val displayPath: String?
+    val isCustom: Boolean
 
-    public ChChestItem(String displayName, String displayPath) {
-        this.displayName = displayName;
-        this.displayPath = displayPath;
-        this.custom = false;
+    constructor(displayName: String, displayPath: String?) {
+        this.displayName = displayName
+        this.displayPath = displayPath
+        this.isCustom = false
     }
 
-    public ChChestItem(String displayName, boolean custom) {
-        this.displayName = displayName;
-        this.custom = custom;
-        displayPath = null;
+    constructor(displayName: String, custom: Boolean) {
+        this.displayName = displayName
+        this.isCustom = custom
+        displayPath = null
     }
 
-    public String getDisplayName() {
-        return displayName;
+    fun setDisplayName(displayName: String): ChChestItem {
+        this.displayName = displayName
+        return this
     }
 
-    public ChChestItem setDisplayName(String displayName) {
-        this.displayName = displayName;
-        return this;
+    override fun toString(): String {
+        return displayName
     }
 
-    public boolean isCustom() {
-        return custom;
-    }
+    val isGemstone: Boolean
+        get() = displayName.startsWith("Flawless") && displayName.endsWith("Gemstone")
 
-    public String getDisplayPath() {
-        return displayPath;
-    }
-
-    @Override
-    public String toString() {
-        return displayName;
-    }
-
-    public boolean isGemstone() {
-        return displayName.startsWith("Flawless") && displayName.endsWith("Gemstone");
-    }
-
-    public boolean isRoboPart() {
-        String[] roboParts = {"Control Switch", "Electron Transmitter", "FTX 3070", "Robotron Reflector", "Superlite Motor", "Synthetic Heart"};
-        for (String roboPart : roboParts) {
-            if (displayName.equals(roboPart)) return true;
+    val isRoboPart: Boolean
+        get() {
+            val roboParts = arrayOf<String?>(
+                "Control Switch",
+                "Electron Transmitter",
+                "FTX 3070",
+                "Robotron Reflector",
+                "Superlite Motor",
+                "Synthetic Heart"
+            )
+            for (roboPart in roboParts) {
+                if (displayName == roboPart) return true
+            }
+            return false
         }
-        return false;
+
+    fun hasDisplayPath(): Boolean {
+        return displayPath != null
     }
 
-    public boolean hasDisplayPath() {
-        return displayPath != null;
-    }
-
-    public boolean isPowder() {
-        return displayName.matches(".*Powder");
-    }
+    val isPowder: Boolean
+        get() = displayName.matches(".*Powder".toRegex())
 }

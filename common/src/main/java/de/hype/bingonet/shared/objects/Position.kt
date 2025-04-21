@@ -1,50 +1,51 @@
-package de.hype.bingonet.shared.objects;
+package de.hype.bingonet.shared.objects
 
-public class Position extends Vector3i {
+class Position : Vector3i {
+    constructor(x: Int, y: Int, z: Int) : super(x, y, z)
 
+    constructor(vector: Vector3i) : super(vector.x, vector.y, vector.z)
 
-    public static final Position ORIGIN = new Position(0, 0, 0);
-
-    public Position(int x, int y, int z) {
-        super(x, y, z);
+    override fun toString(): String {
+        return "$x $y $z"
     }
 
-    public Position(Vector3i vector) {
-        super(vector.x, vector.y, vector.z);
+    fun toFullString(): String {
+        return "X:$x Y:$y Z:$z"
     }
 
-    /**
-     * @param string nneds to be `x y z` formating!
-     */
-    public static Position fromString(String string) {
-        String[] temp = string.split(" ");
-        return new Position(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+    override fun equals(obj: Any?): Boolean {
+        if (obj !is Position) return false
+        return (obj.x == x && obj.y == y && obj.z == z)
     }
 
-    @Override
-    public String toString() {
-        return x + " " + y + " " + z;
+    fun getDistanceBetween(pos: Position): Double {
+        val x = pos.x - this.x
+        val y = pos.y - this.y
+        val z = pos.z - this.z
+        return kotlin.math.sqrt((x * x + y * y + z * z).toDouble())
     }
 
-    public String toFullString() {
-        return "X:" + x + " Y:" + y + " Z:" + z;
+    fun isInRange(otherPos: Position, range: Int): Boolean {
+        return getDistanceBetween(otherPos) < range
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Position)) return false;
-        Position pos2 = ((Position) obj);
-        return (pos2.x == x && pos2.y == y && pos2.z == z);
+    companion object {
+        val ORIGIN: Position = Position(0, 0, 0)
+
+        /**
+         * @param string needs to be `x y z` formating!
+         */
+        @JvmStatic
+        fun fromString(string: String): Position {
+            val temp: Array<String?> = string.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            return Position(temp[0]!!.toInt(), temp[1]!!.toInt(), temp[2]!!.toInt())
+        }
     }
 
-    public Double getDistanceBetween(Position pos) {
-        int x = pos.x - this.x;
-        int y = pos.y - this.y;
-        int z = pos.z - this.z;
-        return Math.sqrt(x * x + y * y + z * z);
-    }
-
-    public boolean isInRange(Position otherPos, int range) {
-        return getDistanceBetween(otherPos) < range;
+    override fun hashCode(): Int {
+        var result = x
+        result = 31 * result + y
+        result = 31 * result + z
+        return result
     }
 }

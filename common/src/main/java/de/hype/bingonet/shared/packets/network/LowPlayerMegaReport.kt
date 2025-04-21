@@ -1,15 +1,5 @@
-package de.hype.bingonet.shared.packets.network;
+package de.hype.bingonet.shared.packets.network
 
-import de.hype.bingonet.environment.packetconfig.AbstractPacket;
+import de.hype.bingonet.environment.packetconfig.AbstractPacket
 
-public class LowPlayerMegaReport extends AbstractPacket {
-    public final int playerCount;
-    public final String serverId;
-
-    public LowPlayerMegaReport(int playerCount, String serverId) {
-        super(1, 1);
-
-        this.playerCount = playerCount;
-        this.serverId = serverId;
-    }
-}
+class LowPlayerMegaReport(@JvmField val playerCount: Int, @JvmField val serverId: String?) : AbstractPacket(1, 1)

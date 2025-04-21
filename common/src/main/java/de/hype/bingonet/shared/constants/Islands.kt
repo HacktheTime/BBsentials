@@ -1,24 +1,24 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
 /**
  * List of all Islands
- * {@link #CRYSTAL_HOLLOWS}
- * {@link #CRIMSON_ISLE}
- * {@link #DEEP_CAVERNS}
- * {@link #DUNGEON}
- * {@link #DUNGEON_HUB}
- * {@link #DWARVEN_MINES}
- * {@link #GOLD_MINE}
- * {@link #HUB}
- * {@link #KUUDRA}
- * {@link #PRIVATE_ISLAND}
- * {@link #SPIDERS_DEN}
- * {@link #THE_END}
- * {@link #THE_FARMING_ISLANDS}
- * {@link #JERRYS_WORKSHOP}
- * {@link #THE_RIFT}
+ * [.CRYSTAL_HOLLOWS]
+ * [.CRIMSON_ISLE]
+ * [.DEEP_CAVERNS]
+ * [.DUNGEON]
+ * [.DUNGEON_HUB]
+ * [.DWARVEN_MINES]
+ * [.GOLD_MINE]
+ * [.HUB]
+ * [.KUUDRA]
+ * [.PRIVATE_ISLAND]
+ * [.SPIDERS_DEN]
+ * [.THE_END]
+ * [.THE_FARMING_ISLANDS]
+ * [.JERRYS_WORKSHOP]
+ * [.THE_RIFT]
  */
-public enum Islands implements BBDisplayNameProvider {
+enum class Islands(val internalName: String?, private val displayName: String?) {
     CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows", "nucleus"),
     CRIMSON_ISLE("crimson_isle", "Crimson Isle", "crimson"),
     DEEP_CAVERNS("mining_2", "Deep Caverns", "deep"),
@@ -35,32 +35,31 @@ public enum Islands implements BBDisplayNameProvider {
     THE_FARMING_ISLANDS("farming_1", "The Farming Islands", "barn"),
     JERRYS_WORKSHOP("winter", "Jerry's Workshop"),
     THE_RIFT("rift", "The Rift"),
-    The_Park("foraging_1", "The Park", "park"),
-    Dark_Auction("dark_auction", "Dark Auction");
-    private final String internalName;
-    private final String displayName;
+    THE_PARK("foraging_1", "The Park", "park"),
+    DARK_AUCTION("dark_auction", "Dark Auction"),
+    BAYOU("fishing_1", "Backwater Bayou", "bayou"),
+    ;
 
-    Islands(String internalName, String displayName) {
-        this.internalName = internalName;
-        this.displayName = displayName;
+    constructor(internalName: String?, displayName: String?, warpArgument: String?) : this(internalName, displayName) {
+        this.warpArgument = warpArgument
     }
 
-    Islands(String internalName, String displayName, String warpArgument) {
-        this(internalName, displayName);
-        this.warpArgument = warpArgument;
+    var warpArgument: String? = null
+        private set
+
+    fun getDisplayName(): String? {
+        return displayName
     }
 
-    private String warpArgument;
-
-    public String getWarpArgument() {
-        return warpArgument;
-    }
-
-    public String getInternalName() {
-        return internalName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
+    companion object {
+        @JvmStatic
+        fun getIslandByMap(map: String): Islands? {
+            for (island in Islands.entries) {
+                if (island.internalName == map) {
+                    return island
+                }
+            }
+            return null
+        }
     }
 }

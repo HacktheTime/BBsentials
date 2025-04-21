@@ -1,6 +1,6 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
-public enum VanillaItems {
+enum class VanillaItems {
     ACACIA_BOAT,
     ACACIA_BUTTON,
     ACACIA_CHEST_BOAT,
@@ -1330,5 +1330,5 @@ public enum VanillaItems {
     ZOMBIE_HORSE_SPAWN_EGG,
     ZOMBIE_SPAWN_EGG,
     ZOMBIE_VILLAGER_SPAWN_EGG,
-    ZOMBIFIED_PIGLIN_SPAWN_EGG;
+    ZOMBIFIED_PIGLIN_SPAWN_EGG
 }

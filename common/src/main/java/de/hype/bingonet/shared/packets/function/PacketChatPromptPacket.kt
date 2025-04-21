@@ -1,27 +1,16 @@
-package de.hype.bingonet.shared.packets.function;
+package de.hype.bingonet.shared.packets.function
 
-import de.hype.bingonet.environment.packetconfig.AbstractPacket;
-import de.hype.bingonet.shared.objects.Message;
-import org.apache.commons.text.StringEscapeUtils;
+import de.hype.bingonet.environment.packetconfig.AbstractPacket
+import de.hype.bingonet.shared.objects.Message
+import de.hype.bingonet.shared.objects.Message.Companion.tellraw
+import org.apache.commons.text.StringEscapeUtils
 
-import java.util.List;
-
-public class PacketChatPromptPacket extends AbstractPacket {
-    private final String message;
-    private List<AbstractPacket> packets;
-
-    public PacketChatPromptPacket(List<AbstractPacket> packets, String message) {
-        super(1, 1);
-        this.packets = packets;
-        this.message = message;
-    }
-
-    public List<AbstractPacket> getPackets() {
-        return packets;
-    }
-
-    public Message getPrintMessage() {
-        String base = "[\"\",{\"text\":\"Bingo Net Server: \",\"color\":\"gold\"},\"\\\"%s\\\" \",\"press (\",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\") to perform.\"]";
-        return Message.tellraw(base.formatted(StringEscapeUtils.escapeJson(message)));
-    }
+class PacketChatPromptPacket(val packets: MutableList<AbstractPacket>, private val message: String) :
+    AbstractPacket(1, 1) {
+    val printMessage: Message
+        get() {
+            val base =
+                "[\"\",{\"text\":\"Bingo Net Server: \",\"color\":\"gold\"},\"\\\"${StringEscapeUtils.escapeJson(message)}\\\" \",\"press (\",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"green\"},\") to perform.\"]"
+            return tellraw(base)
+        }
 }

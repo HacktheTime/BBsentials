@@ -1,93 +1,106 @@
-package de.hype.bingonet.shared.code;
+package de.hype.bingonet.shared.code
 
-import de.hype.bingonet.shared.constants.MinionResourceItem;
-import de.hype.bingonet.shared.objects.minions.Fueles;
-import de.hype.bingonet.shared.objects.minions.MinionItem;
-import de.hype.bingonet.shared.objects.minions.MinionStorage;
-import de.hype.bingonet.shared.objects.minions.Minions;
+import de.hype.bingonet.shared.constants.MinionResourceItem
+import de.hype.bingonet.shared.objects.minions.Fueles
+import de.hype.bingonet.shared.objects.minions.MinionItem
+import de.hype.bingonet.shared.objects.minions.MinionStorage
+import de.hype.bingonet.shared.objects.minions.Minions
+import java.time.Duration
+import java.time.temporal.ChronoUnit
+import java.util.Map
+import kotlin.math.ceil
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+object MinionUtils {
+    @JvmStatic
+    fun getFillTime(
+        minion: Minions,
+        fuel: Fueles?,
+        storage: MinionStorage?,
+        item1: MinionItem?,
+        item2: MinionItem?,
+        percentageMinionSpeed: Double,
+        dropMultiplierBoost: Double
+    ): Duration? {
+        var usedSlots = 0
+        var storageUsedAmount = 0
 
-public class MinionUtils {
+        var itemDropMultiplier = 1.0
+        if (fuel != null) itemDropMultiplier *= (fuel.getBoostMultiplier() - 1).toDouble()
+        if (dropMultiplierBoost != 0.0) itemDropMultiplier *= dropMultiplierBoost
+        if (item1 != null) itemDropMultiplier *= item1.getMultiplier(minion)
+        if (item2 != null) itemDropMultiplier *= item2.getMultiplier(minion)
 
+        var additionalMinionSpeed = 0.0
+        if (percentageMinionSpeed != 0.0) additionalMinionSpeed += percentageMinionSpeed
+        if (fuel != null) itemDropMultiplier += fuel.getBoostPercentage().toDouble()
+        if (item1 != null) additionalMinionSpeed += item1.getMinionSpeedAdditive(minion).toDouble()
+        if (item2 != null) additionalMinionSpeed += item2.getMinionSpeedAdditive(minion).toDouble()
 
-    public static Duration getFillTime(Minions minion, Fueles fuel, MinionStorage storage, MinionItem item1, MinionItem item2, Double percentageMinionSpeed, Double dropMultiplierBoost) {
-        int usedSlots = 0;
-        int storageUsedAmount = 0;
-
-        double itemDropMultiplier = 1;
-        if (fuel != null) itemDropMultiplier *= fuel.getBoostMultiplier() - 1;
-        if (dropMultiplierBoost != null && dropMultiplierBoost != 0)
-            itemDropMultiplier *= dropMultiplierBoost;
-        if (item1 != null) itemDropMultiplier *= item1.getMultiplier(minion);
-        if (item2 != null) itemDropMultiplier *= item2.getMultiplier(minion);
-
-        double additionalMinionSpeed = 0;
-        if (percentageMinionSpeed != null && percentageMinionSpeed != 0)
-            additionalMinionSpeed += percentageMinionSpeed;
-        if (fuel != null) itemDropMultiplier += fuel.getBoostPercentage();
-        if (item1 != null) additionalMinionSpeed += item1.getMinionSpeedAdditive(minion);
-        if (item2 != null) additionalMinionSpeed += item2.getMinionSpeedAdditive(minion);
-
-        int slots = minion.getStorageSlots() + storage.getStorageSlots();
-        boolean compactor = (item1 == MinionItem.COMPACTOR || item2 == MinionItem.COMPACTOR);
-        List<Map.Entry<MinionResourceItem, Double>> values = minion.getItems().entrySet().stream().sorted(Map.Entry.comparingByValue()).toList();
-        for (int i1 = 0; i1 < values.size() - 1; i1++) {
-            MinionResourceItem item = values.get(i1).getKey();
-            if (item1 != null) item = item1.convertItem(item);
-            if (item2 != null) item = item2.convertItem(item);
-            int usedNow = (int) ((values.get(i1).getValue() * ((slots - usedSlots) * 64)) * itemDropMultiplier);
+        val slots = minion.storageSlots + (storage?.storageSlots ?: 0)
+        val compactor = (item1 === MinionItem.COMPACTOR || item2 === MinionItem.COMPACTOR)
+        val values =
+            minion.getItems().entries.stream().sorted(Map.Entry.comparingByValue<MinionResourceItem?, Double>())
+                .toList()
+        for (i1 in 0..<values.size - 1) {
+            var item = values[i1]!!.key
+            if (item1 != null) item = item1.convertItem(item)
+            if (item2 != null) item = item2.convertItem(item)
+            var usedNow = ((values[i1]!!.value!! * ((slots - usedSlots) * 64)) * itemDropMultiplier).toInt()
             if (compactor) {
-                usedNow = (int) Math.ceil((double) usedNow / item.getCompactorLevel());
-                usedSlots++;
+                usedNow = ceil(usedNow.toDouble() / item.compactorLevel).toInt()
+                usedSlots++
             }
-            storageUsedAmount += usedNow;
-            usedSlots += ((int) Math.ceil((double) usedNow / 64D));
+            storageUsedAmount += usedNow
+            usedSlots += (ceil(usedNow.toDouble() / 64.0).toInt())
         }
-        storageUsedAmount += 64 * (slots - usedSlots);
+        storageUsedAmount += 64 * (slots - usedSlots)
 
-        int estimation = ((int) ((100F / (100F + additionalMinionSpeed)) * (minion.getDelay() * minion.getActionsForItem() * itemDropMultiplier) * (storageUsedAmount - 63)));
-        return Duration.of(estimation, ChronoUnit.SECONDS);
+        val estimation =
+            (((100f / (100f + additionalMinionSpeed)) * (minion.getDelay() * minion.actionsForItem * itemDropMultiplier) * (storageUsedAmount - 63)).toInt())
+        return Duration.of(estimation.toLong(), ChronoUnit.SECONDS)
     }
 
-    public static Map<MinionResourceItem, Double> getHourlyDrops(Minions minion, int minionCount, Fueles fuel, MinionStorage storage, MinionItem item1, MinionItem item2, Double percentageMinionSpeed, Double dropMultiplierBoost) {
-        if (minionCount == 0) return new HashMap<>();
+    @JvmStatic
+    fun getHourlyDrops(
+        minion: Minions,
+        minionCount: Int,
+        fuel: Fueles?,
+        storage: MinionStorage?,
+        item1: MinionItem?,
+        item2: MinionItem?,
+        percentageMinionSpeed: Double?,
+        dropMultiplierBoost: Double?
+    ): MutableMap<MinionResourceItem?, Double?> {
+        if (minionCount == 0) return HashMap()
 
-        double itemDropMultiplier = 1;
-        if (fuel != null) itemDropMultiplier *= fuel.getBoostMultiplier() - 1;
-        if (dropMultiplierBoost != null && dropMultiplierBoost != 0)
-            itemDropMultiplier *= dropMultiplierBoost;
-        if (item1 != null) itemDropMultiplier *= item1.getMultiplier(minion);
-        if (item2 != null) itemDropMultiplier *= item2.getMultiplier(minion);
+        var itemDropMultiplier = 1.0
+        if (fuel != null) itemDropMultiplier *= (fuel.getBoostMultiplier() - 1).toDouble()
+        if (dropMultiplierBoost != null && dropMultiplierBoost != 0.0) itemDropMultiplier *= dropMultiplierBoost
+        if (item1 != null) itemDropMultiplier *= item1.getMultiplier(minion)
+        if (item2 != null) itemDropMultiplier *= item2.getMultiplier(minion)
 
-        double additionalMinionSpeed = 0;
-        if (percentageMinionSpeed != null && percentageMinionSpeed != 0)
-            additionalMinionSpeed += percentageMinionSpeed;
-        if (fuel != null) itemDropMultiplier += fuel.getBoostPercentage();
-        if (item1 != null) additionalMinionSpeed += item1.getMinionSpeedAdditive(minion);
-        if (item2 != null) additionalMinionSpeed += item2.getMinionSpeedAdditive(minion);
+        var additionalMinionSpeed = 0.0
+        if (percentageMinionSpeed != null && percentageMinionSpeed != 0.0) additionalMinionSpeed += percentageMinionSpeed
+        if (fuel != null) itemDropMultiplier += fuel.getBoostPercentage().toDouble()
+        if (item1 != null) additionalMinionSpeed += item1.getMinionSpeedAdditive(minion).toDouble()
+        if (item2 != null) additionalMinionSpeed += item2.getMinionSpeedAdditive(minion).toDouble()
 
-        double actions = 3600 / ((100F / (100F + additionalMinionSpeed)) * (minion.getDelay() * minion.getActionsForItem()));
+        val actions =
+            3600 / ((100f / (100f + additionalMinionSpeed)) * (minion.getDelay() * minion.actionsForItem))
 
-        Map<MinionResourceItem, Double> generated = new HashMap<>();
-        double finalItemDropMultiplier = itemDropMultiplier;
-        minion.getItems().forEach((k, v) -> {
-            MinionResourceItem item = k;
-            if (item1 != null) item = item1.convertItem(item);
-            if (item2 != null) item = item2.convertItem(item);
-            generated.put(item, actions * v * finalItemDropMultiplier * minionCount);
-        });
+        val generated: MutableMap<MinionResourceItem?, Double?> = HashMap()
+        val finalItemDropMultiplier = itemDropMultiplier
+        minion.getItems().forEach { (k: MinionResourceItem?, v: Double?) ->
+            var item = k
+            if (item1 != null) item = item1.convertItem(item)
+            if (item2 != null) item = item2.convertItem(item)
+            generated.put(item, actions * v!! * finalItemDropMultiplier * minionCount)
+        }
 
-        double sum = generated.values().stream().mapToDouble(v -> v).sum();
+        val sum = generated.values.stream().mapToDouble { v: Double? -> v!! }.sum()
 
-        if (item1 != null) item1.modifyDrops(sum, generated);
-        if (item2 != null) item2.modifyDrops(sum, generated);
-        return generated;
-
+        item1?.modifyDrops(sum, generated)
+        item2?.modifyDrops(sum, generated)
+        return generated
     }
-
 }

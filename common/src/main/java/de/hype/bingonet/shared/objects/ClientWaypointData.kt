@@ -1,35 +1,63 @@
-package de.hype.bingonet.shared.objects;
+package de.hype.bingonet.shared.objects
+
+import de.hype.bingonet.environment.packetconfig.EnvironmentPacketConfig
+import java.awt.Color
+import java.util.List
 
 
-import de.hype.bingonet.environment.packetconfig.EnvironmentPacketConfig;
+open class ClientWaypointData @JvmOverloads constructor(
+    pos: Position,
+    jsonTextToRender: String,
+    renderDistance: Int,
+    visible: Boolean,
+    deleteOnServerSwap: Boolean,
+    render: MutableList<RenderInformation>?,
+    color: Color = EnvironmentPacketConfig.defaultWaypointColor,
+    doTracer: Boolean = EnvironmentPacketConfig.waypointDefaultWithTracer
+) : WaypointData(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, color, doTracer) {
+    var waypointId: Int = counter++
+        protected set
 
-import java.awt.*;
-import java.util.List;
+    constructor(
+        pos: Position,
+        jsonTextToRender: String,
+        renderDistance: Int,
+        visible: Boolean,
+        deleteOnServerSwap: Boolean,
+        render: RenderInformation,
+        color: Color,
+        doTracer: Boolean
+    ) : this(
+        pos,
+        jsonTextToRender,
+        renderDistance,
+        visible,
+        deleteOnServerSwap,
+        List.of<RenderInformation?>(render),
+        color,
+        doTracer
+    )
 
-public class ClientWaypointData extends WaypointData {
-    public static int counter = 0;
-    protected int waypointId = counter++;
+    constructor(
+        pos: Position,
+        jsonTextToRender: String,
+        renderDistance: Int,
+        visible: Boolean,
+        deleteOnServerSwap: Boolean,
+        render: RenderInformation
+    ) : this(
+        pos,
+        jsonTextToRender,
+        renderDistance,
+        visible,
+        deleteOnServerSwap,
+        List.of<RenderInformation?>(render),
+        EnvironmentPacketConfig.defaultWaypointColor,
+        EnvironmentPacketConfig.waypointDefaultWithTracer
+    )
 
-    public ClientWaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render, Color color, boolean doTracer) {
-        this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, List.of(render), color, doTracer);
+
+    companion object {
+        var counter: Int = 0
     }
-
-    public ClientWaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render) {
-        this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, List.of(render), EnvironmentPacketConfig.getDefaultWaypointColor(), EnvironmentPacketConfig.getWaypointDefaultWithTracer());
-    }
-
-    public ClientWaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render, Color color, boolean doTracer) {
-        super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, color, doTracer);
-    }
-
-    public ClientWaypointData(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render) {
-        this(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, EnvironmentPacketConfig.getDefaultWaypointColor(), EnvironmentPacketConfig.getWaypointDefaultWithTracer());
-    }
-
-
-    public int getWaypointId() {
-        return waypointId;
-    }
-
-
 }

@@ -113,7 +113,7 @@ public class PacketUtils {
         } catch (Exception e) {
             return true;
         }
-        List<InterceptPacketInfo> intercepts = BingoNet.connection.packetIntercepts;
+        List<InterceptPacketInfo<?>> intercepts = BingoNet.connection.packetIntercepts;
         List<Integer> indexes = new ArrayList<>();
         boolean cancelIntercept = false;
         boolean cancelMainExec = false;

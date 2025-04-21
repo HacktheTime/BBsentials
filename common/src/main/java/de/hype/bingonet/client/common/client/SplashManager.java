@@ -82,7 +82,7 @@ public class SplashManager {
                 if (splash.hubSelectorData.hubType.equals(Islands.HUB)) {
                     Islands currentIsland = BingoNet.dataStorage.getIsland();
                     switch (currentIsland) {
-                        case GOLD_MINE, The_Park, SPIDERS_DEN -> {
+                        case GOLD_MINE, THE_PARK, SPIDERS_DEN -> {
                             BingoNet.sender.addSendTask("/warp " + splash.hubSelectorData.hubType.getWarpArgument(), 0.5);
                         }
                         default -> {

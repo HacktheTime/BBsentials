@@ -1,28 +1,15 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
-public interface MinionResourceItem {
+interface MinionResourceItem {
+    val compactorLevel: Int
+        get() = 1
 
-    default Integer getCompactorLevel() {
-        return 1;
-    }
+    val displayName: String
 
-    String getDisplayName();
-
-    public enum UnusedMinionItems implements MinionResourceItem {
+    enum class UnusedMinionItems(override val displayName: String) : MinionResourceItem {
         RED_GIFT("Purple Candy"),
         LUSH_BERRIES("Lush Berrbries"),
         PURPLE_CANDY("Purple Candy"),
         ;
-
-        public final String displayName;
-
-        UnusedMinionItems(String displayName) {
-            this.displayName = displayName;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return null;
-        }
     }
 }

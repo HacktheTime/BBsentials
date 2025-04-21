@@ -1,6 +1,6 @@
-package de.hype.bingonet.shared.packets.addonpacket;
+package de.hype.bingonet.shared.packets.addonpacket
 
-public enum Status {
+enum class Status {
     CONNECT,
     DISCONNECT,
     READY,

@@ -75,8 +75,15 @@ jar {
 }
 
 processResources {
+    def resolveVersion = { String moduleName ->
+        configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.find {
+            it.moduleVersion.id.name == moduleName
+        }?.moduleVersion?.id?.version
+    }
+
+    // Define expandProps at configuration time
     def expandProps = [
-            "group"                      : project.group, //Else we target the task's group.
+            "group": project.group,
             "minecraft_version"          : libs.versions.modern.minecraft.get(),
             "minecraft_versionsSupported": libs.versions.minecraft.versionSupported.get(),
             "fabric_api_version"         : libs.versions.modern.fabric.api.get(),
@@ -84,14 +91,58 @@ processResources {
             "mod_name"                   : mod_name,
             "mod_id"                     : mod_id,
             "mod_version"                : libs.versions.modVersion.get(),
-//            "description": project.description,
             "java_version"               : libs.versions.javaVersion.get()
     ]
 
-    filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
-        expand expandProps
-    }
+    // Register inputs at configuration time
     inputs.properties(expandProps)
+
+    doFirst {
+        // Function to resolve versions from libs.versions.toml that are set to "latest.release"
+        def resolveLatestReleaseVersions = { ->
+            def resolvedVersions = [:]
+
+            // Get the version catalogs extension
+            def versionCatalogs = project.getExtensions().findByType(VersionCatalogsExtension.class)
+            if (versionCatalogs != null) {
+                def catalog = versionCatalogs.named("libs")
+
+                // Get all libraries from the catalog
+                catalog.libraryAliases.each { alias ->
+                    def library = catalog.findLibrary(alias).get()
+                    def module = library.get().module
+                    def version = library.get().versionConstraint.requiredVersion
+
+                    // If version is "latest.release", resolve it
+                    if (version == "latest.release") {
+                        def moduleName = module.name
+                        def resolvedVersion = resolveVersion(moduleName)
+                        if (resolvedVersion) {
+                            resolvedVersions.put(alias, resolvedVersion)
+                        }
+                    }
+                }
+            }
+
+            return resolvedVersions
+        }
+
+        // Resolve all latest.release versions
+        def resolvedLatestVersions = resolveLatestReleaseVersions()
+
+        // Add resolved versions to expandProps
+        expandProps.put("hypixel_mod_api_version", resolveVersion("mod-api"))
+        expandProps.put("fabric_kotlin_version", resolveVersion("fabric-language-kotlin"))
+
+        // Add all resolved latest.release versions to expandProps
+        resolvedLatestVersions.each { alias, version ->
+            expandProps.put(alias + "_version", version)
+        }
+
+        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
+            expand expandProps
+        }
+    }
 }
 
 publishing {

@@ -414,7 +414,7 @@ public class Commands implements MCCommand {
         Position playerPos = EnvironmentCore.utils.getPlayersPosition();
         SplashLocation loc = null;
         for (SplashLocation value : SplashLocations.values()) {
-            if (value.getCoords().isInRange(playerPos, 10)) {
+            if (value.getSplashLocation().coords.isInRange(playerPos, 10)) {
                 loc = value.getSplashLocation();
             }
         }
@@ -450,7 +450,7 @@ public class Commands implements MCCommand {
             Position playerPos = EnvironmentCore.utils.getPlayersPosition();
             SplashLocation loc = null;
             for (SplashLocation value : SplashLocations.values()) {
-                if (value.getCoords().isInRange(playerPos, 10)) {
+                if (value.getSplashLocation().coords.isInRange(playerPos, 10)) {
                     loc = value.getSplashLocation();
                 }
             }

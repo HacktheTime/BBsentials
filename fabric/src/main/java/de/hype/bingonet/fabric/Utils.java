@@ -19,6 +19,7 @@ import de.hype.bingonet.shared.constants.Islands;
 import de.hype.bingonet.shared.constants.VanillaItems;
 import de.hype.bingonet.shared.objects.ChChestData;
 import de.hype.bingonet.shared.objects.Position;
+import de.hype.bingonet.shared.objects.WaypointData;
 import de.hype.bingonet.shared.objects.minions.Minions;
 import de.hype.bingonet.shared.packets.function.MinionDataResponse;
 import kotlin.Unit;
@@ -101,7 +102,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
 
     public static void renderWaypoints(WorldRenderLastEvent event) {
         BlockPos playerPos = MinecraftClient.getInstance().player.getBlockPos();
-        List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter((waypoint) -> waypoint.visible).toList();
+        List<Waypoints> waypoints = Waypoints.waypoints.values().stream().filter(WaypointData::getVisible).toList();
 
         if (!waypoints.isEmpty() || ModInitialiser.tutorialManager.current != null) {
             try {
@@ -120,16 +121,17 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                         }
                     }
                     for (Waypoints waypoint : waypoints) {
-                        BlockPos pos = new BlockPos(waypoint.position.x, waypoint.position.y, waypoint.position.z);
-                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.renderDistance) continue;
-                        color = waypoint.color;
+                        BlockPos pos = new BlockPos(waypoint.getPosition().x, waypoint.getPosition().y, waypoint.getPosition().z);
+                        if (playerPos.toCenterPos().distanceTo(pos.toCenterPos()) >= waypoint.getRenderDistance())
+                            continue;
+                        color = waypoint.getColor();
                         color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50);
                         it.block(pos, color);
-                        it.waypoint(pos, color, FabricTextUtils.jsonToText(waypoint.jsonToRenderText));
-                        if (waypoint.doTracer) {
+                        it.waypoint(pos, color, FabricTextUtils.jsonToText(waypoint.getJsonToRenderText()));
+                        if (waypoint.getDoTracer()) {
                             it.tracer(pos.toCenterPos(), 3f, color);
                         }
-                        it.doWaypointIcon(pos.toCenterPos(), waypoint.render, 25, 25);
+                        it.doWaypointIcon(pos.toCenterPos(), waypoint.getRender(), 25, 25);
 
                     }
                     return Unit.INSTANCE;
@@ -209,7 +211,7 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
     @Override
     public MinionDataResponse getMiniondata() {
         Map<Minions, Integer> minions = new HashMap<>();
-        if (getCurrentIsland() != Islands.PRIVATE_ISLAND) return new MinionDataResponse(null, null);
+        if (getCurrentIsland() != Islands.PRIVATE_ISLAND) throw new IllegalStateException("Not in private island!");
         List<PlayerListEntry> tabList = new ArrayList<>(MinecraftClient.getInstance().getNetworkHandler().getPlayerList());
         boolean inMinionData = false;
         Integer slots = null;

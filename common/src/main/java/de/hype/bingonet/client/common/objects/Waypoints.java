@@ -26,37 +26,37 @@ public class Waypoints extends ClientWaypointData {
     public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, RenderInformation render) {
         super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render);
         ServerSwitchTask.onServerLeaveTask(() -> {
-            if (this.deleteOnServerSwap)
+            if (this.getDeleteOnServerSwap())
                 this.removeFromPool();
         });
-        waypoints.put(waypointId, this);
+        waypoints.put(getWaypointId(), this);
     }
 
     public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render, Color color, boolean doTracer) {
         super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render, color, doTracer);
         ServerSwitchTask.onServerLeaveTask(() -> {
-            if (this.deleteOnServerSwap)
+            if (this.getDeleteOnServerSwap())
                 this.removeFromPool();
         });
-        waypoints.put(waypointId, this);
+        waypoints.put(getWaypointId(), this);
     }
 
     public Waypoints(Position pos, String jsonTextToRender, int renderDistance, boolean visible, boolean deleteOnServerSwap, List<RenderInformation> render) {
         super(pos, jsonTextToRender, renderDistance, visible, deleteOnServerSwap, render);
         ServerSwitchTask.onServerLeaveTask(() -> {
-            if (this.deleteOnServerSwap)
+            if (this.getDeleteOnServerSwap())
                 this.removeFromPool();
         });
-        waypoints.put(waypointId, this);
+        waypoints.put(getWaypointId(), this);
     }
 
     public Waypoints(WaypointData data) {
-        this(data.position, data.jsonToRenderText, data.renderDistance, data.visible, data.deleteOnServerSwap, data.render, data.color, data.doTracer);
+        this(data.getPosition(), data.getJsonToRenderText(), data.getRenderDistance(), data.getVisible(), data.getDeleteOnServerSwap(), data.getRender(), data.getColor(), data.getDoTracer());
     }
 
     public Waypoints removeFromPool() {
         BingoNet.onServerLeave.remove(removeRunnableId);
-        return waypoints.remove(waypointId);
+        return waypoints.remove(getWaypointId());
     }
 
     /**
@@ -67,7 +67,7 @@ public class Waypoints extends ClientWaypointData {
             Waypoints newWaypoint = new Waypoints(data);
             Waypoints oldWaypoint = Waypoints.waypoints.get(waypointId);
 
-            newWaypoint.waypointId = waypointId;
+            newWaypoint.setWaypointId(waypointId);
             newWaypoint.removeFromPool();
             newWaypoint.removeRunnableId = oldWaypoint.removeRunnableId;
             Waypoints.waypoints.replace(waypointId, newWaypoint);
@@ -78,27 +78,27 @@ public class Waypoints extends ClientWaypointData {
     public String getMinimalInfoString() {
         String unformatedName;
         try {
-            unformatedName = EnvironmentCore.utils.getStringFromTextJson(jsonToRenderText);
+            unformatedName = EnvironmentCore.utils.getStringFromTextJson(getJsonToRenderText());
         } catch (Exception e) {
             unformatedName = Formatting.RED + "Invalid Json Name";
         }
-        return "ID: " + getWaypointId() + " | Name: " + unformatedName + "§r | Coords: " + position.toString();
+        return "ID: " + getWaypointId() + " | Name: " + unformatedName + "§r | Coords: " + getPosition().toString();
     }
 
     public String getFullInfoString() {
         StringBuilder builder = new StringBuilder();
         builder.append("Name: ");
         try {
-            builder.append(EnvironmentCore.utils.getStringFromTextJson(jsonToRenderText) + "§r\n");
+            builder.append(EnvironmentCore.utils.getStringFromTextJson(getJsonToRenderText()) + "§r\n");
         } catch (Exception e) {
             builder.append(Formatting.RED + "Invalid Json Name§r\n");
         }
-        builder.append("Coords: " + position.toString() + "\n");
-        builder.append("Visible: " + visible + "\n");
-        builder.append("Deleted on Server Swap: " + deleteOnServerSwap + "\n");
-        builder.append("Maximum Render Distance: " + renderDistance + "\n");
-        for (int i = 0; i < render.size(); i++) {
-            String customTexture = render.get(i).getTexturePath();
+        builder.append("Coords: " + getPosition().toString() + "\n");
+        builder.append("Visible: " + getVisible() + "\n");
+        builder.append("Deleted on Server Swap: " + getDeleteOnServerSwap() + "\n");
+        builder.append("Maximum Render Distance: " + getRenderDistance() + "\n");
+        for (int i = 0; i < getRender().size(); i++) {
+            String customTexture = getRender().get(i).getTexturePath();
             if (customTexture != null)
                 builder.append("(").append(i).append(")Custom Texture: ").append(customTexture);
         }
@@ -109,11 +109,11 @@ public class Waypoints extends ClientWaypointData {
     public String getUserSimpleInformation() {
         String unformatedName;
         try {
-            unformatedName = EnvironmentCore.utils.getStringFromTextJson(jsonToRenderText);
+            unformatedName = EnvironmentCore.utils.getStringFromTextJson(getJsonToRenderText());
         } catch (Exception e) {
             unformatedName = Formatting.RED + "Invalid Json Name";
         }
-        return "Name: " + unformatedName + "§r | Coords: " + position.toString();
+        return "Name: " + unformatedName + "§r | Coords: " + getPosition().toString();
     }
 
 }

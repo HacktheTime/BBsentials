@@ -1,16 +1,17 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
+
 // Mining Events
 
 /**
  * A List of all Mining Events
- * {@link #BETTER_TOGETHER}
- * {@link #DOUBLE_POWDER}
- * {@link #GONE_WITH_THE_WIND}
- * {@link #GOBLIN_RAID}
- * {@link #MITHRIL_GOURMAND}
- * {@link #RAFFLE}
+ * [.BETTER_TOGETHER]
+ * [.DOUBLE_POWDER]
+ * [.GONE_WITH_THE_WIND]
+ * [.GOBLIN_RAID]
+ * [.MITHRIL_GOURMAND]
+ * [.RAFFLE]
  */
-public enum MiningEvents implements BBDisplayNameProvider {
+enum class MiningEvents(@JvmField val displayName: String) {
     BETTER_TOGETHER("Better Together"),
     DOUBLE_POWDER("Double Powder"),
     GONE_WITH_THE_WIND("Gone with the Wind"),
@@ -18,29 +19,24 @@ public enum MiningEvents implements BBDisplayNameProvider {
     MITHRIL_GOURMAND("Mithril Gourmand"),
     RAFFLE("Raffle");
 
-    private final String displayName;
-
-    MiningEvents(String displayName) {
-        this.displayName = displayName;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    //Some Events cant happen in Crystal Holows
-    public boolean isDWEventOnly() {
-        if (this.equals(MiningEvents.MITHRIL_GOURMAND) || this.equals(MiningEvents.RAFFLE) || this.equals(MiningEvents.GOBLIN_RAID)) {
-            return true;
+    val isDWEventOnly: Boolean
+        //Some Events can't happen in Crystal Hollows
+        get() {
+            return this == MITHRIL_GOURMAND || this == RAFFLE || this == GOBLIN_RAID
         }
-        return false;
-    }
 
-    public static boolean isDWEventOnly(String event) {
-        if (event.equals(MiningEvents.MITHRIL_GOURMAND.getDisplayName()) || event.equals(MiningEvents.RAFFLE.getDisplayName()) || event.equals(MiningEvents.GOBLIN_RAID.getDisplayName())) {
-            return true;
+    companion object {
+        @JvmStatic
+        fun isDWEventOnly(event: String): Boolean {
+            return event == MITHRIL_GOURMAND.displayName || event == RAFFLE.displayName || event == GOBLIN_RAID.displayName
         }
-        return false;
+
+        @JvmStatic
+        fun getByDisplayName(string: String): MiningEvents? {
+            for (event in entries) {
+                if (event.displayName == string) return event
+            }
+            return null
+        }
     }
 }

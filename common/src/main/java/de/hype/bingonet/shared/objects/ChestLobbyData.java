@@ -48,8 +48,8 @@ public class ChestLobbyData {
 
     public void setStatusNoOverride(Object statusBase) {
         if (statusBase instanceof StatusConstants statusConstants) {
-            this.status = statusConstants.getDisplayName();
-            color = statusConstants.getColor();
+            this.status = statusConstants.displayName;
+            color = statusConstants.color;
         }
         else if (statusBase instanceof String) {
             this.status = (String) statusBase;

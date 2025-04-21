@@ -35,7 +35,7 @@ public interface Collections extends MinionResourceItem {
 
     int getCollectionForTier(int tier);
 
-    default Integer getCompactorLevel() {
+    default int getCompactorLevel() {
         return 1;
     }
 
@@ -59,7 +59,7 @@ public interface Collections extends MinionResourceItem {
         Pumpkin("PUMPKIN", "PUMPKIN_GENERATOR_1", 40, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000),
         Wheat("WHEAT", "WHEAT_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 10000, 15000, 25000, 50000, 100000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
 
@@ -71,7 +71,7 @@ public interface Collections extends MinionResourceItem {
         Seeds("SEEDS", "SEEDS_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 25000),
         Mushroom("MUSHROOM_COLLECTION", "MUSHROOM_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
@@ -80,7 +80,7 @@ public interface Collections extends MinionResourceItem {
         Mutton("MUTTON", "SHEEP_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
         Melon("MELON", "MELON_GENERATOR_1", 250, 500, 1250, 5000, 15000, 25000, 50000, 100000, 250000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
@@ -137,20 +137,20 @@ public interface Collections extends MinionResourceItem {
     enum Mining implements Collections {
         Lapis_Lazuli("INK_SACK:4", "LAPIS_GENERATOR_1", 250, 500, 1000, 2000, 10000, 25000, 50000, 100000, 150000, 250000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
         Redstone("REDSTONE", "REDSTONE_GENERATOR_1", 100, 250, 750, 1500, 3000, 5000, 10000, 25000, 50000, 200000, 400000, 600000, 800000, 1000000, 1200000, 1400000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
         Umber("UMBER", null, 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
         Coal("COAL", "COAL_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
@@ -158,14 +158,14 @@ public interface Collections extends MinionResourceItem {
         End_Stone("ENDER_STONE", "ENDER_STONE_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000),
         Nether_Quartz("QUARTZ", "QUARTZ_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 4;
             }
         },
         Sand("SAND", "SAND_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000),
         Iron_Ingot("IRON_INGOT", "IRON_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 200000, 400000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
@@ -179,20 +179,20 @@ public interface Collections extends MinionResourceItem {
         Obsidian("OBSIDIAN", "OBSIDIAN_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
         Diamond("DIAMOND", "DIAMOND_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
         Cobblestone("COBBLESTONE", "COBBLESTONE_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 40000, 70000),
         Glowstone_Dust("GLOWSTONE_DUST", "GLOWSTONE_GENERATOR_1", 50, 100, 1000, 2500, 5000, 10000, 25000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 4;
             }
         },
         Gold_Ingot("GOLD_INGOT", "GOLD_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
@@ -206,14 +206,14 @@ public interface Collections extends MinionResourceItem {
         Mithril("MITHRIL_ORE", "MITHRIL_GENERATOR_1", 50, 250, 1000, 2500, 5000, 10000, 250000, 500000, 1000000),
         Emerald("EMERALD", "EMERALD_GENERATOR_1", 50, 100, 250, 1000, 5000, 15000, 30000, 50000, 100000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
         Red_Sand("SAND:1", "RED_SAND_GENERATOR_1", 50, 500, 2500, 10000, 15000, 25000, 50000, 100000),
         Ice("ICE", "ICE_GENERATOR_1", 50, 100, 250, 500, 1000, 5000, 10000, 50000, 100000, 250000, 500000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
@@ -271,7 +271,7 @@ public interface Collections extends MinionResourceItem {
         Chili_Pepper("CHILI_PEPPER", null, 10, 25, 75, 250, 1000, 2500, 5000, 10000, 20000),
         Slimeball("SLIME_BALL", "SLIME_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 9;
             }
         },
@@ -398,7 +398,7 @@ public interface Collections extends MinionResourceItem {
         },
         Clay("CLAY_BALL", "CLAY_GENERATOR_1", 50, 100, 250, 1000, 1500, 2500) {
             @Override
-            public Integer getCompactorLevel() {
+            public int getCompactorLevel() {
                 return 4;
             }
         },

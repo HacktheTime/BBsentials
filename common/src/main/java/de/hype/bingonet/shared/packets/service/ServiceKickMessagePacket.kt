@@ -1,16 +1,6 @@
-package de.hype.bingonet.shared.packets.service;
+package de.hype.bingonet.shared.packets.service
 
-import de.hype.bingonet.environment.packetconfig.AbstractPacket;
+import de.hype.bingonet.environment.packetconfig.AbstractPacket
 
-public class ServiceKickMessagePacket extends AbstractPacket {
-    public final String message;
-    public final int serviceId;
-    public final boolean suggestRejoin;
-
-    public ServiceKickMessagePacket(int serviceId, boolean suggestRejoin, String message) {
-        super(1, 1);
-        this.message = message;
-        this.serviceId = serviceId;
-        this.suggestRejoin = suggestRejoin;
-    }
-}
+class ServiceKickMessagePacket(val serviceId: Int, val suggestRejoin: Boolean, val message: String?) :
+    AbstractPacket(1, 1)

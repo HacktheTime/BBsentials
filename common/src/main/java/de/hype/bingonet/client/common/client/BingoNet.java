@@ -222,7 +222,7 @@ public class BingoNet {
                     if (BingoNet.visualConfig.addSplashWaypoint) {
                         List<RenderInformation> temp = new ArrayList<>();
                         temp.add(new RenderInformation("bingonet", "textures/waypoints/splash_location.png"));
-                        new Waypoints(value.locationInHub.getCoords(), EnvironmentCore.textutils.getJsonFromContent("§6Splash"), 1000, true, true, temp, Color.YELLOW, true);
+                        new Waypoints(value.locationInHub.getSplashLocation().coords, EnvironmentCore.textutils.getJsonFromContent("§6Splash"), 1000, true, true, temp, Color.YELLOW, true);
                     }
                 }
             }

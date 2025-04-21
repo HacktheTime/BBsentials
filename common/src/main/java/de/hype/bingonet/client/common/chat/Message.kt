@@ -1,32 +1,25 @@
-package de.hype.bingonet.client.common.chat;
+package de.hype.bingonet.client.common.chat
 
-import de.hype.bingonet.client.common.client.BingoNet;
+import de.hype.bingonet.client.common.client.BingoNet
+import de.hype.bingonet.shared.objects.Message
 
-import static de.hype.bingonet.shared.objects.Message.MessageSource.PRIVATE_MESSAGE_RECEIVE;
+class Message @JvmOverloads constructor(textJson: String, string: String, actionbar: Boolean = false) :
+    Message(textJson, string, actionbar) {
 
-
-public class Message extends de.hype.bingonet.shared.objects.Message {
-    protected Boolean isFromReportedUser;
-
-    public Message(String textJson, String string) {
-        this(textJson, string, false);
+    fun isFromReportedUser(): Boolean {
+        return BingoNet.temporaryConfig.alreadyReported.contains(getPlayerName()) && !getPlayerName().isEmpty()
     }
 
-    public Message(String textJson, String string, boolean actionbar) {
-        super(textJson, string, actionbar);
-        isFromReportedUser = isFromReportedUser();
+    fun replyToUser(message: String?) {
+        val commandStart = source.replyCommandStart
+        if (commandStart.isEmpty()) return
+        if (source != MessageSource.PRIVATE_MESSAGE_RECEIVE) BingoNet.sender.addImmediateSendTask(commandStart + getPlayerName() + " " + message)
+        else BingoNet.sender.addImmediateSendTask("/r " + getPlayerName() + " " + message)
     }
 
-    public boolean isFromReportedUser() {
-        return BingoNet.temporaryConfig.alreadyReported.contains(getPlayerName()) && !getPlayerName().isEmpty();
-    }
-
-    public void replyToUser(String message) {
-        String commandStart = source.replyCommandStart;
-        if (commandStart == null) return;
-        if (source != PRIVATE_MESSAGE_RECEIVE)
-            BingoNet.sender.addImmediateSendTask(commandStart + getPlayerName() + " " + message);
-        else
-            BingoNet.sender.addImmediateSendTask("/r " + getPlayerName() + " " + message);
+    companion object {
+        fun tellraw(replace: kotlin.String): Message {
+            return de.hype.bingonet.client.common.chat.Message.tellraw(replace)
+        }
     }
 }

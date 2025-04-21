@@ -1,27 +1,21 @@
-package de.hype.bingonet.shared.objects.json;
+package de.hype.bingonet.shared.objects.json
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+class ApiJsonList(var parent: ApiJson, key: String?) {
+    var values: MutableList<ApiJsonElement?> = ArrayList()
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ApiJsonList {
-    ApiJson parent;
-    List<ApiJsonElement> values = new ArrayList<>();
-
-    public ApiJsonList(ApiJson parent, String key) {
-        this.parent = parent;
-        JsonElement temp = parent.getJSONElementSafe();
-        if (temp == null) return;
-        JsonArray array = temp.getAsJsonObject().getAsJsonArray(key);
-        if (array == null) return;
-        for (JsonElement jsonElement : array) {
-            values.add(new ApiJsonElement(jsonElement));
+    init {
+        val temp = parent.jSONElementSafe
+        if (temp != null) {
+            val array = temp.getAsJsonObject().getAsJsonArray(key)
+            if (array != null) {
+                for (jsonElement in array) {
+                    values.add(ApiJsonElement(jsonElement))
+                }
+            }
         }
     }
 
-    public List<ApiJsonElement> toList() {
-        return new ArrayList<>(values);
+    fun toList(): MutableList<ApiJsonElement?> {
+        return ArrayList<ApiJsonElement?>(values)
     }
 }

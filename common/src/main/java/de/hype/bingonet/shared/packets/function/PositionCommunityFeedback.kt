@@ -1,39 +1,25 @@
-package de.hype.bingonet.shared.packets.function;
+package de.hype.bingonet.shared.packets.function
 
-import de.hype.bingonet.environment.packetconfig.AbstractPacket;
+import de.hype.bingonet.environment.packetconfig.AbstractPacket
+import java.util.*
 
-import java.util.Objects;
-import java.util.Set;
-
-public class PositionCommunityFeedback extends AbstractPacket {
-    public Set<ComGoalPosition> positions;
-
-    public PositionCommunityFeedback(Set<ComGoalPosition> positions) {
-        super(1, 1);
-        this.positions = positions;
-    }
-
-    public static class ComGoalPosition {
-        public String goalName;
-        public Integer contribution;
-        public Double topPercentage;
-        public Integer position;
-
-        public ComGoalPosition(String goalName, Integer contribution, Double topPercentage, Integer position) {
-            this.goalName = goalName;
-            this.contribution = contribution;
-            this.topPercentage = topPercentage;
-            this.position = position;
+class PositionCommunityFeedback(@JvmField var positions: MutableSet<ComGoalPosition>) : AbstractPacket(1, 1) {
+    class ComGoalPosition(
+        @JvmField var goalName: String,
+        @JvmField var contribution: Int,
+        @JvmField var topPercentage: Double,
+        @JvmField var position: Int
+    ) {
+        override fun hashCode(): Int {
+            return goalName.hashCode()
         }
 
-        @Override
-        public int hashCode() {
-            return goalName.hashCode();
-        }
-
-        public boolean dataEquals(ComGoalPosition compare) {
-            if (compare == null) return false;
-            return (Objects.equals(topPercentage, compare.topPercentage)) && Objects.equals(compare.position, this.position) && Objects.equals(contribution, compare.contribution);
+        fun dataEquals(compare: ComGoalPosition?): Boolean {
+            if (compare == null) return false
+            return (Objects.equals(
+                topPercentage,
+                compare.topPercentage
+            )) && compare.position == this.position && contribution == compare.contribution
         }
     }
 }

@@ -500,11 +500,11 @@ public class ModInitialiser implements ClientModInitializer {
                                                             context.getSource().sendError(Text.of("No Waypoint on that ID found"));
                                                             return 0;
                                                         }
-                                                        if (waypoint.visible == visible) {
+                                                        if (waypoint.getVisible() == visible) {
                                                             Chat.sendPrivateMessageToSelfInfo("Nothing changed. Waypoint visibility was that state already");
                                                             return 1;
                                                         } else {
-                                                            waypoint.visible = visible;
+                                                            waypoint.setVisible(visible);
                                                             Chat.sendPrivateMessageToSelfSuccess("Nothing changed. Waypoint visibility was that state already");
                                                             return 1;
                                                         }

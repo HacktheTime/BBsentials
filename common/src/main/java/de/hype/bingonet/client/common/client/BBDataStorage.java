@@ -1,6 +1,5 @@
 package de.hype.bingonet.client.common.client;
 
-import de.hype.bingonet.shared.constants.EnumUtils;
 import de.hype.bingonet.shared.constants.Islands;
 import net.hypixel.data.region.Environment;
 import net.hypixel.data.type.GameType;
@@ -34,7 +33,7 @@ public class BBDataStorage {
         }
         if (packet.getMap().isPresent()) {
             this.map = packet.getMap().get();
-            this.island = EnumUtils.getEnumByValue(Islands.class, map);
+            this.island = Islands.getIslandByMap(map);
         } else {
             map = null;
             island = null;

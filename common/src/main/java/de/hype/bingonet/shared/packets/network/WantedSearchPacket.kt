@@ -1,75 +1,86 @@
-package de.hype.bingonet.shared.packets.network;
+package de.hype.bingonet.shared.packets.network
 
+import de.hype.bingonet.environment.packetconfig.AbstractPacket
+import de.hype.bingonet.shared.constants.Islands
 
-import de.hype.bingonet.environment.packetconfig.AbstractPacket;
-import de.hype.bingonet.shared.constants.Islands;
-
-import java.util.List;
 
 /**
  * Used to find collect Data across Servers. Can be used to find Users or Lobbies by ID
  */
-public class WantedSearchPacket extends AbstractPacket {
-    public boolean targetFound = true;
-    public String username;
-    public Islands island;
-    public Boolean mega;
-    public Integer minimumPlayerCount;
-    public Integer maximumPlayerCount;
-    public String serverId;
+class WantedSearchPacket : AbstractPacket {
+    var targetFound: Boolean = true
+    var username: String?
+    var island: Islands? = null
+    var mega: Boolean? = null
+    var minimumPlayerCount: Int? = null
+    var maximumPlayerCount: Int? = null
+    var serverId: String?
 
-    public WantedSearchPacket(String mcUsername, String serverId) {
-        super(1, 1);
-        this.username = mcUsername;
-        this.serverId = serverId;
+    constructor(mcUsername: String?, serverId: String?) : super(1, 1) {
+        this.username = mcUsername
+        this.serverId = serverId
     }
 
-    public WantedSearchPacket(String mcUsername, String serverId, Islands island, Boolean mega, Integer minimumPlayerCount, Integer maximumPlayerCount) {
-        super(1, 1);
-        this.username = mcUsername;
-        this.serverId = serverId;
-        this.mega = mega;
-        this.island = island;
-        this.minimumPlayerCount = minimumPlayerCount;
-        this.maximumPlayerCount = maximumPlayerCount;
+    constructor(
+        mcUsername: String?,
+        serverId: String?,
+        island: Islands?,
+        mega: Boolean?,
+        minimumPlayerCount: Int?,
+        maximumPlayerCount: Int?
+    ) : super(1, 1) {
+        this.username = mcUsername
+        this.serverId = serverId
+        this.mega = mega
+        this.island = island
+        this.minimumPlayerCount = minimumPlayerCount
+        this.maximumPlayerCount = maximumPlayerCount
     }
 
-    public static WantedSearchPacket findMcUser(String username) {
-        WantedSearchPacket packet = new WantedSearchPacket(username, null);
-        packet.targetFound = false;
-        return packet;
+    class WantedSearchPacketReply(
+        @JvmField var finder: String?,
+        usernames: MutableList<String?>,
+        megaServer: Boolean?,
+        serverId: String?
+    ) : AbstractPacket(1, 1) {
+        @JvmField
+        var usernames: MutableList<String?>?
+        var megaServer: Boolean?
+        var currentPlayerCount: Int?
+
+        @JvmField
+        var serverId: String?
+
+        init {
+            this.usernames = usernames
+            this.megaServer = megaServer
+            this.currentPlayerCount = usernames.size
+            this.serverId = serverId
+        }
     }
 
-    public static WantedSearchPacket findServer(String serverId) {
-        WantedSearchPacket packet = new WantedSearchPacket(null, serverId);
-        packet.targetFound = false;
-        return packet;
-    }
+    companion object {
+        fun findMcUser(username: String?): WantedSearchPacket {
+            val packet = WantedSearchPacket(username, null)
+            packet.targetFound = false
+            return packet
+        }
 
-    public static WantedSearchPacket findPrivateMega(Islands island) {
-        WantedSearchPacket packet = new WantedSearchPacket(null, null, island, true, null, 15);
-        packet.targetFound = false;
-        return packet;
-    }
+        @JvmStatic
+        fun findServer(serverId: String?): WantedSearchPacket {
+            val packet = WantedSearchPacket(null, serverId)
+            packet.targetFound = false
+            return packet
+        }
 
-    public static WantedSearchPacket findPrivateMegaHubServer() {
-        return findPrivateMega(Islands.HUB);
-    }
+        fun findPrivateMega(island: Islands?): WantedSearchPacket {
+            val packet = WantedSearchPacket(null, null, island, true, null, 15)
+            packet.targetFound = false
+            return packet
+        }
 
-    public static class WantedSearchPacketReply extends AbstractPacket {
-        public String finder;
-        public List<String> usernames;
-        public Boolean megaServer;
-        public Integer currentPlayerCount;
-        public String serverId;
-
-        public WantedSearchPacketReply(String finder, List<String> usernames, Boolean megaServer, String serverId) {
-            super(1, 1);
-            this.finder = finder;
-            this.usernames = usernames;
-            this.megaServer = megaServer;
-            this.currentPlayerCount = usernames.size();
-            this.serverId = serverId;
+        fun findPrivateMegaHubServer(): WantedSearchPacket {
+            return findPrivateMega(Islands.HUB)
         }
     }
 }

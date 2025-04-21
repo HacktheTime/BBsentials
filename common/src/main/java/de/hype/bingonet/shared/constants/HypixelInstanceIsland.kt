@@ -1,6 +1,9 @@
-package de.hype.bingonet.shared.constants;
+package de.hype.bingonet.shared.constants
 
-public enum HypixelInstanceIsland {
+enum class HypixelInstanceIsland(
+    val typeName: String, val level: Int, val requirement: Int,
+    val instanceType: InstanceIslandType
+) {
     CATACOMBS_ENTRANCE("Entrance", 0, 0, InstanceIslandType.DEFAULT_CATACOMBS),
     CATACOMBS_FLOOR_ONE("Floor 1", 1, 1, InstanceIslandType.DEFAULT_CATACOMBS),
     CATACOMBS_FLOOR_TWO("Floor 2", 2, 3, InstanceIslandType.DEFAULT_CATACOMBS),
@@ -17,31 +20,19 @@ public enum HypixelInstanceIsland {
     MASTER_CATACOMBS_FLOOR_SIX("Mastermode Floor 6", 5, 34, InstanceIslandType.MASTER_CATACOMBS),
     MASTER_CATACOMBS_FLOOR_SEVEN("Mastermode Floor 7", 6, 36, InstanceIslandType.MASTER_CATACOMBS),
     KUUDRA_NORMAL("Kuudra", 0, 0, InstanceIslandType.KUUDRA),
-    KUUDRA_HOT("Kuudra Hot Tier", 1, 1_000, InstanceIslandType.KUUDRA),
-    KUUDRA_BURNING("Kuudra Burning Tier", 2, 3_000, InstanceIslandType.KUUDRA),
-    KUUDRA_FIERY("Kuudra Fiery Tier", 3, 7_000, InstanceIslandType.KUUDRA),
-    KUUDRA_INFERNAL("Kuudra Infernal Tier", 4, 12_000, InstanceIslandType.KUUDRA),
+    KUUDRA_HOT("Kuudra Hot Tier", 1, 1000, InstanceIslandType.KUUDRA),
+    KUUDRA_BURNING("Kuudra Burning Tier", 2, 3000, InstanceIslandType.KUUDRA),
+    KUUDRA_FIERY("Kuudra Fiery Tier", 3, 7000, InstanceIslandType.KUUDRA),
+    KUUDRA_INFERNAL("Kuudra Infernal Tier", 4, 12000, InstanceIslandType.KUUDRA),
     ;
-    public final String name;
-    public final int level;
-    public final int requirement;
-    public final InstanceIslandType instanceType;
 
-    HypixelInstanceIsland(String name, int level, int requirement, InstanceIslandType instanceType) {
-        this.name = name;
-        this.level = level;
-        this.requirement = requirement;
-        this.instanceType = instanceType;
-    }
-
-    public enum InstanceIslandType {
+    enum class InstanceIslandType {
         DEFAULT_CATACOMBS,
         MASTER_CATACOMBS,
         KUUDRA,
         ;
 
-        public boolean isCatacombs() {
-            return this == DEFAULT_CATACOMBS || this == MASTER_CATACOMBS;
-        }
+        val isCatacombs: Boolean
+            get() = this == DEFAULT_CATACOMBS || this == MASTER_CATACOMBS
     }
 }

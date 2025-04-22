@@ -4,7 +4,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.Duration
 import java.time.Instant
-import java.util.Locale
+import java.util.*
 
 object FormattingUtils {
     /**

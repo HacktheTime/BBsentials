@@ -148,22 +148,18 @@ class BBsentialConnection {
     }
 
     fun sendMessage(message: String) {
-        if (messageQueue != null) {
-            Chat.sendPrivateMessageToSelfDebug("BBs: " + message)
-            messageQueue!!.offer(message)
-        } else {
-            Chat.sendPrivateMessageToSelfError("BB: It seems like the connection was lost. Please try to reconnect with /bbi reconnect")
-        }
+        Chat.sendPrivateMessageToSelfDebug("BBs: $message")
+        messageQueue.offer(message)
     }
 
     fun sendHiddenMessage(message: String?) {
         if (this.isConnected) {
             if (BingoNet.developerConfig.isDetailedDevModeEnabled()) {
-                Chat.sendPrivateMessageToSelfDebug("BBDev-s: " + message)
+                Chat.sendPrivateMessageToSelfDebug("BBDev-s: $message")
             }
             try {
                 if (socket!!.isConnected() && writer != null) {
-                    if (BingoNet.developerConfig.isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug("BBHs: " + message)
+                    if (BingoNet.developerConfig.isDetailedDevModeEnabled()) Chat.sendPrivateMessageToSelfDebug("BBHs: $message")
                     writer!!.println(message)
                 }
             } catch (ignored: NullPointerException) {
@@ -189,11 +185,11 @@ class BBsentialConnection {
         val rawjson = PacketUtils.parsePacketToJson(packet)
         if (this.isConnected && writer != null) {
             if (BingoNet.developerConfig.isDetailedDevModeEnabled() && !((packet.javaClass == RequestConnectPacket::class.java && !BingoNet.bbServerConfig.useMojangAuth) && BingoNet.developerConfig.devSecurity)) {
-                Chat.sendPrivateMessageToSelfDebug("BBDev-sP: " + packetName + ": " + rawjson)
+                Chat.sendPrivateMessageToSelfDebug("BBDev-sP: $packetName: $rawjson")
             }
-            writer!!.println(packetName + "." + rawjson)
+            writer!!.println("$packetName.$rawjson")
         } else {
-            Chat.sendPrivateMessageToSelfError("BB: Couldn't send a " + packetName + "! did you get disconnected?")
+            Chat.sendPrivateMessageToSelfError("BB: Couldn't send a $packetName! did you get disconnected?")
         }
     }
 
@@ -319,7 +315,7 @@ class BBsentialConnection {
             for (i in 0..9) {
                 val finalI = i
                 BingoNet.executionService.schedule(
-                    Runnable { Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + finalI) },
+                    Runnable { Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: $finalI") },
                     i.toLong(),
                     TimeUnit.SECONDS
                 )
@@ -344,7 +340,7 @@ class BBsentialConnection {
             val crashThread = Thread(Runnable {
                 EnvironmentCore.utils.playsound("block.anvil.destroy")
                 for (i in 10 downTo 0) {
-                    Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: " + i)
+                    Chat.sendPrivateMessageToSelfFatal("BB: Time till crash: $i")
                     try {
                         Thread.sleep(1000)
                     } catch (ignored: InterruptedException) {
@@ -635,7 +631,7 @@ class BBsentialConnection {
         }
         if (data.shouldModCrash) {
             for (i in 0..<data.warningTimeBeforeCrash) {
-                if (!data.silentCrash) Chat.sendPrivateMessageToSelfFatal("Crashing in " + i + " Seconds")
+                if (!data.silentCrash) Chat.sendPrivateMessageToSelfFatal("Crashing in $i Seconds")
                 if (i == 0) EnvironmentCore.utils.systemExit(data.exitCodeOnCrash)
             }
         }
@@ -717,9 +713,9 @@ class BBsentialConnection {
                 return true
             } else {
                 val emergencyMessage =
-                    "We detected that there was a command used which is not configured to be safe! " + command + " please check if its safe. IMMEDIATELY report this to the Admins and DeveloperAbstractConfig Hype_the_Time (@hackthetime). If it is not safe immediately remove BingoNet!!!!!!!! "
+                    "We detected that there was a command used which is not configured to be safe! $command please check if its safe. IMMEDIATELY report this to the Admins and DeveloperAbstractConfig Hype_the_Time (@hackthetime). If it is not safe immediately remove BingoNet!!!!!!!! "
                 println(emergencyMessage)
-                Chat.sendPrivateMessageToSelfFatal("§4" + emergencyMessage + "\n\n")
+                Chat.sendPrivateMessageToSelfFatal("§4$emergencyMessage\n\n")
             }
             return false
         }

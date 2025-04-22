@@ -107,8 +107,8 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
                         String id = data.getString("id");
                         BingoNet.executionService.execute(() -> {
                             for (Collections value : Collections.values()) {
-                                if (value.getId().equalsIgnoreCase(id)) {
-                                    String minionId = value.getMinionID();
+                                if (value.id.equalsIgnoreCase(id)) {
+                                    String minionId = value.minionID;
                                     if (minionId != null)
                                         BingoNet.sender.addSendTask("/viewrecipe %s".formatted(minionId), 0);
                                 }

@@ -27,3 +27,18 @@ dependencies {
 kotlin {
     jvmToolchain(8)
 }
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'kotlin'
+
+    sourceSets {
+        main.kotlin.srcDirs = ['src/main/java', 'src/main/kotlin']
+    }
+
+    compileKotlin {
+        source(project(":common").sourceSets.main.allSource)
+        inputs.file "../gradle.properties"
+    }
+}

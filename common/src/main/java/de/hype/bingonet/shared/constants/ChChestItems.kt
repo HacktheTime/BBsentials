@@ -61,6 +61,8 @@ object ChChestItems {
         ChChestItem("1,200-4,800 ${Formatting.LIGHT_PURPLE}Gemstone Powder", "legendary_gemstone_powder")
     val MITHRIL_POWDER: ChChestItem =
         ChChestItem("1,200-4,800 ${Formatting.GREEN}Mithril Powder", "legendary_mithril_powder")
+
+    @JvmStatic
     val allItems: MutableList<ChChestItem> = ArrayList<ChChestItem>()
 
     // Automatically populate predefined items using reflection
@@ -88,6 +90,7 @@ object ChChestItems {
         return customItem
     }
 
+    @JvmStatic
     fun getItems(itemInput: Array<String?>): MutableList<ChChestItem?> {
         val items = List.of<String?>(*itemInput)
         val allItems: MutableList<ChChestItem> = allItems

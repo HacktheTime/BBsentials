@@ -25,7 +25,7 @@ object MinionUtils {
         var storageUsedAmount = 0
 
         var itemDropMultiplier = 1.0
-        if (fuel != null) itemDropMultiplier *= (fuel.getBoostMultiplier() - 1).toDouble()
+        if (fuel != null) itemDropMultiplier *= (fuel.getBoostMultiplierMax() - 1).toDouble()
         if (dropMultiplierBoost != 0.0) itemDropMultiplier *= dropMultiplierBoost
         if (item1 != null) itemDropMultiplier *= item1.getMultiplier(minion)
         if (item2 != null) itemDropMultiplier *= item2.getMultiplier(minion)
@@ -70,11 +70,11 @@ object MinionUtils {
         item2: MinionItem?,
         percentageMinionSpeed: Double?,
         dropMultiplierBoost: Double?
-    ): MutableMap<MinionResourceItem?, Double?> {
+    ): MutableMap<MinionResourceItem, Double> {
         if (minionCount == 0) return HashMap()
 
         var itemDropMultiplier = 1.0
-        if (fuel != null) itemDropMultiplier *= (fuel.getBoostMultiplier() - 1).toDouble()
+        if (fuel != null) itemDropMultiplier *= (fuel.getBoostMultiplierMax() - 1).toDouble()
         if (dropMultiplierBoost != null && dropMultiplierBoost != 0.0) itemDropMultiplier *= dropMultiplierBoost
         if (item1 != null) itemDropMultiplier *= item1.getMultiplier(minion)
         if (item2 != null) itemDropMultiplier *= item2.getMultiplier(minion)
@@ -88,7 +88,7 @@ object MinionUtils {
         val actions =
             3600 / ((100f / (100f + additionalMinionSpeed)) * (minion.delay * minion.actionsForItem))
 
-        val generated: MutableMap<MinionResourceItem?, Double?> = HashMap()
+        val generated: MutableMap<MinionResourceItem, Double> = HashMap()
         val finalItemDropMultiplier = itemDropMultiplier
         minion.getItems().forEach { (k: MinionResourceItem, v: Double) ->
             var item = k

@@ -6,11 +6,11 @@ import java.sql.SQLException
 import java.time.Instant
 
 class ChestLobbyData(
-    chest: MutableCollection<ChChestData>,
+    chest: List<ChChestData>,
     serverId: String,
     bbcommand: String,
     extraMessage: String?,
-    status: Any?
+    status: String
 ) {
     @JvmField
     var contactMan: String
@@ -46,33 +46,35 @@ class ChestLobbyData(
         setStatusNoOverride(status)
     }
 
-    fun getStatus(): String {
-        return status
+    constructor(
+        chest: List<ChChestData>,
+        serverId: String,
+        bbcommand: String,
+        extraMessage: String?,
+        status: StatusConstants
+    ) : this(
+        chest,
+        serverId,
+        bbcommand,
+        extraMessage,
+        status.displayName
+    ) {
+        this.color = status.color
     }
 
-    /**
-     * @param statusBase String or StatusConstants as buttonStyle.
-     * @throws IllegalArgumentException if Object is not a [String] or [StatusConstants]
-     */
     @Throws(SQLException::class)
-    fun setStatus(statusBase: Any?) {
+    fun setStatus(statusBase: StatusConstants) {
         setStatusNoOverride(statusBase)
     }
 
-    @Throws(SQLException::class)
-    fun setStatus(statusBase: StatusConstants?) {
-        setStatusNoOverride(statusBase)
+    fun setStatusNoOverride(statusBase: String) {
+        this.status = statusBase
     }
 
-    fun setStatusNoOverride(statusBase: Any?) {
-        if (statusBase is StatusConstants) {
-            this.status = statusBase.displayName
-            color = statusBase.color
-        } else if (statusBase is String) {
-            this.status = statusBase
-        } else {
-            throw IllegalArgumentException("Invalid input buttonStyle. Expected String or StatusConstants.")
-        }
+    fun setStatusNoOverride(statusBase: StatusConstants) {
+        this.status = statusBase.displayName
+        color = statusBase.color
+
     }
 
     fun addChest(chest: ChChestData) {
@@ -96,10 +98,6 @@ class ChestLobbyData(
         // need to be overridden
     }
 
-    fun getPlayersStillIn(): MutableList<String>? {
-        return playersStillIn
-    }
-
     override fun equals(obj: Any?): Boolean {
         if (obj !is ChestLobbyData) return false
         return obj.lobbyId == lobbyId
@@ -108,11 +106,11 @@ class ChestLobbyData(
     protected fun updateLobby(lobby: ChestLobbyData) {
         bbcommand = lobby.bbcommand
         extraMessage = lobby.extraMessage
-        status = lobby.getStatus()
+        status = lobby.status
         contactMan = lobby.contactMan
         chests = ArrayList<ChChestData>(lobby.chests)
         try {
-            setLobbyMetaData(lobby.getPlayersStillIn(), lobby.closingTime)
+            setLobbyMetaData(lobby.playersStillIn, lobby.closingTime)
         } catch (ignored: SQLException) {
         }
     }

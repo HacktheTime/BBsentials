@@ -32,7 +32,7 @@ enum class Fueles(
         false
     )
 
-    fun getBoostMultiplier(): Int {
+    fun getBoostMultiplierMax(): Int {
         return max(boostMultiplier, 1)
     }
 }

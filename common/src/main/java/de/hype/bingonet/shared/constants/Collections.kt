@@ -14,9 +14,8 @@ interface Collections : MinionResourceItem {
         return tierCount[min(tier, tierCount.size - 1)]
     }
 
-    fun getCompactorLevel(): Int {
-        return 1
-    }
+    override val compactorLevel: Int
+        get() = 1
 
     override val displayName: String
         get() = this.toString().replace("_", " ")
@@ -42,9 +41,7 @@ interface Collections : MinionResourceItem {
         Sugar_Cane("SUGAR_CANE", "SUGAR_CANE_GENERATOR_1", 100, 250, 500, 1000, 2000, 5000, 10000, 20000, 50000),
         Pumpkin("PUMPKIN", "PUMPKIN_GENERATOR_1", 40, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000),
         Wheat("WHEAT", "WHEAT_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 10000, 15000, 25000, 50000, 100000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
 
             override fun getSuperCompactorLevel(): Int {
                 return 1296
@@ -52,9 +49,7 @@ interface Collections : MinionResourceItem {
         },
         Seeds("SEEDS", "SEEDS_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 25000),
         Mushroom("MUSHROOM_COLLECTION", "MUSHROOM_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Raw_Rabbit("RABBIT", "RABBIT_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000),
         Nether_Wart(
@@ -75,9 +70,7 @@ interface Collections : MinionResourceItem {
         ),
         Mutton("MUTTON", "SHEEP_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
         Melon("MELON", "MELON_GENERATOR_1", 250, 500, 1250, 5000, 15000, 25000, 50000, 100000, 250000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Potato("POTATO_ITEM", "POTATO_GENERATOR_1", 100, 200, 500, 1750, 5000, 10000, 25000, 50000, 100000),
         Leather("LEATHER", "COW_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000) {
@@ -108,9 +101,7 @@ interface Collections : MinionResourceItem {
             150000,
             250000
         ) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Redstone(
             "REDSTONE",
@@ -132,22 +123,16 @@ interface Collections : MinionResourceItem {
             1200000,
             1400000
         ) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Umber("UMBER", null, 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
         Coal("COAL", "COAL_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Mycelium("MYCEL", "MYCELIUM_GENERATOR_1", 50, 500, 750, 1000, 2500, 10000, 15000, 25000, 50000, 100000),
         End_Stone("ENDER_STONE", "ENDER_STONE_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000),
         Nether_Quartz("QUARTZ", "QUARTZ_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
-            override fun getCompactorLevel(): Int {
-                return 4
-            }
+            override val compactorLevel: Int = 4
         },
         Sand("SAND", "SAND_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000),
         Iron_Ingot(
@@ -166,9 +151,7 @@ interface Collections : MinionResourceItem {
             200000,
             400000
         ) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Gemstone(
             "GEMSTONE_COLLECTION",
@@ -192,9 +175,7 @@ interface Collections : MinionResourceItem {
         Tungsten("TUNGSTEN", null, 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
         Obsidian("OBSIDIAN", "OBSIDIAN_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000),
         Diamond("DIAMOND", "DIAMOND_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Cobblestone(
             "COBBLESTONE",
@@ -211,14 +192,10 @@ interface Collections : MinionResourceItem {
             70000
         ),
         Glowstone_Dust("GLOWSTONE_DUST", "GLOWSTONE_GENERATOR_1", 50, 100, 1000, 2500, 5000, 10000, 25000) {
-            override fun getCompactorLevel(): Int {
-                return 4
-            }
+            override val compactorLevel: Int = 4
         },
         Gold_Ingot("GOLD_INGOT", "GOLD_GENERATOR_1", 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Gravel("GRAVEL", "GRAVEL_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 15000, 50000),
         Hard_Stone("HARD_STONE", "HARD_STONE_GENERATOR_1", 50, 1000, 5000, 50000, 150000, 300000, 1000000) {
@@ -228,15 +205,11 @@ interface Collections : MinionResourceItem {
         },
         Mithril("MITHRIL_ORE", "MITHRIL_GENERATOR_1", 50, 250, 1000, 2500, 5000, 10000, 250000, 500000, 1000000),
         Emerald("EMERALD", "EMERALD_GENERATOR_1", 50, 100, 250, 1000, 5000, 15000, 30000, 50000, 100000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Red_Sand("SAND:1", "RED_SAND_GENERATOR_1", 50, 500, 2500, 10000, 15000, 25000, 50000, 100000),
         Ice("ICE", "ICE_GENERATOR_1", 50, 100, 250, 500, 1000, 5000, 10000, 50000, 100000, 250000, 500000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Glacite("GLACITE", null, 1000, 2500, 10000, 25000, 100000, 250000, 500000, 750000, 1000000),
         Sulphur("SULPHUR_ORE", null, 200, 1000, 2500, 5000, 10000, 15000, 25000, 50000, 100000),
@@ -254,9 +227,7 @@ interface Collections : MinionResourceItem {
         },
         Chili_Pepper("CHILI_PEPPER", null, 10, 25, 75, 250, 1000, 2500, 5000, 10000, 20000),
         Slimeball("SLIME_BALL", "SLIME_GENERATOR_1", 50, 100, 250, 1000, 2500, 5000, 10000, 25000, 50000) {
-            override fun getCompactorLevel(): Int {
-                return 9
-            }
+            override val compactorLevel: Int = 9
         },
         Magma_Cream("MAGMA_CREAM", "MAGMA_CUBE_GENERATOR_1", 50, 250, 1000, 2500, 5000, 10000, 25000, 50000),
         Ghast_Tear("GHAST_TEAR", "GHAST_GENERATOR_1", 20, 250, 1000, 2500, 5000, 10000, 25000) {
@@ -305,9 +276,7 @@ interface Collections : MinionResourceItem {
             }
         },
         Clay("CLAY_BALL", "CLAY_GENERATOR_1", 50, 100, 250, 1000, 1500, 2500) {
-            override fun getCompactorLevel(): Int {
-                return 4
-            }
+            override val compactorLevel: Int = 4
         },
         Sponge("SPONGE", "FISHING_GENERATOR_1", 20, 40, 100, 200, 400, 800, 1500, 2500, 4000) {
             override fun getSuperCompactorLevel(): Int {

@@ -62,7 +62,7 @@ public class SplashManager {
             BingoNet.temporaryConfig.lastChatPromptAnswer = new ChatPrompt(() -> {
                 try {
                     BingoNet.connection.sendPacket(new RequestDynamicSplashInvitePacket(splashId));
-                    BingoNet.partyConfig.partyAcceptConfig.put(splash.getAnnouncer(), new PartyConfig.AcceptPartyInvites(true, Instant.now().plus(5, ChronoUnit.MINUTES)));
+                    BingoNet.partyConfig.partyAcceptConfig.put(splash.announcer, new PartyConfig.AcceptPartyInvites(true, Instant.now().plus(5, ChronoUnit.MINUTES)));
                     Chat.sendPrivateMessageToSelfInfo("Request sent.");
                 } catch (Exception e) {
                     Chat.sendPrivateMessageToSelfError(e.getMessage());
@@ -94,7 +94,7 @@ public class SplashManager {
             islandType = StringEscapeUtils.escapeJson(islandType);
             tellraw = tellraw.replace("@island", islandType).replace("@hubnumber", String.valueOf(splash.hubSelectorData.hubNumber));
         }
-        tellraw = tellraw.replace("@splasher", StringEscapeUtils.escapeJson(splash.getAnnouncer()));
+        tellraw = tellraw.replace("@splasher", StringEscapeUtils.escapeJson(splash.announcer));
         tellraw = tellraw.replace("@location", StringEscapeUtils.escapeJson(splash.locationInHub.getDisplayString()));
         tellraw = tellraw.replace("@extramessage", splash.extraMessage != null ? StringEscapeUtils.escapeJson(splash.extraMessage) : "");
         Chat.sendPrivateMessageToSelfText(Message.tellraw(tellraw));

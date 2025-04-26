@@ -18,8 +18,8 @@ class Message @JvmOverloads constructor(textJson: String, string: String, action
     }
 
     companion object {
-        fun tellraw(replace: kotlin.String): Message {
-            return de.hype.bingonet.client.common.chat.Message.tellraw(replace)
+        fun tellraw(replace: String): Message {
+            return tellraw(replace)
         }
     }
 }

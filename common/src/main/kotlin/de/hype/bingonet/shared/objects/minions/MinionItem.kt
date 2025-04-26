@@ -129,5 +129,6 @@ enum class MinionItem(var bingoObtainable: Boolean, var displayName: String) {
     open fun getMultiplier(minion: Minions): Double {
         return 1.0
     }
+
     open fun modifyDrops(sum: Double, generated: MutableMap<MinionResourceItem, Double>) {}
 }

@@ -101,3 +101,11 @@ loom {
     }
     log4jConfigs.from(project.rootProject.file("log4j2.xml"))
 }
+
+tasks.withType(JavaCompile) {
+    source(project(":common").sourceSets.main.allSource)
+    options.encoding = "UTF-8"
+}
+sourceSets {
+    main.kotlin.srcDirs = ['src/main/java', 'src/main/kotlin']
+}

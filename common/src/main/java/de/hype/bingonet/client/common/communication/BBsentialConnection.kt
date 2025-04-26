@@ -13,6 +13,7 @@ import de.hype.bingonet.client.common.objects.ChatPrompt
 import de.hype.bingonet.client.common.objects.InterceptPacketInfo
 import de.hype.bingonet.client.common.objects.Waypoints
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
+import de.hype.bingonet.environment.packetconfig.EnvironmentPacketConfig
 import de.hype.bingonet.environment.packetconfig.PacketManager
 import de.hype.bingonet.environment.packetconfig.PacketUtils
 import de.hype.bingonet.shared.constants.*
@@ -32,7 +33,6 @@ import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
-import java.util.List
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
@@ -45,13 +45,9 @@ import kotlin.Exception
 import kotlin.Int
 import kotlin.NullPointerException
 import kotlin.RuntimeException
+import kotlin.also
 import kotlin.apply
 import kotlin.arrayOf
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
-import kotlin.collections.MutableList
-import kotlin.collections.first
-import kotlin.collections.indices
 import kotlin.let
 import kotlin.math.min
 
@@ -639,7 +635,7 @@ class BBsentialConnection {
 
     fun annonceChChest(
         coords: Position,
-        items: MutableList<ChChestItem?>?,
+        items: MutableList<ChChestItem>,
         command: kotlin.String,
         extraMessage: kotlin.String?
     ) {
@@ -664,16 +660,15 @@ class BBsentialConnection {
             Chat.sendPrivateMessageToSelfImportantInfo("Opened Stream Party for you since you announced chchest items")
         }
 
-        BingoNet.connection.sendPacket<ChChestPacket?>(
+        BingoNet.connection.sendPacket(
             ChChestPacket(
                 ChestLobbyData(
-                    List.of<ChChestData?>(
-                        ChChestData(
-                            "",
-                            coords,
-                            items
-                        )
-                    ), EnvironmentCore.utils.getServerId(), command, extraMessage, StatusConstants.OPEN
+                    mutableListOf(ChChestData("", coords, items)),
+                    EnvironmentCore.utils.getServerId(),
+                    command,
+                    extraMessage,
+                    StatusConstants.OPEN,
+                    EnvironmentPacketConfig.selfUsername
                 )
             )
         )

@@ -7,10 +7,7 @@ import de.hype.bingonet.fabric.mixins.mixinaccessinterfaces.ICusomItemDataAccess
 import de.hype.bingonet.shared.constants.VanillaItems;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.MergedComponentMap;
+import net.minecraft.component.*;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -46,27 +43,15 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
     public abstract String toString();
 
     @Shadow
-    public abstract ItemStack finishUsing(World par1, LivingEntity par2);
-
-    @Shadow
-    public abstract Text toHoverableText();
-
-    @Shadow
-    public abstract void damage(int amount, LivingEntity entity, EquipmentSlot slot);
-
-    @Shadow
     @Final
     private MergedComponentMap components;
-    @Shadow
-    @Final
-    @Deprecated
-    private @Nullable Item item;
 
     @Shadow
     public abstract ComponentMap getComponents();
 
     @Shadow
-    public abstract boolean canBreak(CachedBlockPosition pos);
+    @Nullable
+    public abstract <T> T remove(ComponentType<? extends T> type);
 
     @Override
     public List<Text> BingoNetAll$getItemRenderTooltip() {
@@ -156,7 +141,10 @@ public abstract class CustomItemData implements FabricICusomItemDataAccess {
 
     @Override
     public void setRenderasItem(Item renderasItem) {
-        components.applyChanges(ComponentChanges.builder().add(DataComponentTypes.ITEM_MODEL, renderasItem.getComponents().get(DataComponentTypes.ITEM_MODEL)).build());
+        if (renderasItem == null) {
+            components.remove(DataComponentTypes.ITEM_MODEL);
+        } else
+            components.applyChanges(ComponentChanges.builder().add(DataComponentTypes.ITEM_MODEL, renderasItem.getComponents().get(DataComponentTypes.ITEM_MODEL)).build());
     }
 
     @Override

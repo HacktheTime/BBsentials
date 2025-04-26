@@ -30,7 +30,7 @@ public class ChChestUpdateListener extends UpdateListener {
     public ChChestUpdateListener(ChestLobbyData lobby) {
         if (lobby == null) return;
         this.lobby = lobby;
-        isHoster = (lobby.contactMan.equalsIgnoreCase(BingoNet.generalConfig.getUsername()));
+        isHoster = (lobby.getContactMan().equalsIgnoreCase(BingoNet.generalConfig.getUsername()));
     }
 
     public void updateLobby(ChestLobbyData data) {
@@ -41,7 +41,7 @@ public class ChChestUpdateListener extends UpdateListener {
     public void setWaypoints() {
         if (!BingoNet.chChestConfig.addWaypointForChests || lobby == null) return;
         String username = BingoNet.generalConfig.getUsername();
-        for (ChChestData chest : lobby.chests) {
+        for (ChChestData chest : lobby.getChests()) {
             Waypoints waypoint = waypoints.get(chest.coords);
             boolean shouldDisplay = !(chestsOpened.contains(chest.coords) || chest.finder.equals(username));
             if (waypoint != null) {
@@ -49,7 +49,7 @@ public class ChChestUpdateListener extends UpdateListener {
                 continue;
             }
             List<ChChestItem> chestItems = new ArrayList<>();
-            lobby.chests.stream().forEach(chChestData -> chestItems.addAll(chChestData.items));
+            lobby.getChests().forEach(chChestData -> chestItems.addAll(chChestData.items));
             List<RenderInformation> renderInformationList = new ArrayList<>();
             chestItems.stream().filter(ChChestItem::hasDisplayPath).forEach((item) -> renderInformationList.add(new RenderInformation("bingonet", "textures/waypoints/" + item.getDisplayPath() + ".png")));
             if (Waypoints.waypoints.values().stream().noneMatch(waypointFiltered -> waypointFiltered.getPosition().equals(chest.coords))) {
@@ -112,7 +112,7 @@ public class ChChestUpdateListener extends UpdateListener {
 
     public List<ChChestData> getUnopenedChests() {
         List<ChChestData> unopened = new ArrayList<>();
-        for (ChChestData chest : lobby.chests) {
+        for (ChChestData chest : lobby.getChests()) {
             if (!chestsOpened.contains(chest.coords)) unopened.add(chest);
         }
         return unopened;
@@ -131,7 +131,7 @@ public class ChChestUpdateListener extends UpdateListener {
             Instant closingTime = EnvironmentCore.utils.getLobbyClosingTime();
             if (Instant.now().isAfter(closingTime)) setStatusNoUpdate(StatusConstants.CLOSED);
             List<String> players = EnvironmentCore.utils.getPlayers();
-            players = players.stream().map(username -> username.replaceAll("\\[\\S+]", "").trim()).filter(userName -> !userName.equals(lobby.contactMan)).collect(Collectors.toList());
+            players = players.stream().map(username -> username.replaceAll("\\[\\S+]", "").trim()).filter(userName -> !userName.equals(lobby.getContactMan())).collect(Collectors.toList());
             lobby.setLobbyMetaData(players, closingTime);
         } catch (SQLException e) {
             Chat.sendPrivateMessageToSelfError("Uhm how did this happen: " + e.getMessage());

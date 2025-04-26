@@ -588,9 +588,9 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                 toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
                 for (ChChestData chest : listener.getUnopenedChests()) {
                     String author = "";
-                    if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder))
+                    if (!listener.lobby.getContactMan().equalsIgnoreCase(chest.finder))
                         author = " [" + chest.finder + "]";
-                    toRender.add(Text.of("(" + chest.coords.toString() + ")" + author + ":"));
+                    toRender.add(Text.of("(" + chest.coords + ")" + author + ":"));
                     chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
             }

@@ -5,18 +5,16 @@ import java.awt.Color
 import java.sql.SQLException
 import java.time.Instant
 
-class ChestLobbyData(
-    chest: List<ChChestData>,
+open class ChestLobbyData(
+    chests: MutableList<ChChestData>,
     serverId: String,
     bbcommand: String,
     extraMessage: String?,
     status: String
 ) {
-    @JvmField
-    var contactMan: String
+    open var contactMan: String = chests.first().finder
 
-    @JvmField
-    var chests: MutableList<ChChestData> = ArrayList()
+    open var chests: MutableList<ChChestData> = ArrayList(chests)
 
     @JvmField
     var bbcommand: String
@@ -38,16 +36,14 @@ class ChestLobbyData(
         protected set
 
     init {
-        chests.addAll(chest)
         this.serverId = serverId
-        this.contactMan = chests.first().finder
         this.bbcommand = bbcommand
         this.extraMessage = extraMessage
         setStatusNoOverride(status)
     }
 
     constructor(
-        chest: List<ChChestData>,
+        chest: MutableList<ChChestData>,
         serverId: String,
         bbcommand: String,
         extraMessage: String?,
@@ -63,7 +59,7 @@ class ChestLobbyData(
     }
 
     @Throws(SQLException::class)
-    fun setStatus(statusBase: StatusConstants) {
+    open fun setStatus(statusBase: StatusConstants) {
         setStatusNoOverride(statusBase)
     }
 
@@ -86,7 +82,7 @@ class ChestLobbyData(
     }
 
     @Throws(SQLException::class)
-    fun setLobbyMetaData(playersStillIn: MutableList<String>?, closingTime: Instant?) {
+    open fun setLobbyMetaData(playersStillIn: MutableList<String>?, closingTime: Instant?) {
         this.playersStillIn = playersStillIn
         if (closingTime != null) {
             this.closingTime = closingTime
@@ -94,16 +90,16 @@ class ChestLobbyData(
         }
     }
 
-    fun onLobbyUpdate() {
+    open fun onLobbyUpdate() {
         // need to be overridden
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is ChestLobbyData) return false
-        return obj.lobbyId == lobbyId
+    override fun equals(other: Any?): Boolean {
+        if (other !is ChestLobbyData) return false
+        return other.lobbyId == lobbyId
     }
 
-    protected fun updateLobby(lobby: ChestLobbyData) {
+    protected open fun updateLobby(lobby: ChestLobbyData) {
         bbcommand = lobby.bbcommand
         extraMessage = lobby.extraMessage
         status = lobby.status

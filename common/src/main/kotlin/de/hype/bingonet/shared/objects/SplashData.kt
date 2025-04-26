@@ -4,7 +4,7 @@ import de.hype.bingonet.shared.constants.Islands
 import de.hype.bingonet.shared.constants.StatusConstants
 
 open class SplashData @JvmOverloads constructor(
-    @JvmField var announcer: String,
+    open var announcer: String,
     @JvmField var locationInHub: SplashLocation,
     extraMessage: String?,
     @JvmField var lessWaste: Boolean,

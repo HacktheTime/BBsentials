@@ -13,9 +13,9 @@ class Position : Vector3i {
         return "X:$x Y:$y Z:$z"
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is Position) return false
-        return (obj.x == x && obj.y == y && obj.z == z)
+    override fun equals(other: Any?): Boolean {
+        if (other !is Position) return false
+        return (other.x == x && other.y == y && other.z == z)
     }
 
     fun getDistanceBetween(pos: Position): Double {

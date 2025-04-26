@@ -71,7 +71,7 @@ interface Minions {
         private fun indexMinions() {
             for (clazz in Minions::class.java.getClasses()) {
                 if (!Minions::class.java.isAssignableFrom(clazz)) continue
-                minionStringMap.put(clazz.getSimpleName().lowercase(Locale.getDefault()), clazz as Class<out Minions?>)
+                minionStringMap.put(clazz.getSimpleName().lowercase(Locale.getDefault()), clazz as Class<out Minions>)
             }
         }
 
@@ -80,7 +80,7 @@ interface Minions {
         fun getMinionFromString(minionName: String, tier: String): Minions {
             if (minionStringMap.isEmpty()) indexMinions()
             // Get the class associated with the minion name
-            val clazz: Class<out Minions?> = minionStringMap.get(
+            val clazz: Class<out Minions> = minionStringMap.get(
                 minionName.lowercase(java.util.Locale.getDefault()).replace("minion", "").trim { it <= ' ' })!!
             if (clazz == null) {
                 throw Exception("No Minion With that Name Found.")
@@ -130,6 +130,7 @@ interface Minions {
             throw Exception("The specified class does not implement Minions or is not an enum.")
         }
 
+        @JvmStatic
         val allMinions: MutableList<String?>
             get() {
                 if (minionStringMap.isEmpty()) indexMinions()
@@ -165,6 +166,7 @@ interface Minions {
             }
         }
 
+        @JvmStatic
         val minionStringMap: MutableMap<String?, Class<out Minions?>?> = HashMap<String?, Class<out Minions?>?>()
     }
 

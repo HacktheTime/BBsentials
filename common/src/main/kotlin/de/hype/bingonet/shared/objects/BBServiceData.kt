@@ -69,9 +69,9 @@ open class BBServiceData(
             data: BBServiceData
         ) : this(user, priority, joinTime, autoRequeue, if (free) 0 else data.price)
 
-        override fun equals(obj: Any?): Boolean {
-            if (obj is Participant) return obj.user == user
-            if (obj is BBUser) return obj == this.user
+        override fun equals(other: Any?): Boolean {
+            if (other is Participant) return other.user == user
+            if (other is BBUser) return other == this.user
             return false
         }
 
@@ -103,15 +103,15 @@ open class BBServiceData(
             this.username = username
         }
 
-        override fun equals(obj: Any?): Boolean {
-            if (obj is Helper) return obj.username == username
-            if (obj is String) {
-                if (username != null) return obj.equals(username, ignoreCase = true)
-                else return user!!.getMcUsername().equals(obj, ignoreCase = true)
+        override fun equals(other: Any?): Boolean {
+            if (other is Helper) return other.username == username
+            if (other is String) {
+                if (username != null) return other.equals(username, ignoreCase = true)
+                else return user!!.getMcUsername().equals(other, ignoreCase = true)
             }
-            if (obj is BBUser) {
-                if (user != null) return obj == user
-                else return obj.getMcUsername().equals(username, ignoreCase = true)
+            if (other is BBUser) {
+                if (user != null) return other == user
+                else return other.getMcUsername().equals(username, ignoreCase = true)
             }
             return false
         }

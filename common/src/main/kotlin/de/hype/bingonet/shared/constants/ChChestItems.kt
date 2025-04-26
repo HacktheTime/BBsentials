@@ -145,6 +145,7 @@ object ChChestItems {
         return customItem
     }
 
+    @JvmStatic
     val allItemNames: MutableList<String?>
         get() = allItems.stream()
             .map<String?>(ChChestItem::displayName)

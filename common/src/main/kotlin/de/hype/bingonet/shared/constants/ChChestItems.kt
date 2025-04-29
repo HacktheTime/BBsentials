@@ -67,9 +67,9 @@ object ChChestItems {
 
     // Automatically populate predefined items using reflection
     init {
-        val fields = ChChestItems::class.java.getDeclaredFields()
+        val fields = ChChestItems::class.java.declaredFields
         for (field in fields) {
-            if (field.getType() == ChChestItem::class.java && isPublicStaticFinal(field)) {
+            if (field.type == ChChestItem::class.java && isPublicStaticFinal(field)) {
                 try {
                     allItems.add((field.get(null) as ChChestItem?)!!)
                 } catch (e: IllegalAccessException) {

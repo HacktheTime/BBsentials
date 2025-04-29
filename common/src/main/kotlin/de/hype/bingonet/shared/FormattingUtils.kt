@@ -102,7 +102,7 @@ object FormattingUtils {
 
     @JvmStatic
     fun formatTime(src: Duration): String {
-        val seconds = src.getSeconds()
+        val seconds = src.seconds
         if (seconds == 0L) return "now"
         val prefix = if (seconds > 0) "in %s" else "%s ago"
         val days = (seconds / 86400).toInt()

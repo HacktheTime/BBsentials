@@ -6,32 +6,30 @@ import de.hype.bingonet.shared.constants.TradeType
 import java.time.Instant
 
 open class BBServiceData(
-    @JvmField protected var type: TradeType,
-    @JvmField protected var description: String,
-    @JvmField protected var hoster: BBUser,
-    @JvmField protected var price: Int,
-    @JvmField protected var helpers: MutableList<Helper>,
-    @JvmField protected var maxUsers: Int,
-    @JvmField protected var forceModOnline: Boolean
+    @JvmField protected val type: TradeType?,
+    open var description: String,
+    open var hoster: BBUser,
+    @JvmField var price: Int,
+    @JvmField var helpers: MutableList<Helper>,
+    @JvmField var maxUsers: Int,
+    @JvmField var forceModOnline: Boolean
 ) {
     var serviceId: Int = 0
-        protected set
 
     @JvmField
-    protected var status: StatusConstants = StatusConstants.OPEN
+    var status: StatusConstants = StatusConstants.OPEN
 
     @JvmField
-    protected var title: String? = null
+    var title: String? = null
+
+    open var participants: MutableList<Participant> = ArrayList<Participant>()
 
     @JvmField
-    protected var participants: MutableList<Participant> = ArrayList<Participant>()
-
-    @JvmField
-    protected var queue: MutableList<Participant> = ArrayList<Participant>()
+    var queue: MutableList<Participant> = ArrayList<Participant>()
     protected lateinit var dcMessageID: String
 
     @JvmField
-    protected var joinLock: Boolean = false
+    var joinLock: Boolean = false
 
     @JvmField
     var circulateParticipants: Boolean = false

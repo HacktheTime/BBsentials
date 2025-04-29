@@ -96,7 +96,7 @@ public abstract class RenderingDefinitions {
 
                                 List<Text> textList = check.getTextTooltip();
                                 textList.getFirst().setStringText("%s(Splash) %s".formatted(Formatting.GOLD, check.getItemStackName()));
-                                textList.add(4, EnvironmentCore.textutils.createText("%sSplasher: %s%s".formatted(Formatting.GRAY, Formatting.LIGHT_PURPLE, value.announcer)));
+                                textList.add(4, EnvironmentCore.textutils.createText("%sSplasher: %s%s".formatted(Formatting.GRAY, Formatting.LIGHT_PURPLE, value.getAnnouncer())));
                                 textList.add(5, EnvironmentCore.textutils.createText("%sLocation: %s".formatted(Formatting.GRAY, value.locationInHub.getDisplayString())));
                                 textList.add(6, EnvironmentCore.textutils.createText(""));
                                 if (value.extraMessage != null && !value.extraMessage.isEmpty()) {

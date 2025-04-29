@@ -35,7 +35,7 @@ class ApiJson {
         isOffPath = false
         if (temp == null) return null
         for (pathPart in path) {
-            if (temp!!.isJsonObject()) {
+            if (temp!!.isJsonObject) {
                 temp = temp.getAsJsonObject().get(pathPart)
             } else temp = null
             if (temp != null) continue
@@ -169,7 +169,7 @@ class ApiJson {
         if (isOffPath) return ApiJson(null)
         var temp: JsonElement? = data
         for (pathPart in path) {
-            if (temp!!.isJsonObject()) {
+            if (temp!!.isJsonObject) {
                 temp = temp.getAsJsonObject().get(pathPart)
             } else temp = null
             if (temp != null) continue

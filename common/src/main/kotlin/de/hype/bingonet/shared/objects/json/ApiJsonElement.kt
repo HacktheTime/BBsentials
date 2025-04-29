@@ -62,6 +62,6 @@ class ApiJsonElement(var element: JsonElement?) {
     }
 
     fun getBoolean(): Boolean {
-        return getBoolean(false);
+        return getBoolean(false)
     }
 }

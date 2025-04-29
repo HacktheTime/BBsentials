@@ -4,6 +4,7 @@ import de.hype.bingonet.shared.constants.StatusConstants
 import java.awt.Color
 import java.sql.SQLException
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 open class ChestLobbyData(
     chests: MutableList<ChChestData>,
@@ -32,7 +33,7 @@ open class ChestLobbyData(
     var serverId: String
     lateinit var status: String
     var playersStillIn: MutableList<String>? = ArrayList()
-    var closingTime: Instant? = null
+    var closingTime: Instant = Instant.now().plus(360, ChronoUnit.MINUTES)
         protected set
 
     init {

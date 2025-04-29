@@ -35,7 +35,7 @@ public class UpdateListenerManager {
         String serverId = EnvironmentCore.utils.getServerId();
         for (Map.Entry<Integer, ChestLobbyData> entry : lobbies.entrySet()) {
             if (!entry.getValue().serverId.equals(serverId)) continue;
-            if (!entry.getValue().contactMan.equals(BingoNet.generalConfig.getUsername())) continue;
+            if (!entry.getValue().getContactMan().equals(BingoNet.generalConfig.getUsername())) continue;
             chChestUpdateListener = new ChChestUpdateListener(entry.getValue());
             chChestUpdateListener.sendUpdatePacket();
             chChestUpdateListener.run();
@@ -45,7 +45,7 @@ public class UpdateListenerManager {
     public static void onChLobbyDataReceived(ChestLobbyData data) {
         ChestLobbyData oldData = lobbies.get(data.lobbyId);
         if (oldData == null) {
-            if (data.contactMan.equals(BingoNet.generalConfig.getUsername())) {
+            if (data.getContactMan().equals(BingoNet.generalConfig.getUsername())) {
                 if (!BingoNet.partyConfig.allowBBinviteMe && data.bbcommand.trim().equalsIgnoreCase("/msg " + BingoNet.generalConfig.getUsername() + " bb:party me")) {
                     Chat.sendPrivateMessageToSelfImportantInfo("Enabled bb:party invites temporarily. Will be disabled on Server swap!");
                     BingoNet.partyConfig.allowBBinviteMe = true;
@@ -64,14 +64,14 @@ public class UpdateListenerManager {
             lobbies.put(data.lobbyId, data);
             if (BBsentialConnection.isCommandSafe(data.bbcommand)) {
                 BingoNet.executionService.execute(UpdateListenerManager::permanentCheck);
-                if (showChChest(data.chests.getFirst().items)) {
+                if (showChChest(data.getChests().getFirst().items)) {
                     String tellrawText = ("{\"text\":\"BB: @username found @item in a chest at (@coords). Click here to get a party invite @extramessage\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"@inviteCommand\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"On clicking you will get invited to a party. Command executed: @inviteCommand\"]}}");
-                    tellrawText = tellrawText.replace("@username", StringEscapeUtils.escapeJson(data.contactMan));
-                    tellrawText = tellrawText.replace("@item", StringEscapeUtils.escapeJson(data.chests.getFirst().items.stream()
+                    tellrawText = tellrawText.replace("@username", StringEscapeUtils.escapeJson(data.getContactMan()));
+                    tellrawText = tellrawText.replace("@item", StringEscapeUtils.escapeJson(data.getChests().getFirst().items.stream()
                             .map(ChChestItem::getDisplayName)
                             .toList()
                             .toString()));
-                    tellrawText = tellrawText.replace("@coords", StringEscapeUtils.escapeJson(data.chests.getFirst().coords.toString()));
+                    tellrawText = tellrawText.replace("@coords", StringEscapeUtils.escapeJson(data.getChests().getFirst().coords.toString()));
                     tellrawText = tellrawText.replace("@inviteCommand", StringEscapeUtils.escapeJson(StringEscapeUtils.escapeJson(data.bbcommand)));
                     if (!(data.extraMessage == null || data.extraMessage.isEmpty())) {
                         tellrawText = tellrawText.replace("@extramessage", " : " + StringEscapeUtils.escapeJson(data.extraMessage));

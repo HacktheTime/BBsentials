@@ -18,7 +18,7 @@ package de.hype.bingonet.shared.constants
  * [.JERRYS_WORKSHOP]
  * [.THE_RIFT]
  */
-enum class Islands(val internalName: String?, private val displayName: String?) {
+enum class Islands(val internalName: String, private val displayName: String) {
     CRYSTAL_HOLLOWS("crystal_hollows", "Crystal Hollows", "nucleus"),
     CRIMSON_ISLE("crimson_isle", "Crimson Isle", "crimson"),
     DEEP_CAVERNS("mining_2", "Deep Caverns", "deep"),
@@ -40,14 +40,14 @@ enum class Islands(val internalName: String?, private val displayName: String?) 
     BAYOU("fishing_1", "Backwater Bayou", "bayou"),
     ;
 
-    constructor(internalName: String?, displayName: String?, warpArgument: String?) : this(internalName, displayName) {
+    constructor(internalName: String, displayName: String, warpArgument: String?) : this(internalName, displayName) {
         this.warpArgument = warpArgument
     }
 
     var warpArgument: String? = null
         private set
 
-    fun getDisplayName(): String? {
+    fun getDisplayName(): String {
         return displayName
     }
 

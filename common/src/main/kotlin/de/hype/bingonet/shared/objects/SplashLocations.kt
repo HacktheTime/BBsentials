@@ -7,8 +7,8 @@ object SplashLocations {
     val COMMUNITY_CENTER: SplashLocation = SplashLocation("Community Center", 2, 71, -99)
 
     @JvmStatic
-    fun values(): Array<SplashLocation> {
-        return arrayOf(BEA, KAT, ENCHANTING_TABLE, COMMUNITY_CENTER)
+    fun values(): List<SplashLocation> {
+        return listOf(BEA, KAT, ENCHANTING_TABLE, COMMUNITY_CENTER)
     }
 
     @JvmStatic

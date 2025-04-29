@@ -580,16 +580,16 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
                     toRender.add(Text.of("§6Closing in " + closingTimeInMinutes / 60 + "h | " + closingTimeInMinutes % 60 + "m"));
                 }
                 for (ChChestData chest : listener.getUnopenedChests()) {
-                    if (chest.finder.equals(generalConfig.getUsername())) continue;
-                    toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.finder)));
+                    if (chest.getFinder().equals(generalConfig.getUsername())) continue;
+                    toRender.add(Text.of("(" + chest.coords.toString() + ") [ %s ]:".formatted(chest.getFinder())));
                     chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }
             } else {
                 toRender.add(Text.of("§4Please Leave the Lobby after getting all the Chests to allow people to be warped in!"));
                 for (ChChestData chest : listener.getUnopenedChests()) {
                     String author = "";
-                    if (!listener.lobby.contactMan.equalsIgnoreCase(chest.finder))
-                        author = " [" + chest.finder + "]";
+                    if (!listener.lobby.getContactMan().equalsIgnoreCase(chest.getFinder()))
+                        author = " [" + chest.getFinder() + "]";
                     toRender.add(Text.of("(" + chest.coords + ")" + author + ":"));
                     chest.items.stream().map(ChChestItem::getDisplayName).forEach((string) -> toRender.add(Text.of(string)));
                 }

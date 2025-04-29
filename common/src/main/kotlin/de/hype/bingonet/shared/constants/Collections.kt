@@ -325,7 +325,7 @@ interface Collections : MinionResourceItem {
             goalName = goalName.replace("_", " ")
             for (value in values()) {
                 if (value.displayName.equals(goalName, ignoreCase = true)) {
-                    return value.javaClass.getName().replace("\\$[0-9]+".toRegex(), "").replace("$", ".")
+                    return value.javaClass.name.replace("\\$[0-9]+".toRegex(), "").replace("$", ".")
                         .replace("de.hype.bingonet.shared.constants.", "") + "." + value.toString()
                 }
             }

@@ -72,7 +72,7 @@ open class Vector3i : Comparable<Vector3i> {
         return Vector3i(this.x + x, this.y + y, this.z + z)
     }
 
-    fun distanceTo(vec: Vector3i): kotlin.Double {
+    fun distanceTo(vec: Vector3i): Double {
         val d0 = (vec.x - this.x).toDouble()
         val d1 = (vec.y - this.y).toDouble()
         val d2 = (vec.z - this.z).toDouble()
@@ -130,7 +130,7 @@ open class Vector3i : Comparable<Vector3i> {
         )
     }
 
-    fun sqrt(value: kotlin.Double): kotlin.Double {
+    fun sqrt(value: Double): Double {
         return kotlin.math.sqrt(value)
     }
 

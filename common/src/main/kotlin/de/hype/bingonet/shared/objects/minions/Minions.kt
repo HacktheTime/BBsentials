@@ -22,7 +22,7 @@ interface Minions {
         get() = 2
 
     val minionName: String
-        get() = this.javaClass.getSimpleName() + " " + this.getTier()
+        get() = this.javaClass.simpleName + " " + this.getTier()
 
     fun getType(): MinionType
 
@@ -69,9 +69,10 @@ interface Minions {
 
     companion object {
         private fun indexMinions() {
-            for (clazz in Minions::class.java.getClasses()) {
+            for (clazz in Minions::class.java.classes) {
                 if (!Minions::class.java.isAssignableFrom(clazz)) continue
-                minionStringMap.put(clazz.getSimpleName().lowercase(Locale.getDefault()), clazz as Class<out Minions>)
+                @Suppress("UNCHECKED_CAST")
+                minionStringMap.put(clazz.simpleName.lowercase(Locale.getDefault()), clazz as Class<out Minions>)
             }
         }
 
@@ -80,8 +81,8 @@ interface Minions {
         fun getMinionFromString(minionName: String, tier: String): Minions {
             if (minionStringMap.isEmpty()) indexMinions()
             // Get the class associated with the minion name
-            val clazz: Class<out Minions> = minionStringMap.get(
-                minionName.lowercase(java.util.Locale.getDefault()).replace("minion", "").trim { it <= ' ' })!!
+            val clazz: Class<out Minions>? = minionStringMap.get(
+                minionName.lowercase(Locale.getDefault()).replace("minion", "").trim { it <= ' ' })
             if (clazz == null) {
                 throw Exception("No Minion With that Name Found.")
             }
@@ -131,10 +132,10 @@ interface Minions {
         }
 
         @JvmStatic
-        val allMinions: MutableList<String?>
+        val allMinions: MutableList<String>
             get() {
                 if (minionStringMap.isEmpty()) indexMinions()
-                return ArrayList<String?>(minionStringMap.keys)
+                return ArrayList<String>(minionStringMap.keys)
             }
 
         // Method to convert Arabic numeral to Roman numeral (1 to 12)

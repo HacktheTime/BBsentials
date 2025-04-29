@@ -663,7 +663,7 @@ class BBsentialConnection {
         BingoNet.connection.sendPacket(
             ChChestPacket(
                 ChestLobbyData(
-                    listOf(ChChestData(EnvironmentPacketConfig.selfUsername, coords, items)),
+                    mutableListOf(ChChestData(EnvironmentPacketConfig.selfUsername, coords, items)),
                     EnvironmentCore.utils.getServerId(),
                     command,
                     extraMessage,

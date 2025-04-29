@@ -15,7 +15,7 @@ enum class MinionItem(var bingoObtainable: Boolean, var displayName: String) {
     SUPER_COMPACTOR_3000("Super Compactor 3000"),
     DWARFEN_SUPER_COMPACTOR("Dwarfen Super Compactor") {
         override fun convertItem(item: MinionResourceItem): MinionResourceItem {
-            return MinionItem.AUTO_SMELTER.convertItem(item)
+            return AUTO_SMELTER.convertItem(item)
         }
     },
     DIAMOND_SPREADING("Diamond Spreading") {

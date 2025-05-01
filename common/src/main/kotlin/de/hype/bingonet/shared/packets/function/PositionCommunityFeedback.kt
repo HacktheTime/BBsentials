@@ -8,7 +8,7 @@ class PositionCommunityFeedback(@JvmField var positions: MutableSet<ComGoalPosit
         @JvmField var goalName: String,
         @JvmField var contribution: Int,
         @JvmField var topPercentage: Double,
-        @JvmField var position: Int
+        @JvmField var position: Int?
     ) {
         override fun hashCode(): Int {
             return goalName.hashCode()

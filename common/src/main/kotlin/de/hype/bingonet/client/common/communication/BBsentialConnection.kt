@@ -537,7 +537,7 @@ class BBsentialConnection {
             reader = null
             socket = null
         } catch (e: Exception) {
-            Chat.sendPrivateMessageToSelfError(e.message)
+            if (e.message != null) Chat.sendPrivateMessageToSelfError(e.message)
             e.printStackTrace()
         }
     }

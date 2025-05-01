@@ -9,9 +9,10 @@ class ComGoalPositionExtendedData(
     val mcuuid: String,
     @JvmField val fromTime: Instant
 ) {
-    val referenceTime: Instant
+    val referenceTime: Instant?
         get() {
-            val punPos = (100 - position.position)
+            val position = position.position ?: return null
+            val punPos = (100 - position)
             return fromTime.plus(punPos.toLong() * punPos, ChronoUnit.MINUTES)
         }
 

@@ -109,10 +109,11 @@ public abstract class InventoryKeyBinds<T extends ScreenHandler> extends Screen 
                             for (Collections value : Collections.values()) {
                                 if (value.getId().equalsIgnoreCase(id)) {
                                     String minionId = value.getMinionID();
-                                    if (minionId != null)
+                                    if (minionId != null) {
                                         BingoNet.sender.addSendTask("/viewrecipe %s".formatted(minionId), 0);
+                                        return;
+                                    }
                                 }
-                                return;
                             }
                         });
                     }

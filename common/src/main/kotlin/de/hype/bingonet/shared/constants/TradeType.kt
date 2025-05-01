@@ -60,30 +60,30 @@ enum class TradeType(
         TradeTypeEnvironmentRegistry.CARRY_ENTRANCE_TO_F3_COMPLETION
     ),
     CATACOMBS_FLOOR_1_230_SCORE(
-        "F1 230 SCore.INSTANCE / Emerald Chest",
-        "Floor 1 230 SCore.INSTANCE Carry.",
-        "Have Cata 1 on Bingo and be able to Solo F1s with 230 SCore.INSTANCE.",
+        "F1 230 Score / Emerald Chest",
+        "Floor 1 230 Score Carry.",
+        "Have Cata 1 on Bingo and be able to Solo F1s with 230 Score.",
         IntUnaryOperator { h: Int -> 5 - 1 - h },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_1_230_SCORE
     ),
     CATACOMBS_FLOOR_1_270_SCORE(
-        "F1 270 SCore.INSTANCE / Obsidian Chest",
-        "Floor 1 270 SCore.INSTANCE Carry.",
-        "Have Cata 1 on Bingo and be able to Solo F1s with 270 SCore.INSTANCE.",
+        "F1 270 Score / Obsidian Chest",
+        "Floor 1 270 Score Carry.",
+        "Have Cata 1 on Bingo and be able to Solo F1s with 270 Score.",
         IntUnaryOperator { h: Int -> 5 - 1 - h },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_1_270_SCORE
     ),
     CATACOMBS_FLOOR_2_250_SCORE(
-        "F2 250 SCore.INSTANCE",
-        "Floor 2 250 SCore.INSTANCE Carry.",
-        "Have Cata 3 on Bingo and be able to Solo F2s with 250 SCore.INSTANCE.",
+        "F2 250 Score",
+        "Floor 2 250 Score Carry.",
+        "Have Cata 3 on Bingo and be able to Solo F2s with 250 Score.",
         IntUnaryOperator { h: Int -> 5 - 1 - h },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_2_250_SCORE
     ),
     CATACOMBS_FLOOR_2_300_SCORE(
-        "F2 300 SCore.INSTANCE",
-        "Floor 2 300 SCore.INSTANCE Carry.",
-        "Have Cata 3 on Bingo and be able to Solo F2s with 300 SCore.INSTANCE.",
+        "F2 300 Score",
+        "Floor 2 300 Score Carry.",
+        "Have Cata 3 on Bingo and be able to Solo F2s with 300 Score.",
         IntUnaryOperator { h: Int -> 5 - 1 - h },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_2_300_SCORE
     ),

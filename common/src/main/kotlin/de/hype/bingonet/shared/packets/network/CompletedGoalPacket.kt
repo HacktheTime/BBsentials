@@ -6,7 +6,7 @@ class CompletedGoalPacket
 /**
  * @param username        username. Filled by the server
  * @param name            Goal name. Filled by the server
- * @param internalId      Bingo goal id (Hypixel id)
+ * @param skyblockId      Bingo goal id (Hypixel id)
  * @param completionType  [BingoGoal][CompletionType.GOAL] or [Card][CompletionType.CARD]
  * @param lore            Bingo BingoGoal Description /
  * @param progress        progress on the Card with how many Goals Completed. -1 For Unknown. In case of Card the Amount that the user Already completed
@@ -14,7 +14,7 @@ class CompletedGoalPacket
  */(
     var username: String,
     @JvmField var name: String,
-    @JvmField var internalId: String,
+    @JvmField var skyblockId: String,
     var lore: String,
     @JvmField var completionType: CompletionType,
     var progress: Int,

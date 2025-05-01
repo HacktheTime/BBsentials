@@ -139,6 +139,7 @@ object ChChestItems {
                 Modifier.isFinal(field.modifiers)
     }
 
+    @JvmStatic
     fun createCustomItem(displayName: String): ChChestItem {
         val customItem = ChChestItem(displayName, true)
         allItems.add(customItem)

@@ -320,6 +320,7 @@ interface Collections : MinionResourceItem {
             return collections
         }
 
+        @JvmStatic
         fun getCodeReference(goalName: String): String? {
             var goalName = goalName
             goalName = goalName.replace("_", " ")

@@ -55,7 +55,7 @@ enum class Islands(val internalName: String, private val displayName: String) {
         @JvmStatic
         fun getIslandByMap(map: String): Islands? {
             for (island in entries) {
-                if (island.internalName == map) {
+                if (island.displayName == map) {
                     return island
                 }
             }

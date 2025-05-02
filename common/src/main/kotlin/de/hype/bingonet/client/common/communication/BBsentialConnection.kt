@@ -29,8 +29,10 @@ import java.io.*
 import java.lang.String
 import java.math.BigInteger
 import java.net.Socket
+import java.security.KeyStore
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
+import java.security.cert.CertificateFactory
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
@@ -39,6 +41,7 @@ import java.util.function.Consumer
 import java.util.function.Function
 import java.util.stream.Collectors
 import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Exception
@@ -72,17 +75,26 @@ class BBsentialConnection {
 
 
     private fun createSSLContext(): SSLContext {
-        return SSLContext.getInstance("TLS").apply {
-            val trustManagerFactory = javax.net.ssl.TrustManagerFactory.getInstance(
-                javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm()
-            )
-            trustManagerFactory.init(null as java.security.KeyStore?)
+        // Load the certificate from resources/assets/public_bingonet_cert.crt
+        val certificateFactory = CertificateFactory.getInstance("X.509")
+        val certStream: InputStream? =
+            object {}.javaClass.classLoader.getResourceAsStream("assets/public_bingonet_cert.crt")
+        requireNotNull(certStream) { "Certificate file not found" }
+        val certificate = certificateFactory.generateCertificate(certStream)
+        certStream.close()
 
-            init(
-                null,
-                trustManagerFactory.trustManagers,
-                SecureRandom()
-            )
+        // Create a KeyStore containing our certificate
+        val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+        keyStore.load(null, null)
+        keyStore.setCertificateEntry("bingonet", certificate)
+
+        // Initialize TrustManagerFactory with the KeyStore
+        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        trustManagerFactory.init(keyStore)
+
+        // Create the SSLContext using the trust managers from our certificate
+        return SSLContext.getInstance("TLS").apply {
+            init(null, trustManagerFactory.trustManagers, SecureRandom())
         }
     }
 
@@ -92,8 +104,9 @@ class BBsentialConnection {
             val sslSocketFactory = sslContext.socketFactory
 
             socket = sslSocketFactory.createSocket(serverIP, serverPort).also { socket ->
-                socket.soTimeout = 30000  // 30 seconds timeout
+                socket.soTimeout = 0
                 socket.tcpNoDelay = true
+                socket.keepAlive = true
             }
 
             messageQueue = LinkedBlockingQueue()
@@ -119,6 +132,7 @@ class BBsentialConnection {
                     }
                 }
             } catch (e: IOException) {
+                e.printStackTrace()
                 close()
             }
         }, "BBsential-Receiver").apply {
@@ -196,7 +210,7 @@ class BBsentialConnection {
     fun onSplashNotifyPacket(packet: SplashNotifyPacket) {
         //influencing the delay in any way is disallowed!
         val waitTime: Int
-        if (packet.splash!!.announcer == BingoNet.generalConfig.getUsername() && BingoNet.splashConfig.autoSplashStatusUpdates) {
+        if (packet.splash.announcer == BingoNet.generalConfig.getUsername() && BingoNet.splashConfig.autoSplashStatusUpdates) {
             Chat.sendPrivateMessageToSelfInfo("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard")
             val splashStatusUpdateListener = SplashStatusUpdateListener(packet.splash)
             UpdateListenerManager.splashStatusUpdateListener = splashStatusUpdateListener
@@ -522,15 +536,15 @@ class BBsentialConnection {
             reader?.close()
             messageQueue?.clear()
             if (BingoNet.bbthread != null) {
-                BingoNet.bbthread.join()
+                BingoNet.bbthread.interrupt()
                 BingoNet.bbthread = null
             }
             if (messageSenderThread != null) {
-                messageSenderThread!!.join()
+                messageSenderThread!!.interrupt()
                 messageSenderThread = null
             }
             if (messageReceiverThread != null) {
-                messageReceiverThread!!.join()
+                messageReceiverThread!!.interrupt()
                 messageReceiverThread = null
             }
             writer = null

@@ -1,7 +1,7 @@
 package de.hype.bingonet.shared.objects.json
 
 class ApiJsonList(var parent: ApiJson, key: String?) {
-    var values: MutableList<ApiJsonElement?> = ArrayList()
+    var values: MutableList<ApiJsonElement> = ArrayList()
 
     init {
         val temp = parent.jSONElementSafe
@@ -15,7 +15,7 @@ class ApiJsonList(var parent: ApiJson, key: String?) {
         }
     }
 
-    fun toList(): MutableList<ApiJsonElement?> {
-        return ArrayList<ApiJsonElement?>(values)
+    fun toList(): MutableList<ApiJsonElement> {
+        return ArrayList<ApiJsonElement>(values)
     }
 }

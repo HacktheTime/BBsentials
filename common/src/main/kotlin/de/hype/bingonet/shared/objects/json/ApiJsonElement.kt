@@ -13,40 +13,64 @@ class ApiJsonElement(var element: JsonElement?) {
     val asObject: ApiJson
         get() = of(element!!.getAsJsonObject())
 
-    fun getStringNullable(def: String?): String? {
-        if (isOffPath) return def
-        if (element == null || element!!.isJsonNull) return def
-        return element!!.asString
-    }
-
     fun getString(def: String): String {
         if (isOffPath) return def
-        if (element == null || element!!.isJsonNull) return def
-        return element!!.asString
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asString
     }
 
-    fun getInt(def: Int?): Int? {
+    @JvmName("getNullableString")
+    fun getString(def: String?): String? {
         if (isOffPath) return def
-        if (element == null || element!!.isJsonNull) return def
-        return element!!.asInt
-    }
-
-    fun getLong(def: Long?): Long? {
-        if (isOffPath) return def
-        if (element == null || element!!.isJsonNull) return def
-        return element!!.asLong
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asString
     }
 
     fun getLong(def: Long): Long {
         if (isOffPath) return def
-        if (element == null || element!!.isJsonNull) return def
-        return element!!.asLong
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asLong
+    }
+
+    @JvmName("getNullableLong")
+    fun getLong(def: Long?): Long? {
+        if (isOffPath) return def
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asLong
     }
 
     fun getBoolean(def: Boolean): Boolean {
         if (isOffPath) return def
-        if (element == null || element!!.isJsonNull) return def
-        return element!!.asBoolean
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asBoolean
+    }
+
+    @JvmName("getNullableBoolean")
+    fun getBoolean(def: Boolean?): Boolean? {
+        if (isOffPath) return def
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asBoolean
+    }
+
+    fun getInt(def: Int): Int {
+        if (isOffPath) return def
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asInt
+    }
+
+    @JvmName("getNullableInt")
+    fun getInt(def: Int?): Int? {
+        if (isOffPath) return def
+        val element = element
+        if (element == null || element.isJsonNull) return def
+        return element.asInt
     }
 
     fun getString(): String {
@@ -54,11 +78,11 @@ class ApiJsonElement(var element: JsonElement?) {
     }
 
     fun getInt(): Int {
-        return getInt(0) ?: 0
+        return getInt(0)
     }
 
     fun getLong(): Long {
-        return getLong(0L) ?: 0L
+        return getLong(0L)
     }
 
     fun getBoolean(): Boolean {

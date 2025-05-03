@@ -8,17 +8,17 @@ class ApiJson {
     var isOffPath: Boolean = false
         private set
     private var data: JsonObject?
-    private var path: MutableList<String?> = ArrayList<String?>()
+    private var path: MutableList<String> = ArrayList<String>()
 
     constructor(obj: JsonObject?) {
         this.data = obj
         if (data == null) isOffPath = true
     }
 
-    constructor(obj: JsonObject?, isOffPath: Boolean, path: MutableList<String?>) {
+    constructor(obj: JsonObject?, isOffPath: Boolean, path: MutableList<String>) {
         this.data = obj
         this.isOffPath = isOffPath
-        this.path = ArrayList<String?>(path)
+        this.path = ArrayList<String>(path)
     }
 
     val `object`: JsonObject?
@@ -30,7 +30,7 @@ class ApiJson {
             return temp
         }
 
-    private fun getJSONElementSafe(path: MutableList<String?>): JsonElement? {
+    private fun getJSONElementSafe(path: MutableList<String>): JsonElement? {
         var temp: JsonElement? = data
         isOffPath = false
         if (temp == null) return null
@@ -51,7 +51,7 @@ class ApiJson {
     val jSONElementSafe: JsonElement?
         get() = getJSONElementSafe(path)
 
-    private fun getJSONObjectSafe(path: MutableList<String?>): JsonObject? {
+    private fun getJSONObjectSafe(path: MutableList<String>): JsonObject? {
         val element = getJSONElementSafe(path)
         if (element == null) return null
         return element.getAsJsonObject()
@@ -64,7 +64,7 @@ class ApiJson {
      */
     fun get(key: String): ApiJson {
         val copy = this.copy()
-        copy.path.addAll(Arrays.asList<String>(*key.split("→".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()))
+        copy.path.addAll(listOf(*key.split("→".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()))
         return copy
     }
 
@@ -76,7 +76,7 @@ class ApiJson {
         return ApiJsonList(this, key)
     }
 
-    val finalElements: MutableSet<MutableMap.MutableEntry<String?, JsonElement?>?>?
+    val finalElements: MutableSet<MutableMap.MutableEntry<String, JsonElement>>
         /**
          * Only use at the entire end since these are the default and not caught!
          *
@@ -84,19 +84,19 @@ class ApiJson {
          */
         get() {
             val obj: JsonObject? = this.jSONObjectSafe
-            if (obj == null) return HashSet<MutableMap.MutableEntry<String?, JsonElement?>?>()
+            if (obj == null) return HashSet<MutableMap.MutableEntry<String, JsonElement>>()
             return obj.entrySet()
         }
 
     fun getElement(id: String): ApiJsonElement {
         try {
-            val pathSplit: Array<String?> = id.split("→".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val path: MutableList<String?> = ArrayList<String?>(this.path)
-            path.addAll(Arrays.asList<String?>(*pathSplit).subList(0, pathSplit.size - 1))
+            val pathSplit: Array<String> = id.split("→".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val path: MutableList<String> = ArrayList<String>(this.path)
+            path.addAll(listOf(*pathSplit).subList(0, pathSplit.size - 1))
             val safeObj = getJSONObjectSafe(path)
             if (safeObj == null) return ApiJsonElement(null)
             return ApiJsonElement(safeObj.get(pathSplit[pathSplit.size - 1]))
-        } catch (ignored: NullPointerException) {
+        } catch (_: NullPointerException) {
             return ApiJsonElement(null)
         }
     }
@@ -118,31 +118,15 @@ class ApiJson {
         return element.getBoolean(def)
     }
 
-
-    fun getStringNullable(key: String, def: String?): String? {
-        val element = getElement(key)
-        return element.getStringNullable(def)
-    }
-
     fun getString(key: String, def: String): String {
         val element = getElement(key)
-        return element.getString(def) ?: def
+        return element.getString(def)
     }
 
     fun getInt(key: String, def: Int): Int {
         val element = getElement(key)
         val temp = element.getInt(def)
-        return temp ?: def
-    }
-
-    fun getIntNullable(key: String, def: Int?): Int? {
-        val element = getElement(key)
-        return element.getInt(def)
-    }
-
-    fun getLongNullable(key: String, def: Long?): Long? {
-        val element = getElement(key)
-        return element.getLong(def)
+        return temp
     }
 
     fun getLong(key: String, def: Long): Long {
@@ -150,18 +134,18 @@ class ApiJson {
         return element.getLong(def)
     }
 
-    val allSubObjects: MutableMap<String?, ApiJson?>
+    val allSubObjects: MutableMap<String, ApiJson>
         get() {
             try {
                 val obj: JsonObject? = this.jSONObjectSafe
                 val keys = obj!!.keySet().stream().toList()
-                val subs: MutableMap<String?, ApiJson?> = HashMap<String?, ApiJson?>()
+                val subs: MutableMap<String, ApiJson> = HashMap<String, ApiJson>()
                 for (key in keys) {
                     subs.put(key, ApiJson(obj.getAsJsonObject(key)))
                 }
                 return subs
             } catch (e: Exception) {
-                return HashMap<String?, ApiJson?>()
+                return HashMap<String, ApiJson>()
             }
         }
 

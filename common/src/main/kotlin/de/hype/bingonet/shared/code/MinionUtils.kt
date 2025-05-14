@@ -7,7 +7,6 @@ import de.hype.bingonet.shared.objects.minions.MinionStorage
 import de.hype.bingonet.shared.objects.minions.Minions
 import java.time.Duration
 import java.time.temporal.ChronoUnit
-import java.util.Map
 import kotlin.math.ceil
 
 object MinionUtils {
@@ -20,7 +19,7 @@ object MinionUtils {
         item2: MinionItem?,
         percentageMinionSpeed: Double,
         dropMultiplierBoost: Double
-    ): Duration? {
+    ): Duration {
         var usedSlots = 0
         var storageUsedAmount = 0
 
@@ -39,13 +38,13 @@ object MinionUtils {
         val slots = minion.getStorageSlots() + (storage?.storageSlots ?: 0)
         val compactor = (item1 === MinionItem.COMPACTOR || item2 === MinionItem.COMPACTOR)
         val values =
-            minion.getItems().entries.stream().sorted(Map.Entry.comparingByValue<MinionResourceItem?, Double>())
+            minion.getItems().entries.sortedBy { it.value }
                 .toList()
         for (i1 in 0..<values.size - 1) {
-            var item = values[i1]!!.key
+            var item = values[i1].key
             if (item1 != null) item = item1.convertItem(item)
             if (item2 != null) item = item2.convertItem(item)
-            var usedNow = ((values[i1]!!.value * ((slots - usedSlots) * 64)) * itemDropMultiplier).toInt()
+            var usedNow = ((values[i1].value * ((slots - usedSlots) * 64)) * itemDropMultiplier).toInt()
             if (compactor) {
                 usedNow = ceil(usedNow.toDouble() / item.compactorLevel).toInt()
                 usedSlots++
@@ -97,7 +96,7 @@ object MinionUtils {
             generated.put(item, actions * v * finalItemDropMultiplier * minionCount)
         }
 
-        val sum = generated.values.stream().mapToDouble { v: Double? -> v!! }.sum()
+        val sum = generated.values.sum()
 
         item1?.modifyDrops(sum, generated)
         item2?.modifyDrops(sum, generated)

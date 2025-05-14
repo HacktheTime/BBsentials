@@ -16,7 +16,8 @@ class ComGoalPositionExtendedData(
             return fromTime.plus(punPos.toLong() * punPos, ChronoUnit.MINUTES)
         }
 
-    fun dataEquals(that: ComGoalPositionExtendedData): Boolean {
-        return mcuuid == that.mcuuid && position.dataEquals(that.position)
+    fun dataEquals(that: ComGoalPositionExtendedData?): Boolean {
+        if (that == null) return false
+        return mcuuid == that.mcuuid && position == that.position
     }
 }

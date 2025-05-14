@@ -2,8 +2,6 @@ package de.hype.bingonet.shared.constants
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import java.util.List
-import java.util.stream.Collectors
 
 /**
  * Enumeration representing various ChChest items in the game.
@@ -63,7 +61,7 @@ object ChChestItems {
         ChChestItem("1,200-4,800 ${Formatting.GREEN}Mithril Powder", "legendary_mithril_powder")
 
     @JvmStatic
-    val allItems: MutableList<ChChestItem> = ArrayList<ChChestItem>()
+    val allItems: MutableList<ChChestItem> = ArrayList()
 
     // Automatically populate predefined items using reflection
     init {
@@ -71,7 +69,7 @@ object ChChestItems {
         for (field in fields) {
             if (field.type == ChChestItem::class.java && isPublicStaticFinal(field)) {
                 try {
-                    allItems.add((field.get(null) as ChChestItem?)!!)
+                    allItems.add((field.get(null) as ChChestItem))
                 } catch (e: IllegalAccessException) {
                     // Handle exception
                 }
@@ -91,10 +89,10 @@ object ChChestItems {
     }
 
     @JvmStatic
-    fun getItems(itemInput: Array<String?>): MutableList<ChChestItem?> {
-        val items = List.of<String?>(*itemInput)
+    fun getItems(itemInput: Array<String>): MutableList<ChChestItem> {
+        val items = listOf(*itemInput)
         val allItems: MutableList<ChChestItem> = allItems
-        val foundItems: MutableList<ChChestItem?> = ArrayList<ChChestItem?>()
+        val foundItems: MutableList<ChChestItem> = ArrayList()
         for (item in items) {
             var foundItem: ChChestItem? = null
             for (allItem in allItems) {
@@ -103,7 +101,7 @@ object ChChestItems {
                     break
                 }
             }
-            requireNotNull(foundItem) { "Unknown Item: " + item }
+            requireNotNull(foundItem) { "Unknown Item: $item" }
             foundItems.add(foundItem)
         }
         return foundItems
@@ -147,9 +145,9 @@ object ChChestItems {
     }
 
     @JvmStatic
-    val allItemNames: MutableList<String?>
-        get() = allItems.stream()
-            .map<String?>(ChChestItem::displayName)
-            .collect(Collectors.toList())
+    val allItemNames: MutableList<String>
+        get() = allItems
+            .map(ChChestItem::displayName)
+            .toMutableList()
     //very fancy way to convert a list to a list of values from the previous list
 }

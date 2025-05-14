@@ -94,7 +94,7 @@ enum class MinionItem(var bingoObtainable: Boolean, var displayName: String) {
             minionActions: Int,
             minion: Minions
         ): MutableMap<MinionResourceItem, Int> {
-            //dropsGenerated.put(PURPLE_CANY,(int) dropsGenerated.values().stream().mapToInt(v->v).sum()*0.00015);
+            //dropsGenerated.put(PURPLE_CANY,(int) dropsGenerated.values().mapToInt(v->v).sum()*0.00015);
             return dropsGenerated
         }
     };

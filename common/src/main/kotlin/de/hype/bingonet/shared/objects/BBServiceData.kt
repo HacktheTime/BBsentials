@@ -120,7 +120,7 @@ open class BBServiceData(
         }
 
         fun getUserName(): String {
-            return username ?: user!!.mcUsername
+            return username ?: user!!.getMcUsername()
         }
 
         fun getUser(): BBUser? {

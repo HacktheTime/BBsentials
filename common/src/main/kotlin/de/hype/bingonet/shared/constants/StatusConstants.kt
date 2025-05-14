@@ -29,7 +29,7 @@ enum class StatusConstants(@JvmField var displayName: String, @JvmField var colo
 
     companion object {
         @JvmStatic
-        fun getSplashStatus(string: String?): StatusConstants? {
+        fun getSplashStatus(string: String?): StatusConstants {
             for (value in entries) {
                 if (value == DONEGOOD || value == ONGOING || value == OPEN || value == CLOSING || value == CLOSINGSOON || value == LEAVINGSOON || value == CLOSED || value == LEFT) {
                     continue
@@ -38,7 +38,7 @@ enum class StatusConstants(@JvmField var displayName: String, @JvmField var colo
                     return value
                 }
             }
-            return null
+            return CANCELED
         }
 
         @JvmStatic

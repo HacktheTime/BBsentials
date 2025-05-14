@@ -38,18 +38,18 @@ class WantedSearchPacket : AbstractPacket {
     }
 
     class WantedSearchPacketReply(
-        @JvmField var finder: String?,
-        usernames: MutableList<String?>,
-        megaServer: Boolean?,
-        serverId: String?
+        @JvmField var finder: String,
+        usernames: MutableList<String>,
+        megaServer: Boolean,
+        serverId: String
     ) : AbstractPacket(1, 1) {
         @JvmField
-        var usernames: MutableList<String?>?
-        var megaServer: Boolean?
-        var currentPlayerCount: Int?
+        var usernames: MutableList<String>
+        var megaServer: Boolean
+        var currentPlayerCount: Int
 
         @JvmField
-        var serverId: String?
+        var serverId: String
 
         init {
             this.usernames = usernames

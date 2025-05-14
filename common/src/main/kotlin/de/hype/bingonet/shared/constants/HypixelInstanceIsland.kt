@@ -32,7 +32,6 @@ enum class HypixelInstanceIsland(
         KUUDRA,
         ;
 
-        val isCatacombs: Boolean
-            get() = this == DEFAULT_CATACOMBS || this == MASTER_CATACOMBS
+        fun isCatacombs(): Boolean = this == DEFAULT_CATACOMBS || this == MASTER_CATACOMBS
     }
 }

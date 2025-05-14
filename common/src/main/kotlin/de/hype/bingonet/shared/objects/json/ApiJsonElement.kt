@@ -11,7 +11,7 @@ class ApiJsonElement(var element: JsonElement?) {
     }
 
     val asObject: ApiJson
-        get() = of(element!!.getAsJsonObject())
+        get() = of(element?.asJsonObject)
 
     fun getString(def: String): String {
         if (isOffPath) return def

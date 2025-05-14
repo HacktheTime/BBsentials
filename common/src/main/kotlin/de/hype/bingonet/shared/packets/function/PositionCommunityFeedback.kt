@@ -1,7 +1,6 @@
 package de.hype.bingonet.shared.packets.function
 
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
-import java.util.*
 
 class PositionCommunityFeedback(@JvmField var positions: MutableSet<ComGoalPosition>) : AbstractPacket(1, 1) {
     class ComGoalPosition(
@@ -14,12 +13,18 @@ class PositionCommunityFeedback(@JvmField var positions: MutableSet<ComGoalPosit
             return goalName.hashCode()
         }
 
-        fun dataEquals(compare: ComGoalPosition?): Boolean {
-            if (compare == null) return false
-            return (Objects.equals(
-                topPercentage,
-                compare.topPercentage
-            )) && compare.position == this.position && contribution == compare.contribution
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as ComGoalPosition
+
+            if (contribution != other.contribution) return false
+            if (topPercentage != other.topPercentage) return false
+            if (position != other.position) return false
+            if (goalName != other.goalName) return false
+
+            return true
         }
     }
 }

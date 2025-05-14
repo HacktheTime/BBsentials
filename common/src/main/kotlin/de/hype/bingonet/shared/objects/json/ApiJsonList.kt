@@ -6,7 +6,7 @@ class ApiJsonList(var parent: ApiJson, key: String?) {
     init {
         val temp = parent.jSONElementSafe
         if (temp != null) {
-            val array = temp.getAsJsonObject().getAsJsonArray(key)
+            val array = temp.asJsonObject.getAsJsonArray(key)
             if (array != null) {
                 for (jsonElement in array) {
                     values.add(ApiJsonElement(jsonElement))
@@ -16,6 +16,6 @@ class ApiJsonList(var parent: ApiJson, key: String?) {
     }
 
     fun toList(): MutableList<ApiJsonElement> {
-        return ArrayList<ApiJsonElement>(values)
+        return ArrayList(values)
     }
 }

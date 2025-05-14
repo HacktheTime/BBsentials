@@ -2,7 +2,6 @@ package de.hype.bingonet.shared.objects
 
 import de.hype.bingonet.environment.packetconfig.EnvironmentPacketConfig
 import java.awt.Color
-import java.util.List
 
 
 open class ClientWaypointData @JvmOverloads constructor(
@@ -33,7 +32,7 @@ open class ClientWaypointData @JvmOverloads constructor(
         renderDistance,
         visible,
         deleteOnServerSwap,
-        List.of<RenderInformation?>(render),
+        mutableListOf<RenderInformation>(render),
         color,
         doTracer
     )
@@ -51,7 +50,7 @@ open class ClientWaypointData @JvmOverloads constructor(
         renderDistance,
         visible,
         deleteOnServerSwap,
-        List.of<RenderInformation?>(render),
+        mutableListOf<RenderInformation>(render),
         EnvironmentPacketConfig.defaultWaypointColor,
         EnvironmentPacketConfig.waypointDefaultWithTracer
     )

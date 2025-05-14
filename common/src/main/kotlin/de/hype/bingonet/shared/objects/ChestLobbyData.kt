@@ -105,7 +105,7 @@ open class ChestLobbyData(
         extraMessage = lobby.extraMessage
         status = lobby.status
         contactMan = lobby.contactMan
-        chests = ArrayList<ChChestData>(lobby.chests)
+        chests = ArrayList(lobby.chests)
         try {
             setLobbyMetaData(lobby.playersStillIn, lobby.closingTime)
         } catch (ignored: SQLException) {

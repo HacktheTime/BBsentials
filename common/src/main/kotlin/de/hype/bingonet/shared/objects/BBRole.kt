@@ -30,13 +30,14 @@ enum class BBRole(dbRoleName: String, visualRoleName: String) {
         var roles: MutableMap<String, BBRole>? = null
 
         @JvmStatic
-        fun getRoleByDBName(dbRoleName: String): BBRole? {
+        fun getRoleByDBName(dbRoleName: String): BBRole {
             roles?.let { return it[dbRoleName]!! }
-            roles = HashMap()
+            val roles = HashMap<String, BBRole>()
             for (value in entries) {
-                roles!!.put(value.dBRoleName, value)
+                roles.put(value.dBRoleName, value)
             }
-            return roles?.get(dbRoleName)
+            this.roles = roles
+            return roles.get(dbRoleName)!!
         }
     }
 }

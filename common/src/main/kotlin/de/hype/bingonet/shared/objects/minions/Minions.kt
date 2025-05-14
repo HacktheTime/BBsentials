@@ -81,8 +81,8 @@ interface Minions {
         fun getMinionFromString(minionName: String, tier: String): Minions {
             if (minionStringMap.isEmpty()) indexMinions()
             // Get the class associated with the minion name
-            val clazz: Class<out Minions>? = minionStringMap.get(
-                minionName.lowercase(Locale.getDefault()).replace("minion", "").trim { it <= ' ' })
+            val clazz: Class<out Minions>? =
+                minionStringMap[minionName.lowercase(Locale.getDefault()).replace("minion", "").trim { it <= ' ' }]
             if (clazz == null) {
                 throw Exception("No Minion With that Name Found.")
             }

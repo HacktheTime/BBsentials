@@ -42,6 +42,11 @@ object FormattingUtils {
         }
     }
 
+    fun formatAmountShortened(amount: Int?): String? {
+        if (amount == null) return null
+        return formatAmountShortened(amount.toLong())
+    }
+
     /**
      * This shortens the amount to numbers like 10k or 10B etc.
      *

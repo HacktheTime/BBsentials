@@ -8,7 +8,7 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
     constructor(pos: Position) : this(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
 
     fun asLong(): Long {
-        var l: Long = 0L
+        var l = 0L
         l = l or ((x.toLong() and BITS_X) shl BIT_SHIFT_X)
         l = l or ((y.toLong() and BITS_Y) shl 0)
         l = l or ((z.toLong() and BITS_Z) shl BIT_SHIFT_Z)
@@ -121,7 +121,7 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
     }
 
     override fun hashCode(): Int {
-        var bits: Long = 1L
+        var bits = 1L
         bits = 31L * bits + doubleToLongBits(x)
         bits = 31L * bits + doubleToLongBits(y)
         bits = 31L * bits + doubleToLongBits(z)

@@ -11,7 +11,7 @@ class RequestUserInfoPacket : AbstractPacket {
     val bingoPoints: Int?
     val displayPrefix: String?
 
-    var roles: MutableList<String?>? = null
+    var roles: MutableList<String>
 
     constructor(
         requestUpToDateData: Boolean,
@@ -20,7 +20,8 @@ class RequestUserInfoPacket : AbstractPacket {
         dcUserId: Long?,
         cardCount: Int?,
         bingoPoints: Int?,
-        displayPrefix: String?
+        displayPrefix: String?,
+        roles: MutableList<String>
     ) : super(1, 1) {
         this.requestUpToDateData = requestUpToDateData
         this.bbUserId = bbUserId
@@ -29,9 +30,16 @@ class RequestUserInfoPacket : AbstractPacket {
         this.cardCount = cardCount
         this.bingoPoints = bingoPoints
         this.displayPrefix = displayPrefix
+        this.roles = roles
     }
 
-    constructor(requestUpToDateData: Boolean, bbUserId: Int?, mcUsername: String?, dcUserId: Long?) : super(1, 1) {
+    constructor(
+        requestUpToDateData: Boolean,
+        bbUserId: Int?,
+        mcUsername: String?,
+        dcUserId: Long?,
+        roles: MutableList<String>
+    ) : super(1, 1) {
         this.requestUpToDateData = requestUpToDateData
         this.bbUserId = bbUserId
         this.mcUsername = mcUsername
@@ -39,15 +47,16 @@ class RequestUserInfoPacket : AbstractPacket {
         this.cardCount = null
         this.bingoPoints = null
         this.displayPrefix = null
+        this.roles = roles
     }
 
     fun hasRole(role: String?): Boolean {
-        return roles!!.contains(role)
+        return roles.contains(role)
     }
 
     companion object {
         fun fromDCUserID(userId: Long, requestUpToDateData: Boolean): RequestUserInfoPacket {
-            return RequestUserInfoPacket(requestUpToDateData, null, null, userId)
+            return RequestUserInfoPacket(requestUpToDateData, null, null, userId, TODO())
         }
     }
 }

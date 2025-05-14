@@ -15,7 +15,7 @@ class CommandChatPromptPacket(private var commands: MutableList<CommandRecord>, 
      * @return The for maliciously checked command list
      */
     fun getCommands(): MutableList<CommandRecord> {
-        commands = commands.stream().filter { v: CommandRecord -> !v.isMalicious }.toList()
+        commands = commands.filter { !it.isMalicious }.toMutableList()
         return commands
     }
 
@@ -24,8 +24,8 @@ class CommandChatPromptPacket(private var commands: MutableList<CommandRecord>, 
             //{"jformat":8,"jobject":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Bingo Net is a mod that you use"}],"text":"Bingo Net Server "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"is suggesting you to execute commands. "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"green","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"show_text","hover_event_value":"","hover_event_children":[],"text":"(Hover for List) "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"To execute them press "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"gold","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"keybind":"Chat Prompt Yes / Open Menu"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"\n"},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"none","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"Attached Message: "},{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"font":null,"color":"dark_gray","insertion":"","click_event_type":"none","click_event_value":"","hover_event_type":"none","hover_event_value":"","hover_event_children":[],"text":"@message"}],"command":"%s","jtemplate":"tellraw"}
             val base =
                 "[{\"text\":\"Bingo Net Server \",\"color\":\"gold\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"Bingo Net is a mod that you use\"]}},\"is suggesting you to execute commands. \",{\"text\":\"(Hover for List) \",\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\"@hover\"]}},\"To execute them press \",{\"keybind\":\"Chat Prompt Yes / Open Menu\",\"color\":\"gold\"},\"\\n\",\"@warnings\",\"Attached Message: \",{\"text\":\"@message\",\"color\":\"dark_gray\"}]"
-            val warningString = if (commands.stream()
-                    .anyMatch { v: CommandRecord? -> v!!.command.startsWith("/warp") }
+            val warningString = if (commands
+                    .any { it.command.startsWith("/warp") }
             ) "§cThe Command List contains a command that can cause changing Servers!" else ""
             return tellraw(
                 base.replace(
@@ -34,7 +34,7 @@ class CommandChatPromptPacket(private var commands: MutableList<CommandRecord>, 
                         "@hover",
                         String.join(
                             "\n",
-                            commands.stream().map<kotlin.String?> { v: CommandRecord? -> v!!.command }.toList()
+                            commands.map { it.command }.toMutableList()
                         )
                     )
                 )

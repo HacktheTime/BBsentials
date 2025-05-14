@@ -52,9 +52,8 @@ open class SplashData @JvmOverloads constructor(
     class HubSelectorData(hubNumber: Int, hubType: Islands) {
         @JvmField
         var hubNumber: Int
-
         @JvmField
-        var hubType: Islands?
+        var hubType: Islands
 
         init {
             require(hubType == Islands.HUB || hubType == Islands.DUNGEON_HUB) { "§cInvalid hub type specified. Please only use the Suggestions!" }

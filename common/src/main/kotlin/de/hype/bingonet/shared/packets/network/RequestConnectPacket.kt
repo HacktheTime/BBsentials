@@ -13,10 +13,10 @@ class RequestConnectPacket
  * @param clientApiVersion
  * @param authType
  */(
-    @JvmField val mcuuid: String?,
-    @JvmField val key: String?,
-    val mcVersion: String?,
-    val modVersion: String?,
+    @JvmField val mcuuid: String,
+    @JvmField val key: String,
+    val mcVersion: String,
+    val modVersion: String,
     val clientApiVersion: Int,
-    @JvmField val authType: AuthenticationConstants?
+    @JvmField val authType: AuthenticationConstants
 ) : AbstractPacket(1, 1)

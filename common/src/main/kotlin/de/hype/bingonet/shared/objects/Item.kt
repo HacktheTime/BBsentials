@@ -9,7 +9,9 @@ class Item {
     private val display: ApiJson
     private val itemCount: Int
     private var creationDate: Instant? = null
-    private var itemID: String? = null
+    val itemID: String by lazy {
+        attributes.getString("id")!!
+    }
     private val mcItemId: Int
     val damage: Int
     private var lore: List<String>? = null
@@ -24,18 +26,13 @@ class Item {
         itemCount = data.getInt("Count", 1)
     }
 
-    fun getItemID(): String {
-        if (itemID == null) {
-            itemID = attributes.getString("id")
-        }
-        return itemID!!
-    }
-
     fun getCreationDate(): Instant {
+        var creationDate = creationDate
         if (creationDate == null) {
             creationDate = Instant.ofEpochMilli(attributes.getLong("timestamp", 0L))
+            this.creationDate = creationDate
         }
-        return creationDate!!
+        return creationDate
     }
 
     fun getItemCount(): Int = itemCount
@@ -43,11 +40,11 @@ class Item {
     fun getDisplayName(): String = display.getString("Name", "BingoNet no name")
 
     fun getLore(): List<String> {
-        if (lore != null) return lore!!
-        val list = mutableListOf<String>()
-        display.getJsonArray("Lore").toList().forEach { e -> list.add(e?.getString() ?: "") }
-        lore = list
-        return lore!!
+        var lore = lore
+        if (lore != null) return lore
+        lore = display.getJsonArray("Lore").toList().map { it.getString() }
+        this.lore = lore
+        return lore
     }
 
     fun getAttributes(): ApiJson = attributes

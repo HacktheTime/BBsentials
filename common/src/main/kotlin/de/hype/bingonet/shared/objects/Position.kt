@@ -37,8 +37,8 @@ class Position : Vector3i {
          */
         @JvmStatic
         fun fromString(string: String): Position {
-            val temp: Array<String?> = string.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            return Position(temp[0]!!.toInt(), temp[1]!!.toInt(), temp[2]!!.toInt())
+            val temp: Array<String> = string.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            return Position(temp[0].toInt(), temp[1].toInt(), temp[2].toInt())
         }
     }
 

@@ -1,6 +1,5 @@
 package de.hype.bingonet.shared.constants
 
-import java.util.*
 import kotlin.math.min
 
 @Suppress("unused", "EnumEntryName")
@@ -303,20 +302,19 @@ interface Collections : MinionResourceItem {
             return 1
         }
 
-        override val minionID: String?
-            get() = null
+        override val minionID: String? = null
     }
 
 
     companion object {
         @JvmStatic
         fun values(): MutableSet<Collections> {
-            val collections: MutableSet<Collections> = HashSet<Collections>()
-            collections.addAll(Arrays.stream(Farming.entries.toTypedArray()).toList())
-            collections.addAll(Arrays.stream(Foraging.entries.toTypedArray()).toList())
-            collections.addAll(Arrays.stream(Mining.entries.toTypedArray()).toList())
-            collections.addAll(Arrays.stream(Fishing.entries.toTypedArray()).toList())
-            collections.addAll(Arrays.stream(Combat.entries.toTypedArray()).toList())
+            val collections: MutableSet<Collections> = HashSet()
+            collections.addAll(Farming.entries)
+            collections.addAll(Foraging.entries)
+            collections.addAll(Mining.entries)
+            collections.addAll(Fishing.entries)
+            collections.addAll(Combat.entries)
             return collections
         }
 

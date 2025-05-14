@@ -2,13 +2,13 @@ package de.hype.bingonet.shared.objects.json
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import java.util.*
+import kotlin.text.get
 
 class ApiJson {
     var isOffPath: Boolean = false
         private set
     private var data: JsonObject?
-    private var path: MutableList<String> = ArrayList<String>()
+    private var path: MutableList<String> = ArrayList()
 
     constructor(obj: JsonObject?) {
         this.data = obj
@@ -25,7 +25,7 @@ class ApiJson {
         get() {
             var temp = data
             for (pathPart in path) {
-                temp = temp!!.getAsJsonObject(pathPart)
+                temp = temp?.getAsJsonObject(pathPart)
             }
             return temp
         }
@@ -35,12 +35,15 @@ class ApiJson {
         isOffPath = false
         if (temp == null) return null
         for (pathPart in path) {
-            if (temp!!.isJsonObject) {
-                temp = temp.getAsJsonObject().get(pathPart)
-            } else temp = null
-            if (temp != null) continue
-            isOffPath = true
-            return null
+            temp = if (temp?.isJsonObject == true) {
+                temp.asJsonObject?.get(pathPart)
+            } else {
+                null
+            }
+            if (temp == null) {
+                isOffPath = true
+                return null
+            }
         }
         return temp
     }
@@ -54,7 +57,7 @@ class ApiJson {
     private fun getJSONObjectSafe(path: MutableList<String>): JsonObject? {
         val element = getJSONElementSafe(path)
         if (element == null) return null
-        return element.getAsJsonObject()
+        return element.asJsonObject
     }
 
 
@@ -84,14 +87,14 @@ class ApiJson {
          */
         get() {
             val obj: JsonObject? = this.jSONObjectSafe
-            if (obj == null) return HashSet<MutableMap.MutableEntry<String, JsonElement>>()
+            if (obj == null) return HashSet()
             return obj.entrySet()
         }
 
     fun getElement(id: String): ApiJsonElement {
         try {
             val pathSplit: Array<String> = id.split("→".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val path: MutableList<String> = ArrayList<String>(this.path)
+            val path: MutableList<String> = ArrayList(this.path)
             path.addAll(listOf(*pathSplit).subList(0, pathSplit.size - 1))
             val safeObj = getJSONObjectSafe(path)
             if (safeObj == null) return ApiJsonElement(null)
@@ -134,12 +137,38 @@ class ApiJson {
         return element.getLong(def)
     }
 
+    @JvmName("getNullableBoolean")
+    fun getBoolean(key: String, def: Boolean?): Boolean? {
+        val element = getElement(key)
+        return element.getBoolean(def)
+    }
+
+    @JvmName("getNullableString")
+    fun getString(key: String, def: String?): String? {
+        val element = getElement(key)
+        return element.getString(def)
+    }
+
+    @JvmName("getNullableInt")
+    fun getInt(key: String, def: Int?): Int? {
+        val element = getElement(key)
+        val temp = element.getInt(def)
+        return temp
+    }
+
+    @JvmName("getNullableLong")
+    fun getLong(key: String, def: Long?): Long? {
+        val element = getElement(key)
+        return element.getLong(def)
+    }
+
     val allSubObjects: MutableMap<String, ApiJson>
         get() {
             try {
                 val obj: JsonObject? = this.jSONObjectSafe
-                val keys = obj!!.keySet().stream().toList()
-                val subs: MutableMap<String, ApiJson> = HashMap<String, ApiJson>()
+                if (obj == null) return HashMap<String, ApiJson>()
+                val keys = obj.keySet().toMutableList()
+                val subs: MutableMap<String, ApiJson> = HashMap()
                 for (key in keys) {
                     subs.put(key, ApiJson(obj.getAsJsonObject(key)))
                 }
@@ -152,15 +181,21 @@ class ApiJson {
     fun copyApplied(): ApiJson {
         if (isOffPath) return ApiJson(null)
         var temp: JsonElement? = data
+        if (temp == null) return ApiJson(null)
         for (pathPart in path) {
-            if (temp!!.isJsonObject) {
-                temp = temp.getAsJsonObject().get(pathPart)
-            } else temp = null
-            if (temp != null) continue
-            break
+            temp = if (temp?.isJsonObject == true) {
+                temp.asJsonObject?.get(pathPart)
+            } else {
+                null
+            }
+            if (temp == null) {
+                isOffPath = true
+                break
+            }
         }
         if (isOffPath) return ApiJson(null)
-        return ApiJson(temp!!.getAsJsonObject())
+        val jsonObject = if (temp?.isJsonObject == true) temp.asJsonObject else null
+        return ApiJson(jsonObject)
     }
 
     companion object {

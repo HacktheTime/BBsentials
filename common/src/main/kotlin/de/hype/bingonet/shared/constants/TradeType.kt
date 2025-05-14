@@ -56,35 +56,35 @@ enum class TradeType(
         "Entrance → F3",
         "Entrance to F3 Carry.",
         "Have Combat 15 on Bingo and be able to Solo F3s in under 15 Minutes consistently.",
-        IntUnaryOperator { h: Int -> 5 - 1 - h },
+        IntUnaryOperator { 5 - 1 - it },
         TradeTypeEnvironmentRegistry.CARRY_ENTRANCE_TO_F3_COMPLETION
     ),
     CATACOMBS_FLOOR_1_230_SCORE(
         "F1 230 Score / Emerald Chest",
         "Floor 1 230 Score Carry.",
         "Have Cata 1 on Bingo and be able to Solo F1s with 230 Score.",
-        IntUnaryOperator { h: Int -> 5 - 1 - h },
+        IntUnaryOperator { 5 - 1 - it },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_1_230_SCORE
     ),
     CATACOMBS_FLOOR_1_270_SCORE(
         "F1 270 Score / Obsidian Chest",
         "Floor 1 270 Score Carry.",
         "Have Cata 1 on Bingo and be able to Solo F1s with 270 Score.",
-        IntUnaryOperator { h: Int -> 5 - 1 - h },
+        IntUnaryOperator { 5 - 1 - it },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_1_270_SCORE
     ),
     CATACOMBS_FLOOR_2_250_SCORE(
         "F2 250 Score",
         "Floor 2 250 Score Carry.",
         "Have Cata 3 on Bingo and be able to Solo F2s with 250 Score.",
-        IntUnaryOperator { h: Int -> 5 - 1 - h },
+        IntUnaryOperator { 5 - 1 - it },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_2_250_SCORE
     ),
     CATACOMBS_FLOOR_2_300_SCORE(
         "F2 300 Score",
         "Floor 2 300 Score Carry.",
         "Have Cata 3 on Bingo and be able to Solo F2s with 300 Score.",
-        IntUnaryOperator { h: Int -> 5 - 1 - h },
+        IntUnaryOperator { 5 - 1 - it },
         TradeTypeEnvironmentRegistry.CATACOMBS_FLOOR_2_300_SCORE
     ),
     GIFTS("Trade Gifts", "Gift Trading", "Have at least 3 Stacks of Gifts", 1, TradeTypeEnvironmentRegistry.GIFTS),
@@ -113,28 +113,28 @@ enum class TradeType(
         "Barbarian Questline Carry",
         "Help to complete Barbarian Questline.",
         "",
-        IntUnaryOperator { h: Int -> 4 },
+        IntUnaryOperator { 4 },
         TradeTypeEnvironmentRegistry.CRIMSON_ISLE_BARBARIAN_FACTION
     ),
     CRIMSON_ISLE_MAGE_FACTION(
         "Mage Questline Carry",
         "Help to complete Mage Faction Questline",
         "Have a way to kill Ashfangs. This may be asking other people but have something prepared.",
-        IntUnaryOperator { h: Int -> 4 },
+        IntUnaryOperator { 4 },
         TradeTypeEnvironmentRegistry.CRIMSON_ISLE_MAGE_FACTION
     ),
     SPIDER_ESSENCE_COM_GOAL(
         "Spider Essence Com Goal",
         "10 T2 Arachne Spawns (Arachne Crystal)",
         "Have 10 Arachne CRYSTALS",
-        IntUnaryOperator { h: Int -> 10 },
+        IntUnaryOperator { 10 },
         TradeTypeEnvironmentRegistry.SPIDER_ESSENCE_COM_GOAL
     ),
     MINING_COMMISSIONS(
         "Mining Commissions",
         "Carrier helps you by mining out tita.",
         "Titanium Insanium 25+, 2000+ Mining Speed",
-        IntUnaryOperator { h: Int -> 3 },
+        IntUnaryOperator { 3 },
         TradeTypeEnvironmentRegistry.MINING_COMMISSIONS
     ),
     SLAYER_TIER_4(
@@ -166,7 +166,7 @@ enum class TradeType(
         requirements: String,
         maxUsers: Int,
         registry: TradeTypeEnvironmentRegistry
-    ) : this(typeName, description, requirements, IntUnaryOperator { helpers: Int -> maxUsers }, registry)
+    ) : this(typeName, description, requirements, IntUnaryOperator { maxUsers }, registry)
 
     fun getMaximumUsers(size: Int): Int {
         return maxUsers.applyAsInt(size)

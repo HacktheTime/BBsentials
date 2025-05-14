@@ -11,4 +11,4 @@ class WelcomeClientPacket
  * @param roles   the User has
  * @param motd    Current MOTD message
  * @param success Whether Auth was successful or not
- */(val roles: MutableSet<BBRole?>?, val motd: String?, val success: Boolean) : AbstractPacket(1, 1) 
+ */(val roles: MutableSet<BBRole>, val motd: String?, val success: Boolean) : AbstractPacket(1, 1)

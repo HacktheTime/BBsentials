@@ -1,7 +1,6 @@
 package de.hype.bingonet.shared.objects
 
 import java.awt.Color
-import java.util.List
 
 open class WaypointData(
     var position: Position,
@@ -30,7 +29,7 @@ open class WaypointData(
         renderDistance,
         visible,
         deleteOnServerSwap,
-        List.of<RenderInformation?>(render),
+        mutableListOf<RenderInformation>(render),
         Color(1f, 1f, 1f),
         doTracer
     )
@@ -50,7 +49,7 @@ open class WaypointData(
         renderDistance,
         visible,
         deleteOnServerSwap,
-        List.of<RenderInformation?>(render),
+        mutableListOf<RenderInformation>(render),
         color,
         doTracer
     )

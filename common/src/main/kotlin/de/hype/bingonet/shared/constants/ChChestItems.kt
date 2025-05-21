@@ -145,9 +145,8 @@ object ChChestItems {
     }
 
     @JvmStatic
-    val allItemNames: MutableList<String>
-        get() = allItems
-            .map(ChChestItem::displayName)
-            .toMutableList()
+    val allItemNames: MutableList<String> by lazy {
+        allItems.map(ChChestItem::displayName).toMutableList()
+    }
     //very fancy way to convert a list to a list of values from the previous list
 }

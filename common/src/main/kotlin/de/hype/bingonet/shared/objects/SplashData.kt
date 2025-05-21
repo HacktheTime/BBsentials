@@ -2,6 +2,7 @@ package de.hype.bingonet.shared.objects
 
 import de.hype.bingonet.shared.constants.Islands
 import de.hype.bingonet.shared.constants.StatusConstants
+import kotlin.properties.Delegates
 
 open class SplashData @JvmOverloads constructor(
     open var announcer: String,
@@ -15,8 +16,7 @@ open class SplashData @JvmOverloads constructor(
     @JvmField var hubSelectorData: HubSelectorData?,
     @JvmField var status: StatusConstants = StatusConstants.WAITING
 ) {
-    @JvmField
-    var splashId: Int = 0
+    var splashId by Delegates.notNull<Int>()
 
     @JvmField
     var extraMessage: String?

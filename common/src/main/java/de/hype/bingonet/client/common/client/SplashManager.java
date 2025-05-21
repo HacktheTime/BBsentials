@@ -23,19 +23,19 @@ public class SplashManager {
 
     public static void addSplash(SplashData splash) {
         try {
-            splashPool.put(splash.splashId, new DisplaySplash(splash));
-            BingoNet.executionService.schedule(() -> splashPool.remove(splash.splashId), 5, TimeUnit.MINUTES);
+            splashPool.put(splash.getSplashId(), new DisplaySplash(splash));
+            BingoNet.executionService.schedule(() -> splashPool.remove(splash.getSplashId()), 5, TimeUnit.MINUTES);
         } catch (Exception ignored) {
             //cant happen anyway
         }
     }
 
     public static void handleSplash(SplashData data) {
-        if (splashPool.containsKey(data.splashId)) {
-            splashPool.get(data.splashId).update(data);
+        if (splashPool.containsKey(data.getSplashId())) {
+            splashPool.get(data.getSplashId()).update(data);
         } else {
             addSplash(data);
-            display(data.splashId);
+            display(data.getSplashId());
         }
     }
 
@@ -47,7 +47,7 @@ public class SplashManager {
                     Chat.sendPrivateMessageToSelfImportantInfo(splash.hubSelectorData.hubType.getDisplayName() + " #" + splash.hubSelectorData.hubNumber + " is " + packet.status);
                 }
             } else {
-                splashPool.remove(splash.splashId);
+                splashPool.remove(splash.getSplashId());
             }
         }
     }

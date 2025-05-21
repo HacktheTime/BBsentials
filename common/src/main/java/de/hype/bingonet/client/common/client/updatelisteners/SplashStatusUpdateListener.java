@@ -46,7 +46,8 @@ public class SplashStatusUpdateListener extends UpdateListener {
     }
 
     public void setStatus(StatusConstants newStatus) {
-        if (!data.status.equals(newStatus)) getConnection().sendPacket(new SplashUpdatePacket(data.splashId, newStatus));
+        if (!data.status.equals(newStatus))
+            getConnection().sendPacket(new SplashUpdatePacket(data.getSplashId(), newStatus));
         if (newStatus.equals(StatusConstants.SPLASHING)) {
             splashed = true;
             BingoNet.executionService.schedule(() -> {

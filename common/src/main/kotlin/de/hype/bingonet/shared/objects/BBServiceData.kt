@@ -79,7 +79,7 @@ open class BBServiceData(
 
         val discordParticipantString: String
             get() {
-                var string = user.getMcUsername()
+                var string = user.mcusername
                 if (price == 0) string = "**$string**"
                 if (priority) string = "__${string}__"
                 if (autoRequeue) string = "*$string*"
@@ -93,7 +93,7 @@ open class BBServiceData(
 
         constructor(user: BBUser) {
             this.user = user
-            this.username = user.getMcUsername()
+            this.username = user.mcusername
         }
 
         constructor(user: BBUser?, username: String) {
@@ -105,22 +105,22 @@ open class BBServiceData(
             if (other is Helper) return other.username == username
             if (other is String) {
                 if (username != null) return other.equals(username, ignoreCase = true)
-                else return user!!.getMcUsername().equals(other, ignoreCase = true)
+                else return user!!.mcusername.equals(other, ignoreCase = true)
             }
             if (other is BBUser) {
                 if (user != null) return other == user
-                else return other.getMcUsername().equals(username, ignoreCase = true)
+                else return other.mcusername.equals(username, ignoreCase = true)
             }
             return false
         }
 
         override fun hashCode(): Int {
             if (username != null) return username.hashCode()
-            else return user!!.getMcUsername().hashCode()
+            else return user!!.mcusername.hashCode()
         }
 
         fun getUserName(): String {
-            return username ?: user!!.getMcUsername()
+            return username ?: user!!.mcusername
         }
 
         fun getUser(): BBUser? {

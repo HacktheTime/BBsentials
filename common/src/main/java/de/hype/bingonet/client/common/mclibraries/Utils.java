@@ -53,7 +53,7 @@ public interface Utils {
 
     String getUsername();
 
-    String getMCUUID();
+    UUID getMCUUID();
 
     default void playsound(String eventName, String namespace) {
         playsound(namespace + ":" + eventName);

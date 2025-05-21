@@ -21,5 +21,5 @@ class InvalidCommandFeedbackPacket
     val displayMessage: String?,
     val argument: String?,
     val permissionNeeded: String?,
-    val userPermissions: MutableSet<BBRole>?
+    val userPermissions: Set<BBRole>?
 ) : AbstractPacket(1, 1)

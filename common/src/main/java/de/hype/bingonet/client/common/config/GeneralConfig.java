@@ -47,8 +47,8 @@ public class GeneralConfig extends BingoNetConfig {
         return bingonetRoles.contains(role);
     }
 
-    public String getMCUUID() {
-        return EnvironmentCore.utils.getMCUUID().replace("-", "");
+    public UUID getMCUUID() {
+        return EnvironmentCore.utils.getMCUUID();
     }
 
     public UUID getMCUUIDID() {

@@ -181,8 +181,8 @@ public class Utils implements de.hype.bingonet.client.common.mclibraries.Utils {
         return MinecraftClient.getInstance().getSession().getUsername();
     }
 
-    public String getMCUUID() {
-        return MinecraftClient.getInstance().getSession().getUuidOrNull().toString();
+    public UUID getMCUUID() {
+        return MinecraftClient.getInstance().getSession().getUuidOrNull();
     }
 
     public UUID getMCUUIDID() {
